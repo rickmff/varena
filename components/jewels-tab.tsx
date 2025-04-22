@@ -5,12 +5,12 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { toast } from 'sonner'
 import spellData from "@/data/jewels"
-import { EffectId } from "./command-generator"
+import { EffectId } from "../data/effects"
 
 
-type SchoolKey = keyof typeof schoolsData;
+export type SchoolKey = keyof typeof schoolsData;
 
-const schoolsData = {
+export const schoolsData = {
   blood: { name: "Blood", image: "/images/schools/blood.png" },
   chaos: { name: "Chaos", image: "/images/schools/chaos.png" },
   unholy: { name: "Unholy", image: "/images/schools/unholy.png" },
@@ -18,6 +18,8 @@ const schoolsData = {
   frost: { name: "Frost", image: "/images/schools/frost.png" },
   lightning: { name: "Lightning", image: "/images/schools/lightning.png" }
 } as const;
+
+export type SchoolColors = typeof schoolColors;
 
 export const schoolColors = {
   blood: {
@@ -70,16 +72,6 @@ export const schoolColors = {
     button: 'bg-red-900/50 hover:bg-red-800',
   }
 } as const;
-
-type SchoolColors = {
-  [key: string]: {
-    primary: string;
-    bg: string;
-    border: string;
-    focus: string;
-    button: string;
-  };
-};
 
 interface JewelTabProps {
   schoolColors: SchoolColors;
@@ -183,7 +175,8 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
         <div className="relative">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={inputClass(`w-full bg-black/50 border rounded-md px-5 text-white focus:ring-2 transition-all flex items-center justify-between ${spellName === '' ? 'py-6' : 'py-4'}`)}
+            disabled={!selectedSchool}
+            className={inputClass(`w-full bg-black/50 border rounded-md px-5 text-white focus:ring-2 transition-all flex items-center justify-between ${spellName === '' ? 'py-6' : 'py-4'} ${!selectedSchool ? 'opacity-50 cursor-not-allowed' : ''}`)}
           >
             {spellName ? (
               <div className="flex items-center gap-2">
@@ -239,20 +232,20 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {spellData[spellName].effects.map((effect) => (
               <div
-                key={effect.id as EffectId}
-                className={`flex items-center space-x-3 p-3 rounded-md transition-all cursor-pointer ${selectedEffects.includes(effect.id as EffectId)
+                key={effect.id}
+                className={`flex items-center space-x-3 p-3 rounded-md transition-all cursor-pointer ${selectedEffects.includes(String(effect.id))
                   ? `${currentColors.button} border border-${currentColors.primary}-500/50`
                   : selectedEffects.length >= 4
                     ? `bg-black/20 border border-${currentColors.primary}-900/20 cursor-not-allowed opacity-50`
                     : `bg-black/30 border border-${currentColors.primary}-900/30 hover:bg-black/40`
                   }`}
-                onClick={() => toggleEffect(effect.id as EffectId)}
+                onClick={() => toggleEffect(String(effect.id))}
               >
                 <div className={`w-5 h-5 rounded border-2 flex items-center justify-center
-                  ${selectedEffects.includes(effect.id as EffectId)
+                  ${selectedEffects.includes(String(effect.id))
                     ? `border-${currentColors.primary}-500 bg-${currentColors.primary}-500`
                     : `border-${currentColors.primary}-900/50`}`}>
-                  {selectedEffects.includes(effect.id as EffectId) && (
+                  {selectedEffects.includes(String(effect.id)) && (
                     <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>

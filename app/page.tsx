@@ -11,6 +11,7 @@ import GameMenu from "@/components/game-menu"
 import ServerStatus from "@/components/ServerStatus"
 import { menuItems } from "@/components/game-menu"
 import CommandGenerator from "@/components/command-generator"
+import router from "next/router"
 export default function Home() {
   const [scrollY, setScrollY] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -263,8 +264,9 @@ export default function Home() {
                   variant="outline"
                   size="lg"
                   className="gap-2 border-white/70 text-white hover:bg-red-900 relative overflow-hidden group"
+                  onClick={() => window.location.hash = '#generate-commands'}
                 >
-                  <span className="relative z-10">WATCH TRAILER</span>
+                  <span className="relative z-10">Get Started</span>
                   <Play className="h-4 w-4 relative z-10" />
                   <motion.span
                     className="absolute inset-0 bg-white/10"
@@ -324,25 +326,25 @@ export default function Home() {
           >
             {[
               {
-                icon: <Download className="h-6 w-6 text-white" />,
+                image: "/images/features/easy-access.png",
                 title: "Easy Access",
                 description:
                   "Quickly access everything you need to practice and improve your skills.",
               },
               {
-                icon: <Play className="h-6 w-6 text-white" />,
+                image: "/images/features/game-modes.png",
                 title: "Game Modes",
                 description:
                   "Experience unique game modes like Pancake and Ranked with leaderboards.",
               },
               {
-                icon: <ChevronRight className="h-6 w-6 text-white" />,
+                image: "/images/features/events.png",
                 title: "Events",
                 description:
                   "Participate in exciting events and challenges to earn rewards.",
               },
               {
-                icon: <Sword className="h-6 w-6 text-white" />,
+                image: "/images/features/mod-actives.png",
                 title: "Mod Actives",
                 description:
                   "Engage with active mods to enhance your gameplay experience.",
@@ -359,9 +361,7 @@ export default function Home() {
                   initial={{ opacity: 0 }}
                   whileHover={{ opacity: 1 }}
                 />
-                <motion.div className="bg-white/10 p-3 rounded-full w-fit mb-4 relative" whileHover={{ rotate: 5 }}>
-                  {feature.icon}
-                </motion.div>
+                <Image src={feature.image} alt={feature.title} fill className="object-cover" />
                 <h3 className="text-xl font-bold mb-2 relative">{feature.title}</h3>
                 <p className="text-gray-100 relative">{feature.description}</p>
                 <motion.div
@@ -378,7 +378,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-32 relative">
+      <section className="py-32 relative" id="generate-commands">
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-black to-transparent"></div>
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black"></div>
         <div className="absolute inset-0 z-0">
