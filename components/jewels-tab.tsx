@@ -5,7 +5,8 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { toast } from 'sonner'
 import spellData from "@/data/jewels"
-import { EffectId, effectsData } from "./command-generator"
+import { EffectId } from "./command-generator"
+
 
 type SchoolKey = keyof typeof schoolsData;
 
@@ -16,6 +17,58 @@ const schoolsData = {
   illusion: { name: "Illusion", image: "/images/schools/illusion.png" },
   frost: { name: "Frost", image: "/images/schools/frost.png" },
   lightning: { name: "Lightning", image: "/images/schools/lightning.png" }
+} as const;
+
+export const schoolColors = {
+  blood: {
+    primary: 'red',
+    bg: 'bg-[url("/images/background/Blood.png")]',
+    border: 'border-red-900/30',
+    focus: 'focus:ring-red-500/50 focus:border-red-500/50',
+    button: 'bg-red-900/50 hover:bg-red-800',
+  },
+  chaos: {
+    primary: 'purple',
+    bg: 'bg-[url("/images/background/Chaos.png")]',
+    border: 'border-red-900/30',
+    focus: 'focus:ring-red-500/50 focus:border-red-500/50',
+    button: 'bg-purple-900/50 hover:bg-purple-800',
+  },
+  unholy: {
+    primary: 'green',
+    bg: 'bg-[url("/images/background/Unholy.png")]',
+    border: 'border-red-900/30',
+    focus: 'focus:ring-red-500/50 focus:border-red-500/50',
+    button: 'bg-green-900/50 hover:bg-green-800',
+  },
+  illusion: {
+    primary: 'blue',
+    bg: 'bg-[url("/images/background/Illusion.png")]',
+    border: 'border-red-900/30',
+    focus: 'focus:ring-red-500/50 focus:border-red-500/50',
+    button: 'bg-blue-900/50 hover:bg-blue-800',
+  },
+  frost: {
+    primary: 'cyan',
+    bg: 'bg-[url("/images/background/Frost.png")]',
+    border: 'border-red-900/30',
+    focus: 'focus:ring-red-500/50 focus:border-red-500/50',
+    button: 'bg-cyan-900/50 hover:bg-cyan-800',
+  },
+  lightning: {
+    primary: 'yellow',
+    bg: 'bg-[url("/images/background/Lightning.png")]',
+    border: 'border-red-900/30',
+    focus: 'focus:ring-red-500/50 focus:border-red-500/50',
+    button: 'bg-yellow-600/50 hover:bg-yellow-600',
+  },
+  default: {
+    primary: 'red',
+    bg: 'bg-black/50',
+    border: 'border-red-900/30',
+    focus: 'focus:ring-red-500/50 focus:border-red-500/50',
+    button: 'bg-red-900/50 hover:bg-red-800',
+  }
 } as const;
 
 type SchoolColors = {
@@ -77,7 +130,7 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
         <div className="relative">
           <button
             onClick={() => setIsSchoolOpen(!isSchoolOpen)}
-            className={inputClass(`w-full bg-black/50 border rounded-md px-5 py-4 text-white focus:ring-2 transition-all flex items-center justify-between`)}
+            className={inputClass(`w-full bg-black/50 border rounded-md px-5 text-white focus:ring-2 transition-all flex items-center justify-between ${selectedSchool === '' ? 'py-6' : 'py-4'}`)}
           >
             {selectedSchool ? (
               <div className="flex items-center gap-2">
@@ -220,25 +273,27 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
         </div>
       )}
 
-      <motion.div
-        className="mt-6"
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <Button
-          variant="outline"
-          className={`w-full text-white relative overflow-hidden group border-${currentColors.primary}-900/70 ${currentColors.button}`}
-          onClick={copyCommand}
+      {selectedSchool && spellName && (
+        <motion.div
+          className="mt-6"
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.95 }}
         >
-          <span className="relative">COPY COMMAND</span>
-          <motion.span
-            className="absolute inset-0 bg-white/10"
-            initial={{ x: "-100%" }}
-            whileHover={{ x: 0 }}
-            transition={{ duration: 0.3 }}
-          />
-        </Button>
-      </motion.div>
+          <Button
+            variant="outline"
+            className={`w-full text-white relative overflow-hidden group border-${currentColors.primary}-900/70 ${currentColors.button}`}
+            onClick={copyCommand}
+          >
+            <span className="relative">COPY COMMAND</span>
+            <motion.span
+              className="absolute inset-0 bg-white/10"
+              initial={{ x: "-100%" }}
+              whileHover={{ x: 0 }}
+              transition={{ duration: 0.3 }}
+            />
+          </Button>
+        </motion.div>
+      )}
     </div>
   )
 }

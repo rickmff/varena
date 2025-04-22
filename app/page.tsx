@@ -216,16 +216,16 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           <BloodParticles />
         </div>
-        <motion.div className="absolute inset-0 z-0 opacity-20" style={{ y: scrollY * 0.2 }}>
+        <div className="absolute inset-0 z-0 opacity-20">
           <Image
-            src="/placeholder.svg?height=1080&width=1920"
+            src="/hero-bg.png"
             alt="V Rising Background"
             fill
             className="object-cover"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black"></div>
-        </motion.div>
+        </div>
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             className="max-w-3xl mx-auto text-center mb-12 flex flex-col items-center"
@@ -297,8 +297,8 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-gradient-to-b from-black to-red-950/20 relative">
-        <div className="absolute inset-0 bg-[url('/placeholder.svg?height=100&width=100')] bg-repeat opacity-5"></div>
+      <section id="features" className="py-20 bg-black relative">
+        <div className="absolute inset-0 bg-repeat opacity-5"></div>
         <div className="container mx-auto px-4 relative">
           <motion.div
             className="text-center mb-16"
@@ -308,11 +308,11 @@ export default function Home() {
             variants={fadeInUp}
           >
             <div className="inline-block rounded-lg bg-red-900/50 border border-white/20 px-3 py-1 text-sm mb-4">
-              GAME FEATURES
+              V ARENA FEATURES
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">MASTER THE NIGHT</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">UNLEASH YOUR POTENTIAL</h2>
             <p className="text-gray-100 max-w-2xl mx-auto">
-              Survive as a vampire in a world where the sun is your enemy and blood is your sustenance.
+              Discover the unique features of V Arena that enhance your gaming experience.
             </p>
           </motion.div>
           <motion.div
@@ -324,28 +324,28 @@ export default function Home() {
           >
             {[
               {
+                icon: <Download className="h-6 w-6 text-white" />,
+                title: "Easy Access",
+                description:
+                  "Quickly access everything you need to practice and improve your skills.",
+              },
+              {
+                icon: <Play className="h-6 w-6 text-white" />,
+                title: "Game Modes",
+                description:
+                  "Experience unique game modes like Pancake and Ranked with leaderboards.",
+              },
+              {
+                icon: <ChevronRight className="h-6 w-6 text-white" />,
+                title: "Events",
+                description:
+                  "Participate in exciting events and challenges to earn rewards.",
+              },
+              {
                 icon: <Sword className="h-6 w-6 text-white" />,
-                title: "Combat",
+                title: "Mod Actives",
                 description:
-                  "Master a variety of weapons and unholy abilities in fast-paced combat against humans and monsters.",
-              },
-              {
-                icon: <Castle className="h-6 w-6 text-white" />,
-                title: "Castle Building",
-                description:
-                  "Build and customize your gothic castle to store resources, create crafting stations, and house your servants.",
-              },
-              {
-                icon: <Users className="h-6 w-6 text-white" />,
-                title: "Multiplayer",
-                description:
-                  "Play solo or team up with friends to build, hunt, and survive together in a shared world.",
-              },
-              {
-                icon: <Moon className="h-6 w-6 text-white" />,
-                title: "Day/Night Cycle",
-                description:
-                  "Navigate a dynamic world where sunlight burns vampires, forcing strategic planning around the day/night cycle.",
+                  "Engage with active mods to enhance your gameplay experience.",
               },
             ].map((feature, index) => (
               <motion.div
@@ -379,12 +379,14 @@ export default function Home() {
       </section>
 
       <section className="py-32 relative">
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black to-transparent"></div>
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black"></div>
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/background/Powers.png"
             alt="Spellbook Background"
             fill
-            className="object-cover opacity-30"
+            className="object-cover opacity-70"
             priority
           />
         </div>
@@ -396,7 +398,7 @@ export default function Home() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="inline-block rounded-lg bg-red-900/50 border border-red-900/50 px-4 py-2 text-sm mb-4 shadow-lg shadow-red-900/20">
+            <div className="inline-block rounded-full bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
               COMMAND GENERATOR
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
@@ -412,7 +414,6 @@ export default function Home() {
 
       {/* News Section */}
       <section id="news" className="py-20 bg-black relative">
-        <div className="absolute inset-0 bg-[url('/placeholder.svg?height=100&width=100')] bg-repeat opacity-5"></div>
         <div className="container mx-auto px-4 relative">
           <motion.div
             className="text-center mb-16"
@@ -563,9 +564,11 @@ export default function Home() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 bg-gradient-to-b from-black to-red-950/30 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/placeholder.svg?height=100&width=100')] bg-repeat opacity-5"></div>
-        <div className="container mx-auto px-4 relative">
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black to-transparent"></div>
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black"></div>
+        <div className="absolute inset-0 z-0 bg-[url('/flower.png')] bg-center bg-cover opacity-30"></div>
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
             className="max-w-6xl mx-auto "
             variants={fadeInUp}
@@ -657,7 +660,6 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-black border-t border-red-900/30 py-12 relative">
-        <div className="absolute inset-0 bg-[url('/placeholder.svg?height=100&width=100')] bg-repeat opacity-5"></div>
         <div className="container mx-auto px-4 relative">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>

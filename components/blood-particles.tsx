@@ -38,7 +38,7 @@ export default function BloodParticles() {
         this.size = Math.random() * 3 + 1
         this.speedX = Math.random() * 0.5 - 0.25
         this.speedY = Math.random() * 0.5 - 0.25
-        this.color = `rgba(139, 0, 0, ${Math.random() * 0.5 + 0.2})`
+        this.color = `rgba(128, 0, 128, ${Math.random() * 0.5 + 0.2})`
         this.alpha = Math.random() * 0.5 + 0.2
       }
 
@@ -66,7 +66,7 @@ export default function BloodParticles() {
 
     // Create particles
     const particles: Particle[] = []
-    const particleCount = Math.min(50, window.innerWidth / 30)
+    const particleCount = Math.min(100, window.innerWidth / 30)
 
     for (let i = 0; i < particleCount; i++) {
       particles.push(new Particle())
