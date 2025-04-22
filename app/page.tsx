@@ -1,0 +1,751 @@
+"use client"
+
+import Link from "next/link"
+import Image from "next/image"
+import { Button } from "@/components/ui/button"
+import { ChevronRight, Play, Users, Sword, Castle, Moon, Download } from "lucide-react"
+import { motion } from "framer-motion"
+import { useState, useEffect } from "react"
+import BloodParticles from "@/components/blood-particles"
+import GameMenu from "@/components/game-menu"
+import ServerStatus from "@/components/ServerStatus"
+import { menuItems } from "@/components/game-menu"
+import CommandGenerator from "@/components/command-generator"
+export default function Home() {
+  const [scrollY, setScrollY] = useState(0)
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY)
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6 },
+    },
+  }
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  }
+
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: 0.6 },
+    },
+  }
+
+  const scaleIn = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.5 },
+    },
+  }
+
+  return (
+    <div className="min-h-screen bg-black text-white overflow-hidden">
+      {/* Game UI Elements */}
+      <div className="absolute top-52 right-4 z-50 hidden md:block">
+        {/*         <ServerStatus
+          currentPlayers={30}
+          maxPlayers={60}
+          ipAddress="123.123.1234.1234"
+          countryCode="US"
+        />
+        <ServerStatus
+          currentPlayers={30}
+          maxPlayers={60}
+          ipAddress="123.123.1234.1234"
+          countryCode="US"
+        />
+        <ServerStatus
+          currentPlayers={30}
+          maxPlayers={60}
+          ipAddress="123.123.1234.1234"
+          countryCode="US"
+        /> */}
+      </div>
+
+      {/* Navigation */}
+      <header className="fixed top-0 left-0 right-0 z-50">
+        <motion.div
+          className="container mx-auto px-4 py-4 flex items-center justify-between"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <motion.div
+            initial={false}
+            animate={{
+              backgroundColor: scrollY > 50 ? "rgba(0, 0, 0, 0.8)" : "rgba(0, 0, 0, 0)",
+              backdropFilter: scrollY > 50 ? "blur(12px)" : "blur(0px)",
+              borderBottom: scrollY > 50 ? "1px solid rgba(139, 0, 0, 0.3)" : "1px solid rgba(139, 0, 0, 0.0)",
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 100,
+              damping: 20,
+              mass: 1,
+              duration: 0.5
+            }}
+            className="absolute inset-0"
+          />
+
+          <Link href="/" className="flex items-center gap-2 z-50">
+            <motion.div whileHover={{ rotate: 10 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
+              <Image
+                src="/logo.svg"
+                alt="V Rising Logo"
+                width={40}
+                height={40}
+                className="h-10 w-10"
+              />
+            </motion.div>
+          </Link>
+          <nav className="hidden md:flex items-center gap-6 relative z-50">
+            {menuItems.map((item: { name: string; href: string }, i: number) => (
+              <motion.div
+                key={item.name}
+                whileHover={{ y: -2, color: "#ffffff" }}
+                transition={{ type: "spring", stiffness: 400, damping: 10, delay: i * 0.1 }}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <motion.div
+                  animate={{
+                    color: scrollY > 50 ? "rgb(209 213 219)" : "#ffffff",
+                  }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 20,
+                  }}
+                >
+                  <Link
+                    href={`#${item.href}`}
+                    className="text-sm hover:text-white transition-colors duration-200"
+                  >
+                    {item.name}
+                  </Link>
+                </motion.div>
+              </motion.div>
+            ))}
+          </nav>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative z-50"
+          >
+            <motion.div
+              animate={{
+                borderColor: scrollY > 50 ? "rgb(127 29 29)" : "rgba(255, 255, 255, 0.3)",
+                backgroundColor: scrollY > 50 ? "rgba(127, 29, 29, 0.1)" : "transparent",
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 100,
+                damping: 20,
+              }}
+            >
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden md:flex text-xs font-bold text-white hover:bg-red-950/50 transition-all duration-300"
+              >
+                <Image
+                  src="/discord.svg"
+                  alt="Discord Logo"
+                  width={20}
+                  height={20}
+                  className="h-5 w-5 mr-2"
+                />
+                JOIN US
+              </Button>
+            </motion.div>
+          </motion.div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden text-white z-50"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <span className="sr-only">Open menu</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-6 w-6"
+            >
+              <line x1="4" x2="20" y1="12" y2="12" />
+              <line x1="4" x2="20" y1="6" y2="6" />
+              <line x1="4" x2="20" y1="18" y2="18" />
+            </svg>
+          </Button>
+        </motion.div>
+      </header>
+
+      {/* Mobile Menu */}
+      <GameMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+
+      {/* Hero Section */}
+      <section className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
+        <div className="absolute inset-0 z-0">
+          <BloodParticles />
+        </div>
+        <motion.div className="absolute inset-0 z-0 opacity-20" style={{ y: scrollY * 0.2 }}>
+          <Image
+            src="/placeholder.svg?height=1080&width=1920"
+            alt="V Rising Background"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black"></div>
+        </motion.div>
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div
+            className="max-w-3xl mx-auto text-center mb-12 flex flex-col items-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            <Image src="/varena-logo.png" alt="Varena Logo" width={600} height={400} />
+            <motion.div
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+            >
+              <motion.div variants={fadeIn} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="gap-2 relative overflow-hidden group border-red-900 text-white flex items-center"
+                >
+                  <Image src="/discord.svg" alt="Varena Logo" width={20} height={20} className="h-5 w-5 mr-2" />
+                  <span className="relative z-10">JOIN US</span>
+                  <motion.span
+                    className="absolute inset-0 bg-white/20"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </Button>
+              </motion.div>
+              <motion.div variants={fadeIn} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="gap-2 border-white/70 text-white hover:bg-red-900 relative overflow-hidden group"
+                >
+                  <span className="relative z-10">WATCH TRAILER</span>
+                  <Play className="h-4 w-4 relative z-10" />
+                  <motion.span
+                    className="absolute inset-0 bg-white/10"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </Button>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+          <motion.div
+            className="relative mx-auto max-w-5xl aspect-video rounded-lg overflow-hidden shadow-2xl shadow-red-900/50"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            <div className="relative aspect-video">
+              <iframe
+                src="https://www.youtube.com/embed/pxQvrcn6Z6Y"
+                title="V Rising Gameplay"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-20 bg-gradient-to-b from-black to-red-950/20 relative">
+        <div className="absolute inset-0 bg-[url('/placeholder.svg?height=100&width=100')] bg-repeat opacity-5"></div>
+        <div className="container mx-auto px-4 relative">
+          <motion.div
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            <div className="inline-block rounded-lg bg-red-900/50 border border-white/20 px-3 py-1 text-sm mb-4">
+              GAME FEATURES
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">MASTER THE NIGHT</h2>
+            <p className="text-gray-100 max-w-2xl mx-auto">
+              Survive as a vampire in a world where the sun is your enemy and blood is your sustenance.
+            </p>
+          </motion.div>
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            {[
+              {
+                icon: <Sword className="h-6 w-6 text-white" />,
+                title: "Combat",
+                description:
+                  "Master a variety of weapons and unholy abilities in fast-paced combat against humans and monsters.",
+              },
+              {
+                icon: <Castle className="h-6 w-6 text-white" />,
+                title: "Castle Building",
+                description:
+                  "Build and customize your gothic castle to store resources, create crafting stations, and house your servants.",
+              },
+              {
+                icon: <Users className="h-6 w-6 text-white" />,
+                title: "Multiplayer",
+                description:
+                  "Play solo or team up with friends to build, hunt, and survive together in a shared world.",
+              },
+              {
+                icon: <Moon className="h-6 w-6 text-white" />,
+                title: "Day/Night Cycle",
+                description:
+                  "Navigate a dynamic world where sunlight burns vampires, forcing strategic planning around the day/night cycle.",
+              },
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                className="bg-black/50 backdrop-blur-sm p-6 rounded-lg border border-red-900/30 hover:border-red-500/50 transition-colors relative overflow-hidden group"
+                variants={scaleIn}
+                whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(139, 0, 0, 0.5)" }}
+              >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  initial={{ opacity: 0 }}
+                  whileHover={{ opacity: 1 }}
+                />
+                <motion.div className="bg-white/10 p-3 rounded-full w-fit mb-4 relative" whileHover={{ rotate: 5 }}>
+                  {feature.icon}
+                </motion.div>
+                <h3 className="text-xl font-bold mb-2 relative">{feature.title}</h3>
+                <p className="text-gray-100 relative">{feature.description}</p>
+                <motion.div
+                  className="absolute bottom-0 right-0 w-20 h-20 opacity-0 group-hover:opacity-10 transition-opacity duration-300"
+                  initial={{ rotate: 0 }}
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                >
+                  <Image src="/placeholder.svg?height=80&width=80&text=Rune" alt="Rune" width={80} height={80} />
+                </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="py-32 relative">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/background/Powers.png"
+            alt="Spellbook Background"
+            fill
+            className="object-cover opacity-30"
+            priority
+          />
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            <div className="inline-block rounded-lg bg-red-900/50 border border-red-900/50 px-4 py-2 text-sm mb-4 shadow-lg shadow-red-900/20">
+              COMMAND GENERATOR
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
+              Server Commands
+            </h2>
+            <p className="text-gray-100 max-w-2xl mx-auto text-lg">
+              Generate commands for our V Arena Server
+            </p>
+          </motion.div>
+          <CommandGenerator />
+        </div>
+      </section>
+
+      {/* News Section */}
+      <section id="news" className="py-20 bg-black relative">
+        <div className="absolute inset-0 bg-[url('/placeholder.svg?height=100&width=100')] bg-repeat opacity-5"></div>
+        <div className="container mx-auto px-4 relative">
+          <motion.div
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            <div className="inline-block rounded-lg bg-red-900/50 border border-red-900/50 px-4 py-2 text-sm mb-4 shadow-lg shadow-red-900/20">
+              LATEST NEWS
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
+              Chronicles of V Rising
+            </h2>
+            <p className="text-gray-100 max-w-2xl mx-auto text-lg">
+              Stay informed about the latest updates, events, and community highlights
+            </p>
+          </motion.div>
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            {[
+              {
+                title: "New Castle Decorations Coming Soon",
+                date: "April 15, 2025",
+                excerpt: "Customize your castle with new gothic decorations and furniture in the upcoming update.",
+                category: "UPDATE",
+                icon: Castle
+              },
+              {
+                title: "Blood Moon Event This Weekend",
+                date: "April 10, 2025",
+                excerpt: "Join us for a special Blood Moon event with increased drop rates and special enemies.",
+                category: "EVENT",
+                icon: Moon
+              },
+              {
+                title: "Community Spotlight: Castle Designs",
+                date: "April 5, 2025",
+                excerpt: "Check out these amazing castle designs from our community members.",
+                category: "COMMUNITY",
+                icon: Users
+              },
+            ].map((news, index) => (
+              <motion.div
+                key={index}
+                variants={scaleIn}
+                whileHover={{
+                  y: -10,
+                  scale: 1.02,
+                  transition: { duration: 0.2 }
+                }}
+              >
+                <Link
+                  href="#"
+                  className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-red-900/30 hover:border-red-500
+                           transition-all duration-300 overflow-hidden group block h-full relative"
+                >
+                  {/* Glow effect on hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-red-900/20" />
+                  </div>
+
+                  <div className="relative aspect-video">
+                    <Image
+                      src={`/blog${index + 1}.png`}
+                      alt={news.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80" />
+
+                    {/* Category Badge */}
+                    <div className="absolute top-4 right-4 flex items-center gap-2">
+                      <motion.div
+                        className="bg-red-900/80 text-white text-xs px-3 py-1.5 rounded-full font-bold
+                                 border border-red-500/50 shadow-lg shadow-red-900/50"
+                        whileHover={{ scale: 1.05 }}
+                      >
+                        <div className="flex items-center gap-2">
+                          {news.icon && <news.icon className="w-3 h-3" />}
+                          {news.category}
+                        </div>
+                      </motion.div>
+                    </div>
+                  </div>
+
+                  <div className="p-6 relative">
+                    <div className="text-red-500 text-sm mb-2 font-bold tracking-wider">{news.date}</div>
+                    <h3 className="text-xl font-bold mb-3 group-hover:text-red-400 transition-colors">
+                      {news.title}
+                    </h3>
+                    <p className="text-gray-300">{news.excerpt}</p>
+
+                    {/* Read More Button */}
+                    <motion.div
+                      className="mt-6 flex items-center gap-2 text-red-500 text-sm font-bold
+                               group-hover:text-red-400 transition-colors"
+                      initial={{ x: -10, opacity: 0 }}
+                      whileHover={{ x: 5 }}
+                      animate={{ x: 0, opacity: 1 }}
+                    >
+                      READ MORE
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                    </motion.div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* View All Button */}
+          <motion.div
+            className="text-center mt-12"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-block"
+            >
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
+                         relative overflow-hidden group px-8 shadow-lg shadow-red-900/20"
+              >
+                <span className="relative z-10 font-bold tracking-wider">VIEW ALL NEWS</span>
+                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
+                <motion.span
+                  className="absolute inset-0 bg-gradient-to-r from-red-900/40 to-transparent"
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: 0 }}
+                  transition={{ duration: 0.3 }}
+                />
+              </Button>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-20 bg-gradient-to-b from-black to-red-950/30 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/placeholder.svg?height=100&width=100')] bg-repeat opacity-5"></div>
+        <div className="container mx-auto px-4 relative">
+          <motion.div
+            className="max-w-6xl mx-auto "
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <div className="grid md:grid-cols-2 items-center">
+              {/* Left side - Discord preview */}
+
+              <Image
+                src="/logo.svg"
+                alt="Logo"
+                width={400}
+                height={400}
+                className="w-full h-auto object-contain relative z-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+              />
+
+              {/* Right side - Call to action */}
+              <div className="p-12 md:p-12">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <motion.div
+                    className="inline-block rounded-lg bg-red-900/50 border border-red-500/30 px-4 py-2 text-sm mb-6 shadow-lg shadow-red-900/20"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    JOIN THE COVEN
+                  </motion.div>
+                  <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent">
+                    UNITE WITH US ON DISCORD
+                  </h2>
+                  <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                    Join thousands of vampires in our thriving community. Share strategies, form alliances, and dominate the night together.
+                  </p>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="mb-8"
+                  >
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="w-full gap-4 relative overflow-hidden group border-2 border-red-900 text-white
+                               bg-gradient-to-r from-red-950/50 to-black hover:from-red-900 hover:to-red-950
+                               shadow-lg shadow-red-900/20 py-8"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <Image
+                        src="/discord.svg"
+                        alt="Discord"
+                        width={32}
+                        height={32}
+                        className="h-8 w-8 group-hover:scale-110 transition-transform"
+                      />
+                      <span className="text-2xl font-bold tracking-wider">JOIN NOW</span>
+                      <motion.span
+                        className="absolute inset-0 bg-white/10"
+                        initial={{ x: "-100%" }}
+                        whileHover={{ x: 0 }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    </Button>
+                  </motion.div>
+                  <div className="flex items-center justify-center gap-8 text-sm text-gray-400">
+                    <motion.div
+                      className="flex items-center gap-2"
+                      whileHover={{ scale: 1.05, color: "#fff" }}
+                    >
+                      <Users className="h-5 w-5" />
+                      <span className="font-semibold">1,000+ Members</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-2"
+                      whileHover={{ scale: 1.05, color: "#fff" }}
+                    >
+                      <Moon className="h-5 w-5" />
+                      <span className="font-semibold">Active 24/7</span>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-black border-t border-red-900/30 py-12 relative">
+        <div className="absolute inset-0 bg-[url('/placeholder.svg?height=100&width=100')] bg-repeat opacity-5"></div>
+        <div className="container mx-auto px-4 relative">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <Link href="/" className="flex items-center gap-2 mb-4">
+                <motion.div transition={{ type: "spring", stiffness: 400, damping: 10 }}>
+                  <Image
+                    src="/varena-logo.png"
+                    alt="Varena Logo"
+                    width={200}
+                    height={200}
+                    className="hover:scale-110 transition-transform duration-300"
+                  />
+                </motion.div>
+              </Link>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-4">Links</h3>
+              <ul className="space-y-2 text-sm text-gray-100">
+                {menuItems.map((item: { name: string; href: string }, i: number) => (
+                  <motion.li
+                    key={item.name}
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    <Link
+                      href={`#${item.href}`}
+                      className="hover:text-white transition-colors"
+                    >
+                      {item.name}
+                    </Link>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-4">Community</h3>
+              <ul className="space-y-2 text-sm text-gray-100">
+                {["Discord", "Twitter", "Reddit", "YouTube", "Twitch"].map((item, i) => (
+                  <motion.li
+                    key={item}
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    <Link href="#" className="hover:text-white transition-colors">
+                      {item}
+                    </Link>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-4">Legal</h3>
+              <ul className="space-y-2 text-sm text-gray-100">
+                {["Privacy Policy", "Terms of Service", "Cookie Policy", "EULA"].map((item, i) => (
+                  <motion.li
+                    key={item}
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    <Link href="#" className="hover:text-white transition-colors">
+                      {item}
+                    </Link>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <motion.div
+            className="border-t border-white/20 mt-8 pt-8 text-center text-sm text-gray-300"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <p>
+              © {new Date().getFullYear()} Stunlock Studios. All rights reserved. V Rising is a trademark of Stunlock
+              Studios.
+            </p>
+            <p className="mt-2">This is a fan-made website and is not affiliated with Stunlock Studios.</p>
+          </motion.div>
+        </div>
+      </footer>
+    </div>
+  )
+}
