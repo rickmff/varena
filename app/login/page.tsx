@@ -24,7 +24,7 @@ const LoginPage = () => {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push('/admin/dashboard'); // Redirect to dashboard on success
+      router.push('/admin'); // Redirect to dashboard on success
     } catch (error) {
       setError("Invalid email or password. Please try again.");
       console.error("Error logging in:", error);

@@ -44,17 +44,17 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
 
     if (selectedEffects.includes(effectId)) {
       setSelectedEffects(selectedEffects.filter(id => id !== effectId));
-    } else if (selectedEffects.length < 4) {
+    } else if (selectedEffects.length < 3) {
       setSelectedEffects([...selectedEffects, effectId]);
     } else {
-      toast.warning('You can only select up to 4 attributes.', { duration: 2000, position: 'top-center' });
+      toast.warning('You can only select up to 3 attributes.', { duration: 2000, position: 'top-center' });
     }
   }
 
   const copyArtifactCommand = async () => {
     // Use selectedWeaponKey and derived infuse
-    if (!selectedWeaponKey || !selectedWeaponDetails || selectedEffects.length !== 4) {
-      toast.error('Please select a weapon and exactly 4 attributes.', { duration: 3000, position: 'top-center' });
+    if (!selectedWeaponKey || !selectedWeaponDetails || selectedEffects.length !== 3) {
+      toast.error('Please select a weapon and exactly 3 attributes.', { duration: 3000, position: 'top-center' });
       return;
     }
     // Prevent copying if infuse is 'None'
@@ -79,7 +79,7 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
   }
 
   // Update condition based on selectedWeaponKey and infuse !== 'None'
-  const canCopyArtifact = selectedWeaponKey && selectedWeaponDetails && selectedWeaponDetails.infuse !== 'None' && selectedEffects.length === 4;
+  const canCopyArtifact = selectedWeaponKey && selectedWeaponDetails && selectedWeaponDetails.infuse !== 'None' && selectedEffects.length === 3;
   const inputClass = (baseClass: string) => `${baseClass} ${currentArtifactColors.border} ${currentArtifactColors.focus}`;
 
   return (

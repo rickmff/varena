@@ -241,16 +241,6 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
                   }`}
                 onClick={() => toggleEffect(String(effect.id))}
               >
-                <div className={`w-5 h-5 rounded border-2 flex items-center justify-center
-                  ${selectedEffects.includes(String(effect.id))
-                    ? `border-${currentColors.primary}-500 bg-${currentColors.primary}-500`
-                    : `border-${currentColors.primary}-900/50`}`}>
-                  {selectedEffects.includes(String(effect.id)) && (
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </div>
                 <label className="text-sm text-white cursor-pointer">
                   {effect.name}
                 </label>

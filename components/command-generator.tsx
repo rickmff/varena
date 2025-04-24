@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
 import JewelTab, { schoolColors, schoolsData } from "./jewels-tab"
 import type { SchoolKey } from "./jewels-tab"
 import LegendaryTab from "./legendary-tab"
@@ -17,9 +17,27 @@ const fadeIn = {
 export default function CommandGenerator() {
   const [activeTab, setActiveTab] = useState(0)
   const [selectedJewelSchool, setSelectedJewelSchool] = useState<SchoolKey | ''>('')
+  const [legendaryInfuse, setLegendaryInfuse] = useState<SchoolKey | ''>('')
 
-  const legendaryDefaultBg = schoolColors.blood.bg
   const jewelDefaultBg = 'bg-[url("/images/background/Shadow.png")]'
+  const legendaryDefaultBg = 'bg-[url("/images/background/Passives.png")]'
+
+  const changeTab = (tab: number) => {
+    setActiveTab(tab)
+    setLegendaryInfuse('')
+    setSelectedJewelSchool('')
+  }
+
+  const computedBG = useMemo(() => {
+    if (activeTab === 0) {
+      return 'bg-[url("/images/background/Passives.png")]'
+    } else if (activeTab === 1) {
+      return legendaryInfuse ? schoolColors[legendaryInfuse as SchoolKey].bg : legendaryDefaultBg + ' bg-cover bg-left'
+    } else if (activeTab === 2) {
+      return selectedJewelSchool ? schoolColors[selectedJewelSchool as SchoolKey].bg : jewelDefaultBg + ' bg-cover bg-center'
+    }
+    return ''
+  }, [activeTab, legendaryInfuse, selectedJewelSchool])
 
   return (
     <motion.div
@@ -29,11 +47,7 @@ export default function CommandGenerator() {
       whileInView="visible"
       viewport={{ once: true }}
     >
-      <div className={`
-        ${activeTab === 0 ? 'bg-[url("/images/background/Passives.png")] bg-cover bg-center' : ''}
-        ${activeTab === 1 ? (legendaryDefaultBg + ' bg-cover bg-center') : ''}
-        ${activeTab === 2 ? (selectedJewelSchool ? schoolColors[selectedJewelSchool as SchoolKey].bg : jewelDefaultBg + ' bg-cover bg-center') : ''}
-        max-w-4xl mx-auto rounded-lg border border-red-900/30 p-6 min-h-[600px] backdrop-blur-sm shadow-lg transition-all duration-500`}>
+      <div className={`max-w-4xl mx-auto rounded-lg border border-red-900/30 p-6 min-h-[600px] backdrop-blur-sm shadow-lg transition-all duration-500 ${computedBG}`}>
         <div className="relative flex justify-center gap-8 mb-8">
           {["Artifact", "Legendary", "Jewel"].map((tab, index) => (
             <motion.button
@@ -42,7 +56,7 @@ export default function CommandGenerator() {
                 ? `text-white`
                 : "text-gray-400 hover:text-white"
                 }`}
-              onClick={() => setActiveTab(index)}
+              onClick={() => changeTab(index)}
               whileTap={{ scale: 0.7 }}
             >
               {activeTab === index && (
@@ -56,14 +70,6 @@ export default function CommandGenerator() {
               )}
               <span className="relative z-10 flex items-center gap-2">
                 {tab}
-                {activeTab === index && (
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: "spring", bounce: 0.4, duration: 0.8 }}
-                    className="w-2 h-2 rounded-full bg-white"
-                  />
-                )}
               </span>
             </motion.button>
           ))}
@@ -84,16 +90,26 @@ export default function CommandGenerator() {
           {activeTab === 1 && (
             <LegendaryTab
               schoolColors={schoolColors}
+              onLegendaryInfuseChange={(infuse) => {
+                const isValid = (s: string): s is SchoolKey => {
+                  return (Object.keys(schoolsData) as Array<string>).includes(s);
+                };
+                if (isValid(infuse)) {
+                  setLegendaryInfuse(infuse);
+                } else {
+                  setLegendaryInfuse('');
+                }
+              }}
             />
           )}
 
           {activeTab === 2 && <JewelTab
             schoolColors={schoolColors}
             onSchoolSelect={(school) => {
-              const isValidSchool = (s: string): s is SchoolKey => {
+              const isValid = (s: string): s is SchoolKey => {
                 return (Object.keys(schoolsData) as Array<string>).includes(s);
               };
-              if (isValidSchool(school)) {
+              if (isValid(school)) {
                 setSelectedJewelSchool(school);
               } else {
                 setSelectedJewelSchool('');

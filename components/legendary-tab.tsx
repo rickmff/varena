@@ -9,11 +9,12 @@ import type { SchoolKey, SchoolColors } from "./jewels-tab"
 import { epicWeaponsDropdown, EpicWeapon } from "../data/epicWeapon"
 import { effectsData, EffectId } from "../data/effects"
 
-interface LegendaryTabProps {
-  schoolColors: SchoolColors; // Pass the whole object
+export interface LegendaryTabProps {
+  schoolColors: SchoolColors;
+  onLegendaryInfuseChange: (infuse: SchoolKey | '') => void;
 }
 
-export default function LegendaryTab({ schoolColors }: LegendaryTabProps) {
+export default function LegendaryTab({ schoolColors, onLegendaryInfuseChange }: LegendaryTabProps) {
   // State moved from CommandGenerator
   const [legendaryWeapon, setLegendaryWeapon] = useState<EpicWeapon | ''>('')
   const [legendaryInfuse, setLegendaryInfuse] = useState<SchoolKey | ''>('')
@@ -27,16 +28,16 @@ export default function LegendaryTab({ schoolColors }: LegendaryTabProps) {
   const toggleEffect = (effectId: EffectId) => {
     if (selectedEffects.includes(effectId)) {
       setSelectedEffects(selectedEffects.filter(id => id !== effectId));
-    } else if (selectedEffects.length < 4) {
+    } else if (selectedEffects.length < 3) {
       setSelectedEffects([...selectedEffects, effectId]);
     } else {
-      toast.warning('You can only select up to 4 attributes.', { duration: 2000, position: 'top-center' });
+      toast.warning('You can only select up to 3 attributes.', { duration: 2000, position: 'top-center' });
     }
   }
 
   const copyLegendaryCommand = async () => {
-    if (!legendaryWeapon || !legendaryInfuse || selectedEffects.length !== 4) {
-      toast.error('Please select a weapon, an infuse, and exactly 4 attributes.', { duration: 3000, position: 'top-center' });
+    if (!legendaryWeapon || !legendaryInfuse || selectedEffects.length !== 3) {
+      toast.error('Please select a weapon, an infuse, and exactly 3 attributes.', { duration: 3000, position: 'top-center' });
       return;
     }
     try {
@@ -52,7 +53,7 @@ export default function LegendaryTab({ schoolColors }: LegendaryTabProps) {
     }
   }
 
-  const canCopyLegendary = legendaryWeapon && legendaryInfuse && selectedEffects.length === 4;
+  const canCopyLegendary = legendaryWeapon && legendaryInfuse && selectedEffects.length === 3;
   const inputClass = (baseClass: string) => `${baseClass} ${currentLegendaryColors.border} ${currentLegendaryColors.focus}`;
 
   // Return the JSX previously inside activeTab === 1 condition
@@ -127,6 +128,7 @@ export default function LegendaryTab({ schoolColors }: LegendaryTabProps) {
                     setLegendaryInfuse(key);
                     setSelectedEffects([]); // Reset effects on infuse change
                     setIsInfuseOpen(false);
+                    onLegendaryInfuseChange(key);
                   }}
                   className={`w-full px-5 py-4 text-left text-white hover:${currentLegendaryColors.button} flex items-center`}
                 >

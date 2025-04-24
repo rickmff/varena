@@ -3,15 +3,14 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ChevronRight, Play, Users, Sword, Castle, Moon, Download } from "lucide-react"
+import { ChevronRight, Play, Users, Castle, Moon, Swords, ShieldCheck, CalendarClock, Terminal } from "lucide-react"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
 import BloodParticles from "@/components/blood-particles"
 import GameMenu from "@/components/game-menu"
-import ServerStatus from "@/components/ServerStatus"
 import { menuItems } from "@/components/game-menu"
 import CommandGenerator from "@/components/command-generator"
-import router from "next/router"
+
 export default function Home() {
   const [scrollY, setScrollY] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -63,28 +62,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
-      {/* Game UI Elements */}
-      <div className="absolute top-52 right-4 z-50 hidden md:block">
-        {/*         <ServerStatus
-          currentPlayers={30}
-          maxPlayers={60}
-          ipAddress="123.123.1234.1234"
-          countryCode="US"
-        />
-        <ServerStatus
-          currentPlayers={30}
-          maxPlayers={60}
-          ipAddress="123.123.1234.1234"
-          countryCode="US"
-        />
-        <ServerStatus
-          currentPlayers={30}
-          maxPlayers={60}
-          ipAddress="123.123.1234.1234"
-          countryCode="US"
-        /> */}
-      </div>
-
       {/* Navigation */}
       <header className="fixed top-0 left-0 right-0 z-50">
         <motion.div
@@ -326,52 +303,135 @@ export default function Home() {
           >
             {[
               {
-                image: "/images/features/easy-access.png",
-                title: "Easy Access",
+                icon: "command",
+                image: "/images/features/Commands.png",
+                title: "Easy Commands",
                 description:
-                  "Quickly access everything you need to practice and improve your skills.",
+                  "Commands to help you with your gameplay and make it easier to practice and improve your skills.",
               },
               {
-                image: "/images/features/game-modes.png",
+                icon: "crossed-swords",
+                image: "/images/features/Pancake.png",
                 title: "Game Modes",
                 description:
                   "Experience unique game modes like Pancake and Ranked with leaderboards.",
               },
               {
-                image: "/images/features/events.png",
+                icon: "calendar-clock",
+                image: "/images/features/Events.png",
                 title: "Events",
                 description:
                   "Participate in exciting events and challenges to earn rewards.",
               },
               {
-                image: "/images/features/mod-actives.png",
-                title: "Mod Actives",
+                icon: "moderation",
+                image: "/images/features/Moderation.png",
+                title: "Moderation",
                 description:
-                  "Engage with active mods to enhance your gameplay experience.",
+                  "Enforcing rules and maintaining a safe and enjoyable environment for all players.",
               },
             ].map((feature, index) => (
               <motion.div
                 key={index}
-                className="bg-black/50 backdrop-blur-sm p-6 rounded-lg border border-red-900/30 hover:border-red-500/50 transition-colors relative overflow-hidden group"
+                className="bg-gradient-to-br from-black via-red-950/10 to-black p-6 rounded-lg border border-red-900/30 hover:border-red-500/50 transition-all duration-500 relative overflow-hidden group h-80"
                 variants={scaleIn}
-                whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(139, 0, 0, 0.5)" }}
+                whileHover={{
+                  y: -5,
+                  boxShadow: "0 10px 25px -5px rgba(139, 0, 0, 0.5)",
+                  transition: { duration: 0.3 }
+                }}
               >
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  initial={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                />
-                <Image src={feature.image} alt={feature.title} fill className="object-cover" />
-                <h3 className="text-xl font-bold mb-2 relative">{feature.title}</h3>
-                <p className="text-gray-100 relative">{feature.description}</p>
-                <motion.div
-                  className="absolute bottom-0 right-0 w-20 h-20 opacity-0 group-hover:opacity-10 transition-opacity duration-300"
-                  initial={{ rotate: 0 }}
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                >
-                  <Image src="/placeholder.svg?height=80&width=80&text=Rune" alt="Rune" width={80} height={80} />
-                </motion.div>
+                {/* Image Background with Overlay */}
+                <div className="absolute inset-0 z-0 opacity-30 group-hover:opacity-50 transition-opacity duration-500">
+                  <Image src={feature.image} alt={feature.title} fill className="object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"></div>
+                </div>
+
+                {/* Content Container with flex to position items */}
+                <div className="h-full flex flex-col items-center justify-center text-center relative z-10">
+                  {/* Icon and Title Container - will fade out on hover */}
+                  <motion.div
+                    className="flex flex-col items-center transition-all duration-500 ease-in-out"
+                    initial={{ opacity: 1, y: 0 }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                    }}
+                    whileHover={{
+                      opacity: 0,
+                      y: -20,
+                      transition: { duration: 0.3 }
+                    }}
+                  >
+                    {/* Icon - can be customized with actual SVGs */}
+                    <motion.div
+                      className="mb-6 relative"
+                      animate={{
+                        y: [0, 5, 0],
+                        opacity: [0.8, 1, 0.8]
+                      }}
+                      transition={{
+                        y: { duration: 2, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" },
+                        opacity: { duration: 2, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" }
+                      }}
+                    >
+                      <div className="w-20 h-20 mx-auto mb-4 relative">
+                        {feature.icon === "command" && (
+                          <Terminal className="w-full h-full text-red-600" />
+                        )}
+                        {feature.icon === "crossed-swords" && (
+                          <Swords className="w-full h-full text-red-600" />
+                        )}
+                        {feature.icon === "calendar-clock" && (
+                          <CalendarClock className="w-full h-full text-red-600" />
+                        )}
+                        {feature.icon === "moderation" && (
+                          <ShieldCheck className="w-full h-full text-red-600" />
+                        )}
+                      </div>
+                    </motion.div>
+
+                    {/* Title */}
+                    <h3 className="text-xl font-bold mb-2 tracking-wider text-red-100">
+                      {feature.title.toUpperCase()}
+                    </h3>
+                  </motion.div>
+
+                  {/* Description - Hidden by default, revealed on hover */}
+                  <motion.div
+                    className="w-full h-full absolute inset-0 flex items-center justify-center text-center px-6"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileHover={{
+                      opacity: 1,
+                      scale: 1,
+                      transition: { duration: 0.4, delay: 0.1 }
+                    }}
+                  >
+
+                    {/* Decorative corner elements */}
+                    <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
+                    <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
+                    <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
+                    <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
+
+                    {/* Description text with blood drop animation */}
+                    <div className="relative">
+                      {/* Small blood drop above text */}
+                      <motion.div
+                        className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-1 h-6 opacity-0 group-hover:opacity-80"
+                        initial={{ scaleY: 0 }}
+                        whileHover={{
+                          scaleY: 1,
+                          transition: { duration: 0.4, delay: 0.3 }
+                        }}
+                      />
+
+                      <p className="text-gray-200 font-medium leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </div>
+                  </motion.div>
+                </div>
               </motion.div>
             ))}
           </motion.div>
@@ -386,7 +446,7 @@ export default function Home() {
             src="/images/background/Powers.png"
             alt="Spellbook Background"
             fill
-            className="object-cover opacity-70"
+            className="object-cover"
             priority
           />
         </div>
