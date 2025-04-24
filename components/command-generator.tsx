@@ -6,6 +6,7 @@ import JewelTab, { schoolColors, schoolsData } from "./jewels-tab"
 import type { SchoolKey } from "./jewels-tab"
 import LegendaryTab from "./legendary-tab"
 import ArtifactTab from "./artifact-tab"
+import ElixirTab from "./elixir-tab"
 const fadeIn = {
   hidden: { opacity: 0 },
   visible: {
@@ -18,6 +19,7 @@ export default function CommandGenerator() {
   const [activeTab, setActiveTab] = useState(0)
   const [selectedJewelSchool, setSelectedJewelSchool] = useState<SchoolKey | ''>('')
   const [legendaryInfuse, setLegendaryInfuse] = useState<SchoolKey | ''>('')
+  const [selectedElixirFlavor, setSelectedElixirFlavor] = useState<string | ''>('')
 
   const jewelDefaultBg = 'bg-[url("/images/background/Shadow.png")]'
   const legendaryDefaultBg = 'bg-[url("/images/background/Passives.png")]'
@@ -113,6 +115,20 @@ export default function CommandGenerator() {
                 setSelectedJewelSchool(school);
               } else {
                 setSelectedJewelSchool('');
+              }
+            }}
+          />}
+
+          {activeTab === 3 && <ElixirTab
+            schoolColors={schoolColors}
+            onElixirFlavorChange={(flavor) => {
+              const isValid = (s: string): s is SchoolKey => {
+                return (Object.keys(schoolsData) as Array<string>).includes(s);
+              };
+              if (isValid(flavor)) {
+                setSelectedElixirFlavor(flavor);
+              } else {
+                setSelectedElixirFlavor('');
               }
             }}
           />}

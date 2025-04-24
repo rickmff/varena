@@ -1,14 +1,14 @@
 import React from 'react';
-import SidebarMenuComponent from '@/components/SidebarMenu';
+import { SidebarProvider } from '@/app/contexts/SidebarContext';
+import { SidebarMenu } from '@/components/SidebarMenu';
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div>
-      <header>
-        <h1>Admin Dashboard</h1>
-      </header>
-      <SidebarMenuComponent />
-      <main>{children}</main>
+      <SidebarProvider>
+        <SidebarMenu />
+        <main>{children}</main>
+      </SidebarProvider>
     </div>
   );
 };

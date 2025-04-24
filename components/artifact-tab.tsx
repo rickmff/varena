@@ -10,36 +10,31 @@ import { artifactDetailsMap } from "../data/artifact"
 import type { ArtifactDetails } from "../data/artifact"
 
 interface ArtifactTabProps {
-  schoolColors: SchoolColors; // Pass the whole object
+  schoolColors: SchoolColors;
 }
 
 export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
-  // State changes: Use selectedWeaponKey, remove artifactIn
-  const [selectedWeaponKey, setSelectedWeaponKey] = useState<string | ''>('') // Store the key ('spear', 'slashers', etc.)
+  const [selectedWeaponKey, setSelectedWeaponKey] = useState<string | ''>('')
   const [selectedEffects, setSelectedEffects] = useState<EffectId[]>([])
   const [isWeaponOpen, setIsWeaponOpen] = useState(false)
-  // Removed isInfuseOpen and setIsInfuseOpen
 
-  // Get selected weapon details and derive infuse/colors
+
   const selectedWeaponDetails: ArtifactDetails | null = selectedWeaponKey ? artifactDetailsMap[selectedWeaponKey] : null;
   const currentInfuse = selectedWeaponDetails?.infuse;
-  // Determine the SchoolKey for styling, defaulting for 'None' or no selection
   const getEffectiveSchoolKey = (): SchoolKey => {
     if (currentInfuse && currentInfuse !== 'None') {
       const lowerInfuse = currentInfuse.toLowerCase() as SchoolKey;
-      // Check if the lowercase infuse exists as a key in schoolColors
       if (lowerInfuse in schoolColors) {
         return lowerInfuse;
       }
     }
-    return 'blood'; // Default school key
+    return 'blood';
   };
   const effectiveSchoolKey = getEffectiveSchoolKey();
   const currentArtifactColors = schoolColors[effectiveSchoolKey];
 
 
   const toggleEffect = (effectId: EffectId) => {
-    // No changes needed here, but ensure it's only possible when a weapon is selected
     if (!selectedWeaponKey) return;
 
     if (selectedEffects.includes(effectId)) {
@@ -52,19 +47,16 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
   }
 
   const copyArtifactCommand = async () => {
-    // Use selectedWeaponKey and derived infuse
     if (!selectedWeaponKey || !selectedWeaponDetails || selectedEffects.length !== 3) {
       toast.error('Please select a weapon and exactly 3 attributes.', { duration: 3000, position: 'top-center' });
       return;
     }
-    // Prevent copying if infuse is 'None'
     if (selectedWeaponDetails.infuse === 'None') {
       toast.error('Cannot generate command for weapons with "None" infuse.', { duration: 3000, position: 'top-center' });
       return;
     }
 
     try {
-      // Use artifactName and lowercase infuse from the map
       const formattedWeaponName = selectedWeaponDetails.artifactName.toLowerCase();
       const infuseForCommand = selectedWeaponDetails.infuse.toLowerCase();
       const command = `.lw ${formattedWeaponName} ${infuseForCommand} ${selectedEffects.join('')}`;
@@ -78,24 +70,19 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
     }
   }
 
-  // Update condition based on selectedWeaponKey and infuse !== 'None'
   const canCopyArtifact = selectedWeaponKey && selectedWeaponDetails && selectedWeaponDetails.infuse !== 'None' && selectedEffects.length === 3;
   const inputClass = (baseClass: string) => `${baseClass} ${currentArtifactColors.border} ${currentArtifactColors.focus}`;
 
   return (
     <div className="space-y-6">
-      {/* Weapon Selector Only */}
-      <div className="grid grid-cols-1 gap-4"> {/* Changed grid-cols-2 to grid-cols-1 */}
-        {/* Weapon Selector - Updated */}
+      <div className="grid grid-cols-1 gap-4">
         <div className="relative">
           <button
             onClick={() => setIsWeaponOpen(!isWeaponOpen)}
-            // Adjust py based on selection
             className={inputClass(`w-full bg-black/70 border rounded-md px-5 text-white focus:ring-2 transition-all flex items-center justify-between capitalize ${!selectedWeaponKey ? 'py-6' : 'py-4'}`)}
           >
             {selectedWeaponDetails ? (
               <div className="flex items-center gap-2 capitalize">
-                {/* Use image and artifactName from details */}
                 <img src={selectedWeaponDetails.image.src} alt={selectedWeaponDetails.artifactName} className="w-10 h-10 mr-4" />
                 <span>{selectedWeaponDetails.artifactName}</span>
               </div>
@@ -107,16 +94,14 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
             </svg>
           </button>
           {isWeaponOpen && (
-            // Iterate over artifactDetailsMap
             <div className={`absolute z-20 w-full mt-1 bg-black/70 border ${currentArtifactColors.border} rounded-md shadow-lg overflow-y-auto max-h-[400px]`}>
               {Object.entries(artifactDetailsMap).map(([key, details]) => (
                 <button
                   key={key}
                   onClick={() => {
-                    setSelectedWeaponKey(key); // Set the key
-                    setSelectedEffects([]); // Reset effects on weapon change
+                    setSelectedWeaponKey(key);
+                    setSelectedEffects([]);
                     setIsWeaponOpen(false);
-                    // No need to set infuse state anymore
                   }}
                   className={`w-full px-5 py-4 text-left text-white hover:${currentArtifactColors.button} flex items-center`}
                 >
@@ -128,19 +113,16 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
           )}
         </div>
 
-        {/* Infuse Selector - REMOVED */}
 
       </div>
 
-      {/* Effects Selection, Command Display, Copy Button - Condition updated */}
-      {selectedWeaponKey && selectedWeaponDetails && ( // Show this section only when a weapon is selected
+      {selectedWeaponKey && selectedWeaponDetails && (
         <motion.div
           className="space-y-4 pt-4"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
         >
-          {/* Effects Buttons - Added check for infuse !== 'None' */}
           {selectedWeaponDetails.infuse !== 'None' ? (
             <div className="col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
               {(Object.entries(effectsData) as [EffectId, string][]).map(([id, effect]) => {
@@ -174,17 +156,14 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
           )}
 
 
-          {/* Command Display - Updated and conditional */}
           <div className={`bg-black/30 p-4 rounded-md border ${currentArtifactColors.border}`}>
             <code className="text-gray-300 font-mono text-sm break-all">
-              {/* Use the selectedWeaponKey directly */}
               .art {selectedWeaponKey} {selectedEffects.join('')}
             </code>
           </div>
 
 
-          {/* Copy Button - Updated condition */}
-          {selectedWeaponDetails.infuse !== 'None' && ( // Only show copy button if infuse is not 'None'
+          {selectedWeaponDetails.infuse !== 'None' && (
             <motion.div
               className="mt-6"
               whileHover={{ scale: canCopyArtifact ? 1.01 : 1 }}

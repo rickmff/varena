@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation"; // Updated import
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '@/lib/firebase'; // Import the initialized auth
@@ -32,6 +32,13 @@ const LoginPage = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      router.push('/admin');
+    }
+  }, [router]);
 
   return (
     <div className="flex justify-center items-center min-h-screen">
