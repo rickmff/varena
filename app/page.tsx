@@ -375,7 +375,7 @@ export default function Home() {
                         opacity: { duration: 2, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" }
                       }}
                     >
-                      <div className="w-20 h-20 mx-auto mb-4 relative">
+                      <div className="w-20 h-20 mx-auto mb-4 relative group-hover:opacity-0 transition-opacity duration-500">
                         {feature.icon === "command" && (
                           <Terminal className="w-full h-full text-red-600" />
                         )}
@@ -392,7 +392,7 @@ export default function Home() {
                     </motion.div>
 
                     {/* Title */}
-                    <h3 className="text-xl font-bold mb-2 tracking-wider text-red-100">
+                    <h3 className="text-xl font-bold mb-2 tracking-wider text-red-100 group-hover:opacity-0 transition-opacity duration-500">
                       {feature.title.toUpperCase()}
                     </h3>
                   </motion.div>
@@ -426,7 +426,7 @@ export default function Home() {
                         }}
                       />
 
-                      <p className="text-gray-200 font-medium leading-relaxed">
+                      <p className="text-gray-200 font-medium leading-relaxed text-lg text-shadow-lg">
                         {feature.description}
                       </p>
                     </div>
@@ -674,9 +674,8 @@ export default function Home() {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="w-full gap-4 relative overflow-hidden group border-2 border-red-900 text-white
-                               bg-gradient-to-r from-red-950/50 to-black hover:from-red-900 hover:to-red-950
-                               shadow-lg shadow-red-900/20 py-8"
+                      className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
+                         relative overflow-hidden group px-8 shadow-lg shadow-red-900/20 w-full py-8 gap-4"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                       <Image
