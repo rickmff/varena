@@ -8,7 +8,7 @@ import { schoolsData } from "./jewels-tab"
 import type { SchoolKey, SchoolColors } from "./jewels-tab"
 import { epicWeaponsDropdown, EpicWeapon } from "../data/epicWeapon"
 import { effectsData, EffectId } from "../data/effects"
-
+import Image from "next/image"
 export interface LegendaryTabProps {
   schoolColors: SchoolColors;
   onLegendaryInfuseChange: (infuse: SchoolKey | '') => void;
@@ -132,7 +132,7 @@ export default function LegendaryTab({ schoolColors, onLegendaryInfuseChange }: 
                   }}
                   className={`w-full px-5 py-4 text-left text-white hover:${currentLegendaryColors.button} flex items-center`}
                 >
-                  <img src={school.image} alt={school.name} className="w-12 h-12 mr-4" />
+                  <Image src={school.image} alt={school.name} className="w-12 h-12 mr-4" width={48} height={48} />
                   {school.name}
                 </button>
               ))}

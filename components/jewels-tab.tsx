@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { toast } from 'sonner'
 import spellData from "@/data/jewels"
 import { EffectId } from "../data/effects"
-
+import Image from "next/image"
 
 export type SchoolKey = keyof typeof schoolsData;
 
@@ -216,7 +216,7 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
                     }}
                     className={`w-full px-5 py-4 text-left text-white hover:${currentColors.button} flex items-center gap-2`}
                   >
-                    <img
+                    <Image
                       src={spell.image ?? "/images/spells/fallback.jpg"}
                       alt={spell.name}
                       className="w-10 h-10 object-cover rounded"

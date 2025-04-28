@@ -8,6 +8,7 @@ import type { SchoolKey, SchoolColors } from "./jewels-tab"
 import { effectsData, EffectId } from "../data/effects"
 import { artifactDetailsMap } from "../data/artifact"
 import type { ArtifactDetails } from "../data/artifact"
+import Image from "next/image"
 
 interface ArtifactTabProps {
   schoolColors: SchoolColors;
@@ -83,7 +84,7 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
           >
             {selectedWeaponDetails ? (
               <div className="flex items-center gap-2 capitalize">
-                <img src={selectedWeaponDetails.image.src} alt={selectedWeaponDetails.artifactName} className="w-10 h-10 mr-4" />
+                <Image src={selectedWeaponDetails.image.src} alt={selectedWeaponDetails.artifactName} className="w-10 h-10 mr-4" width={40} height={40} />
                 <span>{selectedWeaponDetails.artifactName}</span>
               </div>
             ) : (
