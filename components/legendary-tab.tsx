@@ -176,36 +176,38 @@ export default function LegendaryTab({ schoolColors, onLegendaryInfuseChange }: 
             })}
           </div>
 
-          {/* Command Display */}
-          <div className={`bg-black/30 p-4 rounded-md border ${currentLegendaryColors.border}`}>
-            <code className="text-gray-300 font-mono text-sm break-all">
-              .lw {legendaryWeapon.replace(/_/g, ' ').replace('Epic', '').trim().toLowerCase()} {legendaryInfuse} {selectedEffects.join('')}
-            </code>
-          </div>
+          <div className="flex flex-col items-center justify-center pt-6">
+            <span className="text-gray-400/50 text-sm mb-2">Paste on your game chat:  </span>
 
-          {/* Copy Button */}
-          <motion.div
-            className="mt-6"
-            whileHover={{ scale: canCopyLegendary ? 1.01 : 1 }}
-            whileTap={{ scale: canCopyLegendary ? 0.95 : 1 }}
-          >
-            <Button
-              variant="outline"
-              className={`w-full text-white relative overflow-hidden group border-${currentLegendaryColors.primary}-900/70 ${canCopyLegendary ? currentLegendaryColors.button : 'bg-gray-700/50 cursor-not-allowed'} transition-colors`}
-              onClick={copyLegendaryCommand}
-              disabled={!canCopyLegendary}
+            <div className={`bg-black px-4 py-2 rounded-md border w-full text-center ${currentLegendaryColors.border}`}>
+              <code className="text-gray-300 font-mono text-xl break-all bg-black/50 px-12 rounded-md">
+                .lw {legendaryWeapon.replace(/_/g, ' ').replace('Epic', '').trim().toLowerCase()} {legendaryInfuse} {selectedEffects.join('')}
+              </code>
+            </div>
+
+            <motion.div
+              className="-pt-6 w-full"
+              whileHover={{ scale: canCopyLegendary ? 1.01 : 1 }}
+              whileTap={{ scale: canCopyLegendary ? 0.95 : 1 }}
             >
-              <span className="relative z-10">COPY COMMAND</span>
-              {canCopyLegendary && (
-                <motion.span
-                  className="absolute inset-0 bg-white/10 z-0"
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: 0 }}
-                  transition={{ duration: 0.3 }}
-                />
-              )}
-            </Button>
-          </motion.div>
+              <Button
+                variant="outline"
+                className={`w-full text-white relative overflow-hidden group border-${currentLegendaryColors.primary}-900/70 ${canCopyLegendary ? currentLegendaryColors.button : 'bg-gray-700/50 cursor-not-allowed'} transition-colors`}
+                onClick={copyLegendaryCommand}
+                disabled={!canCopyLegendary}
+              >
+                <span className="relative z-10">COPY COMMAND</span>
+                {canCopyLegendary && (
+                  <motion.span
+                    className="absolute inset-0 bg-white/10 z-0"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                )}
+              </Button>
+            </motion.div>
+          </div>
         </motion.div>
       )}
     </div>

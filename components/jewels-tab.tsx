@@ -115,6 +115,8 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
     onSchoolSelect(school)
   }
 
+  const canCopyJewel = spellName && selectedEffects.length > 0
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -247,35 +249,41 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
               </div>
             ))}
           </div>
-
-          <div className={`bg-black/30 p-4 rounded-md border ${currentColors.border}`}>
-            <code className="text-gray-300 font-mono">
-              .j {spellName} {selectedEffects.join('')}
-            </code>
-          </div>
         </div>
       )}
 
       {selectedSchool && spellName && (
-        <motion.div
-          className="mt-6"
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Button
-            variant="outline"
-            className={`w-full text-white relative overflow-hidden group border-${currentColors.primary}-900/70 ${currentColors.button}`}
-            onClick={copyCommand}
+        <div className="flex flex-col items-center justify-center pt-6">
+          <span className="text-gray-400/50 text-sm mb-2">Paste on your game chat:  </span>
+
+          <div className={`bg-black px-4 py-2 rounded-md border w-full text-center ${currentColors.border}`}>
+            <code className="text-gray-300 font-mono text-xl break-all bg-black/50 px-12 rounded-md">
+              .j {spellName} {selectedEffects.join('')}
+            </code>
+          </div>
+          <motion.div
+            className="-pt-6 w-full"
+            whileHover={{ scale: canCopyJewel ? 1.01 : 1 }}
+            whileTap={{ scale: canCopyJewel ? 0.95 : 1 }}
           >
-            <span className="relative">COPY COMMAND</span>
-            <motion.span
-              className="absolute inset-0 bg-white/10"
-              initial={{ x: "-100%" }}
-              whileHover={{ x: 0 }}
-              transition={{ duration: 0.3 }}
-            />
-          </Button>
-        </motion.div>
+            <Button
+              variant="outline"
+              className={`w-full text-white relative overflow-hidden group border-${currentColors.primary}-900/70 ${canCopyJewel ? currentColors.button : 'bg-gray-700/50 cursor-not-allowed'} transition-colors`}
+              onClick={copyCommand}
+              disabled={!canCopyJewel}
+            >
+              <span className="relative z-10">COPY COMMAND</span>
+              {canCopyJewel && (
+                <motion.span
+                  className="absolute inset-0 bg-white/10 z-0"
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: 0 }}
+                  transition={{ duration: 0.3 }}
+                />
+              )}
+            </Button>
+          </motion.div>
+        </div>
       )}
     </div>
   )

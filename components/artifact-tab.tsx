@@ -70,7 +70,7 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
     }
   }
 
-  const canCopyArtifact = selectedWeaponKey && selectedWeaponDetails && selectedWeaponDetails.infuse !== 'None' && selectedEffects.length === 3;
+  const canCopyArtifact = selectedWeaponKey && selectedWeaponDetails && selectedWeaponDetails.artifactName !== '' && selectedEffects.length === 3;
   const inputClass = (baseClass: string) => `${baseClass} ${currentArtifactColors.border} ${currentArtifactColors.focus}`;
 
   return (
@@ -123,7 +123,7 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.4 }}
         >
-          {selectedWeaponDetails.infuse !== 'None' ? (
+          {selectedWeaponDetails.artifactName !== '' && (
             <div className="col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
               {(Object.entries(effectsData) as [EffectId, string][]).map(([id, effect]) => {
                 const isSelected = selectedEffects.includes(id);
@@ -149,44 +149,44 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
                 );
               })}
             </div>
-          ) : (
-            <div className={`bg-black/30 p-4 rounded-md border ${currentArtifactColors.border} text-center text-gray-400`}>
-              Attribute selection is not available for weapons with 'None' infuse.
+          )}
+
+
+          <div className="flex flex-col items-center justify-center pt-6">
+            <span className="text-gray-400/50 mb-2 text-sm">Paste on your game chat:  </span>
+
+            <div className={`bg-black px-4 py-2 rounded-md border w-full text-center ${currentArtifactColors.border}`}>
+              <code className="text-gray-300 font-mono text-xl break-all bg-black/50 px-12 rounded-md">
+                .art {selectedWeaponKey} {selectedEffects.join('')}
+              </code>
             </div>
-          )}
 
 
-          <div className={`bg-black/30 p-4 rounded-md border ${currentArtifactColors.border}`}>
-            <code className="text-gray-300 font-mono text-sm break-all">
-              .art {selectedWeaponKey} {selectedEffects.join('')}
-            </code>
-          </div>
-
-
-          {selectedWeaponDetails.infuse !== 'None' && (
-            <motion.div
-              className="mt-6"
-              whileHover={{ scale: canCopyArtifact ? 1.01 : 1 }}
-              whileTap={{ scale: canCopyArtifact ? 0.95 : 1 }}
-            >
-              <Button
-                variant="outline"
-                className={`w-full text-white relative overflow-hidden group border-${currentArtifactColors.primary}-900/70 ${canCopyArtifact ? currentArtifactColors.button : 'bg-gray-700/50 cursor-not-allowed'} transition-colors`}
-                onClick={copyArtifactCommand}
-                disabled={!canCopyArtifact}
+            {selectedWeaponDetails.artifactName !== '' && (
+              <motion.div
+                className="-pt-6 w-full"
+                whileHover={{ scale: canCopyArtifact ? 1.01 : 1 }}
+                whileTap={{ scale: canCopyArtifact ? 0.95 : 1 }}
               >
-                <span className="relative z-10">COPY COMMAND</span>
-                {canCopyArtifact && (
-                  <motion.span
-                    className="absolute inset-0 bg-white/10 z-0"
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: 0 }}
-                    transition={{ duration: 0.3 }}
-                  />
-                )}
-              </Button>
-            </motion.div>
-          )}
+                <Button
+                  variant="outline"
+                  className={`w-full text-white relative overflow-hidden group border-${currentArtifactColors.primary}-900/70 ${canCopyArtifact ? currentArtifactColors.button : 'bg-gray-700/50 cursor-not-allowed'} transition-colors`}
+                  onClick={copyArtifactCommand}
+                  disabled={!canCopyArtifact}
+                >
+                  <span className="relative z-10">COPY COMMAND</span>
+                  {canCopyArtifact && (
+                    <motion.span
+                      className="absolute inset-0 bg-white/10 z-0"
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: 0 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  )}
+                </Button>
+              </motion.div>
+            )}
+          </div>
         </motion.div>
       )}
     </div>
