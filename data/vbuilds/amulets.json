@@ -1,0 +1,146 @@
+{
+  "amulet_blademaster": {
+    "name": "Amulet of the Blademaster",
+    "img": "/images/vbuilds/amulets/Jewelry_AmuletoftheBlademaster.webp",
+    "attributes": [
+      {
+        "stat": "Spell Power",
+        "value": 34,
+        "unit": "flat"
+      },
+      {
+        "stat": "Blood Drain Reduction",
+        "value": 15,
+        "unit": "percent"
+      },
+      {
+        "stat": "Attack Speed",
+        "value": 7,
+        "unit": "percent"
+      }
+    ],
+    "effect": {
+      "description": "10% chance on primary hit to gain Lesser Storm Shield. Can only trigger once every 10s."
+    }
+  },
+  "amulet_crimson_commander": {
+    "name": "Amulet of the Crimson Commander",
+    "img": "/images/vbuilds/amulets/Jewelry_AmuletoftheCrimsonCommander.webp",
+    "attributes": [
+      {
+        "stat": "Spell Power",
+        "value": 34,
+        "unit": "flat"
+      },
+      {
+        "stat": "Blood Drain Reduction",
+        "value": 15,
+        "unit": "percent"
+      },
+      {
+        "stat": "Weapon Skill Power",
+        "value": 8,
+        "unit": "percent"
+      }
+    ],
+    "effect": {
+      "description": "10% chance on primary hit to gain Lesser Blood Rage. Can only trigger once every 10s."
+    }
+  },
+  "amulet_arch_warlock": {
+    "name": "Amulet of the Arch-Warlock",
+    "img": "/images/vbuilds/amulets/Jewelry_AmuletoftheArch-Warlock.webp",
+    "attributes": [
+      {
+        "stat": "Spell Power",
+        "value": 34,
+        "unit": "flat"
+      },
+      {
+        "stat": "Blood Drain Reduction",
+        "value": 15,
+        "unit": "percent"
+      },
+      {
+        "stat": "Spell Critical Chance",
+        "value": 8,
+        "unit": "percent"
+      }
+    ],
+    "effect": {
+      "description": "10% chance on primary hit to gain Cold Blood. Can only trigger once every 10s."
+    }
+  },
+  "amulet_master_spellweaver": {
+    "name": "Amulet of the Master Spellweaver",
+    "img": "/images/vbuilds/amulets/Jewelry_AmuletoftheMasterSpellweaver.webp",
+    "attributes": [
+      {
+        "stat": "Spell Power",
+        "value": 34,
+        "unit": "flat"
+      },
+      {
+        "stat": "Blood Drain Reduction",
+        "value": 15,
+        "unit": "percent"
+      },
+      {
+        "stat": "Spell Cooldown Rate",
+        "value": 7,
+        "unit": "percent"
+      }
+    ],
+    "effect": {
+      "description": "10% chance on primary hit to gain Lesser Phantom Aegis. Can only trigger once every 10s."
+    }
+  },
+  "amulet_wicked_prophet": {
+    "name": "Amulet of the Wicked Prophet",
+    "img": "/images/vbuilds/amulets/Jewelry_AmuletoftheWickedProphet.webp",
+    "attributes": [
+      {
+        "stat": "Spell Power",
+        "value": 34,
+        "unit": "flat"
+      },
+      {
+        "stat": "Blood Drain Reduction",
+        "value": 15,
+        "unit": "percent"
+      },
+      {
+        "stat": "Spell Life Leech",
+        "value": 5,
+        "unit": "percent"
+      }
+    ],
+    "effect": {
+      "description": "10% chance on primary hit to gain Lesser Power Surge. Can only trigger once every 10s."
+    }
+  },
+  "amulet_unyielding_charger": {
+    "name": "Amulet of the Unyielding Charger",
+    "img": "/images/vbuilds/amulets/Jewelry_AmuletoftheUnyieldingCharger.webp",
+    "attributes": [
+      {
+        "stat": "Spell Power",
+        "value": 34,
+        "unit": "flat"
+      },
+      {
+        "stat": "Blood Drain Reduction",
+        "value": 15,
+        "unit": "percent"
+      },
+      {
+        "stat": "Bonus Movement Speed",
+        "value": 4,
+        "unit": "percent"
+      }
+    ],
+    "effect": {
+      "description": "10% chance on primary hit to spawn a Skeleton Warrior. Can only trigger once every 10s."
+    }
+  }
+}

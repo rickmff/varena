@@ -1,0 +1,2046 @@
+{
+  "veil_of_blood": {
+    "name": "Veil of Blood",
+    "id": "veil_of_blood",
+    "img": "/images/spells/spell-veil_of_blood.jpg",
+    "spellSchool": "blood",
+    "effects": [
+      {
+        "description": "Increase damage (12 - 24%) of next primary attack within 3s",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 1
+      },
+      {
+        "description": "Increase Elude duration (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 2
+      },
+      {
+        "description": "Next primary attack within 3s applies a fading Snare (1.2 - 2s)",
+        "min": 1.2,
+        "max": 2.0,
+        "key": 3
+      },
+      {
+        "description": "Dashing through an enemy applies Leech",
+        "min": null,
+        "max": null,
+        "key": 4
+      },
+      {
+        "description": "Next primary attack within 3s on an enemy affected by Leech increases physical power (8 - 16%) for 4s",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 5
+      },
+      {
+        "description": "Increase healing (1.2 - 2% max HP)",
+        "min": 1.2,
+        "max": 2.0,
+        "key": 6
+      }
+    ]
+  },
+  "blood_fountain": {
+    "name": "Blood Fountain",
+    "id": "blood_fountain",
+    "img": "/images/spells/spell-blood_fountain.jpg",
+    "spellSchool": "blood",
+    "effects": [
+      {
+        "description": "Hit applies Leech",
+        "min": null,
+        "max": null,
+        "key": 1
+      },
+      {
+        "description": "Hit removes negative effects from caster and allies",
+        "min": null,
+        "max": null,
+        "key": 2
+      },
+      {
+        "description": "Hit applies fading Snare (0.8 - 1.2s)",
+        "min": 0.8,
+        "max": 1.2,
+        "key": 3
+      },
+      {
+        "description": "Increase hit healing (16 - 36%)",
+        "min": 16.0,
+        "max": 36.0,
+        "key": 4
+      },
+      {
+        "description": "Recast to conjure an AoE that deals damage to enemies and heals allies (20 - 36%) on hit and then explodes (20 - 36%)",
+        "min": 20.0,
+        "max": 36.0,
+        "key": 5
+      },
+      {
+        "description": "Increase explosion damage (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 6
+      },
+      {
+        "description": "Increase explosion healing (30 - 50%)",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 7
+      },
+      {
+        "description": "Explosion pushes enemies back (1.6 - 3.2m)",
+        "min": 1.6,
+        "max": 3.2,
+        "key": 8
+      },
+      {
+        "description": "Explosion increases ally MS (10% - 18%) for 3s",
+        "min": null,
+        "max": null,
+        "key": 9
+      }
+    ]
+  },
+  "blood_rage": {
+    "name": "Blood Rage",
+    "id": "blood_rage",
+    "img": "/images/spells/spell-blood_rage.jpg",
+    "spellSchool": "blood",
+    "effects": [
+      {
+        "description": "Increase physical power (8% - 16%)",
+        "min": null,
+        "max": null,
+        "key": 1
+      },
+      {
+        "description": "Kill an enemy to heal (1.2 - 2.5% max HP)",
+        "min": 1.2,
+        "max": 2.5,
+        "key": 2
+      },
+      {
+        "description": "Increase effect duration (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 3
+      },
+      {
+        "description": "Increase MS (2 - 6%)",
+        "min": 2.0,
+        "max": 6.0,
+        "key": 4
+      },
+      {
+        "description": "Cast grants a shield (25 - 45%) to caster and allies",
+        "min": 25.0,
+        "max": 45.0,
+        "key": 5
+      },
+      {
+        "description": "Cast applies a fading Snare (0.8 - 1.6s) on enemies",
+        "min": 0.8,
+        "max": 1.6,
+        "key": 6
+      },
+      {
+        "description": "Cast removes all negative effects from caster",
+        "min": null,
+        "max": null,
+        "key": 7
+      }
+    ]
+  },
+  "blood_rite": {
+    "name": "Blood Rite",
+    "id": "blood_rite",
+    "img": "/images/spells/spell-blood_rite.jpg",
+    "spellSchool": "blood",
+    "effects": [
+      {
+        "description": "Trigger applies a fading Snare (1.2 - 2.4s)",
+        "min": 1.2,
+        "max": 2.4,
+        "key": 1
+      },
+      {
+        "description": "Increase damage (12 - 20%)",
+        "min": 12.0,
+        "max": 20.0,
+        "key": 2
+      },
+      {
+        "description": "Trigger for first primary attack within 5s to deal bonus damage (30 - 50%)",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 3
+      },
+      {
+        "description": "Trigger heals (30 - 50%)",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 4
+      },
+      {
+        "description": "Increase Immaterial duration (16 - 24%)",
+        "min": 16.0,
+        "max": 24.0,
+        "key": 5
+      },
+      {
+        "description": "Turn invisible while Immaterial",
+        "min": null,
+        "max": null,
+        "key": 6
+      },
+      {
+        "description": "Trigger conjurs a projectile towards each nearby enemy (1 - 5 max) that deals damage (16 - 24%) and applies Leech",
+        "min": 1.0,
+        "max": 5.0,
+        "key": 7
+      },
+      {
+        "description": "Increase MS (20 - 36%) during channel",
+        "min": 20.0,
+        "max": 36.0,
+        "key": 8
+      }
+    ]
+  },
+  "sanguine_coil": {
+    "name": "Sanguine Coil",
+    "id": "sanguine_coil",
+    "img": "/images/spells/spell-sanguine_coil.jpg",
+    "spellSchool": "blood",
+    "effects": [
+      {
+        "description": "Hit bounces projectile to an additional target or the caster to deal damage or heal (24 - 40%)",
+        "min": 24.0,
+        "max": 40.0,
+        "key": 1
+      },
+      {
+        "description": "Increase damage (8 - 16%)",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 2
+      },
+      {
+        "description": "Increase ally healing (14 - 30%)",
+        "min": 14.0,
+        "max": 30.0,
+        "key": 3
+      },
+      {
+        "description": "Increase life drain (30 - 50%)",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 4
+      },
+      {
+        "description": "Lethal attacks restore 1 charge",
+        "min": null,
+        "max": null,
+        "key": 5
+      },
+      {
+        "description": "Hit on an enemy affected by Leech deals damage (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 6
+      },
+      {
+        "description": "Increase charges by 1",
+        "min": null,
+        "max": null,
+        "key": 7
+      },
+      {
+        "description": "Increase projectile range and speed (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 8
+      }
+    ]
+  },
+  "shadowbolt": {
+    "name": "Shadowbolt",
+    "id": "shadowbolt",
+    "img": "/images/spells/spell-shadowbolt.jpg",
+    "spellSchool": "blood",
+    "effects": [
+      {
+        "description": "Hit conjures an AoE that deals damage (14 - 30%) and applies Leech",
+        "min": 14.0,
+        "max": 30.0,
+        "key": 1
+      },
+      {
+        "description": "Hit on an enemy affected by Leech deals damage (30 - 50%)",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 2
+      },
+      {
+        "description": "Hit applies Vampiric Curse dealing (140 - 180%) leeching (14 - 30%) health after 3s. Decrease hit damage (140%)",
+        "min": 140.0,
+        "max": 180.0,
+        "key": 3
+      },
+      {
+        "description": "Hit on an enemy affected by Leech heals (1.4 - 3% max HP)",
+        "min": 1.4,
+        "max": 3.0,
+        "key": 4
+      },
+      {
+        "description": "Decrease cast time (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 5
+      },
+      {
+        "description": "Decrease CD (8 - 12%)",
+        "min": 8.0,
+        "max": 12.0,
+        "key": 6
+      },
+      {
+        "description": "Hit pushes enemies back (1.6 - 3.2m)",
+        "min": 1.6,
+        "max": 3.2,
+        "key": 7
+      },
+      {
+        "description": "Increase projectile range and speed (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 8
+      }
+    ]
+  },
+  "carrion_swarm": {
+    "name": "Carrion Swarm",
+    "id": "carrion_swarm",
+    "img": "/images/spells/spell-carrion_swarm.jpg",
+    "spellSchool": "blood",
+    "effects": [
+      {
+        "description": "Increase damage done by each bat by (8 - 16%)",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 1
+      },
+      {
+        "description": "Explode when reaching maximum distance dealing (24 - 48%) and inflicting Leech",
+        "min": 24.0,
+        "max": 48.0,
+        "key": 2
+      },
+      {
+        "description": "Hits leeches (4 - 8%) health",
+        "min": 4.0,
+        "max": 8.0,
+        "key": 3
+      },
+      {
+        "description": "Hitting the same target with all bats inflicts a (0.6 - 1s) stun",
+        "min": 0.6,
+        "max": 1.0,
+        "key": 4
+      },
+      {
+        "description": "The first hit inflicts Lesser Vampiric Curse dealing (40 - 60%) damage and leeching (12 - 24%) health",
+        "min": 40.0,
+        "max": 60.0,
+        "key": 5
+      },
+      {
+        "description": "Inflict a fading snare on enemies hit lasting (0.8 - 1.6s)",
+        "min": 0.8,
+        "max": 1.6,
+        "key": 6
+      },
+      {
+        "description": "Veil of Chaos",
+        "min": null,
+        "max": null,
+        "key": 7
+      },
+      {
+        "description": "Next primary attack within 3s on an enemy affected by Ignite applies Agonising Flames",
+        "min": null,
+        "max": null,
+        "key": 8
+      },
+      {
+        "description": "Increase damage (12 - 24%) of next primary attack within 3s",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 9
+      },
+      {
+        "description": "Increase Elude duration (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 10
+      },
+      {
+        "description": "Explosion applies a fading Snare (0.8 - 1.6s)",
+        "min": 0.8,
+        "max": 1.6,
+        "key": 11
+      },
+      {
+        "description": "Increase explosion damage (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 12
+      },
+      {
+        "description": "Recast conjurs a second illusion that deals damage (40 - 80% first explosion damage) in an AoE after 2.2s",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 13
+      }
+    ]
+  },
+  "aftershock": {
+    "name": "Aftershock",
+    "id": "aftershock",
+    "img": "/images/spells/spell-aftershock.jpg",
+    "spellSchool": "chaos",
+    "effects": [
+      {
+        "description": "Increase damage (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 1
+      },
+      {
+        "description": "Hit applies a fading Snare (1 - 1.8s)",
+        "min": 1.0,
+        "max": 1.8,
+        "key": 2
+      },
+      {
+        "description": "Cast knocks enemies back (1.6 - 3.2m)",
+        "min": 1.6,
+        "max": 3.2,
+        "key": 3
+      },
+      {
+        "description": "Explosion on an enemy affected by Ignite applies Agonising Flames",
+        "min": null,
+        "max": null,
+        "key": 4
+      },
+      {
+        "description": "Decrease CD (8 - 12%)",
+        "min": 8.0,
+        "max": 12.0,
+        "key": 5
+      },
+      {
+        "description": "Increase projectile range (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 6
+      }
+    ]
+  },
+  "chaos_barrier": {
+    "name": "Chaos Barrier",
+    "id": "chaos_barrier",
+    "img": "/images/spells/spell-chaos_barrier.jpg",
+    "spellSchool": "chaos",
+    "effects": [
+      {
+        "description": "Increase projectile damage per charge (8 - 16%)",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 1
+      },
+      {
+        "description": "Decrease CD (0.4 - 0.8s) on absorbed hit (3 max)",
+        "min": 0.4,
+        "max": 0.8,
+        "key": 2
+      },
+      {
+        "description": "Projectile hit conjurs an AoE that deals damage (30 - 50%) and applies Ignite",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 3
+      },
+      {
+        "description": "Full charge applies Power Surge (2.4 - 4s) on the caster",
+        "min": 2.4,
+        "max": 4.0,
+        "key": 4
+      },
+      {
+        "description": "Projectile hit applies Stun (0.4 - 1.2s)",
+        "min": 0.4,
+        "max": 1.2,
+        "key": 5
+      },
+      {
+        "description": "Increase MS (8 - 12%) during channel",
+        "min": 8.0,
+        "max": 12.0,
+        "key": 6
+      }
+    ]
+  },
+  "chaos_volley": {
+    "name": "Chaos Volley",
+    "id": "chaos_volley",
+    "img": "/images/spells/spell-chaos_volley.jpg",
+    "spellSchool": "chaos",
+    "effects": [
+      {
+        "description": "Increase damage (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 1
+      },
+      {
+        "description": "Hitting a different enemy with the second projectile deals damage (40 - 60%)",
+        "min": 40.0,
+        "max": 60.0,
+        "key": 2
+      },
+      {
+        "description": "Hit on an enemy affected by Ignite applies Agonising Flames",
+        "min": null,
+        "max": null,
+        "key": 3
+      },
+      {
+        "description": "Decrease CD (8 - 12%)",
+        "min": 8.0,
+        "max": 12.0,
+        "key": 4
+      },
+      {
+        "description": "Hit pushes enemies back (0.8 - 1.6m)",
+        "min": 0.8,
+        "max": 1.6,
+        "key": 5
+      },
+      {
+        "description": "Increase projectile range and speed (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 6
+      }
+    ]
+  },
+  "power_surge": {
+    "name": "Power Surge",
+    "id": "power_surge",
+    "img": "/images/spells/spell-power_surge.jpg",
+    "spellSchool": "chaos",
+    "effects": [
+      {
+        "description": "Increase attack speed (6 - 10%)",
+        "min": 6.0,
+        "max": 10.0,
+        "key": 1
+      },
+      {
+        "description": "Increase physical damage (8 - 16%)",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 2
+      },
+      {
+        "description": "Increase MS (2 - 6%)",
+        "min": 2.0,
+        "max": 6.0,
+        "key": 3
+      },
+      {
+        "description": "Lethal attacks during the effect increase duration by 1s (1 - 5 max)",
+        "min": 1.0,
+        "max": 5.0,
+        "key": 4
+      },
+      {
+        "description": "Increase effect duration (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 5
+      },
+      {
+        "description": "Recast to remove the effect and conjure an AoE that deals damage (40 - 60%) and applies Ignite",
+        "min": 40.0,
+        "max": 60.0,
+        "key": 6
+      },
+      {
+        "description": "Apply a shield (40 - 60%)",
+        "min": 40.0,
+        "max": 60.0,
+        "key": 7
+      },
+      {
+        "description": "Removes all negative effects",
+        "min": null,
+        "max": null,
+        "key": 8
+      }
+    ]
+  },
+  "void": {
+    "name": "Void",
+    "id": "void",
+    "img": "/images/spells/spell-void.jpg",
+    "spellSchool": "chaos",
+    "effects": [
+      {
+        "description": "Increase damage (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 1
+      },
+      {
+        "description": "Explosion leaves behind an AoE that deals damage (8 - 16%) (3 max)",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 2
+      },
+      {
+        "description": "Explosion conjures 3 AoEs that explode to deal damage (12 - 24%) and apply Ignite",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 3
+      },
+      {
+        "description": "Increase recharge rate (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 4
+      },
+      {
+        "description": "Explosion on an enemy affected by Ignite applies Agonising Flames",
+        "min": null,
+        "max": null,
+        "key": 5
+      },
+      {
+        "description": "Increase range (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 6
+      }
+    ]
+  },
+  "rain_of_chaos": {
+    "name": "Rain of Chaos",
+    "id": "rain_of_chaos",
+    "img": "/images/spells/spell-rain_of_chaos.jpg",
+    "spellSchool": "chaos",
+    "effects": [
+      {
+        "description": "Additional meteor strikes the center dealing (40 - 80%) when the effect ends",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 1
+      },
+      {
+        "description": "First meteor engulf the area dealing (8 - 16%)",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 2
+      },
+      {
+        "description": "There is 30% chance to spawn bigger meteor dealing (24 - 40%)",
+        "min": 24.0,
+        "max": 40.0,
+        "key": 3
+      },
+      {
+        "description": "Inflict a fading snare on enemies lasting (0.4 - 1.2s)",
+        "min": 0.4,
+        "max": 1.2,
+        "key": 4
+      },
+      {
+        "description": "Hitting a target affected by Ignite applies Agonising Flames",
+        "min": null,
+        "max": null,
+        "key": 5
+      },
+      {
+        "description": "Reduce cooldown by (8 - 12%)",
+        "min": 8.0,
+        "max": 12.0,
+        "key": 6
+      }
+    ]
+  },
+  "veil_of_frost": {
+    "name": "Veil of Frost",
+    "id": "veil_of_frost",
+    "img": "/images/spells/spell-veil_of_frost.jpg",
+    "spellSchool": "frost",
+    "effects": [
+      {
+        "description": "Next primary attack within 3s consumes Chill and applies Freeze (1.4 - 3s)",
+        "min": 1.4,
+        "max": 3.0,
+        "key": 1
+      },
+      {
+        "description": "Increase damage (12 - 24%) of next primary attack within 3s",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 2
+      },
+      {
+        "description": "Increase Elude duration (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 3
+      },
+      {
+        "description": "Next primary attack within 3s conjurs an AoE that does damage (30 - 50%) and applies Chill",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 4
+      },
+      {
+        "description": "Illusion explodes in an AoE that deals damage (20 - 40%) and applies Chill",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 5
+      },
+      {
+        "description": "Increase shield strength (30 - 50%)",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 6
+      }
+    ]
+  },
+  "cold_snap": {
+    "name": "Cold Snap",
+    "id": "cold_snap",
+    "img": "/images/spells/spell-cold_snap.jpg",
+    "spellSchool": "frost",
+    "effects": [
+      {
+        "description": "Increase shield strength (26 - 50%)",
+        "min": 26.0,
+        "max": 50.0,
+        "key": 1
+      },
+      {
+        "description": "Increase damage (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 2
+      },
+      {
+        "description": "Trigger increases MS (4 - 8%) during shield uptime",
+        "min": 4.0,
+        "max": 8.0,
+        "key": 3
+      },
+      {
+        "description": "Increase Freeze duration (0.4 - 1.2s) on enemies affected by Chill",
+        "min": 0.4,
+        "max": 1.2,
+        "key": 4
+      },
+      {
+        "description": "Trigger to deal damage (24 - 40%) and apply Chill on next primary attack within 6s",
+        "min": 24.0,
+        "max": 40.0,
+        "key": 5
+      },
+      {
+        "description": "Increase MS (20 - 36%) during channel",
+        "min": 20.0,
+        "max": 36.0,
+        "key": 6
+      }
+    ]
+  },
+  "crystal_lance": {
+    "name": "Crystal Lance",
+    "id": "crystal_lance",
+    "img": "/images/spells/spell-crystal_lance.jpg",
+    "spellSchool": "frost",
+    "effects": [
+      {
+        "description": "Increase damage (50 - 70%) to enemies affected by Chill or Freeze",
+        "min": 50.0,
+        "max": 70.0,
+        "key": 1
+      },
+      {
+        "description": "Projectile pierces enemies (1 - 5 max) dealing 50% reduced damage",
+        "min": 1.0,
+        "max": 5.0,
+        "key": 2
+      },
+      {
+        "description": "Decrease cast time (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 3
+      },
+      {
+        "description": "Increase Freeze duration (0.4 - 1.2s) on enemies affected by Chill",
+        "min": 0.4,
+        "max": 1.2,
+        "key": 4
+      },
+      {
+        "description": "Hit on an enemy affected by Chill or Freeze launches 8 projectiles that deal damage (16 - 32%) and apply Chill",
+        "min": 16.0,
+        "max": 32.0,
+        "key": 5
+      },
+      {
+        "description": "Increase projectile range and speed (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 6
+      }
+    ]
+  },
+  "frost_barrier": {
+    "name": "Frost Barrier",
+    "id": "frost_barrier",
+    "img": "/images/spells/spell-frost_barrier.jpg",
+    "spellSchool": "frost",
+    "effects": [
+      {
+        "description": "Increase damage (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 1
+      },
+      {
+        "description": "Barrier hits (3 max) increase spell power (6 - 10%) for 6s",
+        "min": 6.0,
+        "max": 10.0,
+        "key": 2
+      },
+      {
+        "description": "Barrier hits (3 max) decrease CD (0.4 - 0.8s)",
+        "min": 0.4,
+        "max": 0.8,
+        "key": 3
+      },
+      {
+        "description": "Recast pushes enemies (1.6 - 3.2m)",
+        "min": 1.6,
+        "max": 3.2,
+        "key": 4
+      },
+      {
+        "description": "Recast shields caster (40 - 80%) when hitting an enemy affected by Chill or Freeze",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 5
+      },
+      {
+        "description": "Recast consumes Chill and applies Freeze (2 - 4s)",
+        "min": 2.0,
+        "max": 4.0,
+        "key": 6
+      },
+      {
+        "description": "Increase MS (8 - 12%) during channel",
+        "min": 8.0,
+        "max": 12.0,
+        "key": 7
+      },
+      {
+        "description": "",
+        "min": null,
+        "max": null,
+        "key": 8
+      }
+    ]
+  },
+  "frost_bat": {
+    "name": "Frost Bat",
+    "id": "frost_bat",
+    "img": "/images/spells/spell-frost_bat.jpg",
+    "spellSchool": "frost",
+    "effects": [
+      {
+        "description": "Hit on an enemy affected by Chill or Freeze launches 8 projectiles that deal damage (16 - 32%) and apply Chill",
+        "min": 16.0,
+        "max": 32.0,
+        "key": 1
+      },
+      {
+        "description": "Hit on an enemy affected by Chill or Freeze shields caster (40 - 80%)",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 2
+      },
+      {
+        "description": "Hit conjures an AoE that deals damage (40 - 60%)",
+        "min": 40.0,
+        "max": 60.0,
+        "key": 3
+      },
+      {
+        "description": "Increase damage (20 - 40%) to enemies affected by Chill or Freeze",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 4
+      },
+      {
+        "description": "Increase projectile range and speed (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 5
+      },
+      {
+        "description": "Decrease cast time (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 6
+      }
+    ]
+  },
+  "ice_nova": {
+    "name": "Ice Nova",
+    "id": "ice_nova",
+    "img": "/images/spells/spell-ice_nova.jpg",
+    "spellSchool": "frost",
+    "effects": [
+      {
+        "description": "Explosion shields (40 - 80%) caster and allies",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 1
+      },
+      {
+        "description": "Increase damage (30 - 50%) to enemies affected by Chill or Freeze",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 2
+      },
+      {
+        "description": "Recast to conjure an AoE that explodes to deal damage (30 - 50% of first nova)",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 3
+      },
+      {
+        "description": "Decrease CD (8 - 12%)",
+        "min": 8.0,
+        "max": 12.0,
+        "key": 4
+      },
+      {
+        "description": "Increase range (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 5
+      }
+    ]
+  },
+  "arctic_storm": {
+    "name": "Arctic Storm",
+    "id": "arctic_storm",
+    "img": "/images/spells/spell-arctic_storm.jpg",
+    "spellSchool": "frost",
+    "effects": [
+      {
+        "description": "Increase damage done by (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 1
+      },
+      {
+        "description": "Increase movement speed when channeling by (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 2
+      },
+      {
+        "description": "Increase freeze duration (0.4 - 0.8s) on enemies affected by Chill",
+        "min": 0.4,
+        "max": 0.8,
+        "key": 3
+      },
+      {
+        "description": "Knocks enemies back (2 - 4m)",
+        "min": 2.0,
+        "max": 4.0,
+        "key": 4
+      },
+      {
+        "description": "Heal self for (8 - 16%) of damage done",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 5
+      },
+      {
+        "description": "Shield self for (34 - 50%) of your spell power when activated",
+        "min": 34.0,
+        "max": 50.0,
+        "key": 6
+      }
+    ]
+  },
+  "veil_of_illusion": {
+    "name": "Veil of Illusion",
+    "id": "veil_of_illusion",
+    "img": "/images/spells/spell-veil_of_illusion.jpg",
+    "spellSchool": "illusion",
+    "effects": [
+      {
+        "description": "Next primary attack within 3s on an enemy affected by Weaken grants a shield (20 - 40%)",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 1
+      },
+      {
+        "description": "Next primary attack within 3s deals damage (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 2
+      },
+      {
+        "description": "Increase Elude duration (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 3
+      },
+      {
+        "description": "Next primary attack within 3s applies a fading Snare (1.2 - 2s)",
+        "min": 1.2,
+        "max": 2.0,
+        "key": 4
+      },
+      {
+        "description": "Illusion projectiles deal damage (13 - 20%)",
+        "min": 13.0,
+        "max": 20.0,
+        "key": 5
+      },
+      {
+        "description": "Next primary attack within 3s grants Phantasm (1 - 5)",
+        "min": 1.0,
+        "max": 5.0,
+        "key": 6
+      },
+      {
+        "description": "Recast to explode the Illusion to deal damage (20 - 36%) and apply Weaken",
+        "min": 20.0,
+        "max": 36.0,
+        "key": 7
+      }
+    ]
+  },
+  "mist_trance": {
+    "name": "Mist Trance",
+    "id": "mist_trance",
+    "img": "/images/spells/spell-mist_trance.jpg",
+    "spellSchool": "illusion",
+    "effects": [
+      {
+        "description": "Trigger increases first primary attack damage (30 - 50%) for 5s",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 1
+      },
+      {
+        "description": "Trigger applies Fear to enemies (0.8 - 1.6s) in a caster-centred AoE",
+        "min": 0.8,
+        "max": 1.6,
+        "key": 2
+      },
+      {
+        "description": "Trigger increases MS (8 - 16%) for 3s",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 3
+      },
+      {
+        "description": "Trigger grants Phantasm (1 - 5)",
+        "min": 1.0,
+        "max": 5.0,
+        "key": 4
+      },
+      {
+        "description": "Trigger reduces secondary weapon skill CD (40 - 80%)",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 5
+      },
+      {
+        "description": "Increase MS (20 - 36%) during channel",
+        "min": 20.0,
+        "max": 36.0,
+        "key": 6
+      },
+      {
+        "description": "Trigger pushes enemies back (1.6 - 3.2m)",
+        "min": 1.6,
+        "max": 3.2,
+        "key": 7
+      },
+      {
+        "description": "Increase distance travelled (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 8
+      }
+    ]
+  },
+  "mosquito": {
+    "name": "Mosquito",
+    "id": "mosquito",
+    "img": "/images/spells/spell-mosquito.jpg",
+    "spellSchool": "illusion",
+    "effects": [
+      {
+        "description": "Increase damage (20 - 40%)",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 1
+      },
+      {
+        "description": "Increase Fear duration (0.4 - 0.8s)",
+        "min": 0.4,
+        "max": 0.8,
+        "key": 2
+      },
+      {
+        "description": "Increase summon max HP (20 - 40%)",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 3
+      },
+      {
+        "description": "Cast shields (40 - 60%) caster and allies",
+        "min": 40.0,
+        "max": 60.0,
+        "key": 4
+      },
+      {
+        "description": "Explosion summons 3 Wisps that heal the caster and allies (30 - 50%) when walked over",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 5
+      }
+    ]
+  },
+  "phantom_aegis": {
+    "name": "Phantom Aegis",
+    "id": "phantom_aegis",
+    "img": "/images/spells/spell-phantom_aegis.jpg",
+    "spellSchool": "illusion",
+    "effects": [
+      {
+        "description": "Recast to remove the effect and pull the target towards the caster",
+        "min": null,
+        "max": null,
+        "key": 1
+      },
+      {
+        "description": "Breaking the shield conjurs a target-centred AoE that applies Fear (0.8 - 1.6s)",
+        "min": 0.8,
+        "max": 1.6,
+        "key": 2
+      },
+      {
+        "description": "Increase duration (16 - 32%)",
+        "min": 16.0,
+        "max": 32.0,
+        "key": 3
+      },
+      {
+        "description": "Increase spell power (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 4
+      },
+      {
+        "description": "Cast removes all negative effects from target",
+        "min": null,
+        "max": null,
+        "key": 5
+      },
+      {
+        "description": "Cast knocks enemies back (1.6 - 3.2m) from target",
+        "min": 1.6,
+        "max": 3.2,
+        "key": 6
+      },
+      {
+        "description": "Increase MS (6 - 14%)",
+        "min": 6.0,
+        "max": 14.0,
+        "key": 7
+      }
+    ]
+  },
+  "spectral_wolf": {
+    "name": "Spectral Wolf",
+    "id": "spectral_wolf",
+    "img": "/images/spells/spell-spectral_wolf.jpg",
+    "spellSchool": "illusion",
+    "effects": [
+      {
+        "description": "Hit consumes Weaken to summon a Wisp that heals the caster and allies (30 - 50%) when walked over",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 1
+      },
+      {
+        "description": "Hit on an enemy affected by Weaken grants a shield (25 - 40%) per target (3 max)",
+        "min": 25.0,
+        "max": 40.0,
+        "key": 2
+      },
+      {
+        "description": "Increase projectile range and speed (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 3
+      },
+      {
+        "description": "Increase max bounces by 1",
+        "min": null,
+        "max": null,
+        "key": 4
+      },
+      {
+        "description": "Decrease damage penalty per bounce (7 - 15%)",
+        "min": 7.0,
+        "max": 15.0,
+        "key": 5
+      },
+      {
+        "description": "First hit applies a fading Snare (1.6 - 2.4s)",
+        "min": 1.6,
+        "max": 2.4,
+        "key": 6
+      },
+      {
+        "description": "Hit returns the projectile to the caster on last bounce to heal (60 - 100%)",
+        "min": 60.0,
+        "max": 100.0,
+        "key": 7
+      },
+      {
+        "description": "Hit on an enemy affected by Weaken grants Phantasm (1 - 4)",
+        "min": 1.0,
+        "max": 4.0,
+        "key": 8
+      }
+    ]
+  },
+  "wraith_spear": {
+    "name": "Wraith Spear",
+    "id": "wraith_spear",
+    "img": "/images/spells/spell-wraith_spear.jpg",
+    "spellSchool": "illusion",
+    "effects": [
+      {
+        "description": "Hit applies a fading Snare (0.8 - 1.6s)",
+        "min": 0.8,
+        "max": 1.6,
+        "key": 1
+      },
+      {
+        "description": "Hit consumes Weaken to summon a Wisp that heals the caster and allies (30 - 50%) when walked over",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 2
+      },
+      {
+        "description": "Hit on an enemy affected by Weaken grants a shield (20 - 40%) per target (3 max)",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 3
+      },
+      {
+        "description": "Increase projectile range (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 4
+      },
+      {
+        "description": "Increase damage (16 - 28%)",
+        "min": 16.0,
+        "max": 28.0,
+        "key": 5
+      },
+      {
+        "description": "Decrease damage penalty per hit (6 - 10%)",
+        "min": 6.0,
+        "max": 10.0,
+        "key": 6
+      },
+      {
+        "description": "Hit grants allies a shield (60 - 100%)",
+        "min": 60.0,
+        "max": 100.0,
+        "key": 7
+      }
+    ]
+  },
+  "curse": {
+    "name": "Curse",
+    "id": "curse",
+    "img": "/images/spells/spell-curse.jpg",
+    "spellSchool": "illusion",
+    "effects": [
+      {
+        "description": "Increase the damage modifier by (4 - 10%)",
+        "min": 4.0,
+        "max": 10.0,
+        "key": 1
+      },
+      {
+        "description": "Deals (20 - 40%) magic damage on hit",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 2
+      },
+      {
+        "description": "Increase the duration of the Curse by (0.4 - 1s)",
+        "min": 0.4,
+        "max": 1.0,
+        "key": 3
+      },
+      {
+        "description": "Reapply Weaken with (0.4 - 1s) increased duration when the Curse ends",
+        "min": 0.4,
+        "max": 1.0,
+        "key": 4
+      },
+      {
+        "description": "Spawns a wisp healing for (20 - 40%) when the curse ends",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 5
+      },
+      {
+        "description": "Inflict a fading snare on enemies hit lasting (0.4 - 1.2s)",
+        "min": 0.4,
+        "max": 1.2,
+        "key": 6
+      },
+      {
+        "description": "Knock the targets back (1.6 - 3.2m) on hit",
+        "min": 1.6,
+        "max": 3.2,
+        "key": 7
+      }
+    ]
+  },
+  "veil_of_storm": {
+    "name": "Veil of Storm",
+    "id": "veil_of_storm",
+    "img": "/images/spells/spell-veil_of_storm.jpg",
+    "spellSchool": "storm",
+    "effects": [
+      {
+        "description": "Next primary attack within 3s consumes Static to apply Stun (0.3 - 0.5s)",
+        "min": 0.3,
+        "max": 0.5,
+        "key": 1
+      },
+      {
+        "description": "Next primary attack within 3s deals damage (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 2
+      },
+      {
+        "description": "Increase Elude duration (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 3
+      },
+      {
+        "description": "Next primary attack within 3s applies a fading Snare (1.2 - 2s)",
+        "min": 1.2,
+        "max": 2.0,
+        "key": 4
+      },
+      {
+        "description": "Dash through an enemy to apply Static",
+        "min": null,
+        "max": null,
+        "key": 5
+      },
+      {
+        "description": "Illusion conjures an AoE that deals tick damage (12 - 20%) and applies Static",
+        "min": 12.0,
+        "max": 20.0,
+        "key": 6
+      }
+    ]
+  },
+  "ball_lightning": {
+    "name": "Ball Lightning",
+    "id": "ball_lightning",
+    "img": "/images/spells/spell-ball_lightning.jpg",
+    "spellSchool": "storm",
+    "effects": [
+      {
+        "description": "Increase tick damage (3 - 7%)",
+        "min": 3.0,
+        "max": 7.0,
+        "key": 1
+      },
+      {
+        "description": "Recast detonates the ball to deal damage (50 - 90%)",
+        "min": 50.0,
+        "max": 90.0,
+        "key": 2
+      },
+      {
+        "description": "Explosion increases caster and ally MS (8 - 16%) for 4s",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 3
+      },
+      {
+        "description": "Explosion pushes enemies back (1.6 - 3.2m)",
+        "min": 1.6,
+        "max": 3.2,
+        "key": 4
+      },
+      {
+        "description": "Increase projectile range (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 5
+      },
+      {
+        "description": "Explosion consumes Static to apply Stun (0.3 - 0.5s)",
+        "min": 0.3,
+        "max": 0.5,
+        "key": 6
+      }
+    ]
+  },
+  "cyclone": {
+    "name": "Cyclone",
+    "id": "cyclone",
+    "img": "/images/spells/spell-cyclone.jpg",
+    "spellSchool": "storm",
+    "effects": [
+      {
+        "description": "Increase damage (20 - 40%)",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 1
+      },
+      {
+        "description": "Increase damage done by storm shields (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 2
+      },
+      {
+        "description": "Chance to spawn an additional storm shield when the cyclone return to you (40 - 100%)",
+        "min": 40.0,
+        "max": 100.0,
+        "key": 3
+      },
+      {
+        "description": "Each strom shield active grant (2 - 6%) life leech",
+        "min": 2.0,
+        "max": 6.0,
+        "key": 4
+      },
+      {
+        "description": "Increase cast rate by (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 5
+      },
+      {
+        "description": "Increase projectile range and speed (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 6
+      },
+      {
+        "description": "Hit consumes Static to apply Stun (0.3 - 0.5s)",
+        "min": 0.3,
+        "max": 0.5,
+        "key": 7
+      },
+      {
+        "description": "Hit consumes Static for the next 3 primary attacks within 6s to deal damage (12 - 24%) and apply Static",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 8
+      }
+    ]
+  },
+  "discharge": {
+    "name": "Discharge",
+    "id": "discharge",
+    "img": "/images/spells/spell-discharge.jpg",
+    "spellSchool": "storm",
+    "effects": [
+      {
+        "description": "Increase Storm Shield damage (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 1
+      },
+      {
+        "description": "Increase Stun duration (0.1 - 0.3s)",
+        "min": 0.1,
+        "max": 0.3,
+        "key": 2
+      },
+      {
+        "description": "Recast to end counter and conjure a caster-centred AoE that deals damage (16 - 28%) and inflicting a 1s fading snare",
+        "min": 16.0,
+        "max": 28.0,
+        "key": 3
+      },
+      {
+        "description": "Grants spell life leech (2 - 6%) per Storm Shield",
+        "min": 2.0,
+        "max": 6.0,
+        "key": 4
+      },
+      {
+        "description": "Increase MS (20 - 36%) during channel",
+        "min": 20.0,
+        "max": 36.0,
+        "key": 5
+      },
+      {
+        "description": "Trigger for the next 3 primary attacks within 6s to deal damage (12 - 24%) and apply Static",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 6
+      }
+    ]
+  },
+  "lightning_curtain": {
+    "name": "Lightning Curtain",
+    "id": "lightning_curtain",
+    "img": "/images/spells/spell-lightning_curtain.jpg",
+    "spellSchool": "storm",
+    "effects": [
+      {
+        "description": "Hit on caster or ally grants a shield (30 - 50%)",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 1
+      },
+      {
+        "description": "Increase tick damage (4 - 12%)",
+        "min": 4.0,
+        "max": 12.0,
+        "key": 2
+      },
+      {
+        "description": "Block projectiles (3 max) for the next 3 primary attacks within 6s to deal damage (12 - 24%) and apply Static",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 3
+      },
+      {
+        "description": "Hit applies a fading Snare (0.8 - 1.6s)",
+        "min": 0.8,
+        "max": 1.6,
+        "key": 4
+      },
+      {
+        "description": "Increase MS (8 - 16%)",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 5
+      }
+    ]
+  },
+  "polarity_shift": {
+    "name": "Polarity Shift",
+    "id": "polarity_shift",
+    "img": "/images/spells/spell-polarity_shift.jpg",
+    "spellSchool": "storm",
+    "effects": [
+      {
+        "description": "Hit applies a fading Snare (0.8 - 1.6s)",
+        "min": 0.8,
+        "max": 1.6,
+        "key": 1
+      },
+      {
+        "description": "Increase projectile range and speed (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 2
+      },
+      {
+        "description": "Hit consumes Static for the next 3 primary attacks within 6s to deal damage (12 - 24%) and apply Static",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 3
+      },
+      {
+        "description": "Teleport conjures an AoE at the target's location that deals damage (40 - 60%) and applies Static",
+        "min": 40.0,
+        "max": 60.0,
+        "key": 4
+      },
+      {
+        "description": "Hit conjures an AoE at the caster's location that deals damage (40 - 60%) and applies Static",
+        "min": 40.0,
+        "max": 60.0,
+        "key": 5
+      }
+    ]
+  },
+  "lightning_tendrils": {
+    "name": "Lightning Tendrils",
+    "id": "lightning_tendrils",
+    "img": "/images/spells/spell-lightning_tendrils.jpg",
+    "spellSchool": "storm",
+    "effects": [
+      {
+        "description": "Lightning bolts deal (4 - 12%) increased damage",
+        "min": 4.0,
+        "max": 12.0,
+        "key": 1
+      },
+      {
+        "description": "Launch 1 additional lightning bolt",
+        "min": null,
+        "max": null,
+        "key": 2
+      },
+      {
+        "description": "There is (20 - 36%) chance to trigger Chain Lightning on hit",
+        "min": 20.0,
+        "max": 36.0,
+        "key": 3
+      },
+      {
+        "description": "Increase MS when casting and channeling by (16 - 24%)",
+        "min": 16.0,
+        "max": 24.0,
+        "key": 4
+      },
+      {
+        "description": "Hitting 6 bolts in a row on the same target inflicts a stun (0.8 - 1.6s)",
+        "min": 0.8,
+        "max": 1.6,
+        "key": 5
+      },
+      {
+        "description": "Increase cast rate by (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 6
+      },
+      {
+        "description": "Increase projectile range and speed by (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 7
+      }
+    ]
+  },
+  "veil_of_bones": {
+    "name": "Veil of Bones",
+    "id": "veil_of_bones",
+    "img": "/images/spells/spell-veil_of_bones.jpg",
+    "spellSchool": "unholy",
+    "effects": [
+      {
+        "description": "Next primary attack within 3s deals damage (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 1
+      },
+      {
+        "description": "Increase Elude duration (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 2
+      },
+      {
+        "description": "Next primary attack within 3s to enemies below 20% max HP deals damage (20 - 40%)",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 3
+      },
+      {
+        "description": "Dash through an allied skeleton to heal it (40 - 80% summon max HP) and reset its uptime",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 4
+      },
+      {
+        "description": "Dashing through an enemy applies Condemn",
+        "min": null,
+        "max": null,
+        "key": 5
+      },
+      {
+        "description": "Explode skeleton after 2.5s inflicting (40 - 80%)",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 6
+      },
+      {
+        "description": "Next primary attack within 3s summons a Skeleton Mage instead of a Skeleton Warrior",
+        "min": null,
+        "max": null,
+        "key": 7
+      }
+    ]
+  },
+  "bone_explosion": {
+    "name": "Bone Explosion",
+    "id": "bone_explosion",
+    "img": "/images/spells/spell-bone_explosion.jpg",
+    "spellSchool": "unholy",
+    "effects": [
+      {
+        "description": "Increase damage (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 1
+      },
+      {
+        "description": "Explosion conjures an AoE that deals damage (30 - 50%) and applies Condemn",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 2
+      },
+      {
+        "description": "Explosion heals allied skeletons (40 - 80% summon max HP) and resets their uptime",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 3
+      },
+      {
+        "description": "Hit on an enemy under 30% max HP deals damage (18 - 30%). Lethal attacks reduce CD (1.2 - 2.4s)",
+        "min": 18.0,
+        "max": 30.0,
+        "key": 4
+      },
+      {
+        "description": "Explosion conjures 8 projectiles that deal damage (30 - 50%) and apply Condemn",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 5
+      },
+      {
+        "description": "Explosion applies a fading Snare (0.8 - 1.6s)",
+        "min": 0.8,
+        "max": 1.6,
+        "key": 6
+      },
+      {
+        "description": "Decrease CD (8 - 12%)",
+        "min": 8.0,
+        "max": 12.0,
+        "key": 7
+      },
+      {
+        "description": "Increase range (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 8
+      },
+      {
+        "description": "Hitting an ally skeleton make it explode after 2.5s dealing (40 - 80%) and inflict condemn",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 9
+      }
+    ]
+  },
+  "corrupted_skull": {
+    "name": "Corrupted Skull",
+    "id": "corrupted_skull",
+    "img": "/images/spells/spell-corrupted_skull.jpg",
+    "spellSchool": "unholy",
+    "effects": [
+      {
+        "description": "Hit conjures a projectile that circles around the enemy that deals damage (8 - 16%) and applies Condemn",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 1
+      },
+      {
+        "description": "Increase damage (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 2
+      },
+      {
+        "description": "Launch 2 projectiles that deal damage (30 - 50% original damage) and apply Condemn",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 3
+      },
+      {
+        "description": "Hit pushes enemies (1.6 - 3.2m)",
+        "min": 1.6,
+        "max": 3.2,
+        "key": 4
+      },
+      {
+        "description": "Increase projectile range and speed (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 5
+      },
+      {
+        "description": "Hit on allied skeleton causes it to explode in an AoE after 2.5s dealing (40 - 80%) and apply Condemn",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 6
+      }
+    ]
+  },
+  "death_knight": {
+    "name": "Death Knight",
+    "id": "death_knight",
+    "img": "/images/spells/spell-death_knight.jpg",
+    "spellSchool": "unholy",
+    "effects": [
+      {
+        "description": "Increase summon damage (12 - 20%)",
+        "min": 12.0,
+        "max": 20.0,
+        "key": 1
+      },
+      {
+        "description": "Increase summon uptime (20 - 40%)",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 2
+      },
+      {
+        "description": "Heal caster (12 - 24% summon damage)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 3
+      },
+      {
+        "description": "Increase summon max HP (20 - 40%)",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 4
+      },
+      {
+        "description": "Uptime expiration summons a Skeleton Mage with increased damage (20 - 40%)",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 5
+      },
+      {
+        "description": "Cast applies a fading Snare (1 - 1.8s)",
+        "min": 1.0,
+        "max": 1.8,
+        "key": 6
+      }
+    ]
+  },
+  "soulburn": {
+    "name": "Soulburn",
+    "id": "soulburn",
+    "img": "/images/spells/spell-soulburn.jpg",
+    "spellSchool": "unholy",
+    "effects": [
+      {
+        "description": "Inflict a fading snare (1.2 - 2.4s)",
+        "min": 1.2,
+        "max": 2.4,
+        "key": 1
+      },
+      {
+        "description": "Increase cast rate by (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 2
+      },
+      {
+        "description": "Explode skeleton after 2.5s inflicting (40 - 80%)",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 3
+      },
+      {
+        "description": "Increase damage by (8 - 16%)",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 4
+      },
+      {
+        "description": "Increase life drain (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 5
+      },
+      {
+        "description": "Increase targets hit by 1",
+        "min": null,
+        "max": null,
+        "key": 6
+      },
+      {
+        "description": "Shield self for (24 - 40%) of your spell power for each enemy hit",
+        "min": 24.0,
+        "max": 40.0,
+        "key": 7
+      },
+      {
+        "description": "Chances to spawn a skeleton warrior for each enemy hit (60 - 100%)",
+        "min": 60.0,
+        "max": 100.0,
+        "key": 8
+      }
+    ]
+  },
+  "ward_of_the_damned": {
+    "name": "Ward of the Damned",
+    "id": "ward_of_the_damned",
+    "img": "/images/spells/spell-ward_of_the_damned.jpg",
+    "spellSchool": "unholy",
+    "effects": [
+      {
+        "description": "Increase MS (8 - 12%) during channel",
+        "min": 8.0,
+        "max": 12.0,
+        "key": 1
+      },
+      {
+        "description": "Explode skeleton after 2.5s inflicting (40 - 80%)",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 2
+      },
+      {
+        "description": "Increase recast damage (12 - 20%)",
+        "min": 12.0,
+        "max": 20.0,
+        "key": 3
+      },
+      {
+        "description": "Barrier hit (melee) deals damage (30 - 50%) to attacker",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 4
+      },
+      {
+        "description": "Recast increases allied skeleton damage (19 - 30%) for 8s",
+        "min": 19.0,
+        "max": 30.0,
+        "key": 5
+      },
+      {
+        "description": "Barrier hit (projectile) heals (25 - 45%)",
+        "min": 25.0,
+        "max": 45.0,
+        "key": 6
+      },
+      {
+        "description": "Recast pushes enemies (1.6 - 3.2m)",
+        "min": 1.6,
+        "max": 3.2,
+        "key": 7
+      },
+      {
+        "description": "Barrier hit has a chance (20 - 40%) to summon a Skeleton Mage",
+        "min": 20.0,
+        "max": 40.0,
+        "key": 8
+      },
+      {
+        "description": "Recast shields (60 - 120%) allied skeletons for 4s",
+        "min": 60.0,
+        "max": 120.0,
+        "key": 9
+      }
+    ]
+  },
+  "unholy_chains": {
+    "name": "Unholy Chains",
+    "id": "unholy_chains",
+    "img": "/images/spells/spell-unholy_chains.jpg",
+    "spellSchool": "unholy",
+    "effects": [
+      {
+        "description": "Conjure a bone spirit arround the target dealing (8 - 16%)",
+        "min": 8.0,
+        "max": 16.0,
+        "key": 1
+      },
+      {
+        "description": "Deals (35 - 55%) damage every 0.7s but reduce the damage by (50 - 90%)",
+        "min": 35.0,
+        "max": 55.0,
+        "key": 2
+      },
+      {
+        "description": "Increase duration by (0.2 - 0.4s) and the damage done by (40 - 60%)",
+        "min": 0.2,
+        "max": 0.4,
+        "key": 3
+      },
+      {
+        "description": "Inflict a fading snare (0.6 - 1.4s)",
+        "min": 0.6,
+        "max": 1.4,
+        "key": 4
+      },
+      {
+        "description": "Increase MS while channeling by (4 - 12%)",
+        "min": 4.0,
+        "max": 12.0,
+        "key": 5
+      },
+      {
+        "description": "Heal self for (12 - 20%)",
+        "min": 12.0,
+        "max": 20.0,
+        "key": 6
+      },
+      {
+        "description": "Reduce damage taken while channeling by (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 7
+      },
+      {
+        "description": "Spawns a nova of projectiles dealing (30 - 50%) each",
+        "min": 30.0,
+        "max": 50.0,
+        "key": 8
+      },
+      {
+        "description": "Reduces the MS of the target by (4 - 12%)",
+        "min": 4.0,
+        "max": 12.0,
+        "key": 9
+      }
+    ]
+  }
+}

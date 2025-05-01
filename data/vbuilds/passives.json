@@ -1,0 +1,468 @@
+{
+  "blood_spray": {
+    "name": "Blood Spray",
+    "id": "blood_spray",
+    "img": "/images/vbuilds/passives/passive-blood_spray.jpg",
+    "description": "Increases Physical Critical Chance by 8%. Critical Strikes leech 5% health and there is a 25 chance to spaen a Blood Orb when killing a target affected by Leech.",
+    "type": "Elemental",
+    "modifiers": [
+      {
+        "stat": "Physical Critical Chance",
+        "value": 8,
+        "unit": "percent"
+      }
+    ]
+  },
+  "chaos_kindling": {
+    "name": "Chaos Kindling",
+    "id": "chaos_kindling",
+    "img": "/images/vbuilds/passives/passive-chaos_kindling.jpg",
+    "description": "Increases Spell Cooldown Rate by 7%. Ignite deals 25% increased damage and Chaos Explosions ignite enemies hit.",
+    "type": "Elemental",
+    "modifiers": [
+      {
+        "stat": "Spell Cooldown Rate",
+        "value": 7,
+        "unit": "percent"
+      }
+    ]
+  },
+  "arcane_animator": {
+    "name": "Arcane Animator",
+    "id": "arcane_animator",
+    "img": "/images/vbuilds/passives/passive-arcane_animator.jpg",
+    "description": "16% chance to summon a Skeleton Mage when a Condemned target perishes and minions deal 12% bonus damage.",
+    "type": "Elemental",
+    "modifiers": [
+      {
+        "stat": "Minion Damage",
+        "value": 12,
+        "unit": "percent"
+      },
+      {
+        "stat": "Chance to Summon Skeleton Mage",
+        "value": 16,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "spiritual_infusion": {
+    "name": "Spiritual Infusion",
+    "id": "spiritual_infusion",
+    "img": "/images/vbuilds/passives/passive-spiritual_infusion.jpg",
+    "description": "Increases Healing Received by 12% and deal 8% increased spell damage to Weakened enemies.",
+    "type": "Elemental",
+    "modifiers": [
+      {
+        "stat": "Healing Received",
+        "value": 12,
+        "unit": "percent"
+      },
+      {
+        "stat": "Spell Power",
+        "value": 8,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "cold_soul": {
+    "name": "Cold Soul",
+    "id": "cold_soul",
+    "img": "/images/vbuilds/passives/passive-cold_soul.jpg",
+    "description": "Increases Spell Critical Power by 8% and deal 8% increased damage to Chilled and Frozen enemies.",
+    "type": "Elemental",
+    "modifiers": [
+      {
+        "stat": "Spell Critical Power",
+        "value": 8,
+        "unit": "percent"
+      },
+      {
+        "stat": "Spell Power",
+        "value": 8,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "lightning_fast_strikes": {
+    "name": "Lightning Fast Strikes",
+    "id": "lightning_fast_strikes",
+    "img": "/images/vbuilds/passives/passive-lightning_fast_strikes.jpg",
+    "description": "Increases Primary Attack Speed by 7% and Static triggers deals 20% increased damage.",
+    "type": "Elemental",
+    "modifiers": [
+      {
+        "stat": "Attack Speed",
+        "value": 7,
+        "unit": "percent"
+      },
+      {
+        "stat": "Spell Power",
+        "value": 20,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "sanguine_mastery": {
+    "name": "Sanguine Mastery",
+    "id": "sanguine_mastery",
+    "img": "/images/vbuilds/passives/passive-sanguine_mastery.jpg",
+    "description": "Deal 8% increased physical damage to enemies affected by Leech and boost the effect of your current blood type by 8%.",
+    "type": "Elemental",
+    "modifiers": [
+      {
+        "stat": "Physical Power",
+        "value": 8,
+        "unit": "percent",
+        "calculate": false
+      },
+      {
+        "stat": "Blood Efficiency",
+        "value": 8,
+        "unit": "percent"
+      }
+    ]
+  },
+  "renewing_flames": {
+    "name": "Renewing Flames",
+    "id": "renewing_flames",
+    "img": "/images/vbuilds/passives/passive-renewing_flames.jpg",
+    "description": "Deal 8% increased spell damage to enemies affected by Ignite and Ignite heals you for up to 25% of your spell power.",
+    "type": "Elemental",
+    "modifiers": [
+      {
+        "stat": "Spell Power",
+        "value": 8,
+        "unit": "percent",
+        "calculate": false
+      },
+      {
+        "stat": "Healing Received",
+        "value": 25,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "soul_drinker": {
+    "name": "Soul Drinker",
+    "id": "soul_drinker",
+    "img": "/images/vbuilds/passives/passive-soul_drinker.jpg",
+    "description": "Increases Feed Cooldown Rate by 24% and using Bite summons a Skeleton Warrior.",
+    "type": "Elemental",
+    "modifiers": [
+      {
+        "stat": "Feed Cooldown Rate",
+        "value": 24,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "flowing_sorcery": {
+    "name": "Flowing Sorcery",
+    "id": "flowing_sorcery",
+    "img": "/images/vbuilds/passives/passive-flowing_sorcery.jpg",
+    "description": "Increases Spell Cooldown Rate by 7% and there is a 35% chance to not consume Phantasm when triggering a cooldown reset.",
+    "type": "Elemental",
+    "modifiers": [
+      {
+        "stat": "Spell Cooldown Rate",
+        "value": 7,
+        "unit": "percent"
+      },
+      {
+        "stat": "Chance to Not Consume Phantasm",
+        "value": 35,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "chill_weave": {
+    "name": "Chill Weave",
+    "id": "chill_weave",
+    "img": "/images/vbuilds/passives/passive-chill_weave.jpg",
+    "description": "Shields absorb 10% additional damage. Breaking Freeze with a damaging attack triggers a frost nova dealing 40% magic damage and inflicting Chill.",
+    "type": "Elemental",
+    "modifiers": [
+      {
+        "stat": "Shield Efficiency",
+        "value": 10,
+        "unit": "percent"
+      },
+      {
+        "stat": "Magic Damage",
+        "value": 40,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "enhanced_conductivity": {
+    "name": "Enhanced Conductivity",
+    "id": "enhanced_conductivity",
+    "img": "/images/vbuilds/passives/passive-enhanced_conductivity.jpg",
+    "description": "Increases Bonus Spell Power by 7% and spell damage now also triggers bonus damage to enemies affected by Static.",
+    "type": "Elemental",
+    "modifiers": [
+      {
+        "stat": "Bonus Spell Power",
+        "value": 7,
+        "unit": "percent"
+      }
+    ]
+  },
+  "hunger_for_blood": {
+    "name": "Hunger For Blood",
+    "id": "hunger_for_blood",
+    "img": "/images/vbuilds/passives/passive-hunger_for_blood.jpg",
+    "description": "Increases Primary Attack Leech by 5% and increases damage against V Bloods by 8%.",
+    "type": "Vampire",
+    "modifiers": [
+      {
+        "stat": "Primary Attack Leech",
+        "value": 5,
+        "unit": "percent"
+      },
+      {
+        "stat": "Physical Power",
+        "value": 8,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "overpower": {
+    "name": "Overpower",
+    "id": "overpower",
+    "img": "/images/vbuilds/passives/passive-overpower.jpg",
+    "description": "Increases Weapon Cooldown Rate by 7% and Weapon Charge Gain by 6.",
+    "type": "Vampire",
+    "modifiers": [
+      {
+        "stat": "Weapon Cooldown Rate",
+        "value": 7,
+        "unit": "percent"
+      },
+      {
+        "stat": "Weapon Charge Gain",
+        "value": 6,
+        "unit": "flat"
+      }
+    ]
+  },
+  "lethal_strikes": {
+    "name": "Lethal Strikes",
+    "id": "lethal_strikes",
+    "img": "/images/vbuilds/passives/passive-lethal_strikes.jpg",
+    "description": "Increases Physical Critical Power by 8% and deal 12% increased Physical Damage to enemies below 30% health.",
+    "type": "Vampire",
+    "modifiers": [
+      {
+        "stat": "Physical Critical Power",
+        "value": 8,
+        "unit": "percent"
+      },
+      {
+        "stat": "Physical Power",
+        "value": 12,
+        "unit": "percent",
+        "calculate": false
+      },
+      {
+        "stat": "Health Threshold",
+        "value": 30,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "feral_haste": {
+    "name": "Feral Haste",
+    "id": "feral_haste",
+    "img": "/images/vbuilds/passives/passive-feral_haste.jpg",
+    "description": "Increases Movement Speed by 4% and Movement Speed while shapeshifted by 15%.",
+    "type": "Vampire",
+    "modifiers": [
+      {
+        "stat": "Movement Speed",
+        "value": 4,
+        "unit": "percent"
+      },
+      {
+        "stat": "Shapeshift Speed",
+        "value": 15,
+        "unit": "percent"
+      }
+    ]
+  },
+  "bastion": {
+    "name": "Bastion",
+    "id": "bastion",
+    "img": "/images/vbuilds/passives/passive-bastion.jpg",
+    "description": "Increases Maximum Health by 8% and reduces damage taken by 25% when affected by a crowd control effect.",
+    "type": "Vampire",
+    "modifiers": [
+      {
+        "stat": "Max Health",
+        "value": 8,
+        "unit": "percent"
+      },
+      {
+        "stat": "Damage Reduction",
+        "value": 25,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "hunger_for_power": {
+    "name": "Hunger For Power",
+    "id": "hunger_for_power",
+    "img": "/images/vbuilds/passives/passive-hunger_for_power.jpg",
+    "description": "Increases Spell Leech by 5% and using Bite increases your movement speed by 15% and your spell power by 15% for 5s.",
+    "type": "Vampire",
+    "modifiers": [
+      {
+        "stat": "Spell Leech",
+        "value": 5,
+        "unit": "percent"
+      },
+      {
+        "stat": "Movement Speed",
+        "value": 15,
+        "unit": "percent",
+        "calculate": false
+      },
+      {
+        "stat": "Spell Power",
+        "value": 15,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "rampage": {
+    "name": "Rampage",
+    "id": "rampage",
+    "img": "/images/vbuilds/passives/passive-rampage.jpg",
+    "description": "Increases Physical Critical Chance by 8%. Physical Critical Strikes grants 12% increased Attack Speed for 4s.",
+    "type": "Vampire",
+    "modifiers": [
+      {
+        "stat": "Physical Critical Chance",
+        "value": 8,
+        "unit": "percent"
+      },
+      {
+        "stat": "Attack Speed",
+        "value": 12,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "ravenous_strikes": {
+    "name": "Ravenous Strikes",
+    "id": "ravenous_strikes",
+    "img": "/images/vbuilds/passives/passive-ravenous_strikes.jpg",
+    "description": "Increases Weapon Skill Power by 8% and Weapon Skill Leech by 5%.",
+    "type": "Vampire",
+    "modifiers": [
+      {
+        "stat": "Weapon Skill Power",
+        "value": 8,
+        "unit": "percent"
+      },
+      {
+        "stat": "Weapon Skill Leech",
+        "value": 5,
+        "unit": "percent"
+      }
+    ]
+  },
+  "embrace_mayhem": {
+    "name": "Embrace Mayhem",
+    "id": "embrace_mayhem",
+    "img": "/images/vbuilds/passives/passive-embrace_mayhem.jpg",
+    "description": "Increases Ultimate Cooldown Rate by 14% and Ultimate Power by 10%.",
+    "type": "Vampire",
+    "modifiers": [
+      {
+        "stat": "Ultimate Cooldown Rate",
+        "value": 14,
+        "unit": "percent"
+      },
+      {
+        "stat": "Ultimate Power",
+        "value": 10,
+        "unit": "percent"
+      }
+    ]
+  },
+  "wicked_power": {
+    "name": "Wicked Power",
+    "id": "wicked_power",
+    "img": "/images/vbuilds/passives/passive-wicked_power.jpg",
+    "description": "Increases Spell Critical Chance by 8%. Spell Critical Strikes have a 50% chance to inflict a random spell school effect.",
+    "type": "Vampire",
+    "modifiers": [
+      {
+        "stat": "Spell Critical Chance",
+        "value": 8,
+        "unit": "percent"
+      },
+      {
+        "stat": "Chance to Inflict Random Spell Effect",
+        "value": 50,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "dark_enchantment": {
+    "name": "Dark Enchantment",
+    "id": "dark_enchantment",
+    "img": "/images/vbuilds/passives/passive-dark_enchantment.jpg",
+    "description": "Increases Damage Reduction by 4% and triggers a shield absorbing 270% of your spell power for 4s when you take more than 30% of your maximum health in damage over the last 2s.",
+    "type": "Vampire",
+    "modifiers": [
+      {
+        "stat": "Damage Reduction",
+        "value": 4,
+        "unit": "percent"
+      },
+      {
+        "stat": "Shield Efficiency",
+        "value": 270,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  },
+  "turbulent_velocity": {
+    "name": "Turbulent Velocity",
+    "id": "turbulent_velocity",
+    "img": "/images/vbuilds/passives/passive-turbulent_velocity.jpg",
+    "description": "Increases Movement Speed by 4% and gain 4% additional movement speed for 4s when dealing damage to an enemy.",
+    "type": "Vampire",
+    "modifiers": [
+      {
+        "stat": "Movement Speed",
+        "value": 4,
+        "unit": "percent"
+      },
+      {
+        "stat": "Bonus Movement Speed",
+        "value": 4,
+        "unit": "percent",
+        "calculate": false
+      }
+    ]
+  }
+}

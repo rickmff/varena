@@ -1,0 +1,282 @@
+[
+  {
+    "name": "Bonus Physical Power",
+    "value": 0,
+    "unit": "%",
+    "cap": 25,
+    "defaultValue": 0,
+    "category": "Physical"
+  },
+  {
+    "name": "Attack Speed",
+    "value": 0,
+    "unit": "%",
+    "cap": 135,
+    "defaultValue": 100,
+    "category": "Physical"
+  },
+  {
+    "name": "Physical Critical Chance",
+    "value": 0,
+    "unit": "%",
+    "cap": 45,
+    "defaultValue": 5,
+    "category": "Physical"
+  },
+  {
+    "name": "Physical Critical Power",
+    "value": 0,
+    "unit": "%",
+    "cap": 180,
+    "defaultValue": 140,
+    "category": "Physical"
+  },
+  {
+    "name": "Weapon Skill Power",
+    "value": 0,
+    "unit": "%",
+    "cap": 140,
+    "defaultValue": 100,
+    "category": "Physical"
+  },
+  {
+    "name": "Weapon Charge Gain",
+    "value": 0,
+    "unit": "",
+    "cap": 30,
+    "defaultValue": 0,
+    "category": "Physical"
+  },
+  {
+    "name": "Bonus Spell Power",
+    "value": 0,
+    "unit": "%",
+    "cap": 35,
+    "defaultValue": 0,
+    "category": "Spell"
+  },
+  {
+    "name": "Spell Critical Chance",
+    "value": 0,
+    "unit": "%",
+    "cap": 45,
+    "defaultValue": 5,
+    "category": "Spell"
+  },
+  {
+    "name": "Spell Critical Power",
+    "value": 0,
+    "unit": "%",
+    "cap": 180,
+    "defaultValue": 140,
+    "category": "Spell"
+  },
+  {
+    "name": "Ultimate Power",
+    "value": 0,
+    "unit": "%",
+    "cap": 150,
+    "defaultValue": 100,
+    "category": "Spell"
+  },
+  {
+    "name": "Minion Damage",
+    "value": 0,
+    "unit": "%",
+    "cap": 160,
+    "defaultValue": 100,
+    "category": "Spell"
+  },
+  {
+    "name": "Spell Charge Gain",
+    "value": 0,
+    "unit": "",
+    "cap": 30,
+    "defaultValue": 0,
+    "category": "Spell"
+  },
+  {
+    "name": "Bonus Movement Speed",
+    "value": 0,
+    "unit": "%",
+    "cap": 20,
+    "defaultValue": 0,
+    "category": "Speed"
+  },
+  {
+    "name": "Shapeshift Speed",
+    "value": 0,
+    "unit": "%",
+    "cap": 50,
+    "defaultValue": 0,
+    "category": "Speed"
+  },
+  {
+    "name": "Mount Speed",
+    "value": 0,
+    "unit": "%",
+    "cap": 40,
+    "defaultValue": 0,
+    "category": "Speed"
+  },
+  {
+    "name": "Damage Reduction",
+    "value": 0,
+    "unit": "%",
+    "cap": 20,
+    "defaultValue": 0,
+    "category": "Defense"
+  },
+  {
+    "name": "Shield Efficiency",
+    "value": 0,
+    "unit": "%",
+    "cap": 50,
+    "defaultValue": 0,
+    "category": "Defense"
+  },
+  {
+    "name": "Bonus Maximum Health",
+    "value": 0,
+    "unit": "%",
+    "cap": 40,
+    "defaultValue": 0,
+    "category": "Health & Healing"
+  },
+  {
+    "name": "Health Regeneration",
+    "value": 0,
+    "unit": "%",
+    "cap": 100,
+    "defaultValue": 0,
+    "category": "Health & Healing"
+  },
+  {
+    "name": "Healing Received",
+    "value": 0,
+    "unit": "%",
+    "cap": 60,
+    "defaultValue": 0,
+    "category": "Health & Healing"
+  },
+  {
+    "name": "Primary Attack Leech",
+    "value": 0,
+    "unit": "%",
+    "cap": 25,
+    "defaultValue": 0,
+    "category": "Health & Healing"
+  },
+  {
+    "name": "Weapon Skill Leech",
+    "value": 0,
+    "unit": "%",
+    "cap": 25,
+    "defaultValue": 0,
+    "category": "Health & Healing"
+  },
+  {
+    "name": "Spell Leech",
+    "value": 0,
+    "unit": "%",
+    "cap": 25,
+    "defaultValue": 0,
+    "category": "Health & Healing"
+  },
+  {
+    "name": "Blood Efficiency",
+    "value": 0,
+    "unit": "%",
+    "cap": 50,
+    "defaultValue": 0,
+    "category": "Utility"
+  },
+  {
+    "name": "Blood Drain Reduction",
+    "value": 0,
+    "unit": "%",
+    "cap": 100,
+    "defaultValue": 0,
+    "category": "Utility"
+  },
+  {
+    "name": "Resource Yield",
+    "value": 0,
+    "unit": "%",
+    "cap": null,
+    "defaultValue": 100,
+    "category": "Utility"
+  },
+  {
+    "name": "Weapon Cooldown Rate",
+    "value": 0,
+    "unit": "%",
+    "cap": 35,
+    "defaultValue": 0,
+    "category": "Cooldown"
+  },
+  {
+    "name": "Spell Cooldown Rate",
+    "value": 0,
+    "unit": "%",
+    "cap": 40,
+    "defaultValue": 0,
+    "category": "Cooldown"
+  },
+  {
+    "name": "Veil Cooldown Rate",
+    "value": 0,
+    "unit": "%",
+    "cap": 40,
+    "defaultValue": 0,
+    "category": "Cooldown"
+  },
+  {
+    "name": "Ultimate Cooldown Rate",
+    "value": 0,
+    "unit": "%",
+    "cap": 70,
+    "defaultValue": 0,
+    "category": "Cooldown"
+  },
+  {
+    "name": "Max Health",
+    "value": 0,
+    "unit": "",
+    "cap": null,
+    "defaultValue": 125,
+    "category": "Core Attributes"
+  },
+  {
+    "name": "Physical Power",
+    "value": 0,
+    "unit": "",
+    "cap": null,
+    "defaultValue": 10,
+    "category": "Core Attributes"
+  },
+  {
+    "name": "Spell Power",
+    "value": 0,
+    "unit": "",
+    "cap": null,
+    "defaultValue": 10,
+    "category": "Core Attributes"
+  },
+  {
+    "name": "Movement Speed",
+    "value": 0,
+    "unit": "",
+    "cap": null,
+    "defaultValue": 4.0,
+    "category": "Core Attributes"
+  },
+  {
+    "name": "Resource Harvest Power",
+    "value": 0,
+    "unit": "",
+    "cap": null,
+    "defaultValue": 10,
+    "category": "Core Attributes"
+  }
+]

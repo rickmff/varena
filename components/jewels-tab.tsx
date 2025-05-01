@@ -7,6 +7,8 @@ import { toast } from 'sonner'
 import spellData from "@/data/jewels"
 import { EffectId } from "../data/effects"
 import Image from "next/image"
+import Link from "next/link"
+import { Info } from "lucide-react"
 
 export type SchoolKey = keyof typeof schoolsData;
 
@@ -128,10 +130,12 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
           >
             {selectedSchool ? (
               <div className="flex items-center gap-2">
-                <img
+                <Image
                   src={schoolsData[selectedSchool].image}
                   alt={schoolsData[selectedSchool].name}
                   className="w-10 h-10 object-cover rounded"
+                  width={40}
+                  height={40}
                 />
                 <span>{schoolsData[selectedSchool].name}</span>
               </div>
@@ -161,10 +165,12 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
                   }}
                   className={`w-full px-5 py-4 text-left text-white hover:${schoolColors[key as keyof typeof schoolColors].button} flex items-center gap-2`}
                 >
-                  <img
+                  <Image
                     src={school.image}
                     alt={school.name}
                     className="w-10 h-10 object-cover rounded"
+                    width={40}
+                    height={40}
                   />
                   <span>{school.name}</span>
                 </button>
@@ -182,10 +188,12 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
           >
             {spellName ? (
               <div className="flex items-center gap-2">
-                <img
+                <Image
                   src={spellData[spellName].image ?? "/images/spells/fallback.jpg"}
                   alt={spellData[spellName].name}
                   className="w-10 h-10 object-cover rounded"
+                  width={40}
+                  height={40}
                 />
                 <span>{spellData[spellName].name}</span>
               </div>
@@ -220,6 +228,8 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
                       src={spell.image ?? "/images/spells/fallback.jpg"}
                       alt={spell.name}
                       className="w-10 h-10 object-cover rounded"
+                      width={40}
+                      height={40}
                     />
                     <span>{spell.name}</span>
                   </button>
@@ -285,6 +295,16 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
           </motion.div>
         </div>
       )}
+
+
+      <div className="flex justify-center items-center gap-2 pt-6">
+        <Link href={spellData[spellName].wiki} target="_blank" className="flex items-center gap-2 text-gray-400/50 hover:text-gray-400 transition-all">
+          <Info className="w-4 h-4 mr-2" />
+          <span className="text-sm">
+            Read more about {spellData[spellName].name}
+          </span>
+        </Link>
+      </div>
     </div>
   )
 }

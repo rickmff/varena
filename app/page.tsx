@@ -472,6 +472,40 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="py-32 relative" id="jewels">
+        <div className="container mx-auto px-4 relative ">
+          <motion.div
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            <div className="inline-block rounded-full bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
+              Guide
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
+              Build your Build
+            </h2>
+            <p className="text-gray-100 max-w-2xl mx-auto text-lg">
+              Generate command for your builds
+            </p>
+          </motion.div>
+          <Button variant="outline" size="lg" asChild className="gap-2 border-white/70 text-white hover:bg-red-900 relative overflow-hidden group">
+            <Link href="/guide">
+              Go to the page for that
+              <Play className="h-4 w-4 relative z-10" />
+              <motion.span
+                className="absolute inset-0 bg-white/10"
+                initial={{ x: "-100%" }}
+                whileHover={{ x: 0 }}
+                transition={{ duration: 0.3 }}
+              />
+            </Link>
+          </Button>
+        </div>
+      </section>
+
       {/* News Section */}
       <section id="news" className="py-20 bg-black relative">
         <div className="container mx-auto px-4 relative">

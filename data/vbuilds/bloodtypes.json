@@ -1,0 +1,546 @@
+{
+  "Rogue": {
+    "id": "bloodtype_rogue",
+    "effects": {
+      "I": {
+        "description": "16% Increased Physical Critical Chance and 8% increased Physical Critical Power.",
+        "modifiers": [
+          {
+            "stat": "Physical Critical Chance",
+            "value": 16,
+            "unit": "percent"
+          },
+          {
+            "stat": "Physical Critical Power",
+            "value": 8,
+            "unit": "percent"
+          }
+        ]
+      },
+      "II": {
+        "description": "8% Increased Movement Speed and gain 10% additional speed for 3s when striking a killing blow.",
+        "modifiers": [
+          {
+            "stat": "Movement Speed",
+            "value": 8,
+            "unit": "percent"
+          }
+        ]
+      },
+      "III": {
+        "description": "14% Increased Veil Cooldown Rate. 100% increased Physical Critical Chance after using a Veil.",
+        "modifiers": [
+          {
+            "stat": "Veil Cooldown Rate",
+            "value": 14,
+            "unit": "percent"
+          },
+          {
+            "stat": "Physical Critical Chance",
+            "value": 100,
+            "unit": "percent"
+          }
+        ]
+      },
+      "IV": {
+        "description": "50% Chance on Critical Strike to expose victims armor, increasing damage taken from all sources by 15% for 4s.",
+        "modifiers": [
+          {
+            "stat": "All Damage Taken",
+            "value": 15,
+            "unit": "percent"
+          }
+        ]
+      },
+      "V": {
+        "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
+        "modifiers": [
+          {
+            "stat": "Blood Effect Boost",
+            "value": 20,
+            "unit": "percent"
+          }
+        ]
+      }
+    }
+  },
+  "Warrior": {
+    "id": "bloodtype_warrior",
+    "effects": {
+      "I": {
+        "description": "10% Increased Physical Power and Veil attacks deal 30% bonus damage.",
+        "modifiers": [
+          {
+            "stat": "Physical Power",
+            "value": 10,
+            "unit": "percent"
+          },
+          {
+            "stat": "Veil Attack Damage",
+            "value": 30,
+            "unit": "percent"
+          }
+        ]
+      },
+      "II": {
+        "description": "14% Increased Weapon Cooldown Rate and 5% increased Weapon Skill Leech.",
+        "modifiers": [
+          {
+            "stat": "Weapon Cooldown Rate",
+            "value": 14,
+            "unit": "percent"
+          },
+          {
+            "stat": "Weapon Skill Leech",
+            "value": 5,
+            "unit": "percent"
+          }
+        ]
+      },
+      "III": {
+        "description": "16% Increased Weapon Skill Power and 24% increased damage when striking enemies at full health.",
+        "modifiers": [
+          {
+            "stat": "Weapon Skill Power",
+            "value": 16,
+            "unit": "percent"
+          },
+          {
+            "stat": "Full Health Damage",
+            "value": 24,
+            "unit": "percent"
+          }
+        ]
+      },
+      "IV": {
+        "description": "12 Increased Weapon Charge Gain.",
+        "modifiers": [
+          {
+            "stat": "Weapon Charge Gain",
+            "value": 12,
+            "unit": "flat"
+          }
+        ]
+      },
+      "V": {
+        "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
+        "modifiers": [
+          {
+            "stat": "Blood Effect Boost",
+            "value": 20,
+            "unit": "percent"
+          }
+        ]
+      }
+    }
+  },
+  "Corrupted": {
+    "id": "bloodtype_corrupted",
+    "effects": {
+      "I": {
+        "description": "25%-50% Reduced damage taken from Corrupted Attacks and gain 5% Life Leech but you suffer 10% increased damage taken from all other sources.",
+        "modifiers": [
+          {
+            "stat": "Corrupted Damage Reduction",
+            "value": 25,
+            "unit": "percent"
+          },
+          {
+            "stat": "Life Leech",
+            "value": 5,
+            "unit": "percent"
+          },
+          {
+            "stat": "All Damage Taken",
+            "value": 10,
+            "unit": "percent"
+          }
+        ]
+      },
+      "II": {
+        "description": "Reduces the maximum amount of Vile Corruption stacks by 4-8 but you suffer 50%-100% increased Blood drain rate.",
+        "modifiers": []
+      },
+      "III": {
+        "description": "12% Increased Movement Speed and 18% increased Attack Speed but there is a 25% chance when taking damage to trigger an eruption inflicting a 2s snare.",
+        "modifiers": [
+          {
+            "stat": "Movement Speed",
+            "value": 12,
+            "unit": "percent"
+          },
+          {
+            "stat": "Attack Speed",
+            "value": 18,
+            "unit": "percent"
+          }
+        ]
+      },
+      "IV": {
+        "description": "Spell and Weapon Charge Gain increased by 15 but there is a 30% chance to spawn a shadow that attacks you when using an ability.",
+        "modifiers": [
+          {
+            "stat": "Spell Charge Gain",
+            "value": 15,
+            "unit": "flat"
+          },
+          {
+            "stat": "Weapon Charge Gain",
+            "value": 15,
+            "unit": "flat"
+          }
+        ]
+      },
+      "V": {
+        "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
+        "modifiers": [
+          {
+            "stat": "Blood Effect Boost",
+            "value": 20,
+            "unit": "percent"
+          }
+        ]
+      }
+    }
+  },
+  "Brute": {
+    "id": "bloodtype_brute",
+    "effects": {
+      "I": {
+        "description": "14% Increased Primary Attack Speed and gain 5% increased Physical Power.",
+        "modifiers": [
+          {
+            "stat": "Primary Attack Speed",
+            "value": 14,
+            "unit": "percent"
+          },
+          {
+            "stat": "Physical Power",
+            "value": 5,
+            "unit": "percent"
+          }
+        ]
+      },
+      "II": {
+        "description": "10% Primary Attack Life Leech and 4% increased Damage Reduction.",
+        "modifiers": [
+          {
+            "stat": "Primary Attack Life Leech",
+            "value": 10,
+            "unit": "percent"
+          },
+          {
+            "stat": "Damage Reduction",
+            "value": 4,
+            "unit": "percent"
+          }
+        ]
+      },
+      "III": {
+        "description": "16% Increased Maximum Health. Heal self for 5% of your victim's health when striking a killing blow.",
+        "modifiers": [
+          {
+            "stat": "Bonus Maximum Health",
+            "value": 16,
+            "unit": "percent"
+          }
+        ]
+      },
+      "IV": {
+        "description": "15% Chance to parry an attack reducing damage taken by 25%. Parrying an attack increases your own physical power by 20% for 3.5s.",
+        "modifiers": [
+          {
+            "stat": "Parry Damage Reduction",
+            "value": 25,
+            "unit": "percent"
+          },
+          {
+            "stat": "Physical Power (Parry Buff)",
+            "value": 20,
+            "unit": "percent"
+          }
+        ]
+      },
+      "V": {
+        "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
+        "modifiers": [
+          {
+            "stat": "Blood Effect Boost",
+            "value": 20,
+            "unit": "percent"
+          }
+        ]
+      }
+    }
+  },
+  "Scholar": {
+    "id": "bloodtype_scholar",
+    "effects": {
+      "I": {
+        "description": "14% Increased Spell Power and 10% Shield Efficiency.",
+        "modifiers": [
+          {
+            "stat": "Spell Power",
+            "value": 14,
+            "unit": "percent"
+          },
+          {
+            "stat": "Shield Efficiency",
+            "value": 10,
+            "unit": "percent"
+          }
+        ]
+      },
+      "II": {
+        "description": "14% Increased Spell Cooldown Rate and shield self for 25% of your spell power when casting a spell.",
+        "modifiers": [
+          {
+            "stat": "Spell Cooldown Rate",
+            "value": 14,
+            "unit": "percent"
+          }
+        ]
+      },
+      "III": {
+        "description": "20% Ultimate Power and reset your Spell Cooldowns when using an Ultimate.",
+        "modifiers": [
+          {
+            "stat": "Ultimate Power",
+            "value": 20,
+            "unit": "percent"
+          }
+        ]
+      },
+      "IV": {
+        "description": "12 Increased Spell Charge Gain.",
+        "modifiers": [
+          {
+            "stat": "Spell Charge Gain",
+            "value": 12,
+            "unit": "flat"
+          }
+        ]
+      },
+      "V": {
+        "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
+        "modifiers": [
+          {
+            "stat": "Blood Effect Boost",
+            "value": 20,
+            "unit": "percent"
+          }
+        ]
+      }
+    }
+  },
+  "Mutant": {
+    "id": "bloodtype_mutant",
+    "effects": {
+      "I": {
+        "description": "14% Increased Spell Power and 10% increased Shapeshift Speed.",
+        "modifiers": [
+          {
+            "stat": "Spell Power",
+            "value": 14,
+            "unit": "percent"
+          },
+          {
+            "stat": "Shapeshift Speed",
+            "value": 10,
+            "unit": "percent"
+          }
+        ]
+      },
+      "II": {
+        "description": "28% Increased Ultimate Cooldown Rate and spawn 2x Mutant Rats that fight by your side when casting an Ultimate.",
+        "modifiers": [
+          {
+            "stat": "Ultimate Cooldown Rate",
+            "value": 28,
+            "unit": "percent"
+          }
+        ]
+      },
+      "III": {
+        "description": "20% Ultimate Power and 12% increased Minion Damage.",
+        "modifiers": [
+          {
+            "stat": "Ultimate Power",
+            "value": 20,
+            "unit": "percent"
+          },
+          {
+            "stat": "Minion Damage",
+            "value": 12,
+            "unit": "percent"
+          }
+        ]
+      },
+      "IV": {
+        "description": "7% Increased Veil Cooldown Rate and landing a Veil attack reduces Ultimate Cooldown by 7s.",
+        "modifiers": [
+          {
+            "stat": "Veil Cooldown Rate",
+            "value": 7,
+            "unit": "percent"
+          }
+        ]
+      },
+      "V": {
+        "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
+        "modifiers": [
+          {
+            "stat": "Blood Effect Boost",
+            "value": 20,
+            "unit": "percent"
+          }
+        ]
+      }
+    }
+  },
+  "Draculin": {
+    "id": "bloodtype_draculin",
+    "effects": {
+      "I": {
+        "description": "14% Increased Spell Power and 8% increased Spell Critical Power.",
+        "modifiers": [
+          {
+            "stat": "Spell Power",
+            "value": 14,
+            "unit": "percent"
+          },
+          {
+            "stat": "Spell Critical Power",
+            "value": 8,
+            "unit": "percent"
+          }
+        ]
+      },
+      "II": {
+        "description": "16% Increased Spell Critical Chance and Spell hits grants 8% Movement Speed for 3s.",
+        "modifiers": [
+          {
+            "stat": "Spell Critical Chance",
+            "value": 16,
+            "unit": "percent"
+          },
+          {
+            "stat": "Movement Speed",
+            "value": 8,
+            "unit": "percent"
+          }
+        ]
+      },
+      "III": {
+        "description": "10% Increased Spell Leech and 3% increased Spell Charge Gain.",
+        "modifiers": [
+          {
+            "stat": "Spell Life Leech",
+            "value": 10,
+            "unit": "percent"
+          },
+          {
+            "stat": "Spell Charge Gain",
+            "value": 3,
+            "unit": "percent"
+          }
+        ]
+      },
+      "IV": {
+        "description": "Spell Critical Strike Hits increases Spell Cooldown Rate by 40% for 3s.",
+        "modifiers": [
+          {
+            "stat": "Spell Cooldown Rate",
+            "value": 40,
+            "unit": "percent"
+          }
+        ]
+      },
+      "V": {
+        "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
+        "modifiers": [
+          {
+            "stat": "Blood Effect Boost",
+            "value": 20,
+            "unit": "percent"
+          }
+        ]
+      }
+    }
+  },
+  "Creature": {
+    "id": "bloodtype_creature",
+    "effects": {
+      "I": {
+        "description": "16% Increased Maximum Health and 40% increased health regeneration.",
+        "modifiers": [
+          {
+            "stat": "Bonus Maximum Health",
+            "value": 16,
+            "unit": "percent"
+          },
+          {
+            "stat": "Health Regeneration",
+            "value": 40,
+            "unit": "percent"
+          }
+        ]
+      },
+      "II": {
+        "description": "8% Increased Movement Speed and 8% increased Shapeshift Speed.",
+        "modifiers": [
+          {
+            "stat": "Movement Speed",
+            "value": 8,
+            "unit": "percent"
+          },
+          {
+            "stat": "Shapeshift Speed",
+            "value": 8,
+            "unit": "percent"
+          }
+        ]
+      },
+      "III": {
+        "description": "24% Increased Healing Received and 20 increased All Resistances.",
+        "modifiers": [
+          {
+            "stat": "Healing Received",
+            "value": 24,
+            "unit": "percent"
+          },
+          {
+            "stat": "All Resistances",
+            "value": 20,
+            "unit": "flat"
+          }
+        ]
+      },
+      "IV": {
+        "description": "Bite heals you for 5% of your maximum health and temporarily increases your attack speed and physical damage output by 25%.",
+        "modifiers": [
+          {
+            "stat": "Attack Speed (Buffed after Bite)",
+            "value": 25,
+            "unit": "percent"
+          },
+          {
+            "stat": "Physical Power (Buffed after Bite)",
+            "value": 25,
+            "unit": "percent"
+          }
+        ]
+      },
+      "V": {
+        "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
+        "modifiers": [
+          {
+            "stat": "Blood Effect Boost",
+            "value": 20,
+            "unit": "percent"
+          }
+        ]
+      }
+    }
+  }
+}
