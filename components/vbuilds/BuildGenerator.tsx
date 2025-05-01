@@ -22,7 +22,7 @@ export function loadBaseStats(statsArray: any): any {
   return statMap;
 }
 
-const GuidePage = () => {
+const GuidePage = (user: any) => {
   const baseStats = loadBaseStats(stats);
   return (
     <div className="p-8 bg-gray-900 min-h-screen text-gray-200 flex">

@@ -4,14 +4,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-
-export const menuItems = [
-  { name: "FEATURES", href: "#features" },
-  { name: "NEWS", href: "#news" },
-  { name: "LEADERBOARD", href: "#leaderboard" },
-  { name: "GUIDES", href: "#guides" },
-  { name: "COMMANDS", href: "#commands" },
-]
+import { menuItems } from "@/components/NavBar"
 
 interface GameMenuProps {
   isOpen: boolean

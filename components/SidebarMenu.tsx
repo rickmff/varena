@@ -9,6 +9,7 @@ import {
   Home,
   LogOut,
   HelpCircle,
+  Book,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +36,13 @@ const routes = [
     label: 'News',
     icon: HelpCircle,
     href: '/admin/news',
+    color: 'text-violet-500',
+    disabled: false,
+  },
+  {
+    label: 'Guide',
+    icon: Book,
+    href: '/admin/guides',
     color: 'text-violet-500',
     disabled: false,
   },
