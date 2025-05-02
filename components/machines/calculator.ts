@@ -83,7 +83,6 @@ export const calculator = setup({
     id: 'buildMachine',
     initial: 'ready',
     context: ({ input }) => {
-        console.log(input)
         return {
             baseStats: input.stats,
             activeSources: []
@@ -125,7 +124,7 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
 
     // Flatten all modifiers from all active sources
     const allModifiers: Modifier[] = context.activeSources.flatMap(source => source.modifiers);
-    console.log("All Modifiers", allModifiers);
+
     // Apply each modifier
     for (const mod of allModifiers) {
         if (mod.calculate === false) {
@@ -142,8 +141,6 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
         if (mod.unit === "flat") {
             finalStats[mod.stat] = base + mod.value;
         } else if (mod.unit === "percent") {
-            // console.log("mod", mod)
-            // finalStats[mod.stat] = base + (base * mod.value) / 100;
             finalStats[mod.stat] = base + mod.value;
         }
 
