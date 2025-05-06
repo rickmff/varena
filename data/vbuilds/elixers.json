@@ -1,0 +1,42 @@
+{
+  "elixir_of_the_bat": {
+    "id": "elixir_of_the_bat",
+    "name": "Elixir of the Bat",
+    "image": "/images/vbuilds/elixirs/elixir-bat.webp"
+  },
+  "elixir_of_the_beast": {
+    "id": "elixir_of_the_beast",
+    "name": "Elixir of the Beast",
+    "image": "/images/vbuilds/elixirs/elixir-beast.webp"
+  },
+  "elixir_of_the_blasphemous": {
+    "id": "elixir_of_the_blasphemous",
+    "name": "Elixir of the Blasphemous",
+    "image": "/images/vbuilds/elixirs/elixir-blasphemous.webp"
+  },
+  "elixir_of_the_crow": {
+    "id": "elixir_of_the_crow",
+    "name": "Elixir of the Crow",
+    "image": "/images/vbuilds/elixirs/elixir-crow.webp"
+  },
+  "elixir_of_the_prowler": {
+    "id": "elixir_of_the_prowler",
+    "name": "Elixir of the Prowler",
+    "image": "/images/vbuilds/elixirs/elixir-prowler.webp"
+  },
+  "elixir_of_the_raven": {
+    "id": "elixir_of_the_raven",
+    "name": "Elixir of the Raven",
+    "image": "/images/vbuilds/elixirs/elixir-raven.webp"
+  },
+  "elixir_of_the_twisted": {
+    "id": "elixir_of_the_twisted",
+    "name": "Elixir of the Twisted",
+    "image": "/images/vbuilds/elixirs/elixir-twisted.webp"
+  },
+  "elixir_of_the_werewolf": {
+    "id": "elixir_of_the_werewolf",
+    "name": "Elixir of the Werewolf",
+    "image": "/images/vbuilds/elixirs/elixir-werewolf.webp"
+  }
+}
