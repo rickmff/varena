@@ -1,7 +1,8 @@
 {
   "amulet_blademaster": {
+    "id": "amulet_blademaster",
     "name": "Amulet of the Blademaster",
-    "img": "/images/vbuilds/amulets/Jewelry_AmuletoftheBlademaster.webp",
+    "image": "/images/vbuilds/amulets/Jewelry_AmuletoftheBlademaster.webp",
     "attributes": [
       {
         "stat": "Spell Power",
@@ -24,8 +25,9 @@
     }
   },
   "amulet_crimson_commander": {
+    "id": "amulet_crimson_commander",
     "name": "Amulet of the Crimson Commander",
-    "img": "/images/vbuilds/amulets/Jewelry_AmuletoftheCrimsonCommander.webp",
+    "image": "/images/vbuilds/amulets/Jewelry_AmuletoftheCrimsonCommander.webp",
     "attributes": [
       {
         "stat": "Spell Power",
@@ -48,8 +50,9 @@
     }
   },
   "amulet_arch_warlock": {
+    "id": "amulet_arch_warlock",
     "name": "Amulet of the Arch-Warlock",
-    "img": "/images/vbuilds/amulets/Jewelry_AmuletoftheArch-Warlock.webp",
+    "image": "/images/vbuilds/amulets/Jewelry_AmuletoftheArch-Warlock.webp",
     "attributes": [
       {
         "stat": "Spell Power",
@@ -72,8 +75,9 @@
     }
   },
   "amulet_master_spellweaver": {
+    "id": "amulet_master_spellweaver",
     "name": "Amulet of the Master Spellweaver",
-    "img": "/images/vbuilds/amulets/Jewelry_AmuletoftheMasterSpellweaver.webp",
+    "image": "/images/vbuilds/amulets/Jewelry_AmuletoftheMasterSpellweaver.webp",
     "attributes": [
       {
         "stat": "Spell Power",
@@ -96,8 +100,9 @@
     }
   },
   "amulet_wicked_prophet": {
+    "id": "amulet_wicked_prophet",
     "name": "Amulet of the Wicked Prophet",
-    "img": "/images/vbuilds/amulets/Jewelry_AmuletoftheWickedProphet.webp",
+    "image": "/images/vbuilds/amulets/Jewelry_AmuletoftheWickedProphet.webp",
     "attributes": [
       {
         "stat": "Spell Power",
@@ -120,8 +125,9 @@
     }
   },
   "amulet_unyielding_charger": {
+    "id": "amulet_unyielding_charger",
     "name": "Amulet of the Unyielding Charger",
-    "img": "/images/vbuilds/amulets/Jewelry_AmuletoftheUnyieldingCharger.webp",
+    "image": "/images/vbuilds/amulets/Jewelry_AmuletoftheUnyieldingCharger.webp",
     "attributes": [
       {
         "stat": "Spell Power",

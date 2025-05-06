@@ -1,4 +1,4 @@
-import { setup, createMachine, assign, log } from 'xstate';
+import { setup, createMachine, assign, log, raise } from 'xstate';
 
 type StatName =
     | "Bonus Physical Power"
@@ -47,19 +47,24 @@ export interface Modifier {
 export interface ModifierSource {
     id: string;        // unique id like "amulet_blademaster" or "blood_rogue"
     name: string;      // user friendly name like "Amulet of the Blademaster"
-    type: "blood" | "item" | "buff" | "gear" | "passive"; // category
+    type: "blood" | "item" | "buff" | "gear" | "amulet" | "passive"; // category
     modifiers: Modifier[];
 }
 
 interface BuildContext {
     baseStats: Record<StatName, StatEntry>;
     activeSources: ModifierSource[];
+    passives: any[];
 }
 
-type BuildEvent =
+type BuildEvents =
     | { type: 'ADD_SOURCE'; source: ModifierSource }
     | { type: 'REMOVE_SOURCE'; sourceId: string }
-    | { type: 'RESET_BUILD' };
+    | { type: 'RESET_BUILD' }
+    | { type: "goto.passiveForge" }
+    | { type: "goto.overview" }
+    | { type: 'ADD_PASSIVE'; passive: any }
+    | { type: 'REMOVE_PASSIVE'; id: string }
 
 
 type StatEntry = {
@@ -73,25 +78,42 @@ type StatEntry = {
 
 
 
-export const calculator = setup({
+export const builder = setup({
     types: {
         input: {} as { stats: Record<StatName, StatEntry> },
         context: {} as BuildContext,
-        events: {} as BuildEvent
+        events: {} as BuildEvents
+        // actions: 
     }
 }).createMachine({
-    id: 'buildMachine',
-    initial: 'ready',
+    id: 'buildCalculator',
+    initial: 'overview',
     context: ({ input }) => {
         return {
             baseStats: input.stats,
-            activeSources: []
+            activeSources: [],
+            passives: [],
+            // armour: null,
+            // amulet: null,
+            // elixir: null,
+            // selectedWeapon: null,
+            // armour: null,
+            // amulet: null,
+            // weapons: [],
+            // passives: [],
         }
     },
     states: {
-        ready: {
+        overview: {
             entry: [log(({ context }) => `Build machine initialized with base stats: ${JSON.stringify(context.baseStats)}`)],
             on: {
+                // CREATE_WEAPON: {},
+                // CREATE_JEWEL: {
+
+                // },
+                "goto.passiveForge": {
+                    target: 'passiveForge',
+                },
                 ADD_SOURCE: {
                     actions: assign({
                         activeSources: ({ context, event }) => [...context.activeSources, event.source]
@@ -109,9 +131,41 @@ export const calculator = setup({
                     })
                 }
             }
-        }
+        },
+        bloodForge: {},
+        passiveForge: {
+            // entry: [raise({ type: "REMOVE_PASSIVES" })],
+            on: {
+                "goto.overview": {
+                    target: 'overview',
+                },
+                ADD_PASSIVE: {
+                    actions: assign({
+                        passives: ({ context, event }) => [...context.passives, event.passive]
+                    })
+                },
+                REMOVE_PASSIVE: {
+                    actions: assign({
+                        passives: ({ context, event }) => context.passives.filter((p: any) => p.id !== event.id)
+                    })
+                },
+                REMOVE_PASSIVES: {
+                    actions: assign({
+                        passives: []
+                    })
+                },
+            }
+        },
+        weaponForge: {
+            // ADD_WEAPON: {},
+        },
+        spellForge: {},
+        jewelForge: {},
     }
 });
+
+
+
 
 
 export function computeFinalStats(context: BuildContext): Record<string, number> {

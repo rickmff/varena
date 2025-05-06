@@ -1,16 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import passivesData from "@/data/vbuilds/passives.json";
-import { StatProviderContext } from "@/components/vbuilds/StatProvider";
-import { Modifier } from "../machines/calculator";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+import { useBuilder } from "@/components/vbuilds/BuildProvider";
+import { useSelector } from "@xstate/react";
+import { Modifier } from "../machines/builder";
+
+import { PassivePlaceholder } from "./PassiveForge";
 
 export interface Passive {
+  id: string;
   name: string;
   img?: string; // path to image
   description: string;
@@ -27,38 +26,30 @@ export type PassiveCollection = Record<string, Passive>;
 
 const passives: PassiveCollection = passivesData as PassiveCollection;
 
-export function PassiveList() {
-  const [selectedPassives, setSelectedPassives] = useState<string[]>([]);
-  const [hoveredPassive, setHoveredPassive] = useState<string | null>(null);
-  const calculator = StatProviderContext.useActorRef();
+export function PassiveList({
+  setHoverPassive,
+}: {
+  setHoverPassive: Dispatch<SetStateAction<Passive | null>>;
+}) {
+  const { send, builder } = useBuilder();
+
+  const activePassives = useSelector(
+    builder,
+    (state) => state.context.passives
+  );
 
   const handlePassiveChange = (key: string) => {
-    const isSelected = selectedPassives.includes(key);
+    const isSelected = activePassives.find((passive) => passive.id === key);
 
-    if (!isSelected && selectedPassives.length >= 5) {
+    if (!isSelected && activePassives.length >= 5) {
       // Prevent adding more than 5 passives
       return;
     }
 
-    const updatedPassives = isSelected
-      ? selectedPassives.filter((id) => id !== key)
-      : [...selectedPassives, key];
-
-    setSelectedPassives(updatedPassives);
-
     if (isSelected) {
-      calculator.send({ type: "REMOVE_SOURCE", sourceId: key });
+      send({ type: "REMOVE_PASSIVE", id: key });
     } else {
-      const passive = passives[key];
-      calculator.send({
-        type: "ADD_SOURCE",
-        source: {
-          id: key,
-          name: passive.name,
-          modifiers: passive.modifiers as Modifier[],
-          type: "passive",
-        },
-      });
+      send({ type: "ADD_PASSIVE", passive: passives[key] });
     }
   };
 
@@ -77,48 +68,98 @@ export function PassiveList() {
         <div key={type}>
           <h2 className="text-xl font-bold mb-4">{type}</h2>
           <div className="grid lg:grid-cols-6 md:grid-cols-3 grid-cols-2">
-            {groupedPassives[type]?.map(([key, passive]) => (
-              <HoverCard openDelay={0} closeDelay={0} key={key}>
-                <HoverCardTrigger>
-                  <label className="flex flex-col items-center justify-center p-4 cursor-pointer">
-                    {passive.img && (
-                      <img
-                        src={passive.img}
-                        alt={passive.name}
-                        className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-500 ${selectedPassives.includes(key)
+            {groupedPassives[type]?.map(([key, passive]) => {
+              const isSelected = activePassives.find(
+                (passive) => passive.id === key
+              );
+              const hasMaximumSelected = activePassives.length === 5;
+              return (
+                <label
+                  key={key}
+                  className={`flex flex-col items-center justify-center p-4 ${
+                    activePassives.length === 5 && !isSelected
+                      ? "cursor-not-allowed"
+                      : "cursor-pointer"
+                  }`}
+                  onMouseEnter={() => {
+                    setHoverPassive(passive);
+                  }}
+                  onMouseLeave={() => {
+                    setHoverPassive(null);
+                  }}
+                >
+                  {passive.img && (
+                    <img
+                      src={passive.img}
+                      alt={passive.name}
+                      className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-500 ${
+                        isSelected
                           ? "border-emerald-300"
+                          : hasMaximumSelected
+                          ? "border-red-800 opacity-10 pointer-events-none"
                           : "border-gray-700"
-                          }`}
-                      />
-                    )}
-                    <input
-                      type="checkbox"
-                      name="passive"
-                      value={key}
-                      className="hidden"
-                      checked={selectedPassives.includes(key)}
-                      onChange={() => handlePassiveChange(key)}
+                      }`}
                     />
-                  </label>
-                </HoverCardTrigger>
-                <HoverCardContent className="space-y-2 w-96">
-                  <div className="flex items-center gap-4">
-                    {passive.img && (
-                      <img
-                        src={passive.img}
-                        alt={passive.name}
-                        className="w-12 h-12 mb-2 object-contain"
-                      />
-                    )}
-                    <h3 className="font-bold">{passive.name}</h3>
-                  </div>
-                  <p className="text-sm">{passive.description}</p>
-                </HoverCardContent>
-              </HoverCard>
-            ))}
+                  )}
+                  <input
+                    type="checkbox"
+                    name="passive"
+                    value={key}
+                    className="hidden"
+                    checked={isSelected}
+                    onChange={() => handlePassiveChange(passive.id)}
+                  />
+                </label>
+              );
+            })}
           </div>
         </div>
       ))}
+      <div className="flex gap-4 justify-center bg-neutral-900 p-4 rounded-lg">
+        {activePassives.map((selectedPassive: string) => {
+          const allPassives = Object.values(passives);
+          const passive = allPassives.find(
+            (passive) => passive.id === selectedPassive
+          );
+          if (!passive) return null;
+          return (
+            <label
+              className="flex flex-col items-center justify-center cursor-pointer ab"
+              onMouseEnter={() => {
+                setHoverPassive(passive);
+              }}
+              onMouseLeave={() => {
+                setHoverPassive(null);
+              }}
+            >
+              {passive.img && (
+                <img
+                  src={passive.img}
+                  alt={passive.name}
+                  className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-500 ${
+                    activePassives.includes(passive.id)
+                      ? "border-emerald-300"
+                      : "border-gray-700"
+                  }`}
+                />
+              )}
+              <input
+                type="checkbox"
+                name="passive"
+                value={passive.id}
+                className="hidden"
+                checked={
+                  activePassives.find(
+                    (activePassive) => activePassive.id === passive.id
+                  ) !== undefined
+                }
+                onChange={() => handlePassiveChange(passive.id)}
+              />
+            </label>
+          );
+        })}
+        <PassivePlaceholder length={activePassives.length} />
+      </div>
     </div>
   );
 }

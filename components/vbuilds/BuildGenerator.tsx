@@ -1,11 +1,13 @@
 "use client";
 
 import stats from "@/data/vbuilds/stats.json";
-import StatProvider from "@/components/vbuilds/StatProvider";
+import BuildProvider from "@/components/vbuilds/BuildProvider";
 import { GroupedStatList } from "@/components/vbuilds/GroupedStatList";
-import { AmuletList } from "@/components/vbuilds/AmuletList";
-import { PassiveList } from "@/components/vbuilds/PassiveList";
+import { AmuletPicker } from "@/components/vbuilds/AmuletPicker";
 import { WeaponSheet } from "@/components/vbuilds/WeaponSheet";
+import { ArmourPicker } from "@/components/vbuilds/ArmourPicker";
+import { ElixerPicker } from "./ElixirPicker";
+import { PassiveForge, PassivePlaceholder } from "./PassiveForge";
 // import { flattenBaseStats } from "../machines/calculator";
 
 // Base
@@ -22,23 +24,35 @@ export function loadBaseStats(statsArray: any): any {
   return statMap;
 }
 
-const GuidePage = (user: any) => {
+const BuilderPage = (user: any) => {
   const baseStats = loadBaseStats(stats);
   return (
-    <div className="p-8 bg-gray-900 min-h-screen text-gray-200 flex">
-      <StatProvider stats={baseStats}>
+    <div className="p-8  text-gray-200 flex">
+      {/* <div className="absolute inset-0 bg-[url('/flower.png')] bg-cover bg-center grayscale -z-10 opacity-0"></div> */}
+      <BuildProvider stats={baseStats}>
         <GroupedStatList stats={stats} />
-        <div className="w-3/4 pl-8">
-          <h2 className="text-3xl font-bold text-gray-100 mb-4">Amulets</h2>
-          <AmuletList />
-          <h2 className="text-3xl font-bold text-gray-100 mb-4">Passives</h2>
-          <PassiveList />
-          <WeaponSheet />
+        <div className="w-3/4 pl-8 flex flex-col gap-8">
+          <h2 className="text-3xl font-bold text-gray-100 mb-4">Build</h2>
+          <div className="flex gap-4">
+            <ArmourPicker />
+            <AmuletPicker />
+            <ElixerPicker />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-100 mb-4">Passives</h2>
+            <PassiveForge />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-100">Weapons</h2>
+
+            <WeaponSheet />
+          </div>
         </div>
-      </StatProvider>
+      </BuildProvider>
+      {/* <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black "></div> */}
     </div>
   );
-}
+};
 
 // {
 //   bp: [{ primary: "rogue", secondary: "warrior", fusion: 3 }],
@@ -62,4 +76,4 @@ const GuidePage = (user: any) => {
 //   ]
 // }
 
-export default GuidePage;
+export default BuilderPage;
