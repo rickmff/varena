@@ -1,3 +1,4 @@
+import { act } from 'react';
 import { setup, createMachine, assign, log, raise } from 'xstate';
 
 type StatName =
@@ -55,16 +56,28 @@ interface BuildContext {
     baseStats: Record<StatName, StatEntry>;
     activeSources: ModifierSource[];
     passives: any[];
+    weapons: any[];
+    spells: {
+        dash: any | null;
+        spell1: any | null;
+        spell2: any | null;
+        ultimate: any | null;
+    };
 }
 
 type BuildEvents =
     | { type: 'ADD_SOURCE'; source: ModifierSource }
     | { type: 'REMOVE_SOURCE'; sourceId: string }
     | { type: 'RESET_BUILD' }
+    | { type: "goto.spellForge" }
     | { type: "goto.passiveForge" }
     | { type: "goto.overview" }
     | { type: 'ADD_PASSIVE'; passive: any }
     | { type: 'REMOVE_PASSIVE'; id: string }
+    | { type: 'ADD_WEAPON'; weapon: any }
+    | { type: 'REMOVE_WEAPON'; id: string }
+    | { type: 'ADD_SPELL'; spell: any, slot: "dash" | "ultimate" | "spell1" | "spell2" }
+    | { type: 'REMOVE_SPELL'; id: string }
 
 
 type StatEntry = {
@@ -93,6 +106,13 @@ export const builder = setup({
             baseStats: input.stats,
             activeSources: [],
             passives: [],
+            spells: {
+                dash: null,
+                spell1: null,
+                spell2: null,
+                ultimate: null,
+            },
+            weapons: [],
             // armour: null,
             // amulet: null,
             // elixir: null,
@@ -113,6 +133,9 @@ export const builder = setup({
                 // },
                 "goto.passiveForge": {
                     target: 'passiveForge',
+                },
+                "goto.spellForge": {
+                    target: 'spellForge',
                 },
                 ADD_SOURCE: {
                     actions: assign({
@@ -149,17 +172,47 @@ export const builder = setup({
                         passives: ({ context, event }) => context.passives.filter((p: any) => p.id !== event.id)
                     })
                 },
-                REMOVE_PASSIVES: {
+            }
+        },
+        weaponForge: {
+            on: {
+                "goto.overview": {
+                    target: 'overview',
+                },
+                ADD_WEAPON: {
                     actions: assign({
-                        passives: []
+                        passives: ({ context, event }) => [...context.passives, event.weapon]
+                    })
+                },
+                REMOVE_WEAPON: {
+                    actions: assign({
+                        passives: ({ context, event }) => context.passives.filter((p: any) => p.id !== event.id)
                     })
                 },
             }
         },
-        weaponForge: {
-            // ADD_WEAPON: {},
+        spellForge: {
+            // ADD_ULTIMATE: {},
+            on: {
+                "goto.overview": {
+                    target: 'overview',
+                },
+                ADD_SPELL: {
+                    actions: assign({
+                        spells: ({ context, event }) => ({
+                            ...context.spells, [event.slot]: event.spell
+                        })
+                    })
+                },
+                REMOVE_SPELL: {
+                    actions: assign({
+                        spells: ({ context, event }) => ({
+                            ...context.spells, [event.slot]: null
+                        })
+                    })
+                },
+            }
         },
-        spellForge: {},
         jewelForge: {},
     }
 });

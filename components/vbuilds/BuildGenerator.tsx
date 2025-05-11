@@ -8,6 +8,7 @@ import { WeaponSheet } from "@/components/vbuilds/WeaponSheet";
 import { ArmourPicker } from "@/components/vbuilds/ArmourPicker";
 import { ElixerPicker } from "./ElixirPicker";
 import { PassiveForge, PassivePlaceholder } from "./PassiveForge";
+import { SpellForge } from "./SpellForge";
 // import { flattenBaseStats } from "../machines/calculator";
 
 // Base
@@ -46,6 +47,10 @@ const BuilderPage = (user: any) => {
             <h2 className="text-3xl font-bold text-gray-100">Weapons</h2>
 
             <WeaponSheet />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-100 mb-4">Spells</h2>
+            <SpellForge />
           </div>
         </div>
       </BuildProvider>

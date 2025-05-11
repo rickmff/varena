@@ -2,7 +2,7 @@
   "veil_of_blood": {
     "name": "Veil of Blood",
     "id": "veil_of_blood",
-    "img": "/images/spells/spell-veil_of_blood.jpg",
+    "img": "/images/vbuilds/spells/spell-blood-veil_of_blood.png",
     "spellSchool": "blood",
     "effects": [
       {
@@ -46,7 +46,7 @@
   "blood_fountain": {
     "name": "Blood Fountain",
     "id": "blood_fountain",
-    "img": "/images/spells/spell-blood_fountain.jpg",
+    "img": "/images/vbuilds/spells/spell-blood-blood_fountain.png",
     "spellSchool": "blood",
     "effects": [
       {
@@ -108,7 +108,7 @@
   "blood_rage": {
     "name": "Blood Rage",
     "id": "blood_rage",
-    "img": "/images/spells/spell-blood_rage.jpg",
+    "img": "/images/vbuilds/spells/spell-blood-blood_rage.png",
     "spellSchool": "blood",
     "effects": [
       {
@@ -158,7 +158,7 @@
   "blood_rite": {
     "name": "Blood Rite",
     "id": "blood_rite",
-    "img": "/images/spells/spell-blood_rite.jpg",
+    "img": "/images/vbuilds/spells/spell-blood-blood_rite.png",
     "spellSchool": "blood",
     "effects": [
       {
@@ -214,7 +214,7 @@
   "sanguine_coil": {
     "name": "Sanguine Coil",
     "id": "sanguine_coil",
-    "img": "/images/spells/spell-sanguine_coil.jpg",
+    "img": "/images/vbuilds/spells/spell-blood-sanguine_coil.png",
     "spellSchool": "blood",
     "effects": [
       {
@@ -270,7 +270,7 @@
   "shadowbolt": {
     "name": "Shadowbolt",
     "id": "shadowbolt",
-    "img": "/images/spells/spell-shadowbolt.jpg",
+    "img": "/images/vbuilds/spells/spell-blood-shadowbolt.png",
     "spellSchool": "blood",
     "effects": [
       {
@@ -326,7 +326,7 @@
   "carrion_swarm": {
     "name": "Carrion Swarm",
     "id": "carrion_swarm",
-    "img": "/images/spells/spell-carrion_swarm.jpg",
+    "img": "/images/vbuilds/spells/spell-blood-carrion_swarm.png",
     "spellSchool": "blood",
     "effects": [
       {
@@ -412,7 +412,7 @@
   "aftershock": {
     "name": "Aftershock",
     "id": "aftershock",
-    "img": "/images/spells/spell-aftershock.jpg",
+    "img": "/images/vbuilds/spells/spell-chaos-aftershock.png",
     "spellSchool": "chaos",
     "effects": [
       {
@@ -456,7 +456,7 @@
   "chaos_barrier": {
     "name": "Chaos Barrier",
     "id": "chaos_barrier",
-    "img": "/images/spells/spell-chaos_barrier.jpg",
+    "img": "/images/vbuilds/spells/spell-chaos-chaos_barrier.png",
     "spellSchool": "chaos",
     "effects": [
       {
@@ -500,7 +500,7 @@
   "chaos_volley": {
     "name": "Chaos Volley",
     "id": "chaos_volley",
-    "img": "/images/spells/spell-chaos_volley.jpg",
+    "img": "/images/vbuilds/spells/spell-chaos-chaos_volley.png",
     "spellSchool": "chaos",
     "effects": [
       {
@@ -544,7 +544,7 @@
   "power_surge": {
     "name": "Power Surge",
     "id": "power_surge",
-    "img": "/images/spells/spell-power_surge.jpg",
+    "img": "/images/vbuilds/spells/spell-chaos-power_surge.png",
     "spellSchool": "chaos",
     "effects": [
       {
@@ -600,7 +600,7 @@
   "void": {
     "name": "Void",
     "id": "void",
-    "img": "/images/spells/spell-void.jpg",
+    "img": "/images/vbuilds/spells/spell-chaos-void.png",
     "spellSchool": "chaos",
     "effects": [
       {
@@ -644,7 +644,7 @@
   "rain_of_chaos": {
     "name": "Rain of Chaos",
     "id": "rain_of_chaos",
-    "img": "/images/spells/spell-rain_of_chaos.jpg",
+    "img": "/images/vbuilds/spells/spell-chaos-rain_of_chaos.png",
     "spellSchool": "chaos",
     "effects": [
       {
@@ -688,7 +688,7 @@
   "veil_of_frost": {
     "name": "Veil of Frost",
     "id": "veil_of_frost",
-    "img": "/images/spells/spell-veil_of_frost.jpg",
+    "img": "/images/vbuilds/spells/spell-frost-veil_of_frost.png",
     "spellSchool": "frost",
     "effects": [
       {
@@ -732,7 +732,7 @@
   "cold_snap": {
     "name": "Cold Snap",
     "id": "cold_snap",
-    "img": "/images/spells/spell-cold_snap.jpg",
+    "img": "/images/vbuilds/spells/spell-frost-cold_snap.png",
     "spellSchool": "frost",
     "effects": [
       {
@@ -776,7 +776,7 @@
   "crystal_lance": {
     "name": "Crystal Lance",
     "id": "crystal_lance",
-    "img": "/images/spells/spell-crystal_lance.jpg",
+    "img": "/images/vbuilds/spells/spell-frost-crystal_lance.png",
     "spellSchool": "frost",
     "effects": [
       {
@@ -820,7 +820,7 @@
   "frost_barrier": {
     "name": "Frost Barrier",
     "id": "frost_barrier",
-    "img": "/images/spells/spell-frost_barrier.jpg",
+    "img": "/images/vbuilds/spells/spell-frost-frost_barrier.png",
     "spellSchool": "frost",
     "effects": [
       {
@@ -876,7 +876,7 @@
   "frost_bat": {
     "name": "Frost Bat",
     "id": "frost_bat",
-    "img": "/images/spells/spell-frost_bat.jpg",
+    "img": "/images/vbuilds/spells/spell-frost-frost_bat.png",
     "spellSchool": "frost",
     "effects": [
       {
@@ -920,7 +920,7 @@
   "ice_nova": {
     "name": "Ice Nova",
     "id": "ice_nova",
-    "img": "/images/spells/spell-ice_nova.jpg",
+    "img": "/images/vbuilds/spells/spell-frost-ice_nova.png",
     "spellSchool": "frost",
     "effects": [
       {
@@ -958,7 +958,7 @@
   "arctic_storm": {
     "name": "Arctic Storm",
     "id": "arctic_storm",
-    "img": "/images/spells/spell-arctic_storm.jpg",
+    "img": "/images/vbuilds/spells/spell-frost-arctic_storm.png",
     "spellSchool": "frost",
     "effects": [
       {
@@ -1002,7 +1002,7 @@
   "veil_of_illusion": {
     "name": "Veil of Illusion",
     "id": "veil_of_illusion",
-    "img": "/images/spells/spell-veil_of_illusion.jpg",
+    "img": "/images/vbuilds/spells/spell-illusion-veil_of_illusion.png",
     "spellSchool": "illusion",
     "effects": [
       {
@@ -1052,7 +1052,7 @@
   "mist_trance": {
     "name": "Mist Trance",
     "id": "mist_trance",
-    "img": "/images/spells/spell-mist_trance.jpg",
+    "img": "/images/vbuilds/spells/spell-illusion-mist_trance.png",
     "spellSchool": "illusion",
     "effects": [
       {
@@ -1108,7 +1108,7 @@
   "mosquito": {
     "name": "Mosquito",
     "id": "mosquito",
-    "img": "/images/spells/spell-mosquito.jpg",
+    "img": "/images/vbuilds/spells/spell-illusion-mosquito.png",
     "spellSchool": "illusion",
     "effects": [
       {
@@ -1146,7 +1146,7 @@
   "phantom_aegis": {
     "name": "Phantom Aegis",
     "id": "phantom_aegis",
-    "img": "/images/spells/spell-phantom_aegis.jpg",
+    "img": "/images/vbuilds/spells/spell-illusion-phantom_aegis.png",
     "spellSchool": "illusion",
     "effects": [
       {
@@ -1196,7 +1196,7 @@
   "spectral_wolf": {
     "name": "Spectral Wolf",
     "id": "spectral_wolf",
-    "img": "/images/spells/spell-spectral_wolf.jpg",
+    "img": "/images/vbuilds/spells/spell-illusion-spectral_wolf.png",
     "spellSchool": "illusion",
     "effects": [
       {
@@ -1252,7 +1252,7 @@
   "wraith_spear": {
     "name": "Wraith Spear",
     "id": "wraith_spear",
-    "img": "/images/spells/spell-wraith_spear.jpg",
+    "img": "/images/vbuilds/spells/spell-illusion-wraith_spear.png",
     "spellSchool": "illusion",
     "effects": [
       {
@@ -1302,7 +1302,7 @@
   "curse": {
     "name": "Curse",
     "id": "curse",
-    "img": "/images/spells/spell-curse.jpg",
+    "img": "/images/vbuilds/spells/spell-illusion-curse.png",
     "spellSchool": "illusion",
     "effects": [
       {
@@ -1352,7 +1352,7 @@
   "veil_of_storm": {
     "name": "Veil of Storm",
     "id": "veil_of_storm",
-    "img": "/images/spells/spell-veil_of_storm.jpg",
+    "img": "/images/vbuilds/spells/spell-storm-veil_of_storm.png",
     "spellSchool": "storm",
     "effects": [
       {
@@ -1396,7 +1396,7 @@
   "ball_lightning": {
     "name": "Ball Storm",
     "id": "ball_lightning",
-    "img": "/images/spells/spell-ball_lightning.jpg",
+    "img": "/images/vbuilds/spells/spell-storm-ball_lightning.png",
     "spellSchool": "storm",
     "effects": [
       {
@@ -1440,7 +1440,7 @@
   "cyclone": {
     "name": "Cyclone",
     "id": "cyclone",
-    "img": "/images/spells/spell-cyclone.jpg",
+    "img": "/images/vbuilds/spells/spell-storm-cyclone.png",
     "spellSchool": "storm",
     "effects": [
       {
@@ -1496,7 +1496,7 @@
   "discharge": {
     "name": "Discharge",
     "id": "discharge",
-    "img": "/images/spells/spell-discharge.jpg",
+    "img": "/images/vbuilds/spells/spell-storm-discharge.png",
     "spellSchool": "storm",
     "effects": [
       {
@@ -1540,7 +1540,7 @@
   "lightning_curtain": {
     "name": "Storm Curtain",
     "id": "lightning_curtain",
-    "img": "/images/spells/spell-lightning_curtain.jpg",
+    "img": "/images/vbuilds/spells/spell-storm-lightning_curtain.png",
     "spellSchool": "storm",
     "effects": [
       {
@@ -1578,7 +1578,7 @@
   "polarity_shift": {
     "name": "Polarity Shift",
     "id": "polarity_shift",
-    "img": "/images/spells/spell-polarity_shift.jpg",
+    "img": "/images/vbuilds/spells/spell-storm-polarity_shift.png",
     "spellSchool": "storm",
     "effects": [
       {
@@ -1616,7 +1616,7 @@
   "lightning_tendrils": {
     "name": "Storm Tendrils",
     "id": "lightning_tendrils",
-    "img": "/images/spells/spell-lightning_tendrils.jpg",
+    "img": "/images/vbuilds/spells/spell-storm-lightning_tendrils.png",
     "spellSchool": "storm",
     "effects": [
       {
@@ -1666,7 +1666,7 @@
   "veil_of_bones": {
     "name": "Veil of Bones",
     "id": "veil_of_bones",
-    "img": "/images/spells/spell-veil_of_bones.jpg",
+    "img": "/images/vbuilds/spells/spell-unholy-veil_of_bones.png",
     "spellSchool": "unholy",
     "effects": [
       {
@@ -1716,7 +1716,7 @@
   "bone_explosion": {
     "name": "Bone Explosion",
     "id": "bone_explosion",
-    "img": "/images/spells/spell-bone_explosion.jpg",
+    "img": "/images/vbuilds/spells/spell-unholy-bone_explosion.png",
     "spellSchool": "unholy",
     "effects": [
       {
@@ -1778,7 +1778,7 @@
   "corrupted_skull": {
     "name": "Corrupted Skull",
     "id": "corrupted_skull",
-    "img": "/images/spells/spell-corrupted_skull.jpg",
+    "img": "/images/vbuilds/spells/spell-unholy-corrupted_skull.png",
     "spellSchool": "unholy",
     "effects": [
       {
@@ -1822,7 +1822,7 @@
   "death_knight": {
     "name": "Death Knight",
     "id": "death_knight",
-    "img": "/images/spells/spell-death_knight.jpg",
+    "img": "/images/vbuilds/spells/spell-unholy-death_knight.png",
     "spellSchool": "unholy",
     "effects": [
       {
@@ -1866,7 +1866,7 @@
   "soulburn": {
     "name": "Soulburn",
     "id": "soulburn",
-    "img": "/images/spells/spell-soulburn.jpg",
+    "img": "/images/vbuilds/spells/spell-unholy-soulburn.png",
     "spellSchool": "unholy",
     "effects": [
       {
@@ -1922,7 +1922,7 @@
   "ward_of_the_damned": {
     "name": "Ward of the Damned",
     "id": "ward_of_the_damned",
-    "img": "/images/spells/spell-ward_of_the_damned.jpg",
+    "img": "/images/vbuilds/spells/spell-unholy-ward_of_the_damned.png",
     "spellSchool": "unholy",
     "effects": [
       {
@@ -1984,7 +1984,7 @@
   "unholy_chains": {
     "name": "Unholy Chains",
     "id": "unholy_chains",
-    "img": "/images/spells/spell-unholy_chains.jpg",
+    "img": "/images/vbuilds/spells/spell-unholy-unholy_chains.png",
     "spellSchool": "unholy",
     "effects": [
       {
