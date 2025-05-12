@@ -84,7 +84,7 @@ export default function Home() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <Image src="/varena-logo.png" alt="Varena Logo" width={600} height={400} />
+            <Image src="/varena-logo.png" alt="Varena Logo" className="mr-10" width={600} height={400} />
             <motion.div
               className="flex flex-col sm:flex-row gap-4 justify-center"
               variants={staggerContainer}
@@ -98,14 +98,16 @@ export default function Home() {
                   size="lg"
                   className="gap-2 relative overflow-hidden group border-red-900 text-white flex items-center"
                 >
-                  <Image src="/discord.svg" alt="Varena Logo" width={20} height={20} className="h-5 w-5 mr-2" />
-                  <span className="relative z-10">JOIN US</span>
-                  <motion.span
-                    className="absolute inset-0 bg-white/20"
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: 0 }}
-                    transition={{ duration: 0.3 }}
-                  />
+                  <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
+                    <Image src="/discord.svg" alt="Varena Logo" width={20} height={20} className="h-5 w-5 mr-2" />
+                    <span className="relative z-10">JOIN US</span>
+                    <motion.span
+                      className="absolute inset-0 bg-white/20"
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: 0 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </Link>
                 </Button>
               </motion.div>
               <motion.div variants={fadeIn} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -583,21 +585,23 @@ export default function Home() {
                       className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
                          relative overflow-hidden group px-8 shadow-lg shadow-red-900/20 w-full py-8 gap-4"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <Image
-                        src="/discord.svg"
-                        alt="Discord"
-                        width={32}
-                        height={32}
-                        className="h-8 w-8 group-hover:scale-110 transition-transform"
-                      />
-                      <span className="text-2xl font-bold tracking-wider">JOIN NOW</span>
-                      <motion.span
-                        className="absolute inset-0 bg-white/10"
-                        initial={{ x: "-100%" }}
-                        whileHover={{ x: 0 }}
-                        transition={{ duration: 0.3 }}
-                      />
+                      <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Image
+                          src="/discord.svg"
+                          alt="Discord"
+                          width={32}
+                          height={32}
+                          className="h-8 w-8 group-hover:scale-110 transition-transform"
+                        />
+                        <span className="text-2xl font-bold tracking-wider">JOIN NOW</span>
+                        <motion.span
+                          className="absolute inset-0 bg-white/10"
+                          initial={{ x: "-100%" }}
+                          whileHover={{ x: 0 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      </Link>
                     </Button>
                   </motion.div>
                   <div className="flex items-center justify-center gap-8 text-sm text-gray-400">
@@ -606,14 +610,14 @@ export default function Home() {
                       whileHover={{ scale: 1.05, color: "#fff" }}
                     >
                       <Users className="h-5 w-5" />
-                      <span className="font-semibold">1,000+ Members</span>
+                      <span className="font-semibold">5,900+ Members</span>
                     </motion.div>
                     <motion.div
                       className="flex items-center gap-2"
                       whileHover={{ scale: 1.05, color: "#fff" }}
                     >
                       <Moon className="h-5 w-5" />
-                      <span className="font-semibold">Active 24/7</span>
+                      <span className="font-semibold">Active 24/7 as long Rendy doesn't sleep</span>
                     </motion.div>
                   </div>
                 </motion.div>
@@ -664,7 +668,7 @@ export default function Home() {
             <div>
               <h3 className="text-lg font-bold mb-4">Community</h3>
               <ul className="space-y-2 text-sm text-gray-100">
-                {["Discord", "Twitter", "Reddit", "YouTube", "Twitch"].map((item, i) => (
+                {["Discord", "Twitter", "YouTube", "Twitch"].map((item, i) => (
                   <motion.li
                     key={item}
                     initial={{ opacity: 0, x: -10 }}
@@ -672,14 +676,14 @@ export default function Home() {
                     transition={{ delay: i * 0.1 }}
                     viewport={{ once: true }}
                   >
-                    <Link href="#" className="hover:text-white transition-colors">
+                    <Link href={`https://${item.toLowerCase()}.com`} className="hover:text-white transition-colors" target="_blank">
                       {item}
                     </Link>
                   </motion.li>
                 ))}
               </ul>
             </div>
-            <div>
+            {/*             <div>
               <h3 className="text-lg font-bold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm text-gray-100">
                 {["Privacy Policy", "Terms of Service", "Cookie Policy", "EULA"].map((item, i) => (
@@ -696,7 +700,7 @@ export default function Home() {
                   </motion.li>
                 ))}
               </ul>
-            </div>
+            </div> */}
           </div>
           <motion.div
             className="border-t border-white/20 mt-8 pt-8 text-center text-sm text-gray-300"

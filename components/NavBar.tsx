@@ -117,14 +117,16 @@ export default function NavBar() {
                 size="sm"
                 className="hidden md:flex text-xs font-bold text-white hover:bg-red-950/50 transition-all duration-300"
               >
-                <Image
-                  src="/discord.svg"
-                  alt="Discord Logo"
-                  width={20}
-                  height={20}
-                  className="h-5 w-5 mr-2"
-                />
-                JOIN US
+                <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
+                  <Image
+                    src="/discord.svg"
+                    alt="Discord Logo"
+                    width={20}
+                    height={20}
+                    className="h-5 w-5 mr-2"
+                  />
+                  JOIN US
+                </Link>
               </Button>
             </motion.div>
           </motion.div>

@@ -8,7 +8,13 @@ export const metadata: Metadata = {
   title: "V Rising - Vampire Survival Game by Stunlock Studios",
   description:
     "Hunt for blood in a gothic open-world. Build your castle, convert humans, and raise an army of darkness in this vampire survival experience.",
-  generator: 'v0.dev'
+  openGraph: {
+    images: '/og-image.png',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: '/og-image.png',
+  },
 }
 
 export default function RootLayout({
