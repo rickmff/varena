@@ -117,7 +117,7 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
     onSchoolSelect(school)
   }
 
-  const canCopyJewel = spellName && selectedEffects.length > 0
+  const canCopyJewel = spellName && selectedEffects.length === 4
 
   return (
     <div className="space-y-4">
@@ -297,14 +297,14 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
       )}
 
 
-      <div className="flex justify-center items-center gap-2 pt-6">
+      {/*       <div className="flex justify-center items-center gap-2 pt-6">
         <Link href={spellData[spellName].wiki} target="_blank" className="flex items-center gap-2 text-gray-400/50 hover:text-gray-400 transition-all">
           <Info className="w-4 h-4 mr-2" />
           <span className="text-sm">
             Read more about {spellData[spellName].name}
           </span>
         </Link>
-      </div>
+      </div> */}
     </div>
   )
 }

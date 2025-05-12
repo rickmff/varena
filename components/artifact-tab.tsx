@@ -84,7 +84,13 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
           >
             {selectedWeaponDetails ? (
               <div className="flex items-center gap-2 capitalize">
-                <Image src={selectedWeaponDetails.image.src} alt={selectedWeaponDetails.artifactName} className="w-10 h-10 mr-4" width={40} height={40} />
+                <Image
+                  src={selectedWeaponDetails.image}
+                  alt={selectedWeaponDetails.artifactName}
+                  className="w-10 h-10 mr-4"
+                  width={40}
+                  height={40}
+                />
                 <span>{selectedWeaponDetails.artifactName}</span>
               </div>
             ) : (
@@ -106,7 +112,13 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
                   }}
                   className={`w-full px-5 py-4 text-left text-white hover:${currentArtifactColors.button} flex items-center`}
                 >
-                  <img src={details.image.src} alt={details.artifactName} className="w-12 h-12 mr-4" />
+                  <Image
+                    src={details.image}
+                    alt={details.artifactName}
+                    className="w-12 h-12 mr-4"
+                    width={48}
+                    height={48}
+                  />
                   {details.artifactName}
                 </button>
               ))}

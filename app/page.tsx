@@ -344,7 +344,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-32 relative" id="jewels">
+      {/*       <section className="py-32 relative" id="jewels">
         <div className="container mx-auto px-4 relative ">
           <motion.div
             className="text-center mb-16"
@@ -376,7 +376,7 @@ export default function Home() {
             </Link>
           </Button>
         </div>
-      </section>
+      </section> */}
 
       {/* News Section */}
       <section id="news" className="py-20 bg-black relative">
