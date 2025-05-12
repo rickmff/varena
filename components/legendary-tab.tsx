@@ -69,7 +69,13 @@ export default function LegendaryTab({ schoolColors, onLegendaryInfuseChange }: 
           >
             {legendaryWeapon ? (
               <div className="flex items-center gap-2 capitalize">
-                <img src={epicWeaponsDropdown.find(w => w.name === legendaryWeapon)?.image.src} alt={legendaryWeapon} className="w-10 h-10 mr-4" />
+                <Image
+                  src={epicWeaponsDropdown.find(w => w.name === legendaryWeapon)?.image ?? "/images/placeholder.png"}
+                  alt={legendaryWeapon}
+                  className="w-10 h-10 mr-4"
+                  width={40}
+                  height={40}
+                />
                 <span>{legendaryWeapon.replace(/_/g, ' ').replace('Epic', '').trim()}</span>
               </div>
             ) : (
@@ -92,7 +98,7 @@ export default function LegendaryTab({ schoolColors, onLegendaryInfuseChange }: 
                   }}
                   className={`w-full px-5 py-4 text-left text-white hover:${currentLegendaryColors.button} flex items-center`}
                 >
-                  <img src={image.src} alt={name} className="w-12 h-12 mr-4" />
+                  <Image src={image} alt={name} className="w-12 h-12 mr-4" width={48} height={48} />
                   {name.replace(/_/g, ' ').replace('Epic', '').trim()}
                 </button>
               ))}
