@@ -31,7 +31,7 @@ export default function GameMenu({ isOpen, onClose }: GameMenuProps) {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 h-full w-full max-w-sm bg-black border-l-2 border-red-900/30 z-50
+            className="fixed right-0 top-0 h-full w-full max-w-sm bg-black border-l-2 border-purple-900/30 z-50
                      shadow-[-10px_0_30px_-15px_rgba(139,0,0,0.3)]"
           >
             <div className="relative h-full p-6 flex flex-col">
@@ -60,12 +60,12 @@ export default function GameMenu({ isOpen, onClose }: GameMenuProps) {
                       className="group block"
                     >
                       <motion.div
-                        className="p-4 bg-red-950/20 rounded-lg border border-red-900/30
-                                 hover:border-red-500/50 hover:bg-red-900/20 transition-colors relative overflow-hidden"
+                        className="p-4 bg-purple-950/20 rounded-lg border border-purple-900/30
+                                 hover:border-purple-500/50 hover:bg-purple-900/20 transition-colors relative overflow-hidden"
                         whileHover={{ x: 10 }}
                       >
                         {/* Hover Gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-transparent
                                     opacity-0 group-hover:opacity-100 transition-opacity" />
 
                         <span className="relative z-10 text-lg font-bold tracking-wider
@@ -88,10 +88,10 @@ export default function GameMenu({ isOpen, onClose }: GameMenuProps) {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="w-full gap-4 relative overflow-hidden group border-2 border-red-900
-                             bg-gradient-to-r from-red-950/50 to-black hover:from-red-900 hover:to-red-950"
+                    className="w-full gap-4 relative overflow-hidden group border-2 border-purple-900
+                             bg-gradient-to-r from-purple-950/50 to-black hover:from-purple-900 hover:to-purple-950"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-transparent
                                 opacity-0 group-hover:opacity-100 transition-opacity" />
                     <span className="relative z-10 font-bold tracking-wider">JOIN DISCORD</span>
                   </Button>

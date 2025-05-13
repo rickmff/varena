@@ -215,16 +215,16 @@ const mods = [
   },
 ];
 
-export const WeaponSheet = ({}) => {
+export const WeaponSheet = ({ }) => {
   return (
     <Sheet>
-      <SheetTrigger className="bg-red-500 px-3 py-2">
+      <SheetTrigger className="bg-purple-500 px-3 py-2">
         Weapon Select
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
           <div className="flex gap-2">
-            <div className="w-20 h-20 bg-red-500 rounded"></div>
+            <div className="w-20 h-20 bg-purple-500 rounded"></div>
             <div className="w-20 h-20 bg-yellow-500 rounded"></div>
             <div className="w-20 h-20 bg-blue-500 rounded"></div>
           </div>

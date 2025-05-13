@@ -9,10 +9,8 @@ import GameMenu from './game-menu'
 
 export const menuItems = [
   { name: "FEATURES", href: "#features" },
+  { name: "COMMANDS", href: "#generate-commands" },
   { name: "NEWS", href: "#news" },
-  { name: "LEADERBOARD", href: "#leaderboard" },
-  { name: "GUIDES", href: "#guides" },
-  { name: "COMMANDS", href: "#commands" },
 ]
 
 export default function NavBar() {
@@ -44,7 +42,6 @@ export default function NavBar() {
             animate={{
               backgroundColor: scrollY > 50 ? "rgba(0, 0, 0, 0.8)" : "rgba(0, 0, 0, 0)",
               backdropFilter: scrollY > 50 ? "blur(12px)" : "blur(0px)",
-              borderBottom: scrollY > 50 ? "1px solid rgba(139, 0, 0, 0.3)" : "1px solid rgba(139, 0, 0, 0.0)",
             }}
             transition={{
               type: "spring",
@@ -63,11 +60,11 @@ export default function NavBar() {
                 alt="V Rising Logo"
                 width={40}
                 height={40}
-                className="h-10 w-10"
+                className="h-14 w-14"
               />
             </motion.div>
           </Link>
-          <nav className="hidden md:flex items-center gap-6 relative z-50">
+          <nav className="hidden md:flex items-center gap-6 relative z-50 ml-14">
             {menuItems.map((item: { name: string; href: string }, i: number) => (
               <motion.div
                 key={item.name}
@@ -115,7 +112,7 @@ export default function NavBar() {
               <Button
                 variant="outline"
                 size="sm"
-                className="hidden md:flex text-xs font-bold text-white hover:bg-red-950/50 transition-all duration-300"
+                className="hidden md:flex text-xs font-bold text-white hover:bg-purple-950/50 transition-all duration-300"
               >
                 <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
                   <Image

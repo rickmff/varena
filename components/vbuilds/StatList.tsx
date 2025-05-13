@@ -20,7 +20,7 @@ export function StatList({ stats }: { stats: Array<any> }) {
             {stat.cap && (
               <div className="w-full bg-gray-700 rounded h-2">
                 <div
-                  className="bg-red-500 h-2 rounded"
+                  className="bg-purple-500 h-2 rounded"
                   style={{ width: `${progressWidth}%` }}
                 ></div>
               </div>

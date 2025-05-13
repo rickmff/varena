@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import amuletsData from "@/data/vbuilds/amulets.json";
-import { StatProviderContext, useBuilder } from "./BuildProvider";
+import { useBuilder } from "./BuildProvider";
 import { Modifier } from "@/components/machines/builder";
-import { Popover } from "./Popover";
 import {
   DropdownSelect,
   DropdownSelectPlaceholder,

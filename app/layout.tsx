@@ -5,9 +5,9 @@ import type { Metadata } from "next"
 import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
-  title: "V Rising - Vampire Survival Game by Stunlock Studios",
+  title: "V Arena",
   description:
-    "Hunt for blood in a gothic open-world. Build your castle, convert humans, and raise an army of darkness in this vampire survival experience.",
+    "The best community for V Rising",
   openGraph: {
     images: '/og-image.png',
   },

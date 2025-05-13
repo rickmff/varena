@@ -6,7 +6,11 @@ import { useBuilder } from "./BuildProvider";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { useSelector } from "@xstate/react";
 
-export const PassivePlaceholder = () => {
+interface PassivePlaceholderProps {
+  length: number;
+}
+
+export const PassivePlaceholder = ({ length }: PassivePlaceholderProps) => {
   const { builder } = useBuilder();
   const passives = useSelector(builder, (state) => state.context.passives);
 
@@ -19,7 +23,7 @@ export const PassivePlaceholder = () => {
           className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-300"`}
         />
       ))}
-      {Array.from({ length: 5 - passives.length }).map((_, index) => (
+      {Array.from({ length: length - passives.length }).map((_, index) => (
         <div
           key={`placeholder-${index}`}
           className="w-16 h-16 mb-2 rounded-full border-4 border-dashed border-gray-500 flex items-center justify-center"
@@ -48,7 +52,7 @@ export const PassiveForge = () => {
         onClick={() => builder.send({ type: "goto.passiveForge" })}
       >
         <div className="flex gap-4">
-          <PassivePlaceholder />
+          <PassivePlaceholder length={5} />
         </div>
       </DialogTrigger>
       <DialogContent className="w-full max-w-3xl" aria-describedby="Passives">

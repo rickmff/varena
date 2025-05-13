@@ -49,7 +49,7 @@ export default function CommandGenerator() {
       whileInView="visible"
       viewport={{ once: true }}
     >
-      <div className={`max-w-4xl mx-auto rounded-lg border border-red-900/30 p-6 min-h-[600px] backdrop-blur-sm shadow-lg transition-all duration-500 ${computedBG}`}>
+      <div className={`max-w-4xl mx-auto rounded-lg border border-purple-900/30 p-6 min-h-[600px] backdrop-blur-sm shadow-lg transition-all duration-500 ${computedBG}`}>
         <div className="relative flex justify-center gap-8 mb-8">
           {["Artifact", "Legendary", "Jewel"].map((tab, index) => (
             <motion.button

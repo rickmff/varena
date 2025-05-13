@@ -7,8 +7,6 @@ import { toast } from 'sonner'
 import spellData from "@/data/jewels"
 import { EffectId } from "../data/effects"
 import Image from "next/image"
-import Link from "next/link"
-import { Info } from "lucide-react"
 
 export type SchoolKey = keyof typeof schoolsData;
 
@@ -34,44 +32,44 @@ export const schoolColors = {
   chaos: {
     primary: 'purple',
     bg: 'bg-[url("/images/background/Chaos.png")]',
-    border: 'border-red-900/30',
-    focus: 'focus:ring-red-500/50 focus:border-red-500/50',
+    border: 'border-purple-900/30',
+    focus: 'focus:ring-purple-500/50 focus:border-purple-500/50',
     button: 'bg-purple-900/50 hover:bg-purple-800',
   },
   unholy: {
     primary: 'green',
     bg: 'bg-[url("/images/background/Unholy.png")]',
-    border: 'border-red-900/30',
-    focus: 'focus:ring-red-500/50 focus:border-red-500/50',
+    border: 'border-green-900/30',
+    focus: 'focus:ring-green-500/50 focus:border-green-500/50',
     button: 'bg-green-900/50 hover:bg-green-800',
   },
   illusion: {
     primary: 'blue',
     bg: 'bg-[url("/images/background/Illusion.png")]',
-    border: 'border-red-900/30',
-    focus: 'focus:ring-red-500/50 focus:border-red-500/50',
-    button: 'bg-blue-900/50 hover:bg-blue-800',
+    border: 'border-cyan-900/30',
+    focus: 'focus:ring-cyan-500/50 focus:border-cyan-500/50',
+    button: 'bg-cyan-900/50 hover:bg-cyan-800',
   },
   frost: {
     primary: 'cyan',
     bg: 'bg-[url("/images/background/Frost.png")]',
-    border: 'border-red-900/30',
-    focus: 'focus:ring-red-500/50 focus:border-red-500/50',
-    button: 'bg-cyan-900/50 hover:bg-cyan-800',
+    border: 'border-blue-900/30',
+    focus: 'focus:ring-blue-500/50 focus:border-blue-500/50',
+    button: 'bg-blue-900/50 hover:bg-blue-800',
   },
   lightning: {
     primary: 'yellow',
     bg: 'bg-[url("/images/background/Lightning.png")]',
-    border: 'border-red-900/30',
-    focus: 'focus:ring-red-500/50 focus:border-red-500/50',
-    button: 'bg-yellow-600/50 hover:bg-yellow-600',
+    border: 'border-yellow-900/30',
+    focus: 'focus:ring-yellow-500/50 focus:border-yellow-500/50',
+    button: 'bg-yellow-900/50 hover:bg-yellow-800',
   },
   default: {
-    primary: 'red',
+    primary: 'purple',
     bg: 'bg-black/50',
-    border: 'border-red-900/30',
-    focus: 'focus:ring-red-500/50 focus:border-red-500/50',
-    button: 'bg-red-900/50 hover:bg-red-800',
+    border: 'border-purple-900/30',
+    focus: 'focus:ring-purple-500/50 focus:border-purple-500/50',
+    button: 'bg-purple-900/50 hover:bg-purple-800',
   }
 } as const;
 

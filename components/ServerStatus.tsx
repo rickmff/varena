@@ -28,7 +28,7 @@ export default function ServerStatus({
 
   return (
     <div className="flex flex-col items-end gap-3 backdrop-blur-sm px-3 py-2 rounded-lg text-xs">
-      <div className="flex items-center gap-2 bg-red-950/20 rounded-lg p-2">
+      <div className="flex items-center gap-2 bg-purple-950/20 rounded-lg p-2">
         <div className="text-white/90">
           {currentPlayers} / {maxPlayers}
         </div>
