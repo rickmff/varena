@@ -604,7 +604,7 @@ const spellData: Record<string, Jewel> = {
   },
   "polarityshift": {
     name: "Polarity Shift",
-    image: "/images/spells/polarityshift.png",
+    image: "/images/spells/polshift.png",
     wiki: "https://vrising.fandom.com/wiki/Polarity_Shift",
     school: "lightning",
     effects: [
