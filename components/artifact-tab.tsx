@@ -91,7 +91,7 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
                   width={40}
                   height={40}
                 />
-                <span>{selectedWeaponDetails.artifactName}</span>
+                <span>{selectedWeaponDetails.artifactName.replace(/^The\s+/i, '')}</span>
               </div>
             ) : (
               <span>Select Artifact Weapon</span>
@@ -102,26 +102,28 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
           </button>
           {isWeaponOpen && (
             <div className={`absolute z-20 w-full mt-1 bg-black/70 border ${currentArtifactColors.border} rounded-md shadow-lg overflow-y-auto max-h-[400px]`}>
-              {Object.entries(artifactDetailsMap).map(([key, details]) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setSelectedWeaponKey(key);
-                    setSelectedEffects([]);
-                    setIsWeaponOpen(false);
-                  }}
-                  className={`w-full px-5 py-4 text-left text-white hover:${currentArtifactColors.button} flex items-center`}
-                >
-                  <Image
-                    src={details.image}
-                    alt={details.artifactName}
-                    className="w-12 h-12 mr-4"
-                    width={48}
-                    height={48}
-                  />
-                  {details.artifactName}
-                </button>
-              ))}
+              {Object.entries(artifactDetailsMap)
+                .sort(([_, a], [__, b]) => a.artifactName.replace(/^The\s+/i, '').localeCompare(b.artifactName.replace(/^The\s+/i, '')))
+                .map(([key, details]) => (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      setSelectedWeaponKey(key);
+                      setSelectedEffects([]);
+                      setIsWeaponOpen(false);
+                    }}
+                    className={`w-full px-5 py-4 text-left text-white hover:${currentArtifactColors.button} flex items-center`}
+                  >
+                    <Image
+                      src={details.image}
+                      alt={details.artifactName}
+                      className="w-12 h-12 mr-4"
+                      width={48}
+                      height={48}
+                    />
+                    {details.artifactName.replace(/^The\s+/i, '')}
+                  </button>
+                ))}
             </div>
           )}
         </div>

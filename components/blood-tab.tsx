@@ -70,30 +70,32 @@ export default function BloodTab() {
 
           {isPrimaryOpen && (
             <div className="absolute z-10 w-full mt-1 bg-black/90 border border-red-900/30 rounded-md shadow-lg max-h-96 overflow-y-auto">
-              {Object.keys(bloodData).map((blood) => (
-                <button
-                  key={blood}
-                  onClick={() => {
-                    setPrimaryBlood(blood as BloodKey)
-                    setIsPrimaryOpen(false)
-                    setSecondaryBlood('')
-                    setSelectedPerk(null)
-                  }}
-                  className="w-full px-5 py-4 text-left text-white hover:bg-red-900/50 flex items-center gap-2"
-                >
-                  <Image
-                    src={`/images/vbuilds/blood/${blood.toLowerCase()}-blood.png`}
-                    alt={blood}
-                    className="w-10 h-10 object-cover rounded"
-                    width={40}
-                    height={40}
-                    onError={(e) => {
-                      e.currentTarget.src = "/images/vbuilds/blood/brute-blood.png"
+              {Object.keys(bloodData)
+                .sort((a, b) => a.localeCompare(b))
+                .map((blood) => (
+                  <button
+                    key={blood}
+                    onClick={() => {
+                      setPrimaryBlood(blood as BloodKey)
+                      setIsPrimaryOpen(false)
+                      setSecondaryBlood('')
+                      setSelectedPerk(null)
                     }}
-                  />
-                  <span>{blood}</span>
-                </button>
-              ))}
+                    className="w-full px-5 py-4 text-left text-white hover:bg-red-900/50 flex items-center gap-2"
+                  >
+                    <Image
+                      src={`/images/vbuilds/blood/${blood.toLowerCase()}-blood.png`}
+                      alt={blood}
+                      className="w-10 h-10 object-cover rounded"
+                      width={40}
+                      height={40}
+                      onError={(e) => {
+                        e.currentTarget.src = "/images/vbuilds/blood/brute-blood.png"
+                      }}
+                    />
+                    <span>{blood}</span>
+                  </button>
+                ))}
             </div>
           )}
         </div>
@@ -136,6 +138,7 @@ export default function BloodTab() {
             <div className="absolute z-10 w-full mt-1 bg-black/90 border border-red-900/30 rounded-md shadow-lg max-h-96 overflow-y-auto">
               {Object.keys(bloodData)
                 .filter(blood => blood !== primaryBlood)
+                .sort((a, b) => a.localeCompare(b))
                 .map((blood) => (
                   <button
                     key={blood}

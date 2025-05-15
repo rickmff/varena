@@ -87,21 +87,24 @@ export default function LegendaryTab({ schoolColors, onLegendaryInfuseChange }: 
           </button>
           {isWeaponOpen && (
             <div className={`absolute z-20 w-full mt-1 bg-black/70 border ${currentLegendaryColors.border} rounded-md shadow-lg overflow-y-auto max-h-[400px]`}>
-              {epicWeaponsDropdown.map(({ name, image }) => (
-                <button
-                  key={name}
-                  onClick={() => {
-                    setLegendaryWeapon(name as EpicWeapon);
-                    setLegendaryInfuse(''); // Reset infuse on weapon change
-                    setSelectedEffects([]); // Reset effects on weapon change
-                    setIsWeaponOpen(false);
-                  }}
-                  className={`w-full px-5 py-4 text-left text-white hover:${currentLegendaryColors.button} flex items-center`}
-                >
-                  <Image src={image} alt={name} className="w-12 h-12 mr-4" width={48} height={48} />
-                  {name.replace(/_/g, ' ').replace('Epic', '').trim()}
-                </button>
-              ))}
+              {epicWeaponsDropdown
+                .sort((a, b) => a.name.replace(/_/g, ' ').replace('Epic', '').trim()
+                  .localeCompare(b.name.replace(/_/g, ' ').replace('Epic', '').trim()))
+                .map(({ name, image }) => (
+                  <button
+                    key={name}
+                    onClick={() => {
+                      setLegendaryWeapon(name as EpicWeapon);
+                      setLegendaryInfuse(''); // Reset infuse on weapon change
+                      setSelectedEffects([]); // Reset effects on weapon change
+                      setIsWeaponOpen(false);
+                    }}
+                    className={`w-full px-5 py-4 text-left text-white hover:${currentLegendaryColors.button} flex items-center`}
+                  >
+                    <Image src={image} alt={name} className="w-12 h-12 mr-4" width={48} height={48} />
+                    {name.replace(/_/g, ' ').replace('Epic', '').trim()}
+                  </button>
+                ))}
             </div>
           )}
         </div>
@@ -127,21 +130,23 @@ export default function LegendaryTab({ schoolColors, onLegendaryInfuseChange }: 
           </button>
           {isInfuseOpen && legendaryWeapon && (
             <div className={`absolute z-20 w-full mt-1 bg-black/70 border ${currentLegendaryColors.border} rounded-md shadow-lg overflow-y-auto max-h-[400px]`}>
-              {(Object.entries(schoolsData) as [SchoolKey, { name: string; image: string }][]).map(([key, school]) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setLegendaryInfuse(key);
-                    setSelectedEffects([]); // Reset effects on infuse change
-                    setIsInfuseOpen(false);
-                    onLegendaryInfuseChange(key);
-                  }}
-                  className={`w-full px-5 py-4 text-left text-white hover:${currentLegendaryColors.button} flex items-center`}
-                >
-                  <Image src={school.image} alt={school.name} className="w-12 h-12 mr-4" width={48} height={48} />
-                  {school.name}
-                </button>
-              ))}
+              {(Object.entries(schoolsData) as [SchoolKey, { name: string; image: string }][])
+                .sort(([_, a], [__, b]) => a.name.localeCompare(b.name))
+                .map(([key, school]) => (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      setLegendaryInfuse(key);
+                      setSelectedEffects([]); // Reset effects on infuse change
+                      setIsInfuseOpen(false);
+                      onLegendaryInfuseChange(key);
+                    }}
+                    className={`w-full px-5 py-4 text-left text-white hover:${currentLegendaryColors.button} flex items-center`}
+                  >
+                    <Image src={school.image} alt={school.name} className="w-12 h-12 mr-4" width={48} height={48} />
+                    {school.name}
+                  </button>
+                ))}
             </div>
           )}
         </div>
@@ -157,29 +162,32 @@ export default function LegendaryTab({ schoolColors, onLegendaryInfuseChange }: 
         >
           {/* Effects Buttons */}
           <div className="col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {(Object.entries(effectsData) as [EffectId, string][]).map(([id, effect]) => {
-              const isSelected = selectedEffects.includes(id);
-              const isDisabled = !isSelected && selectedEffects.length >= 4;
-              return (
-                <button
-                  key={id}
-                  className={`
+            {(Object.entries(effectsData) as [EffectId, string][])
+              .sort(([_, a], [__, b]) => a.replace('StatMod_', '').replace(/([a-z])([A-Z])/g, '$1 $2')
+                .localeCompare(b.replace('StatMod_', '').replace(/([a-z])([A-Z])/g, '$1 $2')))
+              .map(([id, effect]) => {
+                const isSelected = selectedEffects.includes(id);
+                const isDisabled = !isSelected && selectedEffects.length >= 4;
+                return (
+                  <button
+                    key={id}
+                    className={`
                     h-14 flex items-center justify-center p-2 rounded-md text-sm text-center  border transition-colors duration-200 ease-in-out opacity-100 text-white
                     ${currentLegendaryColors.border}
                     ${isDisabled
-                      ? 'bg-gray-800/50 text-gray-500 cursor-not-allowed opacity-50'
-                      : isSelected
-                        ? `${currentLegendaryColors.button} text-white shadow-md`
-                        : `bg-black/50 text-gray-400 hover:${currentLegendaryColors.button} hover:text-white hover:opacity-100 opacity-80`
-                    }
+                        ? 'bg-gray-800/50 text-gray-500 cursor-not-allowed opacity-50'
+                        : isSelected
+                          ? `${currentLegendaryColors.button} text-white shadow-md`
+                          : `bg-black/50 text-gray-400 hover:${currentLegendaryColors.button} hover:text-white hover:opacity-100 opacity-80`
+                      }
                   `}
-                  onClick={() => toggleEffect(id)}
-                  disabled={isDisabled}
-                >
-                  {effect.replace('StatMod_', '').replace(/([a-z])([A-Z])/g, '$1 $2')}
-                </button>
-              );
-            })}
+                    onClick={() => toggleEffect(id)}
+                    disabled={isDisabled}
+                  >
+                    {effect.replace('StatMod_', '').replace(/([a-z])([A-Z])/g, '$1 $2')}
+                  </button>
+                );
+              })}
           </div>
 
           <div className="flex flex-col items-center justify-center pt-6">

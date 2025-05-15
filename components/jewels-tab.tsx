@@ -152,27 +152,29 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
 
           {isSchoolOpen && (
             <div className={`absolute z-10 w-full mt-1 bg-black/90 border ${currentColors.border} rounded-md shadow-lg`}>
-              {Object.entries(schoolsData).map(([key, school]) => (
-                <button
-                  key={key}
-                  onClick={() => {
-                    handleSchoolSelect(key as SchoolKey)
-                    setSpellName('')
-                    setSelectedEffects([])
-                    setIsSchoolOpen(false)
-                  }}
-                  className={`w-full px-5 py-4 text-left text-white hover:${schoolColors[key as keyof typeof schoolColors].button} flex items-center gap-2`}
-                >
-                  <Image
-                    src={school.image}
-                    alt={school.name}
-                    className="w-10 h-10 object-cover rounded"
-                    width={40}
-                    height={40}
-                  />
-                  <span>{school.name}</span>
-                </button>
-              ))}
+              {Object.entries(schoolsData)
+                .sort(([_, a], [__, b]) => a.name.localeCompare(b.name))
+                .map(([key, school]) => (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      handleSchoolSelect(key as SchoolKey)
+                      setSpellName('')
+                      setSelectedEffects([])
+                      setIsSchoolOpen(false)
+                    }}
+                    className={`w-full px-5 py-4 text-left text-white hover:${schoolColors[key as keyof typeof schoolColors].button} flex items-center gap-2`}
+                  >
+                    <Image
+                      src={school.image}
+                      alt={school.name}
+                      className="w-10 h-10 object-cover rounded"
+                      width={40}
+                      height={40}
+                    />
+                    <span>{school.name}</span>
+                  </button>
+                ))}
             </div>
           )}
         </div>
@@ -212,6 +214,7 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
             <div className={`absolute z-10 w-full mt-1 bg-black/90 border ${currentColors.border} rounded-md shadow-lg max-h-96 overflow-y-auto`}>
               {Object.entries(spellData)
                 .filter(([_, spell]) => !selectedSchool || spell.school === selectedSchool)
+                .sort(([_, a], [__, b]) => a.name.localeCompare(b.name))
                 .map(([key, spell]) => (
                   <button
                     key={key}
@@ -240,22 +243,24 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
       {spellName && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {spellData[spellName].effects.map((effect) => (
-              <div
-                key={effect.id}
-                className={`flex items-center space-x-3 p-3 rounded-md transition-all cursor-pointer ${selectedEffects.includes(String(effect.id))
-                  ? `${currentColors.button} border border-${currentColors.primary}-500/50`
-                  : selectedEffects.length >= 4
-                    ? `bg-black/20 border border-${currentColors.primary}-900/20 cursor-not-allowed opacity-50`
-                    : `bg-black/30 border border-${currentColors.primary}-900/30 hover:bg-black/40`
-                  }`}
-                onClick={() => toggleEffect(String(effect.id))}
-              >
-                <label className="text-sm text-white cursor-pointer">
-                  {effect.name}
-                </label>
-              </div>
-            ))}
+            {spellData[spellName].effects
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((effect) => (
+                <div
+                  key={effect.id}
+                  className={`flex items-center space-x-3 p-3 rounded-md transition-all cursor-pointer ${selectedEffects.includes(String(effect.id))
+                    ? `${currentColors.button} border border-${currentColors.primary}-500/50`
+                    : selectedEffects.length >= 4
+                      ? `bg-black/20 border border-${currentColors.primary}-900/20 cursor-not-allowed opacity-50`
+                      : `bg-black/30 border border-${currentColors.primary}-900/30 hover:bg-black/40`
+                    }`}
+                  onClick={() => toggleEffect(String(effect.id))}
+                >
+                  <label className="text-sm text-white cursor-pointer">
+                    {effect.name}
+                  </label>
+                </div>
+              ))}
           </div>
         </div>
       )}
