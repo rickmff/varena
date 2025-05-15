@@ -37,7 +37,7 @@ export type ArtifactDetails = {
 
 // Update the details map to use string paths
 export const artifactDetailsMap: Record<string, ArtifactDetails> = {
-  slashers: { artifactName: "Cloud Dancers", infuse: "Lightning", image: weaponImagePaths.Slashers_Artifact },
+  slashers: { artifactName: "Cloud Dancers", infuse: "Storm", image: weaponImagePaths.Slashers_Artifact },
   slashers2: { artifactName: "Wings of the Fallen", infuse: "Blood", image: weaponImagePaths.Slashers2_Artifact },
   spear: { artifactName: "The Thousand Storms", infuse: "Storm", image: weaponImagePaths.Spear_Artifact },
   axes: { artifactName: "The Red Twins", infuse: "Blood", image: weaponImagePaths.Axe_Artifact },

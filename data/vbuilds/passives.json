@@ -88,7 +88,7 @@
     ]
   },
   "lightning_fast_strikes": {
-    "name": "Lightning Fast Strikes",
+    "name": "Storm Fast Strikes",
     "id": "lightning_fast_strikes",
     "img": "/images/vbuilds/passives/passive-lightning_fast_strikes.jpg",
     "description": "Increases Primary Attack Speed by 7% and Static triggers deals 20% increased damage.",

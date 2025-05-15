@@ -69,12 +69,13 @@ export default function ElixirTab({ schoolColors, onElixirFlavorChange }: Elixir
           >
             {elixirWeapon ? (
               <div className="flex items-center gap-2 capitalize">
-                <img src={epicWeaponsDropdown.find(w => w.name === elixirWeapon)?.image.src} alt={elixirWeapon} className="w-10 h-10 mr-4" />
+                <img src={epicWeaponsDropdown.find(w => w.name === elixirWeapon)?.image} alt={elixirWeapon} className="w-10 h-10 mr-4" />
                 <span>{elixirWeapon.replace(/_/g, ' ').replace('Epic', '').trim()}</span>
               </div>
             ) : (
               <span>Select Elixir Weapon</span>
             )}
+            )
             <svg className={`w-4 h-4 transition-transform ${isWeaponOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
@@ -92,7 +93,7 @@ export default function ElixirTab({ schoolColors, onElixirFlavorChange }: Elixir
                   }}
                   className={`w-full px-5 py-4 text-left text-white hover:${currentElixirColors.button} flex items-center`}
                 >
-                  <img src={image.src} alt={name} className="w-12 h-12 mr-4" />
+                  <img src={image} alt={name} className="w-12 h-12 mr-4" />
                   {name.replace(/_/g, ' ').replace('Epic', '').trim()}
                 </button>
               ))}
@@ -158,7 +159,7 @@ export default function ElixirTab({ schoolColors, onElixirFlavorChange }: Elixir
                 <button
                   key={id}
                   className={`
-                    h-14 flex items-center justify-center p-2 rounded-md text-sm text-center font-mono border transition-colors duration-200 ease-in-out opacity-100 text-white
+                    h-14 flex items-center justify-center p-2 rounded-md text-sm text-center  border transition-colors duration-200 ease-in-out opacity-100 text-white
                     ${currentElixirColors.border}
                     ${isDisabled
                       ? 'bg-gray-800/50 text-gray-500 cursor-not-allowed opacity-50'
@@ -178,7 +179,7 @@ export default function ElixirTab({ schoolColors, onElixirFlavorChange }: Elixir
 
           {/* Command Display */}
           <div className={`bg-black/30 p-4 rounded-md border ${currentElixirColors.border}`}>
-            <code className="text-gray-300 font-mono text-sm break-all">
+            <code className="text-gray-300  text-sm break-all">
               .lw {elixirWeapon.replace(/_/g, ' ').replace('Epic', '').trim().toLowerCase()} {elixirFlavor} {selectedEffects.join('')}
             </code>
           </div>

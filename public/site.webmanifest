@@ -1,0 +1,81 @@
+{
+  "name": "V Arena - V Rising Community Server",
+  "short_name": "V Arena",
+  "description": "Join V Arena, the premier V Rising community server featuring custom game modes, events, and an active community of vampire enthusiasts.",
+  "icons": [
+    {
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "categories": [
+    "games",
+    "entertainment",
+    "community"
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home-screen.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/screenshots/features.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg"
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "web",
+      "url": "https://v-arena.com"
+    },
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.stunlock.vrising",
+      "id": "com.stunlock.vrising"
+    }
+  ],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Command Generator",
+      "short_name": "Commands",
+      "description": "Generate server commands",
+      "url": "/#generate-commands",
+      "icons": [
+        {
+          "src": "/icons/command-icon.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Join Discord",
+      "short_name": "Discord",
+      "description": "Join our Discord community",
+      "url": "https://discord.gg/varena",
+      "icons": [
+        {
+          "src": "/icons/discord-icon.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "lang": "en",
+  "dir": "ltr"
+}
