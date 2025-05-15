@@ -87,7 +87,7 @@ const spellData: Record<string, Jewel> = {
   },
   "shadowbolt": {
     name: "Shadowbolt",
-    image: "/images/spells/Shadowbolt.png",
+    image: "/images/spells/shadowbolt.png",
     wiki: "https://vrising.fandom.com/wiki/Shadowbolt",
     school: "blood",
     effects: [

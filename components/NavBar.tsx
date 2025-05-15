@@ -56,7 +56,7 @@ export default function NavBar() {
           <Link href="/" className="flex items-center gap-2 z-50">
             <motion.div whileHover={{ rotate: 10 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
               <Image
-                src="/logo.svg"
+                src="/logo.png"
                 alt="V Rising Logo"
                 width={40}
                 height={40}

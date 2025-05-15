@@ -158,7 +158,7 @@ function DesktopSidebar() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0 }}
               >
-                <Image src="/logo.svg" alt="VArena" width={32} height={32} />
+                <Image src="/logo.png" alt="VArena" width={32} height={32} />
                 <span className="text-xl font-bold ">
                   VArena
                 </span>
@@ -261,7 +261,7 @@ function SidebarFooter({ isOpen }: { isOpen: boolean }) {
               <div className="flex items-center">
                 <motion.div whileHover={{ rotate: 10 }} transition={{ duration: 0.2 }}>
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="/logo.svg" alt="User" />
+                    <AvatarImage src="/logo.png" alt="User" />
                     <AvatarFallback>U</AvatarFallback>
                   </Avatar>
                 </motion.div>

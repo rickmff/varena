@@ -86,7 +86,7 @@ export default function Home() {
           >
             <Image src="/varena-logo.png" alt="Varena Logo" className="mr-10" width={600} height={400} />
             <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center"
+              className="flex flex-col sm:flex-row gap-4 justify-center mt-12"
               variants={staggerContainer}
               initial="hidden"
               whileInView="visible"
@@ -160,7 +160,7 @@ export default function Home() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="inline-block rounded-lg bg-red-900/50 border border-white/20 px-3 py-1 text-sm mb-4">
+            <div className="inline-block rounded-md bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
               V ARENA FEATURES
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">UNLEASH YOUR POTENTIAL</h2>
@@ -390,8 +390,8 @@ export default function Home() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="inline-block rounded-lg bg-red-900/50 border border-red-900/50 px-4 py-2 text-sm mb-4 shadow-lg shadow-red-900/20">
-              LATEST NEWS
+            <div className="inline-block rounded-md bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
+              NEWS & UPDATES
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
               Chronicles of V Rising
@@ -548,11 +548,11 @@ export default function Home() {
               {/* Left side - Discord preview */}
 
               <Image
-                src="/logo.svg"
+                src="/logo.png"
                 alt="Logo"
                 width={400}
                 height={400}
-                className="w-full h-auto object-contain relative z-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                className="w-full h-auto object-contain relative z-10"
               />
 
               {/* Right side - Call to action */}
@@ -566,7 +566,7 @@ export default function Home() {
                     className="inline-block rounded-lg bg-red-900/50 border border-red-500/30 px-4 py-2 text-sm mb-6 shadow-lg shadow-red-900/20"
                     whileHover={{ scale: 1.05 }}
                   >
-                    JOIN THE COVEN
+                    JOIN THE ARENA
                   </motion.div>
                   <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent">
                     UNITE WITH US ON DISCORD
@@ -586,7 +586,6 @@ export default function Home() {
                          relative overflow-hidden group px-8 shadow-lg shadow-red-900/20 w-full py-8 gap-4"
                     >
                       <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
-                        <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         <Image
                           src="/discord.svg"
                           alt="Discord"
@@ -604,13 +603,13 @@ export default function Home() {
                       </Link>
                     </Button>
                   </motion.div>
-                  <div className="flex items-center justify-center gap-8 text-sm text-gray-400 truncate">
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-400 truncate">
                     <motion.div
                       className="flex items-center gap-2"
                       whileHover={{ scale: 1.05, color: "#fff" }}
                     >
                       <Users className="h-5 w-5" />
-                      <span className="font-semibold">5,900+ Members</span>
+                      <span className="font-semibold">6,200+ Members</span>
                     </motion.div>
                     <motion.div
                       className="flex items-center gap-2"
