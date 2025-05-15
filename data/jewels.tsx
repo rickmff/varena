@@ -602,6 +602,20 @@ const spellData: Record<string, Jewel> = {
       { id: 6, name: "Increase AoE size (12 - 24%)" }
     ]
   },
+  "chaosvolley": {
+    name: "Chaos Volley",
+    image: "/images/spells/chaosvolley.png",
+    wiki: "https://vrising.fandom.com/wiki/Chaos_Volley",
+    school: "chaos",
+    effects: [
+      { id: 1, name: "Increase damage (8 - 20%)" },
+      { id: 2, name: "Hitting a different enemy with the second projectile deals damage (40 - 60%)" },
+      { id: 3, name: "Hit on an enemy affected by Ignite applies Agonising Flames" },
+      { id: 4, name: "Decrease CD (8 - 12%)" },
+      { id: 5, name: "Hit pushes enemies back (0.8 - 1.6m)" },
+      { id: 6, name: "Increase projectile range and speed (12 - 24%)" }
+    ]
+  },
   "polarityshift": {
     name: "Polarity Shift",
     image: "/images/spells/polshift.png",
