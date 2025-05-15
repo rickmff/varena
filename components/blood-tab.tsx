@@ -178,11 +178,11 @@ export default function BloodTab() {
                 {bloodData[primaryBlood as BloodKey].map((perk, index) => (
                   <div
                     key={index}
-                    className="bg-black/30 border border-green-900/30 p-3 rounded-md"
+                    className="bg-green-900/20 border border-green-900/30 p-3 rounded-md"
                   >
                     <div className="flex items-center">
-                      <div className="bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full mr-2">
-                        <Check className="w-3 h-4" />
+                      <div className="bg-green-500/20 text-green-300 text-xs p-1.5 rounded-full mr-2">
+                        <Check className="w-4 h-4" />
                       </div>
                       <p className="text-sm text-white">{index + 1}. {perk}</p>
                     </div>
@@ -222,10 +222,10 @@ export default function BloodTab() {
                   ))}
 
                   {/* Always included 4th perk */}
-                  <div className="bg-black/30 border border-green-900/30 p-3 rounded-md">
+                  <div className="bg-green-900/20 border border-green-900/30 p-3 rounded-md">
                     <div className="flex items-center">
-                      <div className="bg-green-500/20 text-green-300 text-xs px-2 py-1 rounded-full mr-2">
-                        <Check className="w-3 h-4" />
+                      <div className="bg-green-500/20 text-green-300 text-xs p-1.5 rounded-full mr-2">
+                        <Check className="w-4 h-4" />
                       </div>
                       <p className="text-sm text-white">4. {bloodData[secondaryBlood as BloodKey][3]}</p>
                     </div>
