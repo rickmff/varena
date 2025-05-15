@@ -34,7 +34,7 @@ export const schoolColors = {
     bg: 'bg-[url("/images/background/Chaos.png")]',
     border: 'border-purple-900/30',
     focus: 'focus:ring-purple-500/50 focus:border-purple-500/50',
-    button: 'bg-red-900/50 hover:bg-purple-800',
+    button: 'bg-purple-900/50 hover:bg-purple-800',
   },
   unholy: {
     primary: 'green',
