@@ -402,9 +402,9 @@ const spellData: Record<string, Jewel> = {
     ]
   },
   "balllightning": {
-    name: "Ball Lightning",
+    name: "Ball Storm",
     image: "/images/spells/balllightning.jpg",
-    wiki: "https://vrising.fandom.com/wiki/Ball_Lightning",
+    wiki: "https://vrising.fandom.com/wiki/Ball_Storm",
     school: "lightning",
     effects: [
       { id: 1, name: "Increase tick damage (3 - 7%)" },
@@ -446,9 +446,9 @@ const spellData: Record<string, Jewel> = {
     ]
   },
   "lightningcurtain": {
-    name: "Lightning Curtain",
+    name: "Storm Curtain",
     image: "/images/spells/lcurtain.jpg",
-    wiki: "https://vrising.fandom.com/wiki/Lightning_Curtain",
+    wiki: "https://vrising.fandom.com/wiki/Storm_Curtain",
     school: "lightning",
     effects: [
       { id: 1, name: "Increase damage (8 - 16%)" },
@@ -460,9 +460,9 @@ const spellData: Record<string, Jewel> = {
     ]
   },
   "lightningtendrils": {
-    name: "Lightning Tendrils",
+    name: "Storm Tendrils",
     image: "/images/spells/tendrils.jpg",
-    wiki: "https://vrising.fandom.com/wiki/Lightning_Tendrils",
+    wiki: "https://vrising.fandom.com/wiki/Storm_Tendrils",
     school: "lightning",
     effects: [
       { id: 1, name: "Increase damage (8 - 16%)" },

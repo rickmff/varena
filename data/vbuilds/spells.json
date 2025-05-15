@@ -1394,7 +1394,7 @@
     ]
   },
   "ball_lightning": {
-    "name": "Ball Lightning",
+    "name": "Ball Storm",
     "id": "ball_lightning",
     "img": "/images/spells/spell-ball_lightning.jpg",
     "spellSchool": "storm",
@@ -1538,7 +1538,7 @@
     ]
   },
   "lightning_curtain": {
-    "name": "Lightning Curtain",
+    "name": "Storm Curtain",
     "id": "lightning_curtain",
     "img": "/images/spells/spell-lightning_curtain.jpg",
     "spellSchool": "storm",
@@ -1614,13 +1614,13 @@
     ]
   },
   "lightning_tendrils": {
-    "name": "Lightning Tendrils",
+    "name": "Storm Tendrils",
     "id": "lightning_tendrils",
     "img": "/images/spells/spell-lightning_tendrils.jpg",
     "spellSchool": "storm",
     "effects": [
       {
-        "description": "Lightning bolts deal (4 - 12%) increased damage",
+        "description": "Storm bolts deal (4 - 12%) increased damage",
         "min": 4.0,
         "max": 12.0,
         "key": 1
@@ -1632,7 +1632,7 @@
         "key": 2
       },
       {
-        "description": "There is (20 - 36%) chance to trigger Chain Lightning on hit",
+        "description": "There is (20 - 36%) chance to trigger Chain Storm on hit",
         "min": 20.0,
         "max": 36.0,
         "key": 3

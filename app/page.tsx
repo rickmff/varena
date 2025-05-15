@@ -332,7 +332,7 @@ export default function Home() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="inline-block rounded-full bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
+            <div className="inline-block rounded-md bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
               COMMAND GENERATOR
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">

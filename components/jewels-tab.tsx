@@ -16,7 +16,7 @@ export const schoolsData = {
   unholy: { name: "Unholy", image: "/images/schools/Unholy.png" },
   illusion: { name: "Illusion", image: "/images/schools/Illusion.png" },
   frost: { name: "Frost", image: "/images/schools/Frost.png" },
-  lightning: { name: "Lightning", image: "/images/schools/Lightning.png" }
+  lightning: { name: "Storm", image: "/images/schools/Storm.png" }
 } as const;
 
 export type SchoolColors = typeof schoolColors;
@@ -59,7 +59,7 @@ export const schoolColors = {
   },
   lightning: {
     primary: 'yellow',
-    bg: 'bg-[url("/images/background/Lightning.png")]',
+    bg: 'bg-[url("/images/background/Storm.png")]',
     border: 'border-yellow-900/30',
     focus: 'focus:ring-yellow-500/50 focus:border-yellow-500/50',
     button: 'bg-yellow-900/50 hover:bg-yellow-800',
@@ -265,7 +265,7 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
           <span className="text-gray-400/50 text-sm mb-2">Paste on your game chat:  </span>
 
           <div className={`bg-black px-4 py-2 rounded-md border w-full text-center ${currentColors.border}`}>
-            <code className="text-gray-300 font-mono text-xl break-all bg-black/50 px-12 rounded-md">
+            <code className="text-gray-300  text-xl break-all bg-black/50 px-12 rounded-md">
               .j {spellName} {selectedEffects.join('')}
             </code>
           </div>

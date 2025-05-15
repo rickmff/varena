@@ -1,12 +1,13 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { useState, useEffect, useMemo } from "react"
+import { useState, useMemo } from "react"
 import JewelTab, { schoolColors, schoolsData } from "./jewels-tab"
 import type { SchoolKey } from "./jewels-tab"
 import LegendaryTab from "./legendary-tab"
 import ArtifactTab from "./artifact-tab"
-import ElixirTab from "./elixir-tab"
+import BloodTab from "./blood-tab"
+
 const fadeIn = {
   hidden: { opacity: 0 },
   visible: {
@@ -49,33 +50,59 @@ export default function CommandGenerator() {
       whileInView="visible"
       viewport={{ once: true }}
     >
+
+      <div className="relative flex justify-center gap-8">
+        {["Artifact", "Legendary", "Jewel", "Blood"].map((tab, index) => (
+          <div
+            key={tab}
+            className={`relative px-6 py-3 rounded-md text-lg font-medium tracking-wider transition-all duration-300 cursor-pointer ${activeTab === index
+              ? `text-white`
+              : "text-gray-200 hover:text-white"
+              }`}
+            onClick={() => changeTab(index)}
+          >
+            {activeTab === index && (
+              <>
+                <motion.div
+                  className={`absolute inset-0 hover:!opacity-50 border-b-2 border-red-900/50 bg-gradient-to-b to-red-900/20 from-transparent`}
+                  layoutId="activeTab"
+                  initial={{ opacity: 0.3 }}
+                  animate={{
+                    opacity: [0.3, 0.7, 1],
+                    backgroundPosition: ["0% 0%", "100% 100%"],
+                    scale: [1, 1.02, 1]
+                  }}
+                  transition={{
+                    type: "spring",
+                    bounce: 0.2,
+                    duration: 0.6,
+                    opacity: {
+                      duration: 0.8,
+                      times: [0, 0.7, 1],
+                      ease: "easeOut"
+                    },
+                    backgroundPosition: {
+                      duration: 3,
+                      repeat: Infinity,
+                      repeatType: "reverse",
+                      ease: "easeInOut"
+                    },
+                    scale: {
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatType: "reverse"
+                    }
+                  }}
+                />
+              </>
+            )}
+            <span className="relative z-10 flex items-center gap-2 font-light">
+              {tab}
+            </span>
+          </div>
+        ))}
+      </div>
       <div className={`max-w-4xl mx-auto rounded-lg border border-purple-900/30 p-6 min-h-[600px] backdrop-blur-sm shadow-lg transition-all duration-500 ${computedBG}`}>
-        <div className="relative flex justify-center gap-8 mb-8">
-          {["Artifact", "Legendary", "Jewel"].map((tab, index) => (
-            <motion.button
-              key={tab}
-              className={`relative px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 ${activeTab === index
-                ? `text-white`
-                : "text-gray-400 hover:text-white"
-                }`}
-              onClick={() => changeTab(index)}
-              whileTap={{ scale: 0.7 }}
-            >
-              {activeTab === index && (
-                <>
-                  <motion.div
-                    className={`absolute inset-0 ${index === 1 ? schoolColors.blood.button : schoolColors.blood.button} rounded-full`}
-                    layoutId="activeTab"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  />
-                </>
-              )}
-              <span className="relative z-10 flex items-center gap-2">
-                {tab}
-              </span>
-            </motion.button>
-          ))}
-        </div>
 
         <motion.div
           className="space-y-6"
@@ -119,19 +146,7 @@ export default function CommandGenerator() {
             }}
           />}
 
-          {activeTab === 3 && <ElixirTab
-            schoolColors={schoolColors}
-            onElixirFlavorChange={(flavor) => {
-              const isValid = (s: string): s is SchoolKey => {
-                return (Object.keys(schoolsData) as Array<string>).includes(s);
-              };
-              if (isValid(flavor)) {
-                setSelectedElixirFlavor(flavor);
-              } else {
-                setSelectedElixirFlavor('');
-              }
-            }}
-          />}
+          {activeTab === 3 && <BloodTab />}
         </motion.div>
       </div>
     </motion.div>

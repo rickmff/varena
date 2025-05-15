@@ -164,7 +164,7 @@ export default function LegendaryTab({ schoolColors, onLegendaryInfuseChange }: 
                 <button
                   key={id}
                   className={`
-                    h-14 flex items-center justify-center p-2 rounded-md text-sm text-center font-mono border transition-colors duration-200 ease-in-out opacity-100 text-white
+                    h-14 flex items-center justify-center p-2 rounded-md text-sm text-center  border transition-colors duration-200 ease-in-out opacity-100 text-white
                     ${currentLegendaryColors.border}
                     ${isDisabled
                       ? 'bg-gray-800/50 text-gray-500 cursor-not-allowed opacity-50'
@@ -186,7 +186,7 @@ export default function LegendaryTab({ schoolColors, onLegendaryInfuseChange }: 
             <span className="text-gray-400/50 text-sm mb-2">Paste on your game chat:  </span>
 
             <div className={`bg-black px-4 py-2 rounded-md border w-full text-center ${currentLegendaryColors.border}`}>
-              <code className="text-gray-300 font-mono text-xl break-all bg-black/50 px-12 rounded-md">
+              <code className="text-gray-300  text-xl break-all bg-black/50 px-12 rounded-md">
                 .lw {legendaryWeapon.replace(/_/g, ' ').replace('Epic', '').trim().toLowerCase()} {legendaryInfuse} {selectedEffects.join('')}
               </code>
             </div>
