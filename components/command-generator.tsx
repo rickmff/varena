@@ -7,6 +7,7 @@ import type { SchoolKey } from "./jewels-tab"
 import LegendaryTab from "./legendary-tab"
 import ArtifactTab from "./artifact-tab"
 import BloodTab from "./blood-tab"
+import { Sword, Swords, Gem, FlaskRound } from "lucide-react"
 
 const fadeIn = {
   hidden: { opacity: 0 },
@@ -20,7 +21,6 @@ export default function CommandGenerator() {
   const [activeTab, setActiveTab] = useState(0)
   const [selectedJewelSchool, setSelectedJewelSchool] = useState<SchoolKey | ''>('')
   const [legendaryInfuse, setLegendaryInfuse] = useState<SchoolKey | ''>('')
-  const [selectedElixirFlavor, setSelectedElixirFlavor] = useState<string | ''>('')
 
   const jewelDefaultBg = 'bg-[url("/images/background/Shadow.png")]'
   const legendaryDefaultBg = 'bg-[url("/images/background/Passives.png")]'
@@ -38,6 +38,8 @@ export default function CommandGenerator() {
       return legendaryInfuse ? schoolColors[legendaryInfuse as SchoolKey].bg : legendaryDefaultBg + ' bg-cover bg-left'
     } else if (activeTab === 2) {
       return selectedJewelSchool ? schoolColors[selectedJewelSchool as SchoolKey].bg : jewelDefaultBg + ' bg-cover bg-center'
+    } else if (activeTab === 3) {
+      return 'bg-[url("/images/background/Shadow.png")]'
     }
     return ''
   }, [activeTab, legendaryInfuse, selectedJewelSchool])
@@ -52,12 +54,17 @@ export default function CommandGenerator() {
     >
 
       <div className="relative flex justify-center gap-8">
-        {["Artifact", "Legendary", "Jewel", "Blood"].map((tab, index) => (
+        {[
+          { name: "Artifact", icon: <Sword className="w-5 h-5" /> },
+          { name: "Legendary", icon: <Swords className="w-5 h-5" /> },
+          { name: "Jewel", icon: <Gem className="w-5 h-5" /> },
+          { name: "Blood", icon: <FlaskRound className="w-5 h-5" /> }
+        ].map((tab, index) => (
           <div
-            key={tab}
+            key={tab.name}
             className={`relative px-6 py-3 rounded-md text-lg font-medium tracking-wider transition-all duration-300 cursor-pointer ${activeTab === index
               ? `text-white`
-              : "text-gray-200 hover:text-white"
+              : "text-gray-400 hover:text-white"
               }`}
             onClick={() => changeTab(index)}
           >
@@ -97,7 +104,7 @@ export default function CommandGenerator() {
               </>
             )}
             <span className="relative z-10 flex items-center gap-2 font-light">
-              {tab}
+              {tab.icon} {tab.name}
             </span>
           </div>
         ))}

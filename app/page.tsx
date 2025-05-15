@@ -181,14 +181,14 @@ export default function Home() {
                 image: "/images/features/Commands.png",
                 title: "Easy Commands",
                 description:
-                  "Commands to help you with your gameplay and make it easier to practice and improve your skills.",
+                  "Commands to make it easier to practice and improve your skills.",
               },
               {
                 icon: "crossed-swords",
                 image: "/images/features/Pancake.png",
                 title: "Game Modes",
                 description:
-                  "Experience unique game modes like Pancake and Ranked with leaderboards.",
+                  "Experience unique game modes like Pancake.",
               },
               {
                 icon: "calendar-clock",
@@ -202,7 +202,7 @@ export default function Home() {
                 image: "/images/features/Moderation.png",
                 title: "Moderation",
                 description:
-                  "Enforcing rules and maintaining a safe and enjoyable environment for all players.",
+                  "Maintaining a safe and enjoyable environment for all players.",
               },
             ].map((feature, index) => (
               <motion.div

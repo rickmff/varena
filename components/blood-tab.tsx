@@ -39,7 +39,7 @@ export default function BloodTab() {
         <div className="relative">
           <button
             onClick={() => setIsPrimaryOpen(!isPrimaryOpen)}
-            className="w-full bg-black/50 border border-red-900/30 rounded-md px-5 text-white focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition-all flex items-center justify-between py-6"
+            className={`w-full bg-black/50 border border-red-900/30 rounded-md px-5 text-white focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition-all flex items-center justify-between ${primaryBlood === '' ? 'py-6' : 'py-4'}`}
           >
             {primaryBlood ? (
               <div className="flex items-center gap-2">
@@ -103,7 +103,7 @@ export default function BloodTab() {
           <button
             onClick={() => setIsSecondaryOpen(!isSecondaryOpen)}
             disabled={!primaryBlood}
-            className={`w-full bg-black/50 border border-red-900/30 rounded-md px-5 text-white focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition-all flex items-center justify-between py-6 ${!primaryBlood ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-full bg-black/50 border border-red-900/30 rounded-md px-5 text-white focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition-all flex items-center justify-between py-6 ${secondaryBlood === '' ? 'py-6' : '!py-4'} ${!primaryBlood ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {secondaryBlood ? (
               <div className="flex items-center gap-2">
@@ -264,14 +264,14 @@ export default function BloodTab() {
           >
             <Button
               variant="outline"
-              className={`w-full text-white relative overflow-hidden group border-red-900/70 lowercase ${canCopyCommand ? 'bg-red-900/50 hover:bg-red-800' : 'bg-gray-700/50 cursor-not-allowed'} transition-colors`}
+              className={`w-full text-white relative overflow-hidden group border-red-900/70 ${canCopyCommand ? 'bg-red-900/50 hover:bg-red-800' : 'bg-gray-700/50 cursor-not-allowed'} transition-colors`}
               onClick={copyCommand}
               disabled={!canCopyCommand}
             >
               <span className="relative z-10">COPY COMMAND</span>
               {canCopyCommand && (
                 <motion.span
-                  className="absolute inset-0 bg-white/10 z-0 lowercase"
+                  className="absolute inset-0 bg-white/10 z-0"
                   initial={{ x: "-100%" }}
                   whileHover={{ x: 0 }}
                   transition={{ duration: 0.3 }}
