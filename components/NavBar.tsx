@@ -112,7 +112,7 @@ export default function NavBar() {
               <Button
                 variant="outline"
                 size="sm"
-                className="hidden md:flex text-xs font-bold text-white hover:bg-purple-950/50 transition-all duration-300"
+                className="hidden md:flex text-xs font-bold text-white hover:bg-gray-900/70 transition-all duration-300"
               >
                 <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
                   <Image

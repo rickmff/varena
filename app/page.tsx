@@ -96,7 +96,7 @@ export default function Home() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="gap-2 relative overflow-hidden group border-purple-900 text-white flex items-center"
+                  className="gap-2 relative overflow-hidden group border-purple-900 hover:bg-gray-900/70 bg-black text-white flex items-center"
                 >
                   <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
                     <Image src="/discord.svg" alt="Varena Logo" width={20} height={20} className="h-5 w-5 mr-2" />
@@ -114,7 +114,7 @@ export default function Home() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="gap-2 border-white/70 text-white hover:bg-purple-900 relative overflow-hidden group"
+                  className="gap-2 border-white/70 text-white hover:bg-gray-900/70 bg-black relative overflow-hidden group"
                   onClick={() => window.location.hash = '#generate-commands'}
                 >
                   <span className="relative z-10">Get Started</span>
@@ -160,7 +160,7 @@ export default function Home() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="inline-block rounded-lg bg-purple-900/50 border border-white/20 px-3 py-1 text-sm mb-4">
+            <div className="inline-block rounded-lg bg-red-900/50 border border-white/20 px-3 py-1 text-sm mb-4">
               V ARENA FEATURES
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">UNLEASH YOUR POTENTIAL</h2>
@@ -207,7 +207,7 @@ export default function Home() {
             ].map((feature, index) => (
               <motion.div
                 key={index}
-                className="bg-gradient-to-br from-black via-purple-950/10 to-black p-6 rounded-lg border border-purple-900/30 hover:border-purple-500/50 transition-all duration-500 relative overflow-hidden group h-80"
+                className="bg-gradient-to-br from-black via-red-950/10 to-black p-6 rounded-lg border border-red-900/30 hover:border-red-500/50 transition-all duration-500 relative overflow-hidden group h-80"
                 variants={scaleIn}
                 whileHover={{
                   y: -5,
@@ -251,22 +251,22 @@ export default function Home() {
                     >
                       <div className="w-20 h-20 mx-auto mb-4 relative group-hover:opacity-0 transition-opacity duration-500">
                         {feature.icon === "command" && (
-                          <Terminal className="w-full h-full text-purple-600" />
+                          <Terminal className="w-full h-full text-red-600" />
                         )}
                         {feature.icon === "crossed-swords" && (
-                          <Swords className="w-full h-full text-purple-600" />
+                          <Swords className="w-full h-full text-red-600" />
                         )}
                         {feature.icon === "calendar-clock" && (
-                          <CalendarClock className="w-full h-full text-purple-600" />
+                          <CalendarClock className="w-full h-full text-red-600" />
                         )}
                         {feature.icon === "moderation" && (
-                          <ShieldCheck className="w-full h-full text-purple-600" />
+                          <ShieldCheck className="w-full h-full text-red-600" />
                         )}
                       </div>
                     </motion.div>
 
                     {/* Title */}
-                    <h3 className="text-xl font-bold mb-2 tracking-wider text-purple-100 group-hover:opacity-0 transition-opacity duration-500">
+                    <h3 className="text-xl font-bold mb-2 tracking-wider text-red-100 group-hover:opacity-0 transition-opacity duration-500">
                       {feature.title.toUpperCase()}
                     </h3>
                   </motion.div>
@@ -283,10 +283,10 @@ export default function Home() {
                   >
 
                     {/* Decorative corner elements */}
-                    <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
-                    <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
-                    <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
-                    <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
+                    <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
+                    <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
+                    <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
+                    <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
 
                     {/* Description text with blood drop animation */}
                     <div className="relative">
@@ -332,7 +332,7 @@ export default function Home() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="inline-block rounded-full bg-purple-900/50 border border-purple-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-purple-900/20">
+            <div className="inline-block rounded-full bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
               COMMAND GENERATOR
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
@@ -355,7 +355,7 @@ export default function Home() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="inline-block rounded-full bg-purple-900/50 border border-purple-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-purple-900/20">
+            <div className="inline-block rounded-full bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
               Guide
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
@@ -390,7 +390,7 @@ export default function Home() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="inline-block rounded-lg bg-purple-900/50 border border-purple-900/50 px-4 py-2 text-sm mb-4 shadow-lg shadow-purple-900/20">
+            <div className="inline-block rounded-lg bg-red-900/50 border border-red-900/50 px-4 py-2 text-sm mb-4 shadow-lg shadow-red-900/20">
               LATEST NEWS
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
@@ -441,13 +441,13 @@ export default function Home() {
               >
                 <Link
                   href="#"
-                  className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-purple-900/30 hover:border-purple-500
+                  className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-red-900/30 hover:border-red-500
                            transition-all duration-300 overflow-hidden group block h-full relative"
                 >
                   {/* Glow effect on hover */}
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-purple-900/20 via-transparent to-purple-900/20" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-red-900/20" />
                   </div>
 
                   <div className="relative aspect-video">
@@ -462,8 +462,8 @@ export default function Home() {
                     {/* Category Badge */}
                     <div className="absolute top-4 right-4 flex items-center gap-2">
                       <motion.div
-                        className="bg-purple-900/80 text-white text-xs px-3 py-1.5 rounded-full font-bold
-                                 border border-purple-500/50 shadow-lg shadow-purple-900/50"
+                        className="bg-red-900/80 text-white text-xs px-3 py-1.5 rounded-full font-bold
+                                 border border-red-500/50 shadow-lg shadow-red-900/50"
                         whileHover={{ scale: 1.05 }}
                       >
                         <div className="flex items-center gap-2">
@@ -475,16 +475,16 @@ export default function Home() {
                   </div>
 
                   <div className="p-6 relative">
-                    <div className="text-purple-500 text-sm mb-2 font-bold tracking-wider">{news.date}</div>
-                    <h3 className="text-xl font-bold mb-3 group-hover:text-purple-400 transition-colors">
+                    <div className="text-red-500 text-sm mb-2 font-bold tracking-wider">{news.date}</div>
+                    <h3 className="text-xl font-bold mb-3 group-hover:text-red-400 transition-colors">
                       {news.title}
                     </h3>
                     <p className="text-gray-300">{news.excerpt}</p>
 
                     {/* Read More Button */}
                     <motion.div
-                      className="mt-6 flex items-center gap-2 text-purple-500 text-sm font-bold
-                               group-hover:text-purple-400 transition-colors"
+                      className="mt-6 flex items-center gap-2 text-red-500 text-sm font-bold
+                               group-hover:text-red-400 transition-colors"
                       initial={{ x: -10, opacity: 0 }}
                       whileHover={{ x: 5 }}
                       animate={{ x: 0, opacity: 1 }}
@@ -514,13 +514,13 @@ export default function Home() {
               <Button
                 variant="outline"
                 size="lg"
-                className="border-2 border-purple-900 text-white hover:bg-purple-900/20 hover:border-purple-500
-                         relative overflow-hidden group px-8 shadow-lg shadow-purple-900/20"
+                className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
+                         relative overflow-hidden group px-8 shadow-lg shadow-red-900/20"
               >
                 <span className="relative z-10 font-bold tracking-wider">VIEW ALL NEWS</span>
                 <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
                 <motion.span
-                  className="absolute inset-0 bg-gradient-to-r from-purple-900/40 to-transparent"
+                  className="absolute inset-0 bg-gradient-to-r from-red-900/40 to-transparent"
                   initial={{ x: "-100%" }}
                   whileHover={{ x: 0 }}
                   transition={{ duration: 0.3 }}
@@ -563,12 +563,12 @@ export default function Home() {
                   transition={{ delay: 0.3 }}
                 >
                   <motion.div
-                    className="inline-block rounded-lg bg-purple-900/50 border border-purple-500/30 px-4 py-2 text-sm mb-6 shadow-lg shadow-purple-900/20"
+                    className="inline-block rounded-lg bg-red-900/50 border border-red-500/30 px-4 py-2 text-sm mb-6 shadow-lg shadow-red-900/20"
                     whileHover={{ scale: 1.05 }}
                   >
                     JOIN THE COVEN
                   </motion.div>
-                  <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
+                  <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent">
                     UNITE WITH US ON DISCORD
                   </h2>
                   <p className="text-xl text-gray-300 mb-8 leading-relaxed">
@@ -582,11 +582,11 @@ export default function Home() {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="border-2 border-purple-900 text-white hover:bg-purple-900/20 hover:border-purple-500
-                         relative overflow-hidden group px-8 shadow-lg shadow-purple-900/20 w-full py-8 gap-4"
+                      className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
+                         relative overflow-hidden group px-8 shadow-lg shadow-red-900/20 w-full py-8 gap-4"
                     >
                       <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                         <Image
                           src="/discord.svg"
                           alt="Discord"
@@ -604,7 +604,7 @@ export default function Home() {
                       </Link>
                     </Button>
                   </motion.div>
-                  <div className="flex items-center justify-center gap-8 text-sm text-gray-400">
+                  <div className="flex items-center justify-center gap-8 text-sm text-gray-400 truncate">
                     <motion.div
                       className="flex items-center gap-2"
                       whileHover={{ scale: 1.05, color: "#fff" }}
@@ -617,7 +617,7 @@ export default function Home() {
                       whileHover={{ scale: 1.05, color: "#fff" }}
                     >
                       <Moon className="h-5 w-5" />
-                      <span className="font-semibold">Active 24/7 as long Rendy doesn't sleep</span>
+                      <span className="font-semibold">Active 24/7 as long as Rendy doesn't sleep</span>
                     </motion.div>
                   </div>
                 </motion.div>
@@ -628,7 +628,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black border-t border-purple-900/30 py-12 relative">
+      <footer className="bg-black border-t border-red-900/30 py-12 relative">
         <div className="container mx-auto px-4 relative">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>

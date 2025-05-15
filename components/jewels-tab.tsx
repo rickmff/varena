@@ -11,12 +11,12 @@ import Image from "next/image"
 export type SchoolKey = keyof typeof schoolsData;
 
 export const schoolsData = {
-  blood: { name: "Blood", image: "/images/schools/blood.png" },
-  chaos: { name: "Chaos", image: "/images/schools/chaos.png" },
-  unholy: { name: "Unholy", image: "/images/schools/unholy.png" },
-  illusion: { name: "Illusion", image: "/images/schools/illusion.png" },
-  frost: { name: "Frost", image: "/images/schools/frost.png" },
-  lightning: { name: "Lightning", image: "/images/schools/lightning.png" }
+  blood: { name: "Blood", image: "/images/schools/Blood.png" },
+  chaos: { name: "Chaos", image: "/images/schools/Chaos.png" },
+  unholy: { name: "Unholy", image: "/images/schools/Unholy.png" },
+  illusion: { name: "Illusion", image: "/images/schools/Illusion.png" },
+  frost: { name: "Frost", image: "/images/schools/Frost.png" },
+  lightning: { name: "Lightning", image: "/images/schools/Lightning.png" }
 } as const;
 
 export type SchoolColors = typeof schoolColors;
@@ -34,7 +34,7 @@ export const schoolColors = {
     bg: 'bg-[url("/images/background/Chaos.png")]',
     border: 'border-purple-900/30',
     focus: 'focus:ring-purple-500/50 focus:border-purple-500/50',
-    button: 'bg-purple-900/50 hover:bg-purple-800',
+    button: 'bg-red-900/50 hover:bg-purple-800',
   },
   unholy: {
     primary: 'green',
@@ -69,7 +69,7 @@ export const schoolColors = {
     bg: 'bg-black/50',
     border: 'border-purple-900/30',
     focus: 'focus:ring-purple-500/50 focus:border-purple-500/50',
-    button: 'bg-purple-900/50 hover:bg-purple-800',
+    button: 'bg-red-900/50 hover:bg-purple-800',
   }
 } as const;
 
