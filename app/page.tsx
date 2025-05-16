@@ -582,8 +582,7 @@ export default function Home() {
             viewport={{ once: true }}
           >
             <p>
-              © {new Date().getFullYear()} Stunlock Studios. All rights reserved. V Rising is a trademark of Stunlock
-              Studios.
+              © {new Date().getFullYear()} V Arena. All rights reserved.
             </p>
             <p className="mt-2">This is a fan-made website and is not affiliated with Stunlock Studios.</p>
           </motion.div>
