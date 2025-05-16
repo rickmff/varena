@@ -405,68 +405,95 @@ export default function Home() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 bg-gradient-to-b from-black to-red-950">
-        <div className="container mx-auto px-4">
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black to-transparent"></div>
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black"></div>
+        <div className="absolute inset-0 z-0 bg-[url('/flower.png')] bg-center bg-cover opacity-30"></div>
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            className="max-w-3xl mx-auto text-center"
+            className="max-w-6xl mx-auto "
+            variants={fadeInUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            variants={fadeInUp}
           >
-            <div className="inline-block rounded-md bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
-              JOIN THE FIGHT
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-              Ready to Dominate?
-            </h2>
-            <p className="text-gray-100 text-lg md:text-xl max-w-2xl mx-auto mb-10">
-              Become part of the V Arena community today. Sharpen your skills, meet new players, and conquer the arena.
-            </p>
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="mb-8"
-            >
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
+            <div className="grid md:grid-cols-2 items-center">
+              {/* Left side - Discord preview */}
+
+              <Image
+                src="/logo.png"
+                alt="Logo"
+                width={400}
+                height={400}
+                className="w-full h-auto object-contain relative z-10"
+              />
+
+              {/* Right side - Call to action */}
+              <div className="p-12 md:p-12">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <motion.div
+                    className="inline-block rounded-lg bg-red-900/50 border border-red-500/30 px-4 py-2 text-sm mb-6 shadow-lg shadow-red-900/20"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    JOIN THE ARENA
+                  </motion.div>
+                  <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent">
+                    UNITE WITH US ON DISCORD
+                  </h2>
+                  <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                    Join thousands of vampires in our thriving community. Share strategies, form alliances, and dominate the night together.
+                  </p>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="mb-8"
+                  >
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
                          relative overflow-hidden group px-8 shadow-lg shadow-red-900/20 w-full py-8 gap-4"
-              >
-                <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
-                  <Image
-                    src="/discord.svg"
-                    alt="Discord"
-                    width={32}
-                    height={32}
-                    className="h-8 w-8 group-hover:scale-110 transition-transform"
-                  />
-                  <span className="text-2xl font-bold tracking-wider">JOIN NOW</span>
-                  <motion.span
-                    className="absolute inset-0 bg-white/10"
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: 0 }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </Link>
-              </Button>
-            </motion.div>
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-400 truncate">
-              <motion.div
-                className="flex items-center gap-2"
-                whileHover={{ scale: 1.05, color: "#fff" }}
-              >
-                <Users className="h-5 w-5" />
-                <span className="font-semibold">6,200+ Members</span>
-              </motion.div>
-              <motion.div
-                className="flex items-center gap-2"
-                whileHover={{ scale: 1.05, color: "#fff" }}
-              >
-                <Moon className="h-5 w-5" />
-                <span className="font-semibold">Active 24/7 as long as Rendy doesn't sleep</span>
-              </motion.div>
+                    >
+                      <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
+                        <Image
+                          src="/discord.svg"
+                          alt="Discord"
+                          width={32}
+                          height={32}
+                          className="h-8 w-8 group-hover:scale-110 transition-transform"
+                        />
+                        <span className="text-2xl font-bold tracking-wider">JOIN NOW</span>
+                        <motion.span
+                          className="absolute inset-0 bg-white/10"
+                          initial={{ x: "-100%" }}
+                          whileHover={{ x: 0 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      </Link>
+                    </Button>
+                  </motion.div>
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-400 truncate">
+                    <motion.div
+                      className="flex items-center gap-2"
+                      whileHover={{ scale: 1.05, color: "#fff" }}
+                    >
+                      <Users className="h-5 w-5" />
+                      <span className="font-semibold">6,200+ Members</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-2"
+                      whileHover={{ scale: 1.05, color: "#fff" }}
+                    >
+                      <Moon className="h-5 w-5" />
+                      <span className="font-semibold">Active 24/7 as long as Rendy doesn't sleep</span>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </div>
             </div>
           </motion.div>
         </div>
