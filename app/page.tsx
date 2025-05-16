@@ -9,16 +9,7 @@ import { useState, useEffect } from "react"
 import BloodParticles from "@/components/blood-particles"
 import NavBar, { menuItems } from "@/components/NavBar"
 import CommandGenerator from "@/components/command-generator"
-
-// Add this at the top of your file, after the imports
-declare global {
-  interface Window {
-    featureCarousel?: {
-      interval: NodeJS.Timeout;
-      setHovering: (value: boolean) => void;
-    };
-  }
-}
+import FeatureCarousel from "@/app/components/ui/FeatureCarousel"
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0)
@@ -67,6 +58,38 @@ export default function Home() {
       transition: { duration: 0.5 },
     },
   }
+
+  // Define features data here, or fetch from an API
+  const featuresData = [
+    {
+      icon: "command",
+      image: "/images/features/Commands.png",
+      title: "Easy Commands",
+      description:
+        "Commands to make it easier to practice and improve your skills.",
+    },
+    {
+      icon: "crossed-swords",
+      image: "/images/features/Pancake.png",
+      title: "Game Modes",
+      description:
+        "Experience unique game modes like Pancake.",
+    },
+    {
+      icon: "calendar-clock",
+      image: "/images/features/Events.png",
+      title: "Events",
+      description:
+        "Participate in exciting events and challenges to earn rewards.",
+    },
+    {
+      icon: "moderation",
+      image: "/images/features/Moderation.png",
+      title: "Moderation",
+      description:
+        "Maintaining a safe and enjoyable environment for all players.",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
@@ -159,257 +182,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-60 bg-black relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-black z-10"></div>
-
-        {/* Background carousel container with two layers for smooth crossfade */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <div id="bg-image-1" className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 opacity-0"></div>
-          <div id="bg-image-2" className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 opacity-0"></div>
-        </div>
-
-        <div className="container mx-auto px-4 relative z-50">
-          <motion.div
-            className="text-center mb-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-          >
-            <div className="inline-block rounded-md bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
-              V ARENA FEATURES
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">UNLEASH YOUR POTENTIAL</h2>
-            <p className="text-gray-100 max-w-2xl mx-auto">
-              Discover the unique features of V Arena that enhance your gaming experience.
-            </p>
-          </motion.div>
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative"
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            onViewportEnter={() => {
-              // Start the background carousel when this section comes into view
-              const features = [
-                "/images/features/Commands.png",
-                "/images/features/Pancake.png",
-                "/images/features/Events.png",
-                "/images/features/Moderation.png"
-              ];
-
-              let currentIndex = 0;
-              let isHovering = false;
-
-              // Store the interval ID so we can clear it later
-              const carouselInterval = setInterval(() => {
-                if (!isHovering) {
-                  const bg1 = document.getElementById('bg-image-1');
-                  const bg2 = document.getElementById('bg-image-2');
-
-                  if (bg1 && bg2) {
-                    // Determine which layer is currently visible
-                    const activeLayer = window.getComputedStyle(bg1).opacity !== '0' ? bg1 : bg2;
-                    const inactiveLayer = activeLayer === bg1 ? bg2 : bg1;
-
-                    // Set the new image on the inactive layer
-                    inactiveLayer.style.backgroundImage = `url(${features[currentIndex]})`;
-
-                    // Fade in the inactive layer and fade out the active layer
-                    inactiveLayer.style.opacity = '1';
-                    activeLayer.style.opacity = '0';
-
-                    // Move to the next image
-                    currentIndex = (currentIndex + 1) % features.length;
-                  }
-                }
-              }, 5000); // Change image every 3 seconds
-
-              // Store the interval ID and isHovering flag on the window object
-              // so we can access them from the card hover handlers
-              window.featureCarousel = {
-                interval: carouselInterval,
-                setHovering: (value) => { isHovering = value; }
-              };
-
-              // Clean up the interval when the component unmounts
-              return () => {
-                if (window.featureCarousel) {
-                  clearInterval(window.featureCarousel.interval);
-                  delete window.featureCarousel;
-                }
-              };
-            }}
-            onViewportLeave={() => {
-              // Clean up the interval when the section leaves the viewport
-              if (window.featureCarousel) {
-                clearInterval(window.featureCarousel.interval);
-                delete window.featureCarousel;
-              }
-            }}
-          >
-            {[
-              {
-                icon: "command",
-                image: "/images/features/Commands.png",
-                title: "Easy Commands",
-                description:
-                  "Commands to make it easier to practice and improve your skills.",
-              },
-              {
-                icon: "crossed-swords",
-                image: "/images/features/Pancake.png",
-                title: "Game Modes",
-                description:
-                  "Experience unique game modes like Pancake.",
-              },
-              {
-                icon: "calendar-clock",
-                image: "/images/features/Events.png",
-                title: "Events",
-                description:
-                  "Participate in exciting events and challenges to earn rewards.",
-              },
-              {
-                icon: "moderation",
-                image: "/images/features/Moderation.png",
-                title: "Moderation",
-                description:
-                  "Maintaining a safe and enjoyable environment for all players.",
-              },
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                className="bg-gradient-to-br from-black via-red-950/10 to-black p-6 rounded-lg border border-red-900/30 hover:border-red-500/50 transition-all duration-500 relative overflow-hidden group h-80 backdrop-blur-sm"
-                variants={scaleIn}
-                whileHover={{
-                  y: -5,
-                  boxShadow: "0 10px 25px -5px rgba(139, 0, 0, 0.5)",
-                  transition: { duration: 0.3 }
-                }}
-                onMouseEnter={() => {
-                  // Pause the automatic carousel
-                  if (window.featureCarousel) {
-                    window.featureCarousel.setHovering(true);
-                  }
-
-                  // Get the background image elements
-                  const bg1 = document.getElementById('bg-image-1');
-                  const bg2 = document.getElementById('bg-image-2');
-
-                  if (bg1 && bg2) {
-                    // Determine which layer is currently visible
-                    const activeLayer = window.getComputedStyle(bg1).opacity !== '0' ? bg1 : bg2;
-                    const inactiveLayer = activeLayer === bg1 ? bg2 : bg1;
-
-                    // Set the new image on the inactive layer
-                    inactiveLayer.style.backgroundImage = `url(${feature.image})`;
-
-                    // Fade in the inactive layer and fade out the active layer
-                    inactiveLayer.style.opacity = '1';
-                    activeLayer.style.opacity = '0';
-                  }
-                }}
-                onMouseLeave={() => {
-                  // Resume the automatic carousel
-                  if (window.featureCarousel) {
-                    window.featureCarousel.setHovering(false);
-                  }
-                }}
-              >
-                {/* Content Container with flex to position items */}
-                <div className="h-full flex flex-col items-center justify-center text-center relative z-10">
-                  {/* Icon and Title Container - will fade out on hover */}
-                  <motion.div
-                    className="flex flex-col items-center transition-all duration-500 ease-in-out"
-                    initial={{ opacity: 1, y: 0 }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                    whileHover={{
-                      opacity: 0,
-                      y: -20,
-                      transition: { duration: 0.3 }
-                    }}
-                  >
-                    {/* Icon - can be customized with actual SVGs */}
-                    <motion.div
-                      className="mb-6 relative"
-                      animate={{
-                        y: [0, 5, 0],
-                        opacity: [0.8, 1, 0.8]
-                      }}
-                      transition={{
-                        y: { duration: 2, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" },
-                        opacity: { duration: 2, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" }
-                      }}
-                    >
-                      <div className="w-20 h-20 mx-auto mb-4 relative group-hover:opacity-0 transition-opacity duration-500">
-                        {feature.icon === "command" && (
-                          <Terminal className="w-full h-full text-red-600" />
-                        )}
-                        {feature.icon === "crossed-swords" && (
-                          <Swords className="w-full h-full text-red-600" />
-                        )}
-                        {feature.icon === "calendar-clock" && (
-                          <CalendarClock className="w-full h-full text-red-600" />
-                        )}
-                        {feature.icon === "moderation" && (
-                          <ShieldCheck className="w-full h-full text-red-600" />
-                        )}
-                      </div>
-                    </motion.div>
-
-                    {/* Title */}
-                    <h3 className="text-xl font-bold mb-2 tracking-wider text-red-100 group-hover:opacity-0 transition-opacity duration-500">
-                      {feature.title.toUpperCase()}
-                    </h3>
-                  </motion.div>
-
-                  {/* Description - Hidden by default, revealed on hover */}
-                  <motion.div
-                    className="w-full h-full absolute inset-0 flex items-center justify-center text-center px-6"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileHover={{
-                      opacity: 1,
-                      scale: 1,
-                      transition: { duration: 0.4, delay: 0.1 }
-                    }}
-                  >
-
-                    {/* Decorative corner elements */}
-                    <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
-                    <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
-                    <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
-                    <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
-
-                    {/* Description text with blood drop animation */}
-                    <div className="relative">
-                      {/* Small blood drop above text */}
-                      <motion.div
-                        className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-1 h-6 opacity-0 group-hover:opacity-80"
-                        initial={{ scaleY: 0 }}
-                        whileHover={{
-                          scaleY: 1,
-                          transition: { duration: 0.4, delay: 0.3 }
-                        }}
-                      />
-
-                      <p className="text-gray-200 font-medium leading-relaxed text-lg text-shadow-lg">
-                        {feature.description}
-                      </p>
-                    </div>
-                  </motion.div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black z-10"></div>
-      </section>
+      {/* Features Section - Now uses the FeatureCarousel component */}
+      <FeatureCarousel features={featuresData} />
 
       <section className="py-32 relative" id="generate-commands">
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-black to-transparent"></div>
@@ -631,95 +405,68 @@ export default function Home() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black to-transparent"></div>
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black"></div>
-        <div className="absolute inset-0 z-0 bg-[url('/flower.png')] bg-center bg-cover opacity-30"></div>
-        <div className="container mx-auto px-4 relative z-10">
+      <section className="py-20 bg-gradient-to-b from-black to-red-950">
+        <div className="container mx-auto px-4">
           <motion.div
-            className="max-w-6xl mx-auto "
-            variants={fadeInUp}
+            className="max-w-3xl mx-auto text-center"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
+            variants={fadeInUp}
           >
-            <div className="grid md:grid-cols-2 items-center">
-              {/* Left side - Discord preview */}
-
-              <Image
-                src="/logo.png"
-                alt="Logo"
-                width={400}
-                height={400}
-                className="w-full h-auto object-contain relative z-10"
-              />
-
-              {/* Right side - Call to action */}
-              <div className="p-12 md:p-12">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <motion.div
-                    className="inline-block rounded-lg bg-red-900/50 border border-red-500/30 px-4 py-2 text-sm mb-6 shadow-lg shadow-red-900/20"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    JOIN THE ARENA
-                  </motion.div>
-                  <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent">
-                    UNITE WITH US ON DISCORD
-                  </h2>
-                  <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                    Join thousands of vampires in our thriving community. Share strategies, form alliances, and dominate the night together.
-                  </p>
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="mb-8"
-                  >
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
+            <div className="inline-block rounded-md bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
+              JOIN THE FIGHT
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+              Ready to Dominate?
+            </h2>
+            <p className="text-gray-100 text-lg md:text-xl max-w-2xl mx-auto mb-10">
+              Become part of the V Arena community today. Sharpen your skills, meet new players, and conquer the arena.
+            </p>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="mb-8"
+            >
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
                          relative overflow-hidden group px-8 shadow-lg shadow-red-900/20 w-full py-8 gap-4"
-                    >
-                      <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
-                        <Image
-                          src="/discord.svg"
-                          alt="Discord"
-                          width={32}
-                          height={32}
-                          className="h-8 w-8 group-hover:scale-110 transition-transform"
-                        />
-                        <span className="text-2xl font-bold tracking-wider">JOIN NOW</span>
-                        <motion.span
-                          className="absolute inset-0 bg-white/10"
-                          initial={{ x: "-100%" }}
-                          whileHover={{ x: 0 }}
-                          transition={{ duration: 0.3 }}
-                        />
-                      </Link>
-                    </Button>
-                  </motion.div>
-                  <div className="flex items-center justify-center gap-2 text-sm text-gray-400 truncate">
-                    <motion.div
-                      className="flex items-center gap-2"
-                      whileHover={{ scale: 1.05, color: "#fff" }}
-                    >
-                      <Users className="h-5 w-5" />
-                      <span className="font-semibold">6,200+ Members</span>
-                    </motion.div>
-                    <motion.div
-                      className="flex items-center gap-2"
-                      whileHover={{ scale: 1.05, color: "#fff" }}
-                    >
-                      <Moon className="h-5 w-5" />
-                      <span className="font-semibold">Active 24/7 as long as Rendy doesn't sleep</span>
-                    </motion.div>
-                  </div>
-                </motion.div>
-              </div>
+              >
+                <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
+                  <Image
+                    src="/discord.svg"
+                    alt="Discord"
+                    width={32}
+                    height={32}
+                    className="h-8 w-8 group-hover:scale-110 transition-transform"
+                  />
+                  <span className="text-2xl font-bold tracking-wider">JOIN NOW</span>
+                  <motion.span
+                    className="absolute inset-0 bg-white/10"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </Link>
+              </Button>
+            </motion.div>
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-400 truncate">
+              <motion.div
+                className="flex items-center gap-2"
+                whileHover={{ scale: 1.05, color: "#fff" }}
+              >
+                <Users className="h-5 w-5" />
+                <span className="font-semibold">6,200+ Members</span>
+              </motion.div>
+              <motion.div
+                className="flex items-center gap-2"
+                whileHover={{ scale: 1.05, color: "#fff" }}
+              >
+                <Moon className="h-5 w-5" />
+                <span className="font-semibold">Active 24/7 as long as Rendy doesn't sleep</span>
+              </motion.div>
             </div>
           </motion.div>
         </div>
