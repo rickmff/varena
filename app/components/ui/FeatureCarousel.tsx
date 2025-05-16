@@ -166,8 +166,8 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
 
       {/* Background carousel container */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <div id="bg-image-1" className="absolute inset-0 bg-cover bg-center transition-opacity duration-3000 ease-in-out opacity-0"></div>
-        <div id="bg-image-2" className="absolute inset-0 bg-cover bg-center transition-opacity duration-3000 ease-in-out opacity-0"></div>
+        <div id="bg-image-1" className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out opacity-0"></div>
+        <div id="bg-image-2" className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out opacity-0"></div>
       </div>
 
       <div className="container mx-auto px-4 relative z-50">
