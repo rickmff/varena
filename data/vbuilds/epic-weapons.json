@@ -1,0 +1,86 @@
+{
+  "axe": {
+    "id": "axe",
+    "name": "Axe",
+    "img": "/images/vbuilds/weapons/epic/Axe.png",
+    "arenaCode": "g"
+  },
+  "claws": {
+    "id": "claws",
+    "name": "Claws",
+    "img": "/images/vbuilds/weapons/epic/Claws.png",
+    "arenaCode": "h"
+  },
+  "crossbow": {
+    "id": "crossbow",
+    "name": "Crossbow",
+    "img": "/images/vbuilds/weapons/epic/Crossbow.png",
+    "arenaCode": "i"
+  },
+  "daggers": {
+    "id": "daggers",
+    "name": "Daggers",
+    "img": "/images/vbuilds/weapons/epic/Daggers.png",
+    "arenaCode": "j"
+  },
+  "greatsword": {
+    "id": "greatsword",
+    "name": "GreatSword",
+    "img": "/images/vbuilds/weapons/epic/GreatSword.png",
+    "arenaCode": "k"
+  },
+  "longbow": {
+    "id": "longbow",
+    "name": "LongBow",
+    "img": "/images/vbuilds/weapons/epic/LongBow.png",
+    "arenaCode": "l"
+  },
+  "mace": {
+    "id": "mace",
+    "name": "Mace",
+    "img": "/images/vbuilds/weapons/epic/Mace.png",
+    "arenaCode": "m"
+  },
+  "pistols": {
+    "id": "pistols",
+    "name": "Pistols",
+    "img": "/images/vbuilds/weapons/epic/Pistols.png",
+    "arenaCode": "n"
+  },
+  "reaper": {
+    "id": "reaper",
+    "name": "Reaper",
+    "img": "/images/vbuilds/weapons/epic/Reaper.png",
+    "arenaCode": "o"
+  },
+  "slashers": {
+    "id": "slashers",
+    "name": "Slashers",
+    "img": "/images/vbuilds/weapons/epic/Slashers.png",
+    "arenaCode": "p"
+  },
+  "spear": {
+    "id": "spear",
+    "name": "Spear",
+    "img": "/images/vbuilds/weapons/epic/Spear.png",
+    "arenaCode": "q"
+  },
+  "sword": {
+    "id": "sword",
+    "name": "Sword",
+    "img": "/images/vbuilds/weapons/epic/Sword.png",
+    "arenaCode": "r"
+  },
+  "twinblades": {
+    "id": "twinblades",
+    "name": "TwinBlades",
+    "img": "/images/vbuilds/weapons/epic/Twinblades.png",
+    "arenaCode": "s"
+  },
+  "whip": {
+    "id": "whip",
+    "name": "Whip",
+    "img": "/images/vbuilds/weapons/epic/Whip.png",
+    "arenaCode": "t"
+  }
+}

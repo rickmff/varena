@@ -1,0 +1,72 @@
+[
+  {
+    "id": "StatMod_AttackSpeed",
+    "key": "1",
+    "description": "Increases attack speed"
+  },
+  {
+    "id": "StatMod_CriticalStrikePhysical",
+    "key": "2",
+    "description": "Improves physical critical strike chance"
+  },
+  {
+    "id": "StatMod_CriticalStrikePhysicalPower",
+    "key": "3",
+    "description": "Enhances physical critical strike power"
+  },
+  {
+    "id": "StatMod_CriticalStrikeSpellPower",
+    "key": "4",
+    "description": "Boosts spell critical strike power"
+  },
+  {
+    "id": "StatMod_CriticalStrikeSpells",
+    "key": "5",
+    "description": "Increases spell critical strike chance"
+  },
+  {
+    "id": "StatMod_MaxHealth",
+    "key": "6",
+    "description": "Increases maximum health"
+  },
+  {
+    "id": "StatMod_MovementSpeed",
+    "key": "7",
+    "description": "Improves movement speed"
+  },
+  {
+    "id": "StatMod_PhysicalPower",
+    "key": "8",
+    "description": "Enhances physical power"
+  },
+  {
+    "id": "StatMod_SpellCooldownReduction",
+    "key": "9",
+    "description": "Reduces spell cooldowns"
+  },
+  {
+    "id": "StatMod_SpellLeech",
+    "key": "A",
+    "description": "Grants spell leech ability"
+  },
+  {
+    "id": "StatMod_SpellPower",
+    "key": "B",
+    "description": "Increases spell power"
+  },
+  {
+    "id": "StatMod_TravelCooldownReduction",
+    "key": "C",
+    "description": "Reduces veil cooldowns"
+  },
+  {
+    "id": "StatMod_WeaponCooldownReduction",
+    "key": "D",
+    "description": "Reduces weapon cooldowns"
+  },
+  {
+    "id": "StatMod_WeaponSkillPower",
+    "key": "E",
+    "description": "Enhances weapon skill power"
+  }
+]

@@ -1,33 +1,9 @@
 {
-  "amulet_blademaster": {
-    "id": "amulet_blademaster",
-    "name": "Amulet of the Blademaster",
-    "image": "/images/vbuilds/amulets/Jewelry_AmuletoftheBlademaster.webp",
-    "attributes": [
-      {
-        "stat": "Spell Power",
-        "value": 34,
-        "unit": "flat"
-      },
-      {
-        "stat": "Blood Drain Reduction",
-        "value": 15,
-        "unit": "percent"
-      },
-      {
-        "stat": "Attack Speed",
-        "value": 7,
-        "unit": "percent"
-      }
-    ],
-    "effect": {
-      "description": "10% chance on primary hit to gain Lesser Storm Shield. Can only trigger once every 10s."
-    }
-  },
   "amulet_crimson_commander": {
     "id": "amulet_crimson_commander",
     "name": "Amulet of the Crimson Commander",
     "image": "/images/vbuilds/amulets/Jewelry_AmuletoftheCrimsonCommander.webp",
+    "arenaCode": 1,
     "attributes": [
       {
         "stat": "Spell Power",
@@ -49,10 +25,37 @@
       "description": "10% chance on primary hit to gain Lesser Blood Rage. Can only trigger once every 10s."
     }
   },
+  "amulet_wicked_prophet": {
+    "id": "amulet_wicked_prophet",
+    "name": "Amulet of the Wicked Prophet",
+    "image": "/images/vbuilds/amulets/Jewelry_AmuletoftheWickedProphet.webp",
+    "arenaCode": 2,
+    "attributes": [
+      {
+        "stat": "Spell Power",
+        "value": 34,
+        "unit": "flat"
+      },
+      {
+        "stat": "Blood Drain Reduction",
+        "value": 15,
+        "unit": "percent"
+      },
+      {
+        "stat": "Spell Life Leech",
+        "value": 5,
+        "unit": "percent"
+      }
+    ],
+    "effect": {
+      "description": "10% chance on primary hit to gain Lesser Power Surge. Can only trigger once every 10s."
+    }
+  },
   "amulet_arch_warlock": {
     "id": "amulet_arch_warlock",
     "name": "Amulet of the Arch-Warlock",
     "image": "/images/vbuilds/amulets/Jewelry_AmuletoftheArch-Warlock.webp",
+    "arenaCode": 3,
     "attributes": [
       {
         "stat": "Spell Power",
@@ -78,6 +81,7 @@
     "id": "amulet_master_spellweaver",
     "name": "Amulet of the Master Spellweaver",
     "image": "/images/vbuilds/amulets/Jewelry_AmuletoftheMasterSpellweaver.webp",
+    "arenaCode": 4,
     "attributes": [
       {
         "stat": "Spell Power",
@@ -99,10 +103,12 @@
       "description": "10% chance on primary hit to gain Lesser Phantom Aegis. Can only trigger once every 10s."
     }
   },
-  "amulet_wicked_prophet": {
-    "id": "amulet_wicked_prophet",
-    "name": "Amulet of the Wicked Prophet",
-    "image": "/images/vbuilds/amulets/Jewelry_AmuletoftheWickedProphet.webp",
+
+  "amulet_blademaster": {
+    "id": "amulet_blademaster",
+    "name": "Amulet of the Blademaster",
+    "image": "/images/vbuilds/amulets/Jewelry_AmuletoftheBlademaster.webp",
+    "arenaCode": 5,
     "attributes": [
       {
         "stat": "Spell Power",
@@ -115,13 +121,13 @@
         "unit": "percent"
       },
       {
-        "stat": "Spell Life Leech",
-        "value": 5,
+        "stat": "Attack Speed",
+        "value": 7,
         "unit": "percent"
       }
     ],
     "effect": {
-      "description": "10% chance on primary hit to gain Lesser Power Surge. Can only trigger once every 10s."
+      "description": "10% chance on primary hit to gain Lesser Storm Shield. Can only trigger once every 10s."
     }
   },
   "amulet_unyielding_charger": {

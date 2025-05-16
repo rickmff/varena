@@ -1,6 +1,8 @@
 {
-  "Rogue": {
-    "id": "bloodtype_rogue",
+  "rogue": {
+    "name": "Rogue Blood",
+    "id": "rogue",
+    "image": "/images/vbuilds/blood/rogue-blood.webp",
     "effects": {
       "I": {
         "description": "16% Increased Physical Critical Chance and 8% increased Physical Critical Power.",
@@ -64,8 +66,10 @@
       }
     }
   },
-  "Warrior": {
-    "id": "bloodtype_warrior",
+  "warrior": {
+    "name": "Warrior Blood",
+    "id": "warrior",
+    "image": "/images/vbuilds/blood/warrior-blood.webp",
     "effects": {
       "I": {
         "description": "10% Increased Physical Power and Veil attacks deal 30% bonus damage.",
@@ -134,7 +138,9 @@
       }
     }
   },
-  "Corrupted": {
+  "corrupted": {
+    "name": "Corrupted Blood",
+    "image": "/images/vbuilds/blood/corrupted-blood.webp",
     "id": "bloodtype_corrupted",
     "effects": {
       "I": {
@@ -203,8 +209,10 @@
       }
     }
   },
-  "Brute": {
-    "id": "bloodtype_brute",
+  "brute": {
+    "name": "Brute Blood",
+    "image": "/images/vbuilds/blood/brute-blood.webp",
+    "id": "brute",
     "effects": {
       "I": {
         "description": "14% Increased Primary Attack Speed and gain 5% increased Physical Power.",
@@ -273,8 +281,10 @@
       }
     }
   },
-  "Scholar": {
-    "id": "bloodtype_scholar",
+  "scholar": {
+    "name": "Scholar Blood",
+    "image": "/images/vbuilds/blood/scholar-blood.webp",
+    "id": "scholar",
     "effects": {
       "I": {
         "description": "14% Increased Spell Power and 10% Shield Efficiency.",
@@ -333,8 +343,10 @@
       }
     }
   },
-  "Mutant": {
-    "id": "bloodtype_mutant",
+  "mutant": {
+    "name": "Mutant Blood",
+    "image": "/images/vbuilds/blood/mutant-blood.webp",
+    "id": "mutant",
     "effects": {
       "I": {
         "description": "14% Increased Spell Power and 10% increased Shapeshift Speed.",
@@ -398,8 +410,10 @@
       }
     }
   },
-  "Draculin": {
-    "id": "bloodtype_draculin",
+  "draculin": {
+    "name": "Draculin Blood",
+    "image": "/images/vbuilds/blood/draculin-blood.webp",
+    "id": "draculin",
     "effects": {
       "I": {
         "description": "14% Increased Spell Power and 8% increased Spell Critical Power.",
@@ -468,8 +482,10 @@
       }
     }
   },
-  "Creature": {
-    "id": "bloodtype_creature",
+  "creature": {
+    "name": "Creature Blood",
+    "image": "/images/vbuilds/blood/creature-blood.webp",
+    "id": "creature",
     "effects": {
       "I": {
         "description": "16% Increased Maximum Health and 40% increased health regeneration.",

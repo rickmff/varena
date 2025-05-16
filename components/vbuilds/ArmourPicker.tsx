@@ -9,6 +9,7 @@ import {
   DropdownSelect,
   DropdownSelectPlaceholder,
 } from "./components/DropdownSelect";
+import { useBuilder } from "./BuildProvider";
 
 const armourOptions = [
   {
@@ -37,8 +38,16 @@ type ArmourOption = (typeof armourOptions)[number];
 type ArmourId = ArmourOption["id"];
 
 export const ArmourPicker: React.FC = () => {
+  const { state, builder } = useBuilder();
   return (
     <DropdownSelect
+      onSelect={(id: string) => {
+        const armourId = id as ArmourId;
+        builder.send({
+          type: "ADD_ARMOUR",
+          armour: armourOptions.find((option) => option.id === armourId),
+        });
+      }}
       options={[...armourOptions]}
       defaultValue={null}
       placeholder={

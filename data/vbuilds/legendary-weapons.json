@@ -1,0 +1,92 @@
+{
+  "axe": {
+    "id": "axe",
+    "name": "The Red Twins",
+    "img": "/images/vbuilds/weapons/legendary/Axe.png",
+    "arenaCode": "1"
+  },
+  "claws": {
+    "id": "claws",
+    "name": "Talons of the Lich Beast",
+    "img": "/images/vbuilds/weapons/legendary/Claws.png",
+    "arenaCode": "2"
+  },
+  "crossbow": {
+    "id": "crossbow",
+    "name": "The Siren's Wail",
+    "img": "/images/vbuilds/weapons/legendary/Crossbow.png",
+    "arenaCode": "3"
+  },
+  "daggers": {
+    "id": "daggers",
+    "name": "The Wraithblades",
+    "img": "/images/vbuilds/weapons/legendary/Daggers.png",
+    "arenaCode": "4"
+  },
+  "greatsword": {
+    "id": "greatsword",
+    "name": "Apocalypse",
+    "img": "/images/vbuilds/weapons/legendary/GreatSword.png",
+    "arenaCode": "5"
+  },
+  "longbow": {
+    "id": "longbow",
+    "name": "Oaksong",
+    "img": "/images/vbuilds/weapons/legendary/LongBow.png",
+    "arenaCode": "6"
+  },
+  "mace": {
+    "id": "mace",
+    "name": "Hand of Winter",
+    "img": "/images/vbuilds/weapons/legendary/Mace.png",
+    "arenaCode": "7"
+  },
+  "pistols": {
+    "id": "pistols",
+    "name": "The Endbringers",
+    "img": "/images/vbuilds/weapons/legendary/Pistols.png",
+    "arenaCode": "8"
+  },
+  "reaper": {
+    "id": "reaper",
+    "name": "Mortira's Lament",
+    "img": "/images/vbuilds/weapons/legendary/Reaper.png",
+    "arenaCode": "9"
+  },
+  "slashers_01": {
+    "id": "slashers_01",
+    "name": "Cloud Dancers",
+    "img": "/images/vbuilds/weapons/legendary/Slashers_01.png",
+    "arenaCode": "a"
+  },
+  "slashers_02": {
+    "id": "slashers_02",
+    "name": "Wings of the Fallen",
+    "img": "/images/vbuilds/weapons/legendary/Slashers_02.png",
+    "arenaCode": "b"
+  },
+  "spear": {
+    "id": "spear",
+    "name": "The Thousand Storms",
+    "img": "/images/vbuilds/weapons/legendary/Spear.png",
+    "arenaCode": "c"
+  },
+  "sword": {
+    "id": "sword",
+    "name": "The Gravecaller",
+    "img": "/images/vbuilds/weapons/legendary/Sword.png",
+    "arenaCode": "d"
+  },
+  "twinblades": {
+    "id": "twinblades",
+    "name": "The Fate Dancers",
+    "img": "/images/vbuilds/weapons/legendary/Twinblades.png",
+    "arenaCode": "e"
+  },
+  "whip": {
+    "id": "whip",
+    "name": "The Morning Star",
+    "img": "/images/vbuilds/weapons/legendary/Whip.webp",
+    "arenaCode": "f"
+  }
+}

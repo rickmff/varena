@@ -6,9 +6,12 @@ import { GroupedStatList } from "@/components/vbuilds/GroupedStatList";
 import { AmuletPicker } from "@/components/vbuilds/AmuletPicker";
 import { WeaponSheet } from "@/components/vbuilds/WeaponSheet";
 import { ArmourPicker } from "@/components/vbuilds/ArmourPicker";
+import { CoatingPicker } from "@/components/vbuilds/CoatingPicker";
 import { ElixerPicker } from "./ElixirPicker";
 import { PassiveForge, PassivePlaceholder } from "./PassiveForge";
 import { SpellForge } from "./SpellForge";
+import { WeaponForge } from "./WeaponForge";
+import { BloodForge } from "./BloodForge";
 // import { flattenBaseStats } from "../machines/calculator";
 
 // Base
@@ -31,26 +34,29 @@ const BuilderPage = (user: any) => {
     <div className="p-8  text-gray-200 flex">
       {/* <div className="absolute inset-0 bg-[url('/flower.png')] bg-cover bg-center grayscale -z-10 opacity-0"></div> */}
       <BuildProvider stats={baseStats}>
-        <GroupedStatList stats={stats} />
+        {/* <GroupedStatList stats={stats} /> */}
         <div className="w-3/4 pl-8 flex flex-col gap-8">
-          <h2 className="text-3xl font-bold text-gray-100 mb-4">Build</h2>
-          <div className="flex gap-4">
-            <ArmourPicker />
-            <AmuletPicker />
-            <ElixerPicker />
+          <div>
+            <h2 className="text-3xl font-bold text-gray-100 mb-4">Build</h2>
+            <div className="flex gap-4">
+              <ArmourPicker />
+              <AmuletPicker />
+              <ElixerPicker />
+              <CoatingPicker />
+              <BloodForge />
+            </div>
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-100 mb-4">Spells</h2>
+            <SpellForge />
           </div>
           <div>
             <h2 className="text-3xl font-bold text-gray-100 mb-4">Passives</h2>
             <PassiveForge />
           </div>
           <div>
-            <h2 className="text-3xl font-bold text-gray-100">Weapons</h2>
-
-            <WeaponSheet />
-          </div>
-          <div>
-            <h2 className="text-3xl font-bold text-gray-100 mb-4">Spells</h2>
-            <SpellForge />
+            <h2 className="text-3xl font-bold text-gray-100 mb-4">Weapons</h2>
+            <WeaponForge />
           </div>
         </div>
       </BuildProvider>

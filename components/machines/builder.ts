@@ -1,5 +1,7 @@
-import { act } from 'react';
-import { setup, createMachine, assign, log, raise } from 'xstate';
+import { assign, enqueueActions, log, raise, setup, spawnChild, stopChild } from 'xstate';
+import { AvailableWeaponSlots, Weapon } from '../vbuilds/WeaponForge';
+import { weaponBuilderMachine } from './weaponBuilder';
+import { toast } from 'sonner';
 
 type StatName =
     | "Bonus Physical Power"
@@ -55,30 +57,45 @@ export interface ModifierSource {
 interface BuildContext {
     baseStats: Record<StatName, StatEntry>;
     activeSources: ModifierSource[];
+    amulet: any | null;
+    elixir: any | null;
+    coating: any | null;
+    armour: any | null;
     passives: any[];
-    weapons: any[];
+    weapons: Map<AvailableWeaponSlots, Weapon>; // Use a Map to store weapons by their slot
     spells: {
         dash: any | null;
         spell1: any | null;
         spell2: any | null;
         ultimate: any | null;
     };
+    selectedWeaponSlot: AvailableWeaponSlots | null; // Track the currently selected weapon slot
 }
 
 type BuildEvents =
     | { type: 'ADD_SOURCE'; source: ModifierSource }
     | { type: 'REMOVE_SOURCE'; sourceId: string }
     | { type: 'RESET_BUILD' }
+    | { type: "goto.spellForge.dash" }
+    | { type: "goto.spellForge.spell1" }
+    | { type: "goto.spellForge.spell2" }
+    | { type: "goto.spellForge.ultimate" }
     | { type: "goto.spellForge" }
     | { type: "goto.passiveForge" }
+    | { type: "goto.bloodForge" }
+    | { type: "goto.weaponForge", slot: AvailableWeaponSlots }
     | { type: "goto.overview" }
+    | { type: "ADD_AMULET"; amulet: any }
+    | { type: "ADD_COATING"; coating: any }
+    | { type: "ADD_ELIXIR"; elixir: any }
+    | { type: "ADD_ARMOUR"; armour: any }
     | { type: 'ADD_PASSIVE'; passive: any }
     | { type: 'REMOVE_PASSIVE'; id: string }
-    | { type: 'ADD_WEAPON'; weapon: any }
-    | { type: 'REMOVE_WEAPON'; id: string }
-    | { type: 'ADD_SPELL'; spell: any, slot: "dash" | "ultimate" | "spell1" | "spell2" }
+    | { type: 'ADD_WEAPON'; weapon: Weapon }
+    | { type: 'REMOVE_WEAPON'; position: AvailableWeaponSlots }
+    | { type: 'ADD_SPELL'; spell: any, slot: "dash" | "ultimate" | "spell1" | "spell2", jewel?: number[] }
     | { type: 'REMOVE_SPELL'; id: string }
-
+    | { type: 'LEGENDARY_LIMIT_REACHED' }
 
 type StatEntry = {
     name: string;
@@ -88,8 +105,7 @@ type StatEntry = {
     defaultValue: number;
 };
 
-
-
+export const MAX_LEGENDARY_WEAPONS_COUNT = 3;
 
 export const builder = setup({
     types: {
@@ -97,9 +113,12 @@ export const builder = setup({
         context: {} as BuildContext,
         events: {} as BuildEvents
         // actions: 
+    },
+    actors: {
+        weaponBuilder: weaponBuilderMachine
     }
 }).createMachine({
-    id: 'buildCalculator',
+    id: 'builder',
     initial: 'overview',
     context: ({ input }) => {
         return {
@@ -112,30 +131,66 @@ export const builder = setup({
                 spell2: null,
                 ultimate: null,
             },
-            weapons: [],
-            // armour: null,
-            // amulet: null,
-            // elixir: null,
-            // selectedWeapon: null,
-            // armour: null,
-            // amulet: null,
-            // weapons: [],
-            // passives: [],
+            weapons: new Map(), // Initialize weapons as an empty Map
+            armour: null,
+            amulet: null,
+            elixir: null,
+            coating: null,
+            selectedWeaponSlot: null, // Initialize with null
         }
+    },
+    on: {
+        'goto.overview': {
+            target: '.overview',
+        },
+        "goto.bloodForge": {
+            target: '.bloodForge',
+        },
+        "goto.passiveForge": {
+            target: '.passiveForge',
+        },
+        'goto.spellForge.dash': {
+            target: '.spellForge.dash',
+        },
+        'goto.spellForge.spell1': {
+            target: '.spellForge.spell1',
+        },
+        'goto.spellForge.spell2': {
+            target: '.spellForge.spell2',
+        },
+        'goto.spellForge.ultimate': {
+            target: '.spellForge.ultimate',
+        },
+        'goto.weaponForge': {
+            target: '.weaponForge',
+            actions: assign({
+                selectedWeaponSlot: ({ event }) => event.slot // Set the selected weapon slot
+            })
+        },
     },
     states: {
         overview: {
-            entry: [log(({ context }) => `Build machine initialized with base stats: ${JSON.stringify(context.baseStats)}`)],
+            // entry: [log(({ context }) => `Build machine initialized with base stats: ${JSON.stringify(context.baseStats)}`)],
             on: {
-                // CREATE_WEAPON: {},
-                // CREATE_JEWEL: {
-
-                // },
-                "goto.passiveForge": {
-                    target: 'passiveForge',
+                ADD_AMULET: {
+                    actions: assign({
+                        amulet: ({ event }) => event.amulet
+                    })
                 },
-                "goto.spellForge": {
-                    target: 'spellForge',
+                ADD_ELIXIR: {
+                    actions: assign({
+                        elixir: ({ event }) => event.elixir
+                    })
+                },
+                ADD_ARMOUR: {
+                    actions: assign({
+                        armour: ({ event }) => event.armour
+                    })
+                },
+                ADD_COATING: {
+                    actions: assign({
+                        coating: ({ event }) => event.coating
+                    })
                 },
                 ADD_SOURCE: {
                     actions: assign({
@@ -157,7 +212,6 @@ export const builder = setup({
         },
         bloodForge: {},
         passiveForge: {
-            // entry: [raise({ type: "REMOVE_PASSIVES" })],
             on: {
                 "goto.overview": {
                     target: 'overview',
@@ -175,51 +229,83 @@ export const builder = setup({
             }
         },
         weaponForge: {
+            entry: [spawnChild('weaponBuilder', {
+                id: 'weaponBuilder',
+                input: ({ context }) => {
+                    const weaponLength = Array.from(context.weapons.values())
+                        .filter(w => w.type === "legendary").length
+
+                    if (context.selectedWeaponSlot && context.weapons.has(context.selectedWeaponSlot)) {
+
+                        return { legendaryWeaponCount: weaponLength - 1 }
+                    }
+                    return {
+                        legendaryWeaponCount: weaponLength
+                    }
+                }
+            })],
+            exit: [
+                assign({
+                    selectedWeaponSlot: () => null // Reset the selected weapon slot when leaving weaponForge
+                }),
+                stopChild("weaponBuilder")
+            ],
             on: {
-                "goto.overview": {
-                    target: 'overview',
-                },
                 ADD_WEAPON: {
-                    actions: assign({
-                        passives: ({ context, event }) => [...context.passives, event.weapon]
-                    })
+                    actions: enqueueActions(({ enqueue, context, event }) => {
+
+                        enqueue.assign({
+                            weapons: ({ context, event }) => {
+
+                                if (context.selectedWeaponSlot === null) {
+                                    return context.weapons;
+                                }
+
+                                const updatedWeapons = new Map(context.weapons);
+                                updatedWeapons.set(context.selectedWeaponSlot, event.weapon);
+
+                                return updatedWeapons;
+                            }
+                        });
+                        enqueue.raise({ type: "goto.overview" });
+                    }
+                    )
                 },
                 REMOVE_WEAPON: {
                     actions: assign({
-                        passives: ({ context, event }) => context.passives.filter((p: any) => p.id !== event.id)
+                        weapons: ({ context, event }) => {
+                            const updatedWeapons = new Map(context.weapons);
+                            updatedWeapons.delete(event.position);
+                            return updatedWeapons;
+                        }
                     })
                 },
+                LEGENDARY_LIMIT_REACHED: {
+                    actions: [() => toast.error(`You can only use ${MAX_LEGENDARY_WEAPONS_COUNT} artifact weapons.`)],
+                }
             }
         },
         spellForge: {
-            // ADD_ULTIMATE: {},
+            initial: 'idle',
+            states: {
+                idle: {},
+                dash: {},
+                spell1: {},
+                spell2: {},
+                ultimate: {},
+            },
             on: {
-                "goto.overview": {
-                    target: 'overview',
-                },
                 ADD_SPELL: {
-                    actions: assign({
+                    actions: [assign({
                         spells: ({ context, event }) => ({
                             ...context.spells, [event.slot]: event.spell
                         })
-                    })
-                },
-                REMOVE_SPELL: {
-                    actions: assign({
-                        spells: ({ context, event }) => ({
-                            ...context.spells, [event.slot]: null
-                        })
-                    })
+                    }), raise({ type: "goto.overview" })]
                 },
             }
         },
-        jewelForge: {},
     }
 });
-
-
-
-
 
 export function computeFinalStats(context: BuildContext): Record<string, number> {
     const finalStats: Record<string, number> = {};

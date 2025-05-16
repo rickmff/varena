@@ -14,10 +14,10 @@ const DropdownItem = ({
   onClick: () => void;
 }) => (
   <DropdownMenuItem
-    className="w-24 h-24 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center"
+    className="w-20 h-20 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center"
     onClick={onClick}
   >
-    <img src={option.image} alt={option.name} />
+    <img src={option.image} alt={option.name} className="pointer-events-none" />
   </DropdownMenuItem>
 );
 
@@ -29,7 +29,11 @@ export const DropdownSelectPlaceholder: React.FC<{
   image: string;
 }> = ({ text, image }) => (
   <div className="relative">
-    <img src={image} alt="Select Armour" className="grayscale brightness-50" />
+    <img
+      src={image}
+      alt="Select Armour"
+      className="grayscale brightness-50 pointer-events-none opacity-60"
+    />
     <span className="absolute inset-0 flex items-center justify-center text-white">
       {text}
     </span>
@@ -46,29 +50,32 @@ export const DropdownSelect: React.FC<{
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="w-24 h-24 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center">
+      <DropdownMenuTrigger className="w-20 h-20 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center">
         {selected ? (
           <img
             src={options.find((option) => option.id === selected)?.image}
             alt={options.find((option) => option.id === selected)?.name}
+            className="pointer-events-none"
           />
         ) : (
           <span>{placeholder || "Select an option"}</span>
         )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="p-0 min-w-0 space-y-1">
-        {options
-          .filter((option) => option.id !== selected)
-          .map((option) => (
-            <DropdownItem
-              key={option.id}
-              option={option}
-              onClick={() => {
-                setSelected(option.id);
-                onSelect && onSelect(option.id);
-              }}
-            />
-          ))}
+      <DropdownMenuContent className="p-0 min-w-0 space-y-1 overflow-auto">
+        <div className="flex flex-wrap gap-2 p-2">
+          {options
+            .filter((option) => option.id !== selected)
+            .map((option) => (
+              <DropdownItem
+                key={option.id}
+                option={option}
+                onClick={() => {
+                  setSelected(option.id);
+                  onSelect && onSelect(option.id);
+                }}
+              />
+            ))}
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
