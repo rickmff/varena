@@ -445,7 +445,7 @@ export default function Home() {
                     UNITE WITH US ON DISCORD
                   </h2>
                   <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                    Join thousands of vampires in our thriving community. Share strategies, form alliances, and dominate the night together.
+                    COME JOIN US TO BEAT RENDY
                   </p>
                   <motion.div
                     whileHover={{ scale: 1.02 }}
