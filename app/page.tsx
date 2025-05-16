@@ -10,6 +10,16 @@ import BloodParticles from "@/components/blood-particles"
 import NavBar, { menuItems } from "@/components/NavBar"
 import CommandGenerator from "@/components/command-generator"
 
+// Add this at the top of your file, after the imports
+declare global {
+  interface Window {
+    featureCarousel?: {
+      interval: NodeJS.Timeout;
+      setHovering: (value: boolean) => void;
+    };
+  }
+}
+
 export default function Home() {
   const [scrollY, setScrollY] = useState(0)
 
@@ -150,9 +160,16 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-black relative">
-        <div className="absolute inset-0 bg-repeat opacity-5"></div>
-        <div className="container mx-auto px-4 relative">
+      <section id="features" className="py-60 bg-black relative">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-black z-10"></div>
+
+        {/* Background carousel container with two layers for smooth crossfade */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <div id="bg-image-1" className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 opacity-0"></div>
+          <div id="bg-image-2" className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 opacity-0"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-50">
           <motion.div
             className="text-center mb-16"
             initial="hidden"
@@ -169,11 +186,69 @@ export default function Home() {
             </p>
           </motion.div>
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative"
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
+            onViewportEnter={() => {
+              // Start the background carousel when this section comes into view
+              const features = [
+                "/images/features/Commands.png",
+                "/images/features/Pancake.png",
+                "/images/features/Events.png",
+                "/images/features/Moderation.png"
+              ];
+
+              let currentIndex = 0;
+              let isHovering = false;
+
+              // Store the interval ID so we can clear it later
+              const carouselInterval = setInterval(() => {
+                if (!isHovering) {
+                  const bg1 = document.getElementById('bg-image-1');
+                  const bg2 = document.getElementById('bg-image-2');
+
+                  if (bg1 && bg2) {
+                    // Determine which layer is currently visible
+                    const activeLayer = window.getComputedStyle(bg1).opacity !== '0' ? bg1 : bg2;
+                    const inactiveLayer = activeLayer === bg1 ? bg2 : bg1;
+
+                    // Set the new image on the inactive layer
+                    inactiveLayer.style.backgroundImage = `url(${features[currentIndex]})`;
+
+                    // Fade in the inactive layer and fade out the active layer
+                    inactiveLayer.style.opacity = '1';
+                    activeLayer.style.opacity = '0';
+
+                    // Move to the next image
+                    currentIndex = (currentIndex + 1) % features.length;
+                  }
+                }
+              }, 5000); // Change image every 3 seconds
+
+              // Store the interval ID and isHovering flag on the window object
+              // so we can access them from the card hover handlers
+              window.featureCarousel = {
+                interval: carouselInterval,
+                setHovering: (value) => { isHovering = value; }
+              };
+
+              // Clean up the interval when the component unmounts
+              return () => {
+                if (window.featureCarousel) {
+                  clearInterval(window.featureCarousel.interval);
+                  delete window.featureCarousel;
+                }
+              };
+            }}
+            onViewportLeave={() => {
+              // Clean up the interval when the section leaves the viewport
+              if (window.featureCarousel) {
+                clearInterval(window.featureCarousel.interval);
+                delete window.featureCarousel;
+              }
+            }}
           >
             {[
               {
@@ -207,20 +282,43 @@ export default function Home() {
             ].map((feature, index) => (
               <motion.div
                 key={index}
-                className="bg-gradient-to-br from-black via-red-950/10 to-black p-6 rounded-lg border border-red-900/30 hover:border-red-500/50 transition-all duration-500 relative overflow-hidden group h-80"
+                className="bg-gradient-to-br from-black via-red-950/10 to-black p-6 rounded-lg border border-red-900/30 hover:border-red-500/50 transition-all duration-500 relative overflow-hidden group h-80 backdrop-blur-sm"
                 variants={scaleIn}
                 whileHover={{
                   y: -5,
                   boxShadow: "0 10px 25px -5px rgba(139, 0, 0, 0.5)",
                   transition: { duration: 0.3 }
                 }}
-              >
-                {/* Image Background with Overlay */}
-                <div className="absolute inset-0 z-0 opacity-30 group-hover:opacity-50 transition-opacity duration-500">
-                  <Image src={feature.image} alt={feature.title} fill className="object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black"></div>
-                </div>
+                onMouseEnter={() => {
+                  // Pause the automatic carousel
+                  if (window.featureCarousel) {
+                    window.featureCarousel.setHovering(true);
+                  }
 
+                  // Get the background image elements
+                  const bg1 = document.getElementById('bg-image-1');
+                  const bg2 = document.getElementById('bg-image-2');
+
+                  if (bg1 && bg2) {
+                    // Determine which layer is currently visible
+                    const activeLayer = window.getComputedStyle(bg1).opacity !== '0' ? bg1 : bg2;
+                    const inactiveLayer = activeLayer === bg1 ? bg2 : bg1;
+
+                    // Set the new image on the inactive layer
+                    inactiveLayer.style.backgroundImage = `url(${feature.image})`;
+
+                    // Fade in the inactive layer and fade out the active layer
+                    inactiveLayer.style.opacity = '1';
+                    activeLayer.style.opacity = '0';
+                  }
+                }}
+                onMouseLeave={() => {
+                  // Resume the automatic carousel
+                  if (window.featureCarousel) {
+                    window.featureCarousel.setHovering(false);
+                  }
+                }}
+              >
                 {/* Content Container with flex to position items */}
                 <div className="h-full flex flex-col items-center justify-center text-center relative z-10">
                   {/* Icon and Title Container - will fade out on hover */}
@@ -310,6 +408,7 @@ export default function Home() {
             ))}
           </motion.div>
         </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black z-10"></div>
       </section>
 
       <section className="py-32 relative" id="generate-commands">

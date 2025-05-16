@@ -84,7 +84,7 @@ export default function NavBar() {
                   }}
                 >
                   <Link
-                    href={`#${item.href}`}
+                    href={item.href}
                     className="text-sm hover:text-white transition-colors duration-200"
                   >
                     {item.name}

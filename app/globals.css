@@ -52,6 +52,8 @@
 @layer base {
   * {
     @apply border-border;
+    scrollbar-width: thin;
+    scrollbar-color: #181818 #000;
   }
 
   body {
@@ -85,20 +87,6 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #181818;
-}
-
-/* Firefox scrollbar styles */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #181818 #000;
-}
-
-/* Game UI Font */
-@font-face {
-  font-family: "GameFont";
-  src: url("/fonts/game-font.woff2") format("woff2");
-  font-weight: normal;
-  font-style: normal;
 }
 
 /* Blood drip animation */
