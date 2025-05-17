@@ -63,7 +63,7 @@ export default function Home() {
   const featuresData = [
     {
       icon: "command",
-      image: "/images/features/Commands.png",
+      image: "/images/features/Horse.png",
       title: "Easy Commands",
       description:
         "Commands to make it easier to practice and improve your skills.",
@@ -435,17 +435,11 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <motion.div
-                    className="inline-block rounded-lg bg-red-900/50 border border-red-500/30 px-4 py-2 text-sm mb-6 shadow-lg shadow-red-900/20"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    JOIN THE ARENA
-                  </motion.div>
-                  <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent">
-                    UNITE WITH US ON DISCORD
+                  <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent uppercase">
+                    United by our thirst for blood
                   </h2>
                   <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                    COME JOIN US TO BEAT RENDY
+                    Join a community of both new and experienced players. Sharpen your skills, test new playstyles, and join your kin for the hunt!
                   </p>
                   <motion.div
                     whileHover={{ scale: 1.02 }}
@@ -466,7 +460,7 @@ export default function Home() {
                           height={32}
                           className="h-8 w-8 group-hover:scale-110 transition-transform"
                         />
-                        <span className="text-2xl font-bold tracking-wider">JOIN NOW</span>
+                        <span className="text-2xl font-bold tracking-wider">JOIN THE ARENA</span>
                         <motion.span
                           className="absolute inset-0 bg-white/10"
                           initial={{ x: "-100%" }}

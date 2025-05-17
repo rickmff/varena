@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { Terminal, Swords, CalendarClock, ShieldCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image"; // Assuming you might want to use Next/Image for optimization later
 
 // Define the props for the FeatureCarousel component
 interface Feature {
@@ -208,17 +207,8 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
             >
               {/* Content Container */}
               <div className="h-full flex flex-col items-center justify-center text-center relative z-10">
-                {/* Icon and Title Container */}
-                <motion.div
-                  className="flex flex-col items-center transition-all duration-500 ease-in-out"
-                  initial={{ opacity: 1, y: 0 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  whileHover={{
-                    opacity: 0,
-                    y: -20,
-                    transition: { duration: 0.3 }
-                  }}
-                >
+                {/* Icon and Title Container - Remove whileHover animation */}
+                <div className="flex flex-col items-center transition-all duration-500 ease-in-out group-hover:opacity-0 group-hover:-translate-y-4">
                   <motion.div
                     className="mb-6 relative"
                     animate={{
@@ -230,7 +220,7 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
                       opacity: { duration: 2, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" }
                     }}
                   >
-                    <div className="w-20 h-20 mx-auto mb-4 relative group-hover:opacity-0 transition-opacity duration-500">
+                    <div className="w-20 h-20 mx-auto mb-4 relative">
                       {feature.icon === "command" && (
                         <Terminal className="w-full h-full text-red-600" />
                       )}
@@ -245,20 +235,14 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
                       )}
                     </div>
                   </motion.div>
-                  <h3 className="text-xl font-bold mb-2 tracking-wider text-red-100 group-hover:opacity-0 transition-opacity duration-500">
+                  <h3 className="text-xl font-bold mb-2 tracking-wider text-red-100">
                     {feature.title.toUpperCase()}
                   </h3>
-                </motion.div>
+                </div>
 
-                {/* Description */}
-                <motion.div
-                  className="w-full h-full absolute inset-0 flex items-center justify-center text-center px-6"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileHover={{
-                    opacity: 1,
-                    scale: 1,
-                    transition: { duration: 0.4, delay: 0.1 }
-                  }}
+                {/* Description - Remove whileHover animation */}
+                <div
+                  className="w-full h-full absolute inset-0 flex items-center justify-center text-center px-6 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300"
                 >
                   <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
                   <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
@@ -266,18 +250,14 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
                   <div className="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
                   <div className="relative">
                     <motion.div
-                      className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-1 h-6 opacity-0 group-hover:opacity-80"
-                      initial={{ scaleY: 0 }}
-                      whileHover={{
-                        scaleY: 1,
-                        transition: { duration: 0.4, delay: 0.3 }
-                      }}
+                      className="absolute -top-6 left-1/2 transform -translate-x-1/2 w-1 h-6 opacity-0 group-hover:opacity-80 transition-all duration-300 origin-bottom"
+                      style={{ scaleY: 0 }}
                     />
                     <p className="text-gray-200 font-medium leading-relaxed text-lg text-shadow-lg">
                       {feature.description}
                     </p>
                   </div>
-                </motion.div>
+                </div>
               </div>
             </motion.div>
           ))}
