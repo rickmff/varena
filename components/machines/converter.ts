@@ -179,6 +179,64 @@ export function parsePresetString(input: string) {
     return result;
 }
 
+import elixirData from "@/data/vbuilds/elixirs.json";
+import coatingData from "@/data/vbuilds/coatings.json";
+import { Coating } from "@/components/vbuilds/CoatingPicker";
+const getElixir = (char: string) => {
+    return Object.values(elixirData).find((elixir) => elixir.arenaCode == char);
+}
+
+const getCoating = (chars: string) => {
+    const result = new Map<number, Coating>();
+    chars.split("").forEach((char, index) => {
+        const coating = Object.values(coatingData).find((coating) => coating.arenaCode == char);
+        if (coating) {
+            result.set(index + 1, coating);
+        }
+    });
+    return result;
+}
+
+// 6271n24t1234j1245312342k3238e0238q5128o3238d023880187p3782l3187144445a2
+
+export const convertStringToBuild = (input: string) => {
+    const build = {
+        elixir: getElixir(input[0]),
+        coating: getCoating(input.slice(2, 9)),
+        // passives: parsed.passives,
+        // elixir: parsed.elixir,
+        // coating: parsed.coating,
+        // passives: parsed.passives,
+        // veil: parsed.veil,
+        // ability1: parsed.ability1,
+        // ability2: parsed.ability2,
+        // ultimate: parsed.ultimate,
+        // weapons: parsed.weapons,
+        // amulet: parsed.amulet,
+        // chest: parsed.chest,
+        // legs: parsed.legs,
+        // boots: parsed.boots,
+        // gloves: parsed.gloves,
+    };
+    return build;
+}
+
+// passives: [],
+// spells: {
+//     dash: null,
+//     spell1: null,
+//     spell2: null,
+//     ultimate: null,
+// },
+// weapons: new Map(), // Initialize weapons as an empty Map
+// armour: null,
+// amulet: null,
+// elixir: null,
+// coating: null,
+// blood: null,
+// selectedWeaponSlot: null, // Initialize with null
+
+
 // export function generatePresetString(data: Record<string, string | string[]>) {
 //     let result = "";
 

@@ -11,6 +11,9 @@ export function useBuilder() {
   return { state, builder: actorRef, send: actorRef.send };
 }
 
+import { convertStringToBuild } from "../machines/converter";
+import { useEffect } from "react";
+
 export default function BuildProvider({
   children,
   stats,
@@ -18,8 +21,20 @@ export default function BuildProvider({
   children: React.ReactNode;
   stats: any;
 }) {
+  useEffect(() => {}, []);
+
   return (
-    <BuilderContext.Provider logic={builder} options={{ input: { stats } }}>
+    <BuilderContext.Provider
+      logic={builder}
+      options={{
+        input: {
+          stats,
+          build: convertStringToBuild(
+            "6271n24t1234j1245312342k3238e0238q5128o3238d023880187p3782l3187144445a2"
+          ),
+        },
+      }}
+    >
       {children}
     </BuilderContext.Provider>
   );

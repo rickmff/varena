@@ -23,7 +23,7 @@ export function CoatingPicker() {
   return (
     <DropdownSelect
       options={Object.values(coatings)}
-      defaultValue={state.context.amulet?.id}
+      defaultValue={state.context.coating?.id}
       onSelect={(id) => {
         // builder.send({
         //   type: "ADD_SOURCE",

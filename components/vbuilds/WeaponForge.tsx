@@ -40,9 +40,8 @@ const SlotTrigger = ({
 }) => {
   const { state, builder } = useBuilder();
 
-  console.log(state.context, slot);
   const weaponInSlot = state.context.weapons.get(slot);
-  console.log("weaponInSlot", weaponInSlot);
+
   return (
     <DialogTrigger
       className={`w-20 h-20 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 ${

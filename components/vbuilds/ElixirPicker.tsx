@@ -3,7 +3,7 @@ import {
   DropdownSelect,
   DropdownSelectPlaceholder,
 } from "./components/DropdownSelect";
-import elixirData from "@/data/vbuilds/elixers.json";
+import elixirData from "@/data/vbuilds/elixirs.json";
 
 const elixerOptions = Object.values(elixirData);
 
@@ -12,7 +12,6 @@ type ElixerOption = (typeof elixerOptions)[number];
 
 export const ElixerPicker: React.FC = () => {
   const { state, builder } = useBuilder();
-  console.log("ElixerPicker", state.context);
 
   return (
     <DropdownSelect

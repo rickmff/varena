@@ -12,6 +12,7 @@ import bloodData from "@/data/vbuilds/bloodtypes.json";
 import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Button } from "../ui/button";
+import { set } from "date-fns";
 
 const SlotTrigger = ({ children }: { children?: React.ReactNode }) => {
   const { state, builder } = useBuilder();
@@ -30,18 +31,46 @@ const SlotTrigger = ({ children }: { children?: React.ReactNode }) => {
 
 export const BloodSlotPlaceholder: React.FC<{
   placeholderImage?: string;
-}> = ({ placeholderImage }) => {
+  blood: any;
+}> = ({ placeholderImage, blood }) => {
   const { state, builder } = useBuilder();
 
+  console.log(state.context, "BloodSlotPlaceholder");
+
+  if (!blood) {
+    return (
+      <div className="relative">
+        <img
+          src={placeholderImage}
+          alt="Select Weapon"
+          className="grayscale brightness-50 opacity-60 pointer-events-none"
+        />
+        <span className="absolute inset-0 flex items-center justify-center text-white">
+          Select Blood
+        </span>
+      </div>
+    );
+  }
+
   return (
-    <div className="relative">
+    <div className="relative w-20 h-20">
       <img
-        src={placeholderImage}
-        alt="Select Weapon"
-        className="grayscale brightness-50 opacity-60 pointer-events-none"
+        src={bloodData[blood.primary].image}
+        alt="Primary Blood"
+        className="pointer-events-none w-10 h-10 absolute top-1.5 left-1.5"
       />
-      <span className="absolute inset-0 flex items-center justify-center text-white">
-        Select Blood
+      <img
+        src={bloodData[blood.secondary].image}
+        alt="Secondary Blood"
+        className="pointer-events-none w-10 h-10 absolute bottom-1.5 right-1.5"
+      />
+      <span
+        className="absolute text-red-600 text-xl bottom-0 right-0 w-8 h-8 0"
+        style={{
+          textShadow: `2px 2px 0 #000, -2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000`,
+        }}
+      >
+        {blood.infusion}
       </span>
     </div>
   );
@@ -68,19 +97,26 @@ const BloodTabs = ({
   setValue,
   setInfusion,
   primarySelectedValue,
-  defaultValue,
+  value,
   type,
 }: {
-  defaultValue?: string;
+  value: string;
   setValue: Dispatch<React.SetStateAction<any>>;
   setInfusion?: Dispatch<React.SetStateAction<any>>;
   primarySelectedValue?: string | null;
   type: "primary" | "secondary";
 }) => {
+  if (type === "secondary") {
+    console.log("secondary", value);
+  }
   return (
     <Tabs
-      defaultValue={defaultValue}
+      value={value}
       onValueChange={(value) => {
+        if (type === "secondary") {
+          setInfusion && setInfusion(undefined);
+        }
+
         setValue(value);
       }}
     >
@@ -104,10 +140,10 @@ const BloodTabs = ({
             </div>
             <div className="flex flex-col gap-4">
               <RadioGroup
-                defaultValue="I"
+                // defaultValue="I"
                 className="space-y-4"
-                onValueChange={() => {
-                  setInfusion && setInfusion(blood.id);
+                onValueChange={(value) => {
+                  setInfusion && setInfusion(value);
                 }}
               >
                 {Object.entries(blood.effects)
@@ -160,7 +196,7 @@ export const BloodForge = () => {
   const { state, builder } = useBuilder();
 
   const [primaryBlood, setPrimaryBlood] = useState("rogue");
-  const [secondaryBlood, setSecondaryBlood] = useState(null);
+  const [secondaryBlood, setSecondaryBlood] = useState("");
   const [secondaryBloodInfusion, setSecondaryBloodInfusion] = useState<any>();
 
   return (
@@ -173,7 +209,10 @@ export const BloodForge = () => {
       }}
     >
       <SlotTrigger>
-        <BloodSlotPlaceholder placeholderImage="/images/vbuilds/blood/rogue-blood.webp" />
+        <BloodSlotPlaceholder
+          placeholderImage="/images/vbuilds/blood/rogue-blood.webp"
+          blood={state.context.blood}
+        />
       </SlotTrigger>
       <DialogContent className="w-full max-w-5xl" aria-describedby="Passives">
         <DialogDescription />
@@ -185,7 +224,7 @@ export const BloodForge = () => {
             </h2>
             <BloodTabs
               setValue={setPrimaryBlood}
-              defaultValue="rogue"
+              value={primaryBlood}
               type="primary"
             />
           </div>
@@ -195,13 +234,28 @@ export const BloodForge = () => {
             </h2>
             <BloodTabs
               type="secondary"
+              value={primaryBlood === secondaryBlood ? "" : secondaryBlood}
               setValue={setSecondaryBlood}
               setInfusion={setSecondaryBloodInfusion}
               primarySelectedValue={primaryBlood}
             />
           </div>
         </div>
-        {secondaryBloodInfusion && <Button>Create Blood Infusion</Button>}
+        {secondaryBloodInfusion && (
+          <Button
+            onClick={() => {
+              builder.send({
+                type: "ADD_BLOOD",
+
+                primary: primaryBlood,
+                secondary: secondaryBlood,
+                infusion: secondaryBloodInfusion,
+              });
+            }}
+          >
+            Create Blood Infusion
+          </Button>
+        )}
       </DialogContent>
     </Dialog>
   );

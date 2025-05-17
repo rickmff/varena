@@ -141,7 +141,7 @@
   "corrupted": {
     "name": "Corrupted Blood",
     "image": "/images/vbuilds/blood/corrupted-blood.webp",
-    "id": "bloodtype_corrupted",
+    "id": "corrupted",
     "effects": {
       "I": {
         "description": "25%-50% Reduced damage taken from Corrupted Attacks and gain 5% Life Leech but you suffer 10% increased damage taken from all other sources.",

@@ -3,48 +3,48 @@
     "id": "elixir_of_the_bat",
     "name": "Elixir of the Bat",
     "image": "/images/vbuilds/elixirs/elixir-bat.webp",
-    "arenaCode": 1
+    "arenaCode": "1"
   },
   "elixir_of_the_beast": {
     "id": "elixir_of_the_beast",
     "name": "Elixir of the Beast",
     "image": "/images/vbuilds/elixirs/elixir-beast.webp",
-    "arenaCode": 2
+    "arenaCode": "2"
   },
   "elixir_of_the_blasphemous": {
     "id": "elixir_of_the_blasphemous",
     "name": "Elixir of the Blasphemous",
     "image": "/images/vbuilds/elixirs/elixir-blasphemous.webp",
-    "arenaCode": 3
+    "arenaCode": "3"
   },
   "elixir_of_the_crow": {
     "id": "elixir_of_the_crow",
     "name": "Elixir of the Crow",
     "image": "/images/vbuilds/elixirs/elixir-crow.webp",
-    "arenaCode": 4
+    "arenaCode": "4"
   },
   "elixir_of_the_prowler": {
     "id": "elixir_of_the_prowler",
     "name": "Elixir of the Prowler",
     "image": "/images/vbuilds/elixirs/elixir-prowler.webp",
-    "arenaCode": 5
+    "arenaCode": "5"
   },
   "elixir_of_the_raven": {
     "id": "elixir_of_the_raven",
     "name": "Elixir of the Raven",
     "image": "/images/vbuilds/elixirs/elixir-raven.webp",
-    "arenaCode": 6
+    "arenaCode": "6"
   },
   "elixir_of_the_twisted": {
     "id": "elixir_of_the_twisted",
     "name": "Elixir of the Twisted",
     "image": "/images/vbuilds/elixirs/elixir-twisted.webp",
-    "arenaCode": 7
+    "arenaCode": "7"
   },
   "elixir_of_the_werewolf": {
     "id": "elixir_of_the_werewolf",
     "name": "Elixir of the Werewolf",
     "image": "/images/vbuilds/elixirs/elixir-werewolf.webp",
-    "arenaCode": 8
+    "arenaCode": "8"
   }
 }

@@ -63,6 +63,11 @@ interface BuildContext {
     armour: any | null;
     passives: any[];
     weapons: Map<AvailableWeaponSlots, Weapon>; // Use a Map to store weapons by their slot
+    blood: {
+        primary: any | null;
+        secondary: any | null;
+        infusion: any | null;
+    } | null;
     spells: {
         dash: any | null;
         spell1: any | null;
@@ -86,6 +91,7 @@ type BuildEvents =
     | { type: "goto.weaponForge", slot: AvailableWeaponSlots }
     | { type: "goto.overview" }
     | { type: "ADD_AMULET"; amulet: any }
+    | { type: "ADD_BLOOD"; primary: any, secondary: any, infusion: any }
     | { type: "ADD_COATING"; coating: any }
     | { type: "ADD_ELIXIR"; elixir: any }
     | { type: "ADD_ARMOUR"; armour: any }
@@ -109,7 +115,7 @@ export const MAX_LEGENDARY_WEAPONS_COUNT = 3;
 
 export const builder = setup({
     types: {
-        input: {} as { stats: Record<StatName, StatEntry> },
+        input: {} as { stats: Record<StatName, StatEntry>, build: Record<string, any> },
         context: {} as BuildContext,
         events: {} as BuildEvents
         // actions: 
@@ -121,6 +127,7 @@ export const builder = setup({
     id: 'builder',
     initial: 'overview',
     context: ({ input }) => {
+        console.log(input, "builder context");
         return {
             baseStats: input.stats,
             activeSources: [],
@@ -134,8 +141,9 @@ export const builder = setup({
             weapons: new Map(), // Initialize weapons as an empty Map
             armour: null,
             amulet: null,
-            elixir: null,
-            coating: null,
+            elixir: input.build.elixir || null,
+            coating: input.build.coating || null,
+            blood: null,
             selectedWeaponSlot: null, // Initialize with null
         }
     },
@@ -210,7 +218,20 @@ export const builder = setup({
                 }
             }
         },
-        bloodForge: {},
+        bloodForge: {
+            on: {
+                ADD_BLOOD: {
+                    actions: assign({
+                        blood: ({ context, event }) => ({
+                            primary: event.primary,
+                            secondary: event.secondary,
+                            infusion: event.infusion
+                        })
+                    }),
+                    target: 'overview'
+                }
+            }
+        },
         passiveForge: {
             on: {
                 "goto.overview": {

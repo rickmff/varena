@@ -54,9 +54,19 @@ const BuilderPage = (user: any) => {
             <h2 className="text-3xl font-bold text-gray-100 mb-4">Passives</h2>
             <PassiveForge />
           </div>
-          <div>
-            <h2 className="text-3xl font-bold text-gray-100 mb-4">Weapons</h2>
+          <div className="space-y-4">
+            <h2 className="text-3xl font-bold text-gray-100">Weapons</h2>
             <WeaponForge />
+            <div className="flex gap-4">
+              <CoatingPicker />
+              <CoatingPicker />
+              <CoatingPicker />
+              <CoatingPicker />
+              <CoatingPicker />
+              <CoatingPicker />
+              <CoatingPicker />
+              <CoatingPicker />
+            </div>
           </div>
         </div>
       </BuildProvider>
