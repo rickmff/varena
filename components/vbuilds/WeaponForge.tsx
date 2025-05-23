@@ -22,6 +22,7 @@ export interface Weapon {
   effects: string[]; // List of effects for the weapon
   img: string;
   infusion?: string; // Infusion type (optional)
+  arenaCode: string; // Arena code for the weapon
 }
 
 export type WeaponData = {

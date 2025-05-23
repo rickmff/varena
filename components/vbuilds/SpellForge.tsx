@@ -44,6 +44,11 @@ import UltimateForge from "./UltimateForge";
 //   );
 // };
 
+import {
+  HoverCardTrigger,
+  HoverCard,
+  HoverCardContent,
+} from "../ui/hover-card";
 const SlotTrigger = ({
   children,
   goto,
@@ -52,13 +57,28 @@ const SlotTrigger = ({
   goto: "dash" | "spell1" | "spell2" | "ultimate";
 }) => {
   const { state, builder } = useBuilder();
+  console.log("d");
   return (
-    <SheetTrigger
-      className="w-20 h-20 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden"
-      onClick={() => builder.send({ type: `goto.spellForge.${goto}` })}
-    >
-      {children}
-    </SheetTrigger>
+    <HoverCard>
+      <HoverCardTrigger>
+        <SheetTrigger
+          className="w-20 h-20 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden"
+          onClick={() => builder.send({ type: `goto.spellForge.${goto}` })}
+        >
+          {children}
+        </SheetTrigger>
+      </HoverCardTrigger>
+      <HoverCardContent className="w-96 flex flex-col gap-4">
+        {state.context.spells[goto]?.jewel?.map((jewel: AddSpell) => (
+          <div>
+            {
+              state.context.spells[goto].effects.find((e) => e.key == jewel)
+                .description
+            }
+          </div>
+        ))}
+      </HoverCardContent>
+    </HoverCard>
   );
 };
 
@@ -150,7 +170,7 @@ export const SpellForge = () => {
         </SlotTrigger>
         <SlotTrigger goto={"ultimate"}>
           {spells.ultimate ? (
-            <img src={spells["ultimate"].img} className="w-16 h-16" />
+            <img src={spells["ultimate"].img} className="w-20 h-20" />
           ) : (
             <SlotPlaceholder
               placeholderImage="/images/vbuilds/spells/spell-chaos-merciless_charge.png"

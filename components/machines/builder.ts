@@ -2,72 +2,26 @@ import { assign, enqueueActions, log, raise, setup, spawnChild, stopChild } from
 import { AvailableWeaponSlots, Weapon } from '../vbuilds/WeaponForge';
 import { weaponBuilderMachine } from './weaponBuilder';
 import { toast } from 'sonner';
+import { Coating } from '../vbuilds/CoatingPicker';
+import { StatName } from './calculator';
+import bloodData from '@/data/vbuilds/bloodtypes.json';
 
-type StatName =
-    | "Bonus Physical Power"
-    | "Attack Speed"
-    | "Physical Critical Chance"
-    | "Physical Critical Power"
-    | "Weapon Skill Power"
-    | "Weapon Charge Gain"
-    | "Bonus Spell Power"
-    | "Spell Critical Chance"
-    | "Spell Critical Power"
-    | "Ultimate Power"
-    | "Minion Damage"
-    | "Spell Charge Gain"
-    | "Bonus Movement Speed"
-    | "Shapeshift Speed"
-    | "Mount Speed"
-    | "Damage Reduction"
-    | "Shield Efficiency"
-    | "Bonus Maximum Health"
-    | "Health Regeneration"
-    | "Healing Received"
-    | "Primary Attack Leech"
-    | "Weapon Skill Leech"
-    | "Spell Leech"
-    | "Blood Efficiency"
-    | "Blood Drain Reduction"
-    | "Resource Yield"
-    | "Weapon Cooldown Rate"
-    | "Spell Cooldown Rate"
-    | "Veil Cooldown Rate"
-    | "Ultimate Cooldown Rate"
-    | "Max Health"
-    | "Physical Power"
-    | "Spell Power"
-    | "Movement Speed"
-    | "Resource Harvest Power";
 
-export interface Modifier {
-    stat: StatName;
-    value: number;
-    unit: "flat" | "percent";
-    calculate?: boolean; // whether to apply this modifier in calculations, default true
+export type BloodContext = {
+    primary: keyof typeof bloodData,
+    secondary: keyof typeof bloodData,
+    infusion: keyof typeof bloodData[keyof typeof bloodData]['effects']
 }
 
-export interface ModifierSource {
-    id: string;        // unique id like "amulet_blademaster" or "blood_rogue"
-    name: string;      // user friendly name like "Amulet of the Blademaster"
-    type: "blood" | "item" | "buff" | "gear" | "amulet" | "passive"; // category
-    modifiers: Modifier[];
-}
-
-interface BuildContext {
+export interface BuildContext {
     baseStats: Record<StatName, StatEntry>;
-    activeSources: ModifierSource[];
     amulet: any | null;
     elixir: any | null;
-    coating: any | null;
+    coatings: Map<AvailableWeaponSlots, Coating>;
     armour: any | null;
     passives: any[];
     weapons: Map<AvailableWeaponSlots, Weapon>; // Use a Map to store weapons by their slot
-    blood: {
-        primary: any | null;
-        secondary: any | null;
-        infusion: any | null;
-    } | null;
+    blood: BloodContext | null;
     spells: {
         dash: any | null;
         spell1: any | null;
@@ -78,8 +32,6 @@ interface BuildContext {
 }
 
 type BuildEvents =
-    | { type: 'ADD_SOURCE'; source: ModifierSource }
-    | { type: 'REMOVE_SOURCE'; sourceId: string }
     | { type: 'RESET_BUILD' }
     | { type: "goto.spellForge.dash" }
     | { type: "goto.spellForge.spell1" }
@@ -91,9 +43,12 @@ type BuildEvents =
     | { type: "goto.weaponForge", slot: AvailableWeaponSlots }
     | { type: "goto.overview" }
     | { type: "ADD_AMULET"; amulet: any }
+    | { type: "REMOVE_AMULET"; }
     | { type: "ADD_BLOOD"; primary: any, secondary: any, infusion: any }
-    | { type: "ADD_COATING"; coating: any }
+    | { type: "ADD_COATING"; coating: any, slot: AvailableWeaponSlots }
+    | { type: "REMOVE_COATING"; slot: AvailableWeaponSlots }
     | { type: "ADD_ELIXIR"; elixir: any }
+    | { type: "REMOVE_ELIXIR"; }
     | { type: "ADD_ARMOUR"; armour: any }
     | { type: 'ADD_PASSIVE'; passive: any }
     | { type: 'REMOVE_PASSIVE'; id: string }
@@ -127,25 +82,28 @@ export const builder = setup({
     id: 'builder',
     initial: 'overview',
     context: ({ input }) => {
-        console.log(input, "builder context");
-        return {
+
+        const ctx = {
             baseStats: input.stats,
             activeSources: [],
-            passives: [],
-            spells: {
+            passives: input.build.passives || [],
+            spells: input.build.spells || {
                 dash: null,
                 spell1: null,
                 spell2: null,
                 ultimate: null,
             },
-            weapons: new Map(), // Initialize weapons as an empty Map
-            armour: null,
-            amulet: null,
+            weapons: input.build.weapons || new Map(), // Initialize weapons as an empty Map
+            armour: input.build.armour || null,
+            amulet: input.build.amulet || null,
             elixir: input.build.elixir || null,
-            coating: input.build.coating || null,
-            blood: null,
+            coatings: input.build.coatings || new Map(),
+            blood: input.build.blood || null,
             selectedWeaponSlot: null, // Initialize with null
         }
+
+        console.log("ctx", ctx)
+        return ctx
     },
     on: {
         'goto.overview': {
@@ -185,9 +143,19 @@ export const builder = setup({
                         amulet: ({ event }) => event.amulet
                     })
                 },
+                REMOVE_AMULET: {
+                    actions: assign({
+                        amulet: null
+                    })
+                },
                 ADD_ELIXIR: {
                     actions: assign({
                         elixir: ({ event }) => event.elixir
+                    })
+                },
+                REMOVE_ELIXIR: {
+                    actions: assign({
+                        elixir: null
                     })
                 },
                 ADD_ARMOUR: {
@@ -195,27 +163,29 @@ export const builder = setup({
                         armour: ({ event }) => event.armour
                     })
                 },
+                REMOVE_ARMOUR: {
+                    actions: assign({
+                        armour: null
+                    })
+                },
                 ADD_COATING: {
                     actions: assign({
-                        coating: ({ event }) => event.coating
+                        coatings: ({ context, event }) => {
+                            const updatedCoatings = new Map(context.coatings);
+                            updatedCoatings.set(event.slot, event.coating);
+                            return updatedCoatings;
+                        }
                     })
                 },
-                ADD_SOURCE: {
+                REMOVE_COATING: {
                     actions: assign({
-                        activeSources: ({ context, event }) => [...context.activeSources, event.source]
+                        coatings: ({ context, event }) => {
+                            const updatedCoatings = new Map(context.coatings);
+                            updatedCoatings.delete(event.slot);
+                            return updatedCoatings;
+                        }
                     })
                 },
-                REMOVE_SOURCE: {
-                    actions: assign({
-                        activeSources: ({ context, event }) =>
-                            context.activeSources.filter((source: ModifierSource) => source.id !== event.sourceId)
-                    })
-                },
-                RESET_BUILD: {
-                    actions: assign({
-                        activeSources: () => []
-                    })
-                }
             }
         },
         bloodForge: {
@@ -319,7 +289,7 @@ export const builder = setup({
                 ADD_SPELL: {
                     actions: [assign({
                         spells: ({ context, event }) => ({
-                            ...context.spells, [event.slot]: event.spell
+                            ...context.spells, [event.slot]: { ...event.spell, jewel: event.jewel }
                         })
                     }), raise({ type: "goto.overview" })]
                 },
@@ -327,43 +297,3 @@ export const builder = setup({
         },
     }
 });
-
-export function computeFinalStats(context: BuildContext): Record<string, number> {
-    const finalStats: Record<string, number> = {};
-
-    // Start from defaultValue for each stat
-    for (const [statName, statEntry] of Object.entries(context.baseStats)) {
-        finalStats[statName] = statEntry.defaultValue;
-    }
-
-    // Flatten all modifiers from all active sources
-    const allModifiers: Modifier[] = context.activeSources.flatMap(source => source.modifiers);
-
-    // Apply each modifier
-    for (const mod of allModifiers) {
-        if (mod.calculate === false) {
-            continue;
-        }
-
-        if (!(mod.stat in finalStats)) {
-            // Stat not found in base, create new (optional depending on your needs)
-            finalStats[mod.stat] = 0;
-        }
-
-        const base = finalStats[mod.stat];
-
-        if (mod.unit === "flat") {
-            finalStats[mod.stat] = base + mod.value;
-        } else if (mod.unit === "percent") {
-            finalStats[mod.stat] = base + mod.value;
-        }
-
-        // Cap enforcement (optional per modifier or after all modifiers are applied)
-        const cap = context.baseStats[mod.stat]?.cap;
-        if (cap !== null && cap !== undefined && finalStats[mod.stat] > cap) {
-            finalStats[mod.stat] = cap;
-        }
-    }
-
-    return finalStats;
-}

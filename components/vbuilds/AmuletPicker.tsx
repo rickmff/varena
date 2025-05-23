@@ -34,17 +34,9 @@ export function AmuletPicker() {
     <DropdownSelect
       options={Object.values(amulets)}
       defaultValue={state.context.amulet?.id}
+      selected={state.context.amulet?.id}
+      clear={() => builder.send({ type: "REMOVE_AMULET" })}
       onSelect={(id) => {
-        builder.send({
-          type: "ADD_SOURCE",
-          source: {
-            id: id,
-            name: amulets[id].name,
-            modifiers: amulets[id].attributes as Modifier[],
-            type: "gear",
-          },
-        });
-
         builder.send({ type: "ADD_AMULET", amulet: amulets[id] });
       }}
       placeholder={

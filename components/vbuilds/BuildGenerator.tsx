@@ -12,6 +12,8 @@ import { PassiveForge, PassivePlaceholder } from "./PassiveForge";
 import { SpellForge } from "./SpellForge";
 import { WeaponForge } from "./WeaponForge";
 import { BloodForge } from "./BloodForge";
+import ArenaCode from "./components/ArenaCode";
+
 // import { flattenBaseStats } from "../machines/calculator";
 
 // Base
@@ -31,18 +33,18 @@ export function loadBaseStats(statsArray: any): any {
 const BuilderPage = (user: any) => {
   const baseStats = loadBaseStats(stats);
   return (
-    <div className="p-8  text-gray-200 flex">
+    <div className="p-8  text-gray-200 flex mt-40">
       {/* <div className="absolute inset-0 bg-[url('/flower.png')] bg-cover bg-center grayscale -z-10 opacity-0"></div> */}
       <BuildProvider stats={baseStats}>
-        {/* <GroupedStatList stats={stats} /> */}
+        <GroupedStatList stats={stats} />
         <div className="w-3/4 pl-8 flex flex-col gap-8">
           <div>
+            <ArenaCode />
             <h2 className="text-3xl font-bold text-gray-100 mb-4">Build</h2>
             <div className="flex gap-4">
               <ArmourPicker />
               <AmuletPicker />
               <ElixerPicker />
-              <CoatingPicker />
               <BloodForge />
             </div>
           </div>
@@ -58,14 +60,14 @@ const BuilderPage = (user: any) => {
             <h2 className="text-3xl font-bold text-gray-100">Weapons</h2>
             <WeaponForge />
             <div className="flex gap-4">
-              <CoatingPicker />
-              <CoatingPicker />
-              <CoatingPicker />
-              <CoatingPicker />
-              <CoatingPicker />
-              <CoatingPicker />
-              <CoatingPicker />
-              <CoatingPicker />
+              <CoatingPicker slot={1} />
+              <CoatingPicker slot={2} />
+              <CoatingPicker slot={3} />
+              <CoatingPicker slot={4} />
+              <CoatingPicker slot={5} />
+              <CoatingPicker slot={6} />
+              <CoatingPicker slot={7} />
+              <CoatingPicker slot={8} />
             </div>
           </div>
         </div>

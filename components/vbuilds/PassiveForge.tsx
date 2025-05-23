@@ -18,6 +18,7 @@ export const PassivePlaceholder = ({ length }: PassivePlaceholderProps) => {
     <div className="flex gap-4 justify-center bg-neutral-900 p-4 rounded-lg">
       {passives.map((passive: Passive) => (
         <img
+          key={passive.id}
           src={passive.img}
           alt={passive.name}
           className={`w-16 h-16 object-contain rounded-full border-4 border-emerald-300"`}

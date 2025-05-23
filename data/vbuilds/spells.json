@@ -5,6 +5,7 @@
     "img": "/images/vbuilds/spells/spell-blood-veil_of_blood.png",
     "spellSchool": "blood",
     "category": "veil",
+    "arenaCode": "2",
     "effects": [
       {
         "description": "Increase damage (12 - 24%) of next primary attack within 3s",
@@ -50,6 +51,7 @@
     "img": "/images/vbuilds/spells/spell-blood-blood_fountain.png",
     "spellSchool": "blood",
     "category": "spell",
+    "arenaCode": "1",
     "effects": [
       {
         "description": "Hit applies Leech",
@@ -113,6 +115,7 @@
     "img": "/images/vbuilds/spells/spell-blood-blood_rage.png",
     "spellSchool": "blood",
     "category": "spell",
+    "arenaCode": "2",
     "effects": [
       {
         "description": "Increase physical power (8% - 16%)",
@@ -164,6 +167,7 @@
     "img": "/images/vbuilds/spells/spell-blood-blood_rite.png",
     "spellSchool": "blood",
     "category": "spell",
+    "arenaCode": "3",
     "effects": [
       {
         "description": "Trigger applies a fading Snare (1.2 - 2.4s)",
@@ -221,6 +225,7 @@
     "img": "/images/vbuilds/spells/spell-blood-sanguine_coil.png",
     "spellSchool": "blood",
     "category": "spell",
+    "arenaCode": "4",
     "effects": [
       {
         "description": "Hit bounces projectile to an additional target or the caster to deal damage or heal (24 - 40%)",
@@ -278,6 +283,7 @@
     "img": "/images/vbuilds/spells/spell-blood-shadowbolt.png",
     "spellSchool": "blood",
     "category": "spell",
+    "arenaCode": "5",
     "effects": [
       {
         "description": "Hit conjures an AoE that deals damage (14 - 30%) and applies Leech",
@@ -335,6 +341,7 @@
     "img": "/images/vbuilds/spells/spell-blood-carrion_swarm.png",
     "spellSchool": "blood",
     "category": "spell",
+    "arenaCode": "6",
     "effects": [
       {
         "description": "Increase damage done by each bat by (8 - 16%)",
@@ -371,48 +378,6 @@
         "min": 0.8,
         "max": 1.6,
         "key": 6
-      },
-      {
-        "description": "Veil of Chaos",
-        "min": null,
-        "max": null,
-        "key": 7
-      },
-      {
-        "description": "Next primary attack within 3s on an enemy affected by Ignite applies Agonising Flames",
-        "min": null,
-        "max": null,
-        "key": 8
-      },
-      {
-        "description": "Increase damage (12 - 24%) of next primary attack within 3s",
-        "min": 12.0,
-        "max": 24.0,
-        "key": 9
-      },
-      {
-        "description": "Increase Elude duration (8 - 20%)",
-        "min": 8.0,
-        "max": 20.0,
-        "key": 10
-      },
-      {
-        "description": "Explosion applies a fading Snare (0.8 - 1.6s)",
-        "min": 0.8,
-        "max": 1.6,
-        "key": 11
-      },
-      {
-        "description": "Increase explosion damage (12 - 24%)",
-        "min": 12.0,
-        "max": 24.0,
-        "key": 12
-      },
-      {
-        "description": "Recast conjurs a second illusion that deals damage (40 - 80% first explosion damage) in an AoE after 2.2s",
-        "min": 40.0,
-        "max": 80.0,
-        "key": 13
       }
     ]
   },
@@ -422,6 +387,7 @@
     "img": "/images/vbuilds/spells/spell-blood-crimson_beam.png",
     "spellSchool": "blood",
     "category": "ultimate",
+    "arenaCode": "1",
     "effects": []
   },
   "heart_strike": {
@@ -430,7 +396,54 @@
     "img": "/images/vbuilds/spells/spell-blood-heart_strike.png",
     "spellSchool": "blood",
     "category": "ultimate",
+    "arenaCode": "2",
     "effects": []
+  },
+  "veil_of_chaos": {
+    "name": "Veil of Chaos",
+    "id": "veil_of_chaos",
+    "img": "/images/vbuilds/spells/spell-chaos-veil_of_chaos.png",
+    "spellSchool": "chaos",
+    "category": "veil",
+    "arenaCode": "3",
+    "effects": [
+      {
+        "description": "Next primary attack within 3s on an enemy affected by Ignite applies Agonising Flames",
+        "min": null,
+        "max": null,
+        "key": 1
+      },
+      {
+        "description": "Increase damage (12 - 24%) of next primary attack within 3s",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 2
+      },
+      {
+        "description": "Increase Elude duration (8 - 20%)",
+        "min": 8.0,
+        "max": 20.0,
+        "key": 3
+      },
+      {
+        "description": "Explosion applies a fading Snare (0.8 - 1.6s)",
+        "min": 0.8,
+        "max": 1.6,
+        "key": 4
+      },
+      {
+        "description": "Increase explosion damage (12 - 24%)",
+        "min": 12.0,
+        "max": 24.0,
+        "key": 5
+      },
+      {
+        "description": "Recast conjurs a second illusion that deals damage (40 - 80% first explosion damage) in an AoE after 2.2s",
+        "min": 40.0,
+        "max": 80.0,
+        "key": 6
+      }
+    ]
   },
   "aftershock": {
     "name": "Aftershock",
@@ -438,6 +451,7 @@
     "img": "/images/vbuilds/spells/spell-chaos-aftershock.png",
     "spellSchool": "chaos",
     "category": "spell",
+    "arenaCode": "7",
     "effects": [
       {
         "description": "Increase damage (12 - 24%)",
@@ -483,6 +497,7 @@
     "img": "/images/vbuilds/spells/spell-chaos-chaos_barrier.png",
     "spellSchool": "chaos",
     "category": "spell",
+    "arenaCode": "8",
     "effects": [
       {
         "description": "Increase projectile damage per charge (8 - 16%)",
@@ -528,6 +543,7 @@
     "img": "/images/vbuilds/spells/spell-chaos-chaos_volley.png",
     "spellSchool": "chaos",
     "category": "spell",
+    "arenaCode": "9",
     "effects": [
       {
         "description": "Increase damage (8 - 20%)",
@@ -573,6 +589,7 @@
     "img": "/images/vbuilds/spells/spell-chaos-power_surge.png",
     "spellSchool": "chaos",
     "category": "spell",
+    "arenaCode": "a",
     "effects": [
       {
         "description": "Increase attack speed (6 - 10%)",
@@ -630,6 +647,7 @@
     "img": "/images/vbuilds/spells/spell-chaos-void.png",
     "spellSchool": "chaos",
     "category": "spell",
+    "arenaCode": "b",
     "effects": [
       {
         "description": "Increase damage (8 - 20%)",
@@ -675,6 +693,7 @@
     "img": "/images/vbuilds/spells/spell-chaos-rain_of_chaos.png",
     "spellSchool": "chaos",
     "category": "spell",
+    "arenaCode": "c",
     "effects": [
       {
         "description": "Additional meteor strikes the center dealing (40 - 80%) when the effect ends",
@@ -720,6 +739,7 @@
     "img": "/images/vbuilds/spells/spell-chaos-merciless_charge.png",
     "spellSchool": "chaos",
     "category": "ultimate",
+    "arenaCode": "3",
     "effects": []
   },
   "chaos_barrage": {
@@ -728,6 +748,7 @@
     "img": "/images/vbuilds/spells/spell-chaos-chaos_barrage.png",
     "spellSchool": "chaos",
     "category": "ultimate",
+    "arenaCode": "4",
     "effects": []
   },
   "veil_of_frost": {
@@ -736,6 +757,7 @@
     "img": "/images/vbuilds/spells/spell-frost-veil_of_frost.png",
     "spellSchool": "frost",
     "category": "veil",
+    "arenaCode": "4",
     "effects": [
       {
         "description": "Next primary attack within 3s consumes Chill and applies Freeze (1.4 - 3s)",
@@ -781,6 +803,7 @@
     "img": "/images/vbuilds/spells/spell-frost-cold_snap.png",
     "spellSchool": "frost",
     "category": "spell",
+    "arenaCode": "d",
     "effects": [
       {
         "description": "Increase shield strength (26 - 50%)",
@@ -826,6 +849,7 @@
     "img": "/images/vbuilds/spells/spell-frost-crystal_lance.png",
     "spellSchool": "frost",
     "category": "spell",
+    "arenaCode": "e",
     "effects": [
       {
         "description": "Increase damage (50 - 70%) to enemies affected by Chill or Freeze",
@@ -871,6 +895,7 @@
     "img": "/images/vbuilds/spells/spell-frost-frost_barrier.png",
     "spellSchool": "frost",
     "category": "spell",
+    "arenaCode": "f",
     "effects": [
       {
         "description": "Increase damage (8 - 20%)",
@@ -928,6 +953,7 @@
     "img": "/images/vbuilds/spells/spell-frost-frost_bat.png",
     "spellSchool": "frost",
     "category": "spell",
+    "arenaCode": "g",
     "effects": [
       {
         "description": "Hit on an enemy affected by Chill or Freeze launches 8 projectiles that deal damage (16 - 32%) and apply Chill",
@@ -973,6 +999,7 @@
     "img": "/images/vbuilds/spells/spell-frost-ice_nova.png",
     "spellSchool": "frost",
     "category": "spell",
+    "arenaCode": "h",
     "effects": [
       {
         "description": "Explosion shields (40 - 80%) caster and allies",
@@ -1012,6 +1039,7 @@
     "img": "/images/vbuilds/spells/spell-frost-arctic_storm.png",
     "spellSchool": "frost",
     "category": "spell",
+    "arenaCode": "i",
     "effects": [
       {
         "description": "Increase damage done by (12 - 24%)",
@@ -1051,12 +1079,31 @@
       }
     ]
   },
+  "arctic_leap": {
+    "name": "Arctic Leap",
+    "id": "arctic_leap",
+    "img": "/images/vbuilds/spells/spell-frost-arctic_leap.png",
+    "spellSchool": "frost",
+    "category": "ultimate",
+    "arenaCode": "5",
+    "effects": []
+  },
+  "ice_block": {
+    "name": "Ice Block",
+    "id": "ice_block",
+    "img": "/images/vbuilds/spells/spell-frost-ice_block.png",
+    "spellSchool": "frost",
+    "category": "ultimate",
+    "arenaCode": "6",
+    "effects": []
+  },
   "veil_of_illusion": {
     "name": "Veil of Illusion",
     "id": "veil_of_illusion",
     "img": "/images/vbuilds/spells/spell-illusion-veil_of_illusion.png",
     "spellSchool": "illusion",
     "category": "veil",
+    "arenaCode": "5",
     "effects": [
       {
         "description": "Next primary attack within 3s on an enemy affected by Weaken grants a shield (20 - 40%)",
@@ -1108,6 +1155,7 @@
     "img": "/images/vbuilds/spells/spell-illusion-mist_trance.png",
     "spellSchool": "illusion",
     "category": "spell",
+    "arenaCode": "j",
     "effects": [
       {
         "description": "Trigger increases first primary attack damage (30 - 50%) for 5s",
@@ -1165,6 +1213,7 @@
     "img": "/images/vbuilds/spells/spell-illusion-mosquito.png",
     "spellSchool": "illusion",
     "category": "spell",
+    "arenaCode": "k",
     "effects": [
       {
         "description": "Increase damage (20 - 40%)",
@@ -1204,6 +1253,7 @@
     "img": "/images/vbuilds/spells/spell-illusion-phantom_aegis.png",
     "spellSchool": "illusion",
     "category": "spell",
+    "arenaCode": "l",
     "effects": [
       {
         "description": "Recast to remove the effect and pull the target towards the caster",
@@ -1255,6 +1305,7 @@
     "img": "/images/vbuilds/spells/spell-illusion-spectral_wolf.png",
     "spellSchool": "illusion",
     "category": "spell",
+    "arenaCode": "m",
     "effects": [
       {
         "description": "Hit consumes Weaken to summon a Wisp that heals the caster and allies (30 - 50%) when walked over",
@@ -1312,6 +1363,7 @@
     "img": "/images/vbuilds/spells/spell-illusion-wraith_spear.png",
     "spellSchool": "illusion",
     "category": "spell",
+    "arenaCode": "n",
     "effects": [
       {
         "description": "Hit applies a fading Snare (0.8 - 1.6s)",
@@ -1363,6 +1415,7 @@
     "img": "/images/vbuilds/spells/spell-illusion-curse.png",
     "spellSchool": "illusion",
     "category": "spell",
+    "arenaCode": "o",
     "effects": [
       {
         "description": "Increase the damage modifier by (4 - 10%)",
@@ -1408,12 +1461,31 @@
       }
     ]
   },
+  "spectral_guardian": {
+    "name": "Spectral Guardian",
+    "id": "spectral_guardian",
+    "img": "/images/vbuilds/spells/spell-illusion-spectral_guardian.png",
+    "spellSchool": "illusion",
+    "category": "ultimate",
+    "arenaCode": "7",
+    "effects": []
+  },
+  "wisp_dance": {
+    "name": "Wisp Dance",
+    "id": "wisp_dance",
+    "img": "/images/vbuilds/spells/spell-illusion-wisp_dance.png",
+    "spellSchool": "illusion",
+    "category": "ultimate",
+    "arenaCode": "8",
+    "effects": []
+  },
   "veil_of_storm": {
     "name": "Veil of Storm",
     "id": "veil_of_storm",
     "img": "/images/vbuilds/spells/spell-storm-veil_of_storm.png",
     "spellSchool": "storm",
     "category": "veil",
+    "arenaCode": "6",
     "effects": [
       {
         "description": "Next primary attack within 3s consumes Static to apply Stun (0.3 - 0.5s)",
@@ -1459,6 +1531,7 @@
     "img": "/images/vbuilds/spells/spell-storm-ball_lightning.png",
     "spellSchool": "storm",
     "category": "spell",
+    "arenaCode": "p",
     "effects": [
       {
         "description": "Increase tick damage (3 - 7%)",
@@ -1504,6 +1577,7 @@
     "img": "/images/vbuilds/spells/spell-storm-cyclone.png",
     "spellSchool": "storm",
     "category": "spell",
+    "arenaCode": "q",
     "effects": [
       {
         "description": "Increase damage (20 - 40%)",
@@ -1561,6 +1635,7 @@
     "img": "/images/vbuilds/spells/spell-storm-discharge.png",
     "spellSchool": "storm",
     "category": "spell",
+    "arenaCode": "r",
     "effects": [
       {
         "description": "Increase Storm Shield damage (8 - 20%)",
@@ -1606,6 +1681,7 @@
     "img": "/images/vbuilds/spells/spell-storm-lightning_curtain.png",
     "spellSchool": "storm",
     "category": "spell",
+    "arenaCode": "s",
     "effects": [
       {
         "description": "Hit on caster or ally grants a shield (30 - 50%)",
@@ -1645,6 +1721,7 @@
     "img": "/images/vbuilds/spells/spell-storm-polarity_shift.png",
     "spellSchool": "storm",
     "category": "spell",
+    "arenaCode": "t",
     "effects": [
       {
         "description": "Hit applies a fading Snare (0.8 - 1.6s)",
@@ -1684,6 +1761,7 @@
     "img": "/images/vbuilds/spells/spell-storm-lightning_tendrils.png",
     "spellSchool": "storm",
     "category": "spell",
+    "arenaCode": "u",
     "effects": [
       {
         "description": "Storm bolts deal (4 - 12%) increased damage",
@@ -1729,12 +1807,31 @@
       }
     ]
   },
+  "raging_tempest": {
+    "name": "Raging Tempest",
+    "id": "raging_tempest",
+    "img": "/images/vbuilds/spells/spell-storm-raging_tempest.png",
+    "spellSchool": "storm",
+    "category": "ultimate",
+    "arenaCode": "9",
+    "effects": []
+  },
+  "lightning_typhoon": {
+    "name": "Lightning Typhoon",
+    "id": "lightning_typhoon",
+    "img": "/images/vbuilds/spells/spell-storm-lightning_typhoon.png",
+    "spellSchool": "storm",
+    "category": "ultimate",
+    "arenaCode": "a",
+    "effects": []
+  },
   "veil_of_bones": {
     "name": "Veil of Bones",
     "id": "veil_of_bones",
     "img": "/images/vbuilds/spells/spell-unholy-veil_of_bones.png",
     "spellSchool": "unholy",
     "category": "veil",
+    "arenaCode": "7",
     "effects": [
       {
         "description": "Next primary attack within 3s deals damage (12 - 24%)",
@@ -1786,6 +1883,7 @@
     "img": "/images/vbuilds/spells/spell-unholy-bone_explosion.png",
     "spellSchool": "unholy",
     "category": "spell",
+    "arenaCode": "v",
     "effects": [
       {
         "description": "Increase damage (12 - 24%)",
@@ -1849,6 +1947,7 @@
     "img": "/images/vbuilds/spells/spell-unholy-corrupted_skull.png",
     "spellSchool": "unholy",
     "category": "spell",
+    "arenaCode": "w",
     "effects": [
       {
         "description": "Hit conjures a projectile that circles around the enemy that deals damage (8 - 16%) and applies Condemn",
@@ -1894,6 +1993,7 @@
     "img": "/images/vbuilds/spells/spell-unholy-death_knight.png",
     "spellSchool": "unholy",
     "category": "spell",
+    "arenaCode": "x",
     "effects": [
       {
         "description": "Increase summon damage (12 - 20%)",
@@ -1939,6 +2039,7 @@
     "img": "/images/vbuilds/spells/spell-unholy-soulburn.png",
     "spellSchool": "unholy",
     "category": "spell",
+    "arenaCode": "y",
     "effects": [
       {
         "description": "Inflict a fading snare (1.2 - 2.4s)",
@@ -1996,6 +2097,7 @@
     "img": "/images/vbuilds/spells/spell-unholy-ward_of_the_damned.png",
     "spellSchool": "unholy",
     "category": "spell",
+    "arenaCode": "z",
     "effects": [
       {
         "description": "Increase MS (8 - 12%) during channel",
@@ -2059,6 +2161,7 @@
     "img": "/images/vbuilds/spells/spell-unholy-unholy_chains.png",
     "spellSchool": "unholy",
     "category": "spell",
+    "arenaCode": "A",
     "effects": [
       {
         "description": "Conjure a bone spirit arround the target dealing (8 - 16%)",
@@ -2115,5 +2218,23 @@
         "key": 9
       }
     ]
+  },
+  "army_of_the_dead": {
+    "name": "Army Of The Dead",
+    "id": "army_of_the_dead",
+    "img": "/images/vbuilds/spells/spell-unholy-army_of_the_dead.png",
+    "spellSchool": "unholy",
+    "category": "ultimate",
+    "arenaCode": "b",
+    "effects": []
+  },
+  "volatile_arachnid": {
+    "name": "Volatile Arachnid",
+    "id": "volatile_arachnid",
+    "img": "/images/vbuilds/spells/spell-unholy-volatile_arachnid.png",
+    "spellSchool": "unholy",
+    "category": "ultimate",
+    "arenaCode": "c",
+    "effects": []
   }
 }

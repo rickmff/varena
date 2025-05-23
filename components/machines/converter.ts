@@ -1,193 +1,27 @@
-export const Necks = new Map([
-    ["Prefabs.Empty", 0],
-    ["Prefabs.Item_MagicSource_General_T08_Blood", 1],
-    ["Prefabs.Item_MagicSource_General_T08_Chaos", 2],
-    ["Prefabs.Item_MagicSource_General_T08_Frost", 3],
-    ["Prefabs.Item_MagicSource_General_T08_Illusion", 4],
-    ["Prefabs.Item_MagicSource_General_T08_Storm", 5],
-    ["Prefabs.Item_MagicSource_General_T08_Unholy", 6],
-]);
-
-export const BloodTypes: Map<string, number | string> = new Map<string, number | string>([
-    ["Empty", 0],
-    ["FrailedBlood", 1],
-    ["BruteBlood", 2],
-    ["CreatureBlood", 3],
-    ["MutantBlood", 4],
-    ["RogueBlood", 5],
-    ["ScholarBlood", 6],
-    ["WarriorBlood", 7],
-    ["WorkerBlood", 8],
-    ["DraculinBlood", 9],
-    ["CorruptedBlood", "a"], // Updated to follow the custom indexing scheme
-]);
-
-export const LegendaryWeapons: Map<string, number | string> = new Map<string, number | string>([
-    ["Prefabs.Item_Weapon_Axe_Legendary_T08", 0],
-    ["Prefabs.Item_Weapon_Claws_Legendary_T08", 1],
-    ["Prefabs.Item_Weapon_Crossbow_Legendary_T08", 2],
-    ["Prefabs.Item_Weapon_Daggers_Legendary_T08", 3],
-    ["Prefabs.Item_Weapon_GreatSword_Legendary_T08", 4],
-    ["Prefabs.Item_Weapon_Longbow_Legendary_T08", 5],
-    ["Prefabs.Item_Weapon_Mace_Legendary_T08", 6],
-    ["Prefabs.Item_Weapon_Pistols_Legendary_T08", 7],
-    ["Prefabs.Item_Weapon_Reaper_Legendary_T08", 8],
-    ["Prefabs.Item_Weapon_Slashers_Legendary_T08", 9],
-    ["Prefabs.Item_Weapon_Spear_Legendary_T08", "a"],
-    ["Prefabs.Item_Weapon_Sword_Legendary_T08", "b"],
-    ["Prefabs.Item_Weapon_TwinBlades_Legendary_T08", "c"],
-    ["Prefabs.Item_Weapon_Whip_Legendary_T08", "d"],
-]);
-
-export const ArtifactWeapons: Map<string, number | string> = new Map<string, number | string>([
-    ["Prefabs.Item_Weapon_Axe_Unique_T08_Variation01", 0],
-    ["Prefabs.Item_Weapon_Claws_Unique_T08_Variation01", 1],
-    ["Prefabs.Item_Weapon_Crossbow_Unique_T08_Variation01", 2],
-    ["Prefabs.Item_Weapon_Daggers_Unique_T08_Variation01", 3],
-    ["Prefabs.Item_Weapon_GreatSword_Unique_T08_Variation01", 4],
-    ["Prefabs.Item_Weapon_Longbow_Unique_T08_Variation01", 5],
-    ["Prefabs.Item_Weapon_Mace_Unique_T08_Variation01", 6],
-    ["Prefabs.Item_Weapon_Pistols_Unique_T08_Variation01", 7],
-    ["Prefabs.Item_Weapon_Reaper_Unique_T08_Variation01", 8],
-    ["Prefabs.Item_Weapon_Slashers_Unique_T08_Variation01", 9],
-    ["Prefabs.Item_Weapon_Slashers_Unique_T08_Variation02", "a"],
-    ["Prefabs.Item_Weapon_Spear_Unique_T08_Variation01", "b"],
-    ["Prefabs.Item_Weapon_Sword_Unique_T08_Variation01", "c"],
-    ["Prefabs.Item_Weapon_TwinBlades_Unique_T08_Variation01", "d"],
-    ["Prefabs.Item_Weapon_Whip_Unique_T08_Variation01", "e"],
-]);
-
-export const Coatings: Map<string, number> = new Map([
-    ["AB_Vampire_Coating_Blood_Buff", 0],
-    ["AB_Vampire_Coating_Chaos_Buff", 1],
-    ["AB_Vampire_Coating_Frost_Buff", 2],
-    ["AB_Vampire_Coating_Illusion_Buff", 3],
-    ["AB_Vampire_Coating_Storm_Buff", 4],
-    ["AB_Vampire_Coating_Unholy_Buff", 5],
-]);
-
-export const Elixirs: Map<string, number> = new Map([
-    ["AB_Elixir_Bat_T01_Buff", 0],
-    ["AB_Elixir_Beast_T01_Buff", 1],
-    ["AB_Elixir_Blasphemous_T01_Buff", 2],
-    ["AB_Elixir_Crow_T01_Buff", 3],
-    ["AB_Elixir_Prowler_T01_Buff", 4],
-    ["AB_Elixir_Raven_T01_Buff", 5],
-    ["AB_Elixir_Twisted_T01_Buff", 6],
-    ["AB_Elixir_WerewolfT01_Buff", 7],
-]);
-
-const elixirMap: Record<string, string> = {
-    "0": "AB_Elixir_Bat_T01_Buff",
-    "1": "AB_Elixir_Beast_T01_Buff",
-    "2": "AB_Elixir_Blasphemous_T01_Buff",
-    "3": "AB_Elixir_Crow_T01_Buff",
-    "4": "AB_Elixir_Prowler_T01_Buff",
-    "5": "AB_Elixir_Raven_T01_Buff",
-    "6": "AB_Elixir_Twisted_T01_Buff",
-    "7": "AB_Elixir_WerewolfT01_Buff",
-};
-
-const coatingMap: Record<string, string> = {
-    "0": "AB_Vampire_Coating_Blood_Buff",
-    "1": "AB_Vampire_Coating_Chaos_Buff",
-    "2": "AB_Vampire_Coating_Frost_Buff",
-    "3": "AB_Vampire_Coating_Illusion_Buff",
-    "4": "AB_Vampire_Coating_Storm_Buff",
-    "5": "AB_Vampire_Coating_Unholy_Buff",
-};
-
-const passiveMap: Record<string, string> = {
-    "n": "Passive_Mistrance",
-    "t": "Passive_Tempest",
-    "j": "Passive_Juggernaut",
-    "k": "Passive_Knight",
-    "e": "Passive_Enigma",
-    "q": "Passive_Quickness",
-    "o": "Passive_Overload",
-    "d": "Passive_Dominance",
-    "p": "Passive_Precision",
-    "l": "Passive_Lethality",
-    "a": "Passive_Arcane",
-};
-
-const ultimateMap: Record<string, string> = {
-    "0": "Ultimate_Elixir_Bat_T01_Buff",
-    "1": "Ultimate_Elixir_Beast_T01_Buff",
-    "2": "Ultimate_Elixir_Blasphemous_T01_Buff",
-    "3": "Ultimate_Elixir_Crow_T01_Buff",
-    "4": "Ultimate_Elixir_Prowler_T01_Buff",
-    "5": "Ultimate_Elixir_Raven_T01_Buff",
-    "6": "Ultimate_Elixir_Twisted_T01_Buff",
-    "7": "Ultimate_Elixir_WerewolfT01_Buff",
-};
-
-const amuletMap: Record<string, string> = {}
-
-const armorMap: Record<string, string> = {}
-const weaponsMap: Record<string, string> = {}
-
-const sectionDefinitions = [
-    { name: "elixir", length: 1, map: elixirMap },
-    { name: "coating", length: 1, map: coatingMap },
-    { name: "passives", length: 5, map: passiveMap },
-    { name: "veil", length: 5, map: passiveMap },
-    { name: "ability1", length: 5, map: passiveMap },
-    { name: "ability2", length: 5, map: passiveMap },
-    { name: "ultimate", length: 1, map: ultimateMap },
-    { name: "weapons", length: 40, map: weaponsMap },
-    { name: "amulet", length: 1, map: amuletMap },
-    { name: "chest", length: 1, map: armorMap },
-    { name: "legs", length: 1, map: armorMap },
-    { name: "boots", length: 1, map: armorMap },
-    { name: "gloves", length: 1, map: armorMap },
-    { name: "primaryBlood", length: 1, map: armorMap },
-    { name: "secondaryBlood", length: 1, map: armorMap },
-    { name: "secondaryInfusion", length: 1, map: armorMap },
-];
-
-export function parsePresetString(input: string) {
-    const result: Record<string, string | string[]> = {};
-    let currentIndex = 0;
-
-    for (const section of sectionDefinitions) {
-        const { name, length, map } = section;
-        const slice = input.slice(currentIndex, currentIndex + length);
-
-        if (length === 1) {
-            // Single value
-            const value = map[slice];
-            if (!value) {
-                throw new Error(`Invalid character '${slice}' for section '${name}'`);
-            }
-            result[name] = value;
-        } else {
-            // Range of values
-            const values = slice.split("").map(char => {
-                const value = map[char];
-                if (!value) {
-                    throw new Error(`Invalid character '${char}' in section '${name}'`);
-                }
-                return value;
-            });
-            result[name] = values;
-        }
-
-        currentIndex += length;
-    }
-
-    return result;
-}
-
 import elixirData from "@/data/vbuilds/elixirs.json";
 import coatingData from "@/data/vbuilds/coatings.json";
+import passiveData from "@/data/vbuilds/passives.json";
 import { Coating } from "@/components/vbuilds/CoatingPicker";
-const getElixir = (char: string) => {
+import { Passive } from "../vbuilds/PassiveList";
+import legendaryWeaponData from "@/data/vbuilds/legendary-weapons.json";
+import epicWeaponData from "@/data/vbuilds/epic-weapons.json";
+import infusionData from "@/data/vbuilds/infusions.json";
+import weaponEffectData from "@/data/vbuilds/weaponEffects.json";
+import amuletData from "@/data/vbuilds/amulets.json";
+import { AvailableWeaponSlots, Weapon } from "../vbuilds/WeaponForge";
+import { MAX_LEGENDARY_WEAPONS_COUNT } from "./builder";
+import { armourOptions } from "../vbuilds/ArmourPicker";
+import bloodData from "@/data/vbuilds/bloodtypes.json";
+import spellData from "@/data/vbuilds/spells.json";
+
+
+const importElixir = (char: string) => {
     return Object.values(elixirData).find((elixir) => elixir.arenaCode == char);
 }
 
-const getCoating = (chars: string) => {
+const importCoatings = (chars: string) => {
     const result = new Map<number, Coating>();
+    // console.log("coatings", chars);
     chars.split("").forEach((char, index) => {
         const coating = Object.values(coatingData).find((coating) => coating.arenaCode == char);
         if (coating) {
@@ -197,12 +31,252 @@ const getCoating = (chars: string) => {
     return result;
 }
 
+const importPassives = (chars: string) => {
+    // console.log("passives", chars)
+    let result: Passive[] = [];
+    chars.split("").forEach((char, index) => {
+        const passive = Object.values(passiveData).find((passive) => passive.arenaCode == char);
+        if (passive) {
+            result.push({
+                ...passive,
+                modifiers: passive.modifiers.map(modifier => ({
+                    ...modifier,
+                    unit: modifier.unit as "flat" | "percent", // Explicitly cast unit to the expected type
+                })),
+            });
+        }
+    });
+    return result;
+}
+
+const importSpells = (chars: string) => {
+    console.log("spells", chars)
+    const spellDataArray = Object.values(spellData);
+
+    const veils = spellDataArray.filter(spell => spell.category === "veil");
+    const spells = spellDataArray.filter(spell => spell.category === "spell");
+    const ultimates = spellDataArray.filter(spell => spell.category === "ultimate");
+
+    const spell1 = spells.find(spell => spell.arenaCode === chars[0]);
+    const spell2 = spells.find(spell => spell.arenaCode === chars[5]);
+    const veil = veils.find(spell => spell.arenaCode === chars[10]);
+    const ultimate = ultimates.find(spell => spell.arenaCode === chars[15]);
+
+    const output = {
+        dash: { ...veil, jewel: [chars[1], chars[2], chars[3], chars[4]] },
+        spell1: { ...spell1, jewel: [chars[6], chars[7], chars[8], chars[9]] },
+        spell2: { ...spell2, jewel: [chars[11], chars[12], chars[13], chars[14]] },
+        ultimate: ultimate
+    }
+
+    return output
+}
+
+const importWeapons = (chars: string) => {
+    // console.log("weapons", chars);
+    const weaponData = [
+        ...Object.values(legendaryWeaponData).map(weapon => ({ ...weapon, type: "legendary" as const })),
+        ...Object.values(epicWeaponData).map(weapon => ({ ...weapon, type: "epic" as const }))
+    ];
+
+    const weapons = new Map<number, Weapon>();
+    let legendaryCount = 0; // Track the number of legendary weapons
+
+    for (let i = 0; i < chars.length; i += 5) {
+        const arenaCode = chars[i];
+        const infusionCode = chars[i + 1];
+        const effectCodes = chars.slice(i + 2, i + 5);
+        // console.log("arenaCode", arenaCode);
+
+        const weapon = weaponData.find(
+            (weapon) => weapon.arenaCode === arenaCode
+        );
+        const infusion = Object.values(infusionData).find(
+            (infusion) => infusion.arenaCode === infusionCode
+        );
+
+        const effects = effectCodes
+            .split("")
+            .map((code) => {
+                const effect = Object.values(weaponEffectData).find((effect) => effect.key === code);
+                return effect ? effect.id : undefined;
+            })
+            .filter((id): id is string => id !== undefined);
+
+        const hasInfusion = weapon && weapon.type === "epic" && infusion ? true : false;
+
+        if (weapon) {
+            if (weapon.type === "legendary") {
+                if (legendaryCount >= MAX_LEGENDARY_WEAPONS_COUNT) {
+                    // console.log(`Skipping weapon at slot ${(i / 5) + 1} as it exceeds the legendary limit.`);
+                    continue; // Skip setting this weapon if the legendary limit is exceeded
+                }
+                legendaryCount++;
+            }
+
+            const slot = (i / 5) + 1;
+            weapons.set(slot, {
+                ...weapon,
+                position: slot as AvailableWeaponSlots,
+                infusion: hasInfusion && infusion ? infusion.id : undefined,
+                effects: effects,
+            });
+        }
+    }
+
+
+    return weapons;
+};
+
+const importAmulet = (char: string) => {
+    return Object.values(amuletData).find((amulet) => amulet.arenaCode == char);
+}
+
+const importArmour = (chars: string) => {
+    return armourOptions.find((option) => option.arenaCode == chars[0])
+}
+
+
+const importBlood = (chars: string) => {
+    const primary = Object.values(bloodData).find((blood) => blood.arenaCode == chars[0]);
+    const secondary = Object.values(bloodData).find((blood) => blood.arenaCode == chars[1]);
+    const infusion = { 1: "I", 2: "II", 3: "III" }[chars[2]];
+    if (chars.length !== 3) {
+        return null
+    }
+
+    if (!primary || !secondary || !infusion) {
+        return null
+    }
+
+    return { primary: primary.id, secondary: secondary.id, infusion }
+
+}
+
+const exportPassives = (passives: Passive[]) => {
+    // console.log(passives)
+    let result = "";
+    for (let i = 0; i < 5; i++) {
+        const passive = passives[i];
+        if (passive) {
+            result += passive.arenaCode;
+        } else {
+            result += "0"; // Default value if no passive is found
+        }
+    }
+
+    return result;
+}
+
+const exportCoating = (coatings: Map<number, Coating>) => {
+    let result = "";
+    for (let i = 1; i <= 8; i++) {
+        const coating = coatings.get(i);
+        if (coating) {
+            result += coating.arenaCode;
+        } else {
+            result += "0"; // Default value if no coating is found
+        }
+    }
+    return result;
+}
+
+const exportSpells = (selectedSpells) => {
+    // console.log("spells", spells)
+    const spellDataArray = Object.values(spellData);
+
+    const veils = spellDataArray.filter(spell => spell.category === "veil");
+    const spells = spellDataArray.filter(spell => spell.category === "spell");
+    const ultimates = spellDataArray.filter(spell => spell.category === "ultimate");
+
+    const veil = veils.find(spell => spell.arenaCode === selectedSpells?.dash?.arenaCode);
+    const spell1 = spells.find(spell => spell.arenaCode === selectedSpells?.spell1?.arenaCode);
+    const spell2 = spells.find(spell => spell.arenaCode === selectedSpells?.spell2?.arenaCode);
+    const ultimate = ultimates.find(spell => spell.arenaCode === selectedSpells?.ultimate?.arenaCode);
+
+    return spell1?.arenaCode + selectedSpells?.spell1?.jewel.join("") + spell2?.arenaCode + selectedSpells?.spell2?.jewel.join("") + veil?.arenaCode + selectedSpells?.dash?.jewel.join("") + ultimate?.arenaCode
+}
+
+const exportWeapons = (weapons: Map<number, Weapon>) => {
+    let result = "";
+
+    for (let i = 1; i <= 8; i++) {
+        const weapon = weapons.get(i);
+        const e = weapons.get(8);
+        if (weapon) {
+            result += weapon.arenaCode || "0"; // Add weapon arena code
+            result += weapon.infusion ? Object.values(infusionData).find(value => value.id === weapon.infusion)?.arenaCode || "0" : "0"; // Add infusion code
+            result += weapon.effects.map(effectId => {
+                const effect = Object.values(weaponEffectData).find(e => e.id === effectId);
+                return effect ? effect.key : "0";
+            }).join(""); // Add effects
+        } else {
+            result += "00000"; // Default value for empty weapon slot
+        }
+    }
+
+    return result;
+};
+
+
+const exportArmour = (armourCode: string | undefined) => {
+    return !armourCode ? "0000" : armourCode.repeat(4)
+}
+
+const exportBlood = (blood: { primary?: string; secondary?: string; infusion?: string } | null) => {
+    console.log(blood)
+    if (!blood || !blood.primary || !blood.secondary || !blood.infusion) {
+        return "000";
+    }
+
+    const primary = bloodData[blood.primary as keyof typeof bloodData]?.arenaCode;
+    const secondary = bloodData[blood.secondary as keyof typeof bloodData]?.arenaCode;
+    const infusion = { "I": "1", "II": "2", "III": "3" }[blood.infusion];
+
+    return primary + secondary + infusion;
+};
+
+export const exportVArenaCode = (build) => {
+    console.log({ build })
+    const elixir = build.elixir?.arenaCode || "0";
+    const coatings = exportCoating(build.coatings);
+    const passives = exportPassives(build.passives);
+    const spells = exportSpells(build.spells);
+    const weapons = exportWeapons(build.weapons);
+    const amulet = build.amulet?.arenaCode || "0";
+    const armour = exportArmour(build.armour?.arenaCode);
+    const blood = exportBlood(build.blood)
+    // const amu
+    // const spells = build.spells
+    // const passives = build.passives.map((passive) => passive.arenaCode).join("");
+    // const veil = build.veil?.arenaCode || "0";
+    // const ability1 = build.ability1?.arenaCode || "0";
+    // const ability2 = build.ability2?.arenaCode || "0";
+    // const ultimate = build.ultimate?.arenaCode || "0";
+    // const weapons = Array.from(build.weapons.values()).map((weapon) => weapon.arenaCode).join("");
+    // const amulet = build.amulet?.arenaCode || "0";
+    // const chest = build.chest?.arenaCode || "0";
+    // const legs = build.legs?.arenaCode || "0";
+    // const boots = build.boots?.arenaCode || "0";
+    // const gloves = build.gloves?.arenaCode || "0";
+    // console.log(weapons)
+    console.log('ar', armour)
+
+    return elixir + coatings + passives + spells + weapons + amulet + armour + blood;
+}
+
 // 6271n24t1234j1245312342k3238e0238q5128o3238d023880187p3782l3187144445a2
 
 export const convertStringToBuild = (input: string) => {
     const build = {
-        elixir: getElixir(input[0]),
-        coating: getCoating(input.slice(2, 9)),
+        elixir: importElixir(input[0]),
+        coatings: importCoatings(input.slice(1, 9)),
+        passives: importPassives(input.slice(9, 14)),
+        spells: importSpells(input.slice(14, 30)),
+        weapons: importWeapons(input.slice(30, 70)), // Adjusted to get 8 * 5 characters (40 characters) after spells
+        amulet: importAmulet(input[70]),
+        armour: importArmour(input.slice(71, 75)), // Adjusted to get 4 characters for the armour
+        blood: importBlood(input.slice(75, 78)),
         // passives: parsed.passives,
         // elixir: parsed.elixir,
         // coating: parsed.coating,
@@ -218,6 +292,8 @@ export const convertStringToBuild = (input: string) => {
         // boots: parsed.boots,
         // gloves: parsed.gloves,
     };
+
+    console.log("build", build);
     return build;
 }
 

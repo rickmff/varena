@@ -1,6 +1,6 @@
 "use client";
 
-import { computeFinalStats } from "../machines/builder";
+import { computeFinalStats } from "../machines/calculator";
 import { StatList } from "./StatList";
 import { useBuilder } from "./BuildProvider";
 

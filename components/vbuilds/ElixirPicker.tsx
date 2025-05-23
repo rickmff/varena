@@ -17,6 +17,8 @@ export const ElixerPicker: React.FC = () => {
     <DropdownSelect
       options={[...elixerOptions]}
       defaultValue={state.context.elixir?.id}
+      selected={state.context.elixir?.id}
+      clear={() => builder.send({ type: "REMOVE_ELIXIR" })}
       onSelect={(id: string) => {
         const elixirId = id as keyof typeof elixirData;
         builder.send({ type: "ADD_ELIXIR", elixir: elixirData[elixirId] });

@@ -32,6 +32,7 @@ export const WeaponSelect = () => {
                 type: "legendary",
                 effects: [],
                 img: weapon.img,
+                arenaCode: weapon.arenaCode,
               },
             });
           }}
@@ -63,6 +64,7 @@ export const WeaponSelect = () => {
                 type: "epic",
                 effects: [],
                 img: weapon.img,
+                arenaCode: weapon.arenaCode,
               },
             });
           }}

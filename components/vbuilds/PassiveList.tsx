@@ -14,6 +14,7 @@ export interface Passive {
   img?: string; // path to image
   description: string;
   type: string;
+  arenaCode: string;
   modifiers: Array<{
     stat: string;
     value: number;

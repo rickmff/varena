@@ -1,36 +1,34 @@
-import React, { useState } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuContent,
-} from "../ui/dropdown-menu";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import React from "react";
 import {
   DropdownSelect,
   DropdownSelectPlaceholder,
 } from "./components/DropdownSelect";
 import { useBuilder } from "./BuildProvider";
 
-const armourOptions = [
+export const armourOptions = [
   {
     id: "shadow",
     name: "Dracula's Shadow Armour Set",
     image: "/images/vbuilds/armour/armour-draculas_shadow_chestguard.webp",
+    arenaCode: "2",
   },
   {
     id: "grim",
     name: "Dracula's Grim Armour Set",
     image: "/images/vbuilds/armour/armour-draculas_grim_chestguard.webp",
+    arenaCode: "1",
   },
   {
     id: "dread",
     name: "Dracula's Dread Armour Set",
     image: "/images/vbuilds/armour/armour-draculas_dread_chestguard.webp",
+    arenaCode: "4",
   },
   {
     id: "maleficer",
     name: "Dracula's Maleficer Armour Set",
     image: "/images/vbuilds/armour/armour-draculas_maleficer_chestguard.webp",
+    arenaCode: "3",
   },
 ] as const;
 
@@ -41,6 +39,8 @@ export const ArmourPicker: React.FC = () => {
   const { state, builder } = useBuilder();
   return (
     <DropdownSelect
+      selected={state.context.armour?.id}
+      clear={() => builder.send({ type: "REMOVE_ARMOUR" })}
       onSelect={(id: string) => {
         const armourId = id as ArmourId;
         builder.send({

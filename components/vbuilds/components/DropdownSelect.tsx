@@ -10,17 +10,28 @@ const DropdownItem = ({
   option,
   onClick,
 }: {
-  option: Option;
+  option: Option | ClearOption;
   onClick: () => void;
 }) => (
   <DropdownMenuItem
     className="w-20 h-20 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center"
     onClick={onClick}
   >
-    <img src={option.image} alt={option.name} className="pointer-events-none" />
+    {option.label ? (
+      <span className="absolute inset-0 flex items-center justify-center text-white">
+        {option.label}
+      </span>
+    ) : (
+      <img
+        src={option.image}
+        alt={option.name}
+        className="pointer-events-none"
+      />
+    )}
   </DropdownMenuItem>
 );
 
+type ClearOption = { label: string; image?: string; name?: string };
 type Option = { id: string; name: string; image: string; [key: string]: any };
 type OptionId = Option["id"];
 
@@ -45,8 +56,10 @@ export const DropdownSelect: React.FC<{
   defaultValue: OptionId | null;
   placeholder?: any;
   onSelect?: (id: OptionId) => void;
-}> = ({ defaultValue, options, placeholder, onSelect }) => {
-  const [selected, setSelected] = useState<OptionId | null>(defaultValue);
+  clear?: () => void;
+  selected: OptionId;
+}> = ({ defaultValue, options, placeholder, onSelect, clear, selected }) => {
+  // const [selected, setSelected] = useState<OptionId | null>(defaultValue);
 
   return (
     <DropdownMenu>
@@ -70,11 +83,21 @@ export const DropdownSelect: React.FC<{
                 key={option.id}
                 option={option}
                 onClick={() => {
-                  setSelected(option.id);
+                  // setSelected(option.id);
                   onSelect && onSelect(option.id);
                 }}
               />
             ))}
+          {selected && clear && (
+            <DropdownItem
+              option={{
+                label: "Clear",
+              }}
+              onClick={() => {
+                clear();
+              }}
+            />
+          )}
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

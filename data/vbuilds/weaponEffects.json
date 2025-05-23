@@ -46,27 +46,27 @@
   },
   {
     "id": "StatMod_SpellLeech",
-    "key": "A",
+    "key": "a",
     "description": "Grants spell leech ability"
   },
   {
     "id": "StatMod_SpellPower",
-    "key": "B",
+    "key": "b",
     "description": "Increases spell power"
   },
   {
     "id": "StatMod_TravelCooldownReduction",
-    "key": "C",
+    "key": "c",
     "description": "Reduces veil cooldowns"
   },
   {
     "id": "StatMod_WeaponCooldownReduction",
-    "key": "D",
+    "key": "d",
     "description": "Reduces weapon cooldowns"
   },
   {
     "id": "StatMod_WeaponSkillPower",
-    "key": "E",
+    "key": "e",
     "description": "Enhances weapon skill power"
   }
 ]
