@@ -1,0 +1,38 @@
+{
+  "blood": {
+    "id": "blood",
+    "name": "Blood Coating",
+    "image": "/images/vbuilds/consumables/BloodCoating.webp",
+    "arenaCode": "1"
+  },
+  "chaos": {
+    "id": "chaos",
+    "name": "Chaos Coating",
+    "image": "/images/vbuilds/consumables/ChaosCoating.webp",
+    "arenaCode": "2"
+  },
+  "frost": {
+    "id": "frost",
+    "name": "Frost Coating",
+    "image": "/images/vbuilds/consumables/FrostCoating.webp",
+    "arenaCode": "3"
+  },
+  "illusion": {
+    "id": "illusion",
+    "name": "Illusion Coating",
+    "image": "/images/vbuilds/consumables/IllusionCoating.webp",
+    "arenaCode": "4"
+  },
+  "storm": {
+    "id": "storm",
+    "name": "Storm Coating",
+    "image": "/images/vbuilds/consumables/StormCoating.webp",
+    "arenaCode": "5"
+  },
+  "unholy": {
+    "id": "unholy",
+    "name": "Unholy Coating",
+    "image": "/images/vbuilds/consumables/UnholyCoating.webp",
+    "arenaCode": "6"
+  }
+}

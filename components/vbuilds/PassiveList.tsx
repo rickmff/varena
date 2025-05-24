@@ -14,6 +14,7 @@ export interface Passive {
   img?: string; // path to image
   description: string;
   type: string;
+  arenaCode: string;
   modifiers: Array<{
     stat: string;
     value: number;
@@ -76,10 +77,11 @@ export function PassiveList({
               return (
                 <label
                   key={key}
-                  className={`flex flex-col items-center justify-center p-4 ${activePassives.length === 5 && !isSelected
-                    ? "cursor-not-allowed"
-                    : "cursor-pointer"
-                    }`}
+                  className={`flex flex-col items-center justify-center p-4 ${
+                    activePassives.length === 5 && !isSelected
+                      ? "cursor-not-allowed"
+                      : "cursor-pointer"
+                  }`}
                   onMouseEnter={() => {
                     setHoverPassive(passive);
                   }}
@@ -91,12 +93,13 @@ export function PassiveList({
                     <img
                       src={passive.img}
                       alt={passive.name}
-                      className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-500 ${isSelected
-                        ? "border-emerald-300"
-                        : hasMaximumSelected
+                      className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-500 ${
+                        isSelected
+                          ? "border-emerald-300"
+                          : hasMaximumSelected
                           ? "border-purple-800 opacity-10 pointer-events-none"
                           : "border-gray-700"
-                        }`}
+                      }`}
                     />
                   )}
                   <input
@@ -134,10 +137,11 @@ export function PassiveList({
                 <img
                   src={passive.img}
                   alt={passive.name}
-                  className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-500 ${activePassives.includes(passive.id)
-                    ? "border-emerald-300"
-                    : "border-gray-700"
-                    }`}
+                  className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-500 ${
+                    activePassives.includes(passive.id)
+                      ? "border-emerald-300"
+                      : "border-gray-700"
+                  }`}
                 />
               )}
               <input

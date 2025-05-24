@@ -1,6 +1,9 @@
 {
-  "Rogue": {
-    "id": "bloodtype_rogue",
+  "rogue": {
+    "name": "Rogue Blood",
+    "id": "rogue",
+    "image": "/images/vbuilds/blood/rogue-blood.webp",
+    "arenaCode": "5",
     "effects": {
       "I": {
         "description": "16% Increased Physical Critical Chance and 8% increased Physical Critical Power.",
@@ -8,12 +11,14 @@
           {
             "stat": "Physical Critical Chance",
             "value": 16,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Physical Critical Power",
             "value": 8,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -21,9 +26,10 @@
         "description": "8% Increased Movement Speed and gain 10% additional speed for 3s when striking a killing blow.",
         "modifiers": [
           {
-            "stat": "Movement Speed",
+            "stat": "Bonus Movement Speed",
             "value": 8,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -33,12 +39,14 @@
           {
             "stat": "Veil Cooldown Rate",
             "value": 14,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Physical Critical Chance",
             "value": 100,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       },
@@ -48,7 +56,8 @@
           {
             "stat": "All Damage Taken",
             "value": 15,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       },
@@ -58,14 +67,18 @@
           {
             "stat": "Blood Effect Boost",
             "value": 20,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       }
     }
   },
-  "Warrior": {
-    "id": "bloodtype_warrior",
+  "warrior": {
+    "name": "Warrior Blood",
+    "id": "warrior",
+    "image": "/images/vbuilds/blood/warrior-blood.webp",
+    "arenaCode": "7",
     "effects": {
       "I": {
         "description": "10% Increased Physical Power and Veil attacks deal 30% bonus damage.",
@@ -73,12 +86,14 @@
           {
             "stat": "Physical Power",
             "value": 10,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Veil Attack Damage",
             "value": 30,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -88,12 +103,14 @@
           {
             "stat": "Weapon Cooldown Rate",
             "value": 14,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Weapon Skill Leech",
             "value": 5,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -103,12 +120,14 @@
           {
             "stat": "Weapon Skill Power",
             "value": 16,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           },
           {
             "stat": "Full Health Damage",
             "value": 24,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       },
@@ -118,7 +137,8 @@
           {
             "stat": "Weapon Charge Gain",
             "value": 12,
-            "unit": "flat"
+            "unit": "flat",
+            "calculate": true
           }
         ]
       },
@@ -128,14 +148,18 @@
           {
             "stat": "Blood Effect Boost",
             "value": 20,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       }
     }
   },
-  "Corrupted": {
-    "id": "bloodtype_corrupted",
+  "corrupted": {
+    "name": "Corrupted Blood",
+    "image": "/images/vbuilds/blood/corrupted-blood.webp",
+    "id": "corrupted",
+    "arenaCode": "a",
     "effects": {
       "I": {
         "description": "25%-50% Reduced damage taken from Corrupted Attacks and gain 5% Life Leech but you suffer 10% increased damage taken from all other sources.",
@@ -143,17 +167,20 @@
           {
             "stat": "Corrupted Damage Reduction",
             "value": 25,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Life Leech",
             "value": 5,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "All Damage Taken",
             "value": 10,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -165,14 +192,16 @@
         "description": "12% Increased Movement Speed and 18% increased Attack Speed but there is a 25% chance when taking damage to trigger an eruption inflicting a 2s snare.",
         "modifiers": [
           {
-            "stat": "Movement Speed",
+            "stat": "Bonus Movement Speed",
             "value": 12,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Attack Speed",
             "value": 18,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -182,12 +211,14 @@
           {
             "stat": "Spell Charge Gain",
             "value": 15,
-            "unit": "flat"
+            "unit": "flat",
+            "calculate": true
           },
           {
             "stat": "Weapon Charge Gain",
             "value": 15,
-            "unit": "flat"
+            "unit": "flat",
+            "calculate": true
           }
         ]
       },
@@ -197,14 +228,18 @@
           {
             "stat": "Blood Effect Boost",
             "value": 20,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       }
     }
   },
-  "Brute": {
-    "id": "bloodtype_brute",
+  "brute": {
+    "name": "Brute Blood",
+    "image": "/images/vbuilds/blood/brute-blood.webp",
+    "id": "brute",
+    "arenaCode": "2",
     "effects": {
       "I": {
         "description": "14% Increased Primary Attack Speed and gain 5% increased Physical Power.",
@@ -212,12 +247,14 @@
           {
             "stat": "Primary Attack Speed",
             "value": 14,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Physical Power",
             "value": 5,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -227,12 +264,14 @@
           {
             "stat": "Primary Attack Life Leech",
             "value": 10,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Damage Reduction",
             "value": 4,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -242,7 +281,8 @@
           {
             "stat": "Bonus Maximum Health",
             "value": 16,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -252,12 +292,14 @@
           {
             "stat": "Parry Damage Reduction",
             "value": 25,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           },
           {
             "stat": "Physical Power (Parry Buff)",
             "value": 20,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       },
@@ -267,14 +309,18 @@
           {
             "stat": "Blood Effect Boost",
             "value": 20,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       }
     }
   },
-  "Scholar": {
-    "id": "bloodtype_scholar",
+  "scholar": {
+    "name": "Scholar Blood",
+    "image": "/images/vbuilds/blood/scholar-blood.webp",
+    "id": "scholar",
+    "arenaCode": "6",
     "effects": {
       "I": {
         "description": "14% Increased Spell Power and 10% Shield Efficiency.",
@@ -282,12 +328,14 @@
           {
             "stat": "Spell Power",
             "value": 14,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Shield Efficiency",
             "value": 10,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -297,7 +345,8 @@
           {
             "stat": "Spell Cooldown Rate",
             "value": 14,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       },
@@ -307,7 +356,8 @@
           {
             "stat": "Ultimate Power",
             "value": 20,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -317,7 +367,8 @@
           {
             "stat": "Spell Charge Gain",
             "value": 12,
-            "unit": "flat"
+            "unit": "flat",
+            "calculate": true
           }
         ]
       },
@@ -327,14 +378,18 @@
           {
             "stat": "Blood Effect Boost",
             "value": 20,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       }
     }
   },
-  "Mutant": {
-    "id": "bloodtype_mutant",
+  "mutant": {
+    "name": "Mutant Blood",
+    "image": "/images/vbuilds/blood/mutant-blood.webp",
+    "id": "mutant",
+    "arenaCode": "4",
     "effects": {
       "I": {
         "description": "14% Increased Spell Power and 10% increased Shapeshift Speed.",
@@ -342,12 +397,14 @@
           {
             "stat": "Spell Power",
             "value": 14,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Shapeshift Speed",
             "value": 10,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -357,7 +414,8 @@
           {
             "stat": "Ultimate Cooldown Rate",
             "value": 28,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -367,12 +425,14 @@
           {
             "stat": "Ultimate Power",
             "value": 20,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Minion Damage",
             "value": 12,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -382,7 +442,8 @@
           {
             "stat": "Veil Cooldown Rate",
             "value": 7,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -392,14 +453,18 @@
           {
             "stat": "Blood Effect Boost",
             "value": 20,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       }
     }
   },
-  "Draculin": {
-    "id": "bloodtype_draculin",
+  "draculin": {
+    "name": "Draculin Blood",
+    "image": "/images/vbuilds/blood/draculin-blood.webp",
+    "id": "draculin",
+    "arenaCode": "9",
     "effects": {
       "I": {
         "description": "14% Increased Spell Power and 8% increased Spell Critical Power.",
@@ -407,12 +472,14 @@
           {
             "stat": "Spell Power",
             "value": 14,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Spell Critical Power",
             "value": 8,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -422,12 +489,14 @@
           {
             "stat": "Spell Critical Chance",
             "value": 16,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
-            "stat": "Movement Speed",
+            "stat": "Bonus Movement Speed",
             "value": 8,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       },
@@ -437,12 +506,14 @@
           {
             "stat": "Spell Life Leech",
             "value": 10,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Spell Charge Gain",
             "value": 3,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -452,7 +523,8 @@
           {
             "stat": "Spell Cooldown Rate",
             "value": 40,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       },
@@ -462,14 +534,18 @@
           {
             "stat": "Blood Effect Boost",
             "value": 20,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       }
     }
   },
-  "Creature": {
-    "id": "bloodtype_creature",
+  "creature": {
+    "name": "Creature Blood",
+    "image": "/images/vbuilds/blood/creature-blood.webp",
+    "id": "creature",
+    "arenaCode": "3",
     "effects": {
       "I": {
         "description": "16% Increased Maximum Health and 40% increased health regeneration.",
@@ -477,12 +553,14 @@
           {
             "stat": "Bonus Maximum Health",
             "value": 16,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Health Regeneration",
             "value": 40,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -490,14 +568,16 @@
         "description": "8% Increased Movement Speed and 8% increased Shapeshift Speed.",
         "modifiers": [
           {
-            "stat": "Movement Speed",
+            "stat": "Bonus Movement Speed",
             "value": 8,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "Shapeshift Speed",
             "value": 8,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           }
         ]
       },
@@ -507,12 +587,14 @@
           {
             "stat": "Healing Received",
             "value": 24,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": true
           },
           {
             "stat": "All Resistances",
             "value": 20,
-            "unit": "flat"
+            "unit": "flat",
+            "calculate": true
           }
         ]
       },
@@ -522,12 +604,14 @@
           {
             "stat": "Attack Speed (Buffed after Bite)",
             "value": 25,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           },
           {
             "stat": "Physical Power (Buffed after Bite)",
             "value": 25,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       },
@@ -537,7 +621,8 @@
           {
             "stat": "Blood Effect Boost",
             "value": 20,
-            "unit": "percent"
+            "unit": "percent",
+            "calculate": false
           }
         ]
       }

@@ -2567,6 +2567,11 @@ hasown@^2.0.2:
   dependencies:
     function-bind "^1.1.2"
 
+hotkeys-js@^3.13.10:
+  version "3.13.10"
+  resolved "https://registry.yarnpkg.com/hotkeys-js/-/hotkeys-js-3.13.10.tgz#429105d76c534b91e65a1e53b92b18447ec82455"
+  integrity sha512-O3ktQfRV5eMDCIxj60enw5FBLQfTiRnX6evXn3UFeWylIcHAXwRkRTeiGX8dg3MKaM7y3SNj6PmcCxrwuoIBtA==
+
 html-entities@^2.5.2:
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/html-entities/-/html-entities-2.6.0.tgz#7c64f1ea3b36818ccae3d3fb48b6974208e984f8"
