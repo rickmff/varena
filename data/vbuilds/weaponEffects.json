@@ -2,71 +2,183 @@
   {
     "id": "StatMod_AttackSpeed",
     "key": "1",
-    "description": "Increases attack speed"
+    "description": "Increases attack speed",
+    "modifiers": [
+      {
+        "stat": "Attack Speed",
+        "value": 14,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   },
   {
     "id": "StatMod_CriticalStrikePhysical",
     "key": "2",
-    "description": "Improves physical critical strike chance"
+    "description": "Improves physical critical strike chance",
+    "modifiers": [
+      {
+        "stat": "Physical Critical Chance",
+        "value": 16,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   },
   {
     "id": "StatMod_CriticalStrikePhysicalPower",
     "key": "3",
-    "description": "Enhances physical critical strike power"
+    "description": "Enhances physical critical strike power",
+    "modifiers": [
+      {
+        "stat": "Physical Critical Power",
+        "value": 16,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   },
   {
     "id": "StatMod_CriticalStrikeSpellPower",
     "key": "4",
-    "description": "Boosts spell critical strike power"
+    "description": "Boosts spell critical strike power",
+    "modifiers": [
+      {
+        "stat": "Spell Critical Power",
+        "value": 16,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   },
   {
     "id": "StatMod_CriticalStrikeSpells",
     "key": "5",
-    "description": "Increases spell critical strike chance"
+    "description": "Increases spell critical strike chance",
+    "modifiers": [
+      {
+        "stat": "Spell Critical Chance",
+        "value": 16,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   },
   {
     "id": "StatMod_MaxHealth",
     "key": "6",
-    "description": "Increases maximum health"
+    "description": "Increases maximum health",
+    "modifiers": [
+      {
+        "stat": "Bonus Maximum Health",
+        "value": 16,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   },
   {
     "id": "StatMod_MovementSpeed",
     "key": "7",
-    "description": "Improves movement speed"
+    "description": "Improves movement speed",
+    "modifiers": [
+      {
+        "stat": "Bonus Movement Speed",
+        "value": 8,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   },
   {
     "id": "StatMod_PhysicalPower",
     "key": "8",
-    "description": "Enhances physical power"
+    "description": "Enhances physical power",
+    "modifiers": [
+      {
+        "stat": "Bonus Physical Power",
+        "value": 10,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   },
   {
     "id": "StatMod_SpellCooldownReduction",
     "key": "9",
-    "description": "Reduces spell cooldowns"
+    "description": "Reduces spell cooldowns",
+    "modifiers": [
+      {
+        "stat": "Spell Cooldown Rate",
+        "value": 14,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   },
   {
     "id": "StatMod_SpellLeech",
     "key": "a",
-    "description": "Grants spell leech ability"
+    "description": "Grants spell leech ability",
+    "modifiers": [
+      {
+        "stat": "Spell Leech",
+        "value": 10,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   },
   {
     "id": "StatMod_SpellPower",
     "key": "b",
-    "description": "Increases spell power"
+    "description": "Increases spell power",
+    "modifiers": [
+      {
+        "stat": "Bonus Spell Power",
+        "value": 14,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   },
   {
     "id": "StatMod_TravelCooldownReduction",
     "key": "c",
-    "description": "Reduces veil cooldowns"
+    "description": "Reduces veil cooldowns",
+    "modifiers": [
+      {
+        "stat": "Veil Cooldown Rate",
+        "value": 14,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   },
   {
     "id": "StatMod_WeaponCooldownReduction",
     "key": "d",
-    "description": "Reduces weapon cooldowns"
+    "description": "Reduces weapon cooldowns",
+    "modifiers": [
+      {
+        "stat": "Weapon Cooldown Rate",
+        "value": 14,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   },
   {
     "id": "StatMod_WeaponSkillPower",
     "key": "e",
-    "description": "Enhances weapon skill power"
+    "description": "Enhances weapon skill power",
+    "modifiers": [
+      {
+        "stat": "Weapon Skill Power",
+        "value": 16,
+        "unit": "percent",
+        "calculate": true
+      }
+    ]
   }
 ]

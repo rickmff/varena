@@ -1,5 +1,7 @@
 import bloodData from '@/data/vbuilds/bloodtypes.json'
+import weaponEffectData from '@/data/vbuilds/weaponEffects.json'
 import { BuildContext, BloodContext } from './builder'
+import { AvailableWeaponSlots, Weapon } from '../vbuilds/WeaponForge';
 
 
 export type StatName =
@@ -73,6 +75,30 @@ export const getBloodModifiers = (blood: BloodContext | null) => {
     return bloodModifiers
 };
 
+export const getPassiveModifiers = (passives: string[] | null) => {
+    if (!passives) return [];
+    const passiveModifiers: Modifier[] = passives.flatMap((passive) => passive.modifiers)
+
+    console.log("passiveModifiers", passiveModifiers)
+
+    return passiveModifiers
+}
+
+const getWeaponSlotModifiers = (weapons: Map<AvailableWeaponSlots, Weapon>, slot: AvailableWeaponSlots) => {
+    const weapon = weapons.get(slot);
+    if (!weapon || !weapon.effects) {
+        return [];
+    }
+
+    const modifiers = weapon.effects.flatMap(effect => {
+        const modifiers = weaponEffectData.find(weaponEffect => weaponEffect.id === effect)?.modifiers || [];
+        return modifiers
+    });
+
+    return modifiers
+}
+
+
 
 export function computeFinalStats(context: BuildContext): Record<string, number> {
     const finalStats: Record<string, number> = {};
@@ -82,12 +108,33 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
         finalStats[statName] = statEntry.defaultValue;
     }
 
-    const amulet = context.amulet.attributes || [];
-    const elixir = context.elixir.modifiers || [];
+    const amulet = context.amulet?.attributes || [];
+    const elixir = context.elixir?.modifiers || [];
     const bloodModifiers = getBloodModifiers(context.blood)
+    const passiveModifiers = getPassiveModifiers(context.passives) || []
+    const armour = context.armour?.modifiers || []
 
-    const allModifiers: Modifier[] = [...amulet, ...bloodModifiers, ...elixir]
+    console.log('armour', armour)
+    const bagAndCapeModifiers = [
+        { stat: "Max Health", value: 24, unit: "flat" }, // Tier 3 Cape
+        { stat: "Max Health", value: 42, unit: "flat" }, // Bat Leather Bag
+        { stat: "Resource Yield", value: 10, unit: "percent" },
 
+    ] as Modifier[]
+
+    const selectedWeaponModifiers = getWeaponSlotModifiers(context.weapons, 1) || [];
+
+    const allModifiers: Modifier[] = [
+        ...armour,
+        ...amulet,
+        ...elixir,
+        ...bloodModifiers,
+        ...bagAndCapeModifiers,
+        ...passiveModifiers,
+        ...selectedWeaponModifiers
+
+    ];
+    console.log("allModifiers", allModifiers.filter(mod => mod.calculate !== false))
 
     // Apply each modifier
     for (const mod of allModifiers) {

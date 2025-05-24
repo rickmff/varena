@@ -72,8 +72,8 @@ const SlotTrigger = ({
         {state.context.spells[goto]?.jewel?.map((jewel: AddSpell) => (
           <div>
             {
-              state.context.spells[goto].effects.find((e) => e.key == jewel)
-                .description
+              state.context.spells[goto]?.effects?.find((e) => e.key == jewel)
+                ?.description
             }
           </div>
         ))}

@@ -46,6 +46,20 @@ const BuilderPage = (user: any) => {
               <AmuletPicker />
               <ElixerPicker />
               <BloodForge />
+              <div className="relative w-20 h-20 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center overflow-hidden">
+                <img
+                  src="/images/vbuilds/armour/bag-bat_leather_bag.webp"
+                  alt="bag"
+                  className={`pointer-events-none`}
+                />
+              </div>
+              <div className="relative w-20 h-20 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center overflow-hidden">
+                <img
+                  src="/images/vbuilds/armour/cape-phantom_veil.webp"
+                  alt="cape"
+                  className={`pointer-events-none max-h-20`}
+                />
+              </div>
             </div>
           </div>
           <div>

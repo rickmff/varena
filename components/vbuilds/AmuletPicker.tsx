@@ -3,7 +3,7 @@
 import { useState } from "react";
 import amuletsData from "@/data/vbuilds/amulets.json";
 import { useBuilder } from "./BuildProvider";
-import { Modifier } from "@/components/machines/builder";
+// import { Modifier } from "@/components/machines/builder";
 import {
   DropdownSelect,
   DropdownSelectPlaceholder,

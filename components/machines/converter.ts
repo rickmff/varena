@@ -63,13 +63,13 @@ const importSpells = (chars: string) => {
     const ultimate = ultimates.find(spell => spell.arenaCode === chars[15]);
 
     const output = {
-        dash: { ...veil, jewel: [chars[1], chars[2], chars[3], chars[4]] },
-        spell1: { ...spell1, jewel: [chars[6], chars[7], chars[8], chars[9]] },
-        spell2: { ...spell2, jewel: [chars[11], chars[12], chars[13], chars[14]] },
-        ultimate: ultimate
-    }
+        dash: veil ? { ...veil, jewel: [chars[1], chars[2], chars[3], chars[4]] } : null,
+        spell1: spell1 ? { ...spell1, jewel: [chars[6], chars[7], chars[8], chars[9]] } : null,
+        spell2: spell2 ? { ...spell2, jewel: [chars[11], chars[12], chars[13], chars[14]] } : null,
+        ultimate: ultimate || null
+    };
 
-    return output
+    return output;
 }
 
 const importWeapons = (chars: string) => {
@@ -194,7 +194,18 @@ const exportSpells = (selectedSpells) => {
     const spell2 = spells.find(spell => spell.arenaCode === selectedSpells?.spell2?.arenaCode);
     const ultimate = ultimates.find(spell => spell.arenaCode === selectedSpells?.ultimate?.arenaCode);
 
-    return spell1?.arenaCode + selectedSpells?.spell1?.jewel.join("") + spell2?.arenaCode + selectedSpells?.spell2?.jewel.join("") + veil?.arenaCode + selectedSpells?.dash?.jewel.join("") + ultimate?.arenaCode
+    const veilCode = veil?.arenaCode || "0";
+    const veilJewels = selectedSpells?.dash?.jewel?.join("") || "0000";
+
+    const spell1Code = spell1?.arenaCode || "0";
+    const spell1Jewels = selectedSpells?.spell1?.jewel?.join("") || "0000";
+
+    const spell2Code = spell2?.arenaCode || "0";
+    const spell2Jewels = selectedSpells?.spell2?.jewel?.join("") || "0000";
+
+    const ultimateCode = ultimate?.arenaCode || "0";
+
+    return spell1Code + spell1Jewels + spell2Code + spell2Jewels + veilCode + veilJewels + ultimateCode;
 }
 
 const exportWeapons = (weapons: Map<number, Weapon>) => {

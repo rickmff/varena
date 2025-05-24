@@ -50,6 +50,7 @@ type BuildEvents =
     | { type: "ADD_ELIXIR"; elixir: any }
     | { type: "REMOVE_ELIXIR"; }
     | { type: "ADD_ARMOUR"; armour: any }
+    | { type: "REMOVE_ARMOUR"; }
     | { type: 'ADD_PASSIVE'; passive: any }
     | { type: 'REMOVE_PASSIVE'; id: string }
     | { type: 'ADD_WEAPON'; weapon: Weapon }
