@@ -24,7 +24,7 @@ export function loadBaseStats(statsArray: any): any {
   return statMap;
 }
 
-const BuilderPage = (user: any) => {
+const BuilderPage = () => {
   const baseStats = loadBaseStats(stats);
   return (
     <div className="p-8  text-gray-200 flex">
