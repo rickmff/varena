@@ -48,6 +48,7 @@
     "firebase": "^11.6.0",
     "firebase-admin": "^13.3.0",
     "framer-motion": "latest",
+    "hotkeys-js": "^3.13.10",
     "input-otp": "1.4.1",
     "lucide-react": "^0.454.0",
     "next": "15.2.4",

@@ -26,7 +26,7 @@
         "description": "8% Increased Movement Speed and gain 10% additional speed for 3s when striking a killing blow.",
         "modifiers": [
           {
-            "stat": "Movement Speed",
+            "stat": "Bonus Movement Speed",
             "value": 8,
             "unit": "percent",
             "calculate": true
@@ -192,7 +192,7 @@
         "description": "12% Increased Movement Speed and 18% increased Attack Speed but there is a 25% chance when taking damage to trigger an eruption inflicting a 2s snare.",
         "modifiers": [
           {
-            "stat": "Movement Speed",
+            "stat": "Bonus Movement Speed",
             "value": 12,
             "unit": "percent",
             "calculate": true
@@ -493,7 +493,7 @@
             "calculate": true
           },
           {
-            "stat": "Movement Speed",
+            "stat": "Bonus Movement Speed",
             "value": 8,
             "unit": "percent",
             "calculate": false
@@ -568,7 +568,7 @@
         "description": "8% Increased Movement Speed and 8% increased Shapeshift Speed.",
         "modifiers": [
           {
-            "stat": "Movement Speed",
+            "stat": "Bonus Movement Speed",
             "value": 8,
             "unit": "percent",
             "calculate": true

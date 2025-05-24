@@ -306,7 +306,7 @@
     "arenaCode": "f",
     "modifiers": [
       {
-        "stat": "Movement Speed",
+        "stat": "Bonus Movement Speed",
         "value": 4,
         "unit": "percent"
       },
@@ -352,7 +352,7 @@
         "unit": "percent"
       },
       {
-        "stat": "Movement Speed",
+        "stat": "Bonus Movement Speed",
         "value": 15,
         "unit": "percent",
         "calculate": false
@@ -477,9 +477,10 @@
     "arenaCode": "o",
     "modifiers": [
       {
-        "stat": "Movement Speed",
+        "stat": "Bonus Movement Speed",
         "value": 4,
-        "unit": "percent"
+        "unit": "percent",
+        "calculate": true
       },
       {
         "stat": "Bonus Movement Speed",

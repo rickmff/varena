@@ -1,10 +1,11 @@
-import { assign, enqueueActions, log, raise, setup, spawnChild, stopChild } from 'xstate';
+import { assign, enqueueActions, fromCallback, log, raise, setup, spawnChild, stopChild } from 'xstate';
 import { AvailableWeaponSlots, Weapon } from '../vbuilds/WeaponForge';
 import { weaponBuilderMachine } from './weaponBuilder';
 import { toast } from 'sonner';
 import { Coating } from '../vbuilds/CoatingPicker';
 import { StatName } from './calculator';
 import bloodData from '@/data/vbuilds/bloodtypes.json';
+import hotkeys from 'hotkeys-js';
 
 
 export type BloodContext = {
@@ -29,6 +30,7 @@ export interface BuildContext {
         ultimate: any | null;
     };
     selectedWeaponSlot: AvailableWeaponSlots | null; // Track the currently selected weapon slot
+    focusedWeapon: AvailableWeaponSlots | null; // Track the focused weapon slot
 }
 
 type BuildEvents =
@@ -58,6 +60,8 @@ type BuildEvents =
     | { type: 'ADD_SPELL'; spell: any, slot: "dash" | "ultimate" | "spell1" | "spell2", jewel?: number[] }
     | { type: 'REMOVE_SPELL'; id: string }
     | { type: 'LEGENDARY_LIMIT_REACHED' }
+    | { type: 'FOCUS_WEAPON', slot: AvailableWeaponSlots }
+    | { type: 'UNFOCUS_WEAPON' }
 
 type StatEntry = {
     name: string;
@@ -69,6 +73,21 @@ type StatEntry = {
 
 export const MAX_LEGENDARY_WEAPONS_COUNT = 3;
 
+
+const selectWeaponHotkeys = fromCallback(({ sendBack }) => {
+    hotkeys('1,2,3,4,5,6,7,8', (e) => {
+        sendBack({ type: 'FOCUS_WEAPON', slot: e.key });
+    })
+
+    hotkeys('0', () => {
+        sendBack({ type: 'UNFOCUS_WEAPON' });
+    })
+
+    return () => {
+        hotkeys.unbind('1,2,3,4,5,6,7,8')
+    }
+})
+
 export const builder = setup({
     types: {
         input: {} as { stats: Record<StatName, StatEntry>, build: Record<string, any> },
@@ -77,7 +96,8 @@ export const builder = setup({
         // actions: 
     },
     actors: {
-        weaponBuilder: weaponBuilderMachine
+        weaponBuilder: weaponBuilderMachine,
+        hotkeys: selectWeaponHotkeys
     }
 }).createMachine({
     id: 'builder',
@@ -101,6 +121,7 @@ export const builder = setup({
             coatings: input.build.coatings || new Map(),
             blood: input.build.blood || null,
             selectedWeaponSlot: null, // Initialize with null
+            focusedWeapon: null as AvailableWeaponSlots | null, // Track the focused weapon slot
         }
 
         console.log("ctx", ctx)
@@ -138,6 +159,7 @@ export const builder = setup({
     states: {
         overview: {
             // entry: [log(({ context }) => `Build machine initialized with base stats: ${JSON.stringify(context.baseStats)}`)],
+            invoke: { id: 'hotkeys', src: 'hotkeys' },
             on: {
                 ADD_AMULET: {
                     actions: assign({
@@ -187,6 +209,15 @@ export const builder = setup({
                         }
                     })
                 },
+                FOCUS_WEAPON: {
+                    actions: assign({
+                        focusedWeapon: ({ event }) => event.slot // Set the focused weapon slot
+                    }),
+                },
+                UNFOCUS_WEAPON: {
+                    actions: assign({ focusedWeapon: () => null })
+                }
+
             }
         },
         bloodForge: {

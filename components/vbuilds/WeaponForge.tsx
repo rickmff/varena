@@ -42,7 +42,10 @@ const SlotTrigger = ({
   const { state, builder } = useBuilder();
 
   const weaponInSlot = state.context.weapons.get(slot);
-
+  console.log("weaponInSlot", {
+    focusedWeapon: state.context.focusedWeapon,
+    slot,
+  });
   return (
     <DialogTrigger
       className={`w-20 h-20 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 ${
@@ -51,7 +54,7 @@ const SlotTrigger = ({
           : weaponInSlot.type === "legendary"
           ? "border-orange-500"
           : "border-purple-500"
-      }`}
+      } ${state.context.focusedWeapon == slot ? "ring-2 ring-blue-500" : ""}`}
       onClick={() => {
         builder.send({ type: `goto.weaponForge`, slot });
       }}

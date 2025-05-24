@@ -2,6 +2,7 @@ import bloodData from '@/data/vbuilds/bloodtypes.json'
 import weaponEffectData from '@/data/vbuilds/weaponEffects.json'
 import { BuildContext, BloodContext } from './builder'
 import { AvailableWeaponSlots, Weapon } from '../vbuilds/WeaponForge';
+import { stateIn } from 'xstate';
 
 
 export type StatName =
@@ -84,8 +85,10 @@ export const getPassiveModifiers = (passives: string[] | null) => {
     return passiveModifiers
 }
 
-const getWeaponSlotModifiers = (weapons: Map<AvailableWeaponSlots, Weapon>, slot: AvailableWeaponSlots) => {
-    const weapon = weapons.get(slot);
+const getWeaponSlotModifiers = (weapons: Map<AvailableWeaponSlots, Weapon>, slot: AvailableWeaponSlots | null) => {
+    if (!slot) return [];
+
+    const weapon = weapons.get(Number(slot) as AvailableWeaponSlots);
     if (!weapon || !weapon.effects) {
         return [];
     }
@@ -122,7 +125,9 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
 
     ] as Modifier[]
 
-    const selectedWeaponModifiers = getWeaponSlotModifiers(context.weapons, 1) || [];
+    const selectedWeaponModifiers = getWeaponSlotModifiers(context.weapons, context.focusedWeapon) || [];
+
+    console.log("selectedWeaponModifiers", selectedWeaponModifiers)
 
     const allModifiers: Modifier[] = [
         ...armour,
