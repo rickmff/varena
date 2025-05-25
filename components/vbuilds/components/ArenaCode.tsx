@@ -1,22 +1,43 @@
 import React from "react";
 import { useBuilder } from "../BuildProvider";
 import { exportVArenaCode } from "@/components/machines/converter";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const ArenaCode: React.FC = () => {
   const { state } = useBuilder();
+  const exportCommand = `.import-build ${exportVArenaCode({
+    elixir: state.context.elixir,
+    coatings: state.context.coatings,
+    passives: state.context.passives,
+    spells: state.context.spells,
+    weapons: state.context.weapons,
+    amulet: state.context.amulet,
+    armour: state.context.armour,
+    blood: state.context.blood,
+  })}`;
+
+  const copyBuildCommand = async () => {
+    try {
+      await navigator.clipboard.writeText(exportCommand);
+      toast.success("Build command copied!");
+    } catch (error) {
+      toast.error("Failed to copy command");
+    }
+  };
 
   return (
-    <div>
-      {exportVArenaCode({
-        elixir: state.context.elixir,
-        coatings: state.context.coatings,
-        passives: state.context.passives,
-        spells: state.context.spells,
-        weapons: state.context.weapons,
-        amulet: state.context.amulet,
-        armour: state.context.armour,
-        blood: state.context.blood,
-      })}
+    <div className="flex gap-4">
+      <input
+        className="text-gray-300 text-base bg-black/50 bg-black px-4 py-2 rounded-md border w-3/4 text-center"
+        value={exportCommand}
+      />
+      <Button
+        onClick={copyBuildCommand}
+        className="px-3 py-2 text-white group border-red-900/70  bg-red-900/50 hover:bg-red-800 transition-colors"
+      >
+        COPY COMMAND
+      </Button>
     </div>
   );
 };

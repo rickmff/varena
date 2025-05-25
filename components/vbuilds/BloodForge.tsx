@@ -15,7 +15,7 @@ import { Button } from "../ui/button";
 import { set } from "date-fns";
 
 const SlotTrigger = ({ children }: { children?: React.ReactNode }) => {
-  const { state, builder } = useBuilder();
+  const { builder } = useBuilder();
 
   return (
     <DialogTrigger
@@ -31,11 +31,13 @@ const SlotTrigger = ({ children }: { children?: React.ReactNode }) => {
 
 export const BloodSlotPlaceholder: React.FC<{
   placeholderImage?: string;
-  blood: any;
+  blood: {
+    primary: keyof typeof bloodData;
+    secondary: keyof typeof bloodData;
+    infusion: string;
+  } | null;
 }> = ({ placeholderImage, blood }) => {
   const { state, builder } = useBuilder();
-
-  console.log(state.context, "BloodSlotPlaceholder");
 
   if (!blood) {
     return (
@@ -76,21 +78,6 @@ export const BloodSlotPlaceholder: React.FC<{
   );
 };
 
-//   return (
-//     <div className={`relative rounded-md overflow-hidden`}>
-//       <img src={weaponInSlot?.img} className="w-20 h-20" />
-//       {weaponInSlot.infusion && (
-//         <div className="overflow-hidden w-10 h-10 rounded-md bg-black/80 flex items-center justify-center absolute right-0 bottom-0 border-l-2 border-t-2 border-purple-500 rounded-bl-none rounded-tr-none">
-//           <img
-//             src={`/images/vbuilds/spellschools/${weaponInSlot.infusion}.png`}
-//             className={`spellSchool spellSchool-${weaponInSlot.infusion} w-8 h-8`}
-//           />
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
 const bloodList = Object.values(bloodData);
 
 const BloodTabs = ({
@@ -107,7 +94,6 @@ const BloodTabs = ({
   type: "primary" | "secondary";
 }) => {
   if (type === "secondary") {
-    console.log("secondary", value);
   }
   return (
     <Tabs

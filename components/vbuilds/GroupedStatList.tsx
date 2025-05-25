@@ -30,10 +30,10 @@ export function GroupedStatList({ stats }: { stats: Record<string, any> }) {
   const groupedStats = groupStatsByCategoryWithValues(stats, finalStats);
 
   return (
-    <div className="w-1/4">
+    <div>
       {Object.entries(groupedStats).map(([category, statsArray]) => (
         <div key={category} className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-100 mb-4">{category}</h2>
+          <h2 className="text-xl font-bold text-gray-100 mb-4">{category}</h2>
           <StatList stats={statsArray} />
         </div>
       ))}

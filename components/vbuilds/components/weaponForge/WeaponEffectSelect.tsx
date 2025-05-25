@@ -5,15 +5,18 @@ import { useSelector } from "@xstate/react";
 import { Button } from "@/components/ui/button";
 export const WeaponEffectSelect = () => {
   const { builder } = useBuilder();
+
   const weaponBuilder = useSelector(
     builder,
     (state) => state.children.weaponBuilder
   );
 
-  const selectedEffects = useSelector(
-    weaponBuilder,
-    (state) => state!.context.effects
-  );
+  const selectedEffects = useSelector(weaponBuilder, (state) => {
+    if (state && "context" in state) {
+      return state.context.effects;
+    }
+    return [];
+  });
 
   return (
     <div>

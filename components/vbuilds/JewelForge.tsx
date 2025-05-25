@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "../ui/button";
-import { builder } from "../machines/builder";
 
-type Spell = {
+export type Spell = {
   id: String;
   name: String;
   effects: Array<{ key: number; description: string }>;

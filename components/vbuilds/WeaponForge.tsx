@@ -1,16 +1,13 @@
-import { useState } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
-import { PassiveList, Passive } from "./PassiveList";
-import { PlusIcon } from "lucide-react";
 import { useBuilder } from "./BuildProvider";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { useSelector } from "@xstate/react";
 import { WeaponSelect } from "./components/weaponForge/WeaponSelect";
 import { WeaponEffectSelect } from "./components/weaponForge/WeaponEffectSelect";
 
-import legoWeaponData from "@/data/vbuilds/legendary-weapons.json";
 import epicWeaponData from "@/data/vbuilds/epic-weapons.json";
 import { InfusionSelect } from "./components/weaponForge/InfusionSelect";
+import { WeaponBuilderContext } from "../machines/weaponBuilder";
 
 export type AvailableWeaponSlots = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
@@ -109,7 +106,10 @@ export const WeaponForge = () => {
     builder,
     (state) => state.children.weaponBuilder
   );
-  const weaponState = useSelector(weaponSelector, (state) => state);
+  const weaponState = useSelector(weaponSelector, (state) => state as any) as {
+    matches: (value: string) => boolean;
+    context: WeaponBuilderContext;
+  };
 
   return (
     <Dialog

@@ -1,12 +1,6 @@
 "use client";
-import { useState } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
-// import { SpellList, Spell } from "./SpellList";
-import { PlusIcon } from "lucide-react";
 import { useBuilder } from "./BuildProvider";
-import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { useSelector } from "@xstate/react";
-import spellData from "@/data/vbuilds/spells.json";
 import {
   Sheet,
   SheetClose,
@@ -18,31 +12,6 @@ import SpellTabs from "./SpellTabs";
 import { DashForge } from "./DashForge";
 import { AddSpell } from "./JewelForge";
 import UltimateForge from "./UltimateForge";
-
-// export const SpellPlaceholder = () => {
-//   const { builder } = useBuilder();
-//   const spells = useSelector(builder, (state) => state.context.spells);
-
-//   return (
-//     <div className="flex gap-4 justify-center bg-neutral-900 p-4 rounded-lg">
-//       {spells.map((spell: Spell) => (
-//         <img
-//           src={spell.img}
-//           alt={spell.name}
-//           className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-300"`}
-//         />
-//       ))}
-//       {Array.from({ length: 5 - spells.length }).map((_, index) => (
-//         <div
-//           key={`placeholder-${index}`}
-//           className="w-16 h-16 mb-2 rounded-full border-4 border-dashed border-gray-500 flex items-center justify-center"
-//         >
-//           <PlusIcon className="w-8 h-8 text-gray-500" />
-//         </div>
-//       ))}
-//     </div>
-//   );
-// };
 
 import {
   HoverCardTrigger,
@@ -57,7 +26,7 @@ const SlotTrigger = ({
   goto: "dash" | "spell1" | "spell2" | "ultimate";
 }) => {
   const { state, builder } = useBuilder();
-  console.log("d");
+
   return (
     <HoverCard>
       <HoverCardTrigger>
@@ -118,7 +87,6 @@ const SlotImage = ({ slot }: { slot: "dash" | "spell1" | "spell2" }) => {
 };
 
 export const SpellForge = () => {
-  //   const [hoveredSpell, setHoveredSpell] = useState<Spell | null>(null);
   const { state, builder } = useBuilder();
   const spells = useSelector(builder, (state) => state.context.spells);
 
@@ -193,7 +161,6 @@ export const SpellForge = () => {
             <h2 className="text-xl font-bold text-gray-100 mb-4">Veil</h2>
             <DashForge
               onAdd={({ spell, jewel }) => {
-                console.log("Adding spell", spell, jewel);
                 builder.send({ type: "ADD_SPELL", spell, slot: "dash", jewel });
               }}
             />

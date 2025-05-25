@@ -80,7 +80,7 @@ export const getPassiveModifiers = (passives: string[] | null) => {
     if (!passives) return [];
     const passiveModifiers: Modifier[] = passives.flatMap((passive) => passive.modifiers)
 
-    console.log("passiveModifiers", passiveModifiers)
+
 
     return passiveModifiers
 }
@@ -117,7 +117,7 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
     const passiveModifiers = getPassiveModifiers(context.passives) || []
     const armour = context.armour?.modifiers || []
 
-    console.log('armour', armour)
+
     const bagAndCapeModifiers = [
         { stat: "Max Health", value: 24, unit: "flat" }, // Tier 3 Cape
         { stat: "Max Health", value: 42, unit: "flat" }, // Bat Leather Bag
@@ -127,7 +127,7 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
 
     const selectedWeaponModifiers = getWeaponSlotModifiers(context.weapons, context.focusedWeapon) || [];
 
-    console.log("selectedWeaponModifiers", selectedWeaponModifiers)
+
 
     const allModifiers: Modifier[] = [
         ...armour,
@@ -139,7 +139,7 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
         ...selectedWeaponModifiers
 
     ];
-    console.log("allModifiers", allModifiers.filter(mod => mod.calculate !== false))
+
 
     // Apply each modifier
     for (const mod of allModifiers) {
@@ -161,10 +161,10 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
         }
 
         // Cap enforcement (optional per modifier or after all modifiers are applied)
-        const cap = context.baseStats[mod.stat]?.cap;
-        if (cap !== null && cap !== undefined && finalStats[mod.stat] > cap) {
-            finalStats[mod.stat] = cap;
-        }
+        // const cap = context.baseStats[mod.stat]?.cap;
+        // if (cap !== null && cap !== undefined && finalStats[mod.stat] > cap) {
+        //     finalStats[mod.stat] = cap;
+        // }
     }
 
     return finalStats;

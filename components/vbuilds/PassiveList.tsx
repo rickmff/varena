@@ -1,10 +1,9 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import passivesData from "@/data/vbuilds/passives.json";
 import { useBuilder } from "@/components/vbuilds/BuildProvider";
 import { useSelector } from "@xstate/react";
-import { Modifier } from "../machines/builder";
 
 import { PassivePlaceholder } from "./PassiveForge";
 

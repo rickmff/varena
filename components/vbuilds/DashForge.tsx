@@ -1,5 +1,4 @@
 import spellsData from "@/data/vbuilds/spells.json";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 import { AddSpellWithJewel, JewelForge } from "./JewelForge";
 
@@ -13,18 +12,6 @@ export const DashForge = ({
   onAdd: (params: AddSpellWithJewel) => void;
 }) => {
   const [selectedVeil, setSelectedVeil] = useState<any | null>(null);
-  const [selectedEffects, setSelectedEffects] = useState<number[]>([]);
-
-  const toggleEffectSelection = (key: number) => {
-    setSelectedEffects((prev) => {
-      if (prev.includes(key)) {
-        return prev.filter((effectKey) => effectKey !== key);
-      } else if (prev.length < 4) {
-        return [...prev, key];
-      }
-      return prev;
-    });
-  };
 
   return (
     <div>

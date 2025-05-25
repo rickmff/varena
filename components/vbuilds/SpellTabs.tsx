@@ -8,6 +8,12 @@ import { useState } from "react";
 import { JewelForge, AddSpellWithJewel } from "./JewelForge";
 import { XIcon } from "lucide-react";
 
+import { Spell } from "./JewelForge";
+
+type SpellsData = {
+  [key: string]: Spell;
+};
+
 export const veilSpells = Object.values(spellsData).filter((spell) =>
   spell.name.toLowerCase().includes("veil")
 );
@@ -82,7 +88,10 @@ const SpellTabs = ({
               ))}
           </ToggleGroup>
           {selectedSpell && (
-            <JewelForge spell={spellsData[selectedSpell]} onAdd={onAdd} />
+            <JewelForge
+              spell={(spellsData as SpellsData)[selectedSpell]}
+              onAdd={onAdd}
+            />
           )}
         </TabsContent>
       ))}

@@ -7,9 +7,6 @@ import elixirData from "@/data/vbuilds/elixirs.json";
 
 const elixerOptions = Object.values(elixirData);
 
-type ElixerOption = (typeof elixerOptions)[number];
-// type ElixerId = ElixerOption["id"];
-
 export const ElixerPicker: React.FC = () => {
   const { state, builder } = useBuilder();
 

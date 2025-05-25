@@ -21,7 +21,7 @@ const importElixir = (char: string) => {
 
 const importCoatings = (chars: string) => {
     const result = new Map<number, Coating>();
-    // console.log("coatings", chars);
+
     chars.split("").forEach((char, index) => {
         const coating = Object.values(coatingData).find((coating) => coating.arenaCode == char);
         if (coating) {
@@ -32,7 +32,7 @@ const importCoatings = (chars: string) => {
 }
 
 const importPassives = (chars: string) => {
-    // console.log("passives", chars)
+
     let result: Passive[] = [];
     chars.split("").forEach((char, index) => {
         const passive = Object.values(passiveData).find((passive) => passive.arenaCode == char);
@@ -50,7 +50,7 @@ const importPassives = (chars: string) => {
 }
 
 const importSpells = (chars: string) => {
-    console.log("spells", chars)
+
     const spellDataArray = Object.values(spellData);
 
     const veils = spellDataArray.filter(spell => spell.category === "veil");
@@ -73,7 +73,7 @@ const importSpells = (chars: string) => {
 }
 
 const importWeapons = (chars: string) => {
-    // console.log("weapons", chars);
+
     const weaponData = [
         ...Object.values(legendaryWeaponData).map(weapon => ({ ...weapon, type: "legendary" as const })),
         ...Object.values(epicWeaponData).map(weapon => ({ ...weapon, type: "epic" as const }))
@@ -86,7 +86,7 @@ const importWeapons = (chars: string) => {
         const arenaCode = chars[i];
         const infusionCode = chars[i + 1];
         const effectCodes = chars.slice(i + 2, i + 5);
-        // console.log("arenaCode", arenaCode);
+
 
         const weapon = weaponData.find(
             (weapon) => weapon.arenaCode === arenaCode
@@ -108,7 +108,7 @@ const importWeapons = (chars: string) => {
         if (weapon) {
             if (weapon.type === "legendary") {
                 if (legendaryCount >= MAX_LEGENDARY_WEAPONS_COUNT) {
-                    // console.log(`Skipping weapon at slot ${(i / 5) + 1} as it exceeds the legendary limit.`);
+
                     continue; // Skip setting this weapon if the legendary limit is exceeded
                 }
                 legendaryCount++;
@@ -154,7 +154,7 @@ const importBlood = (chars: string) => {
 }
 
 const exportPassives = (passives: Passive[]) => {
-    // console.log(passives)
+
     let result = "";
     for (let i = 0; i < 5; i++) {
         const passive = passives[i];
@@ -182,7 +182,7 @@ const exportCoating = (coatings: Map<number, Coating>) => {
 }
 
 const exportSpells = (selectedSpells) => {
-    // console.log("spells", spells)
+
     const spellDataArray = Object.values(spellData);
 
     const veils = spellDataArray.filter(spell => spell.category === "veil");
@@ -235,7 +235,7 @@ const exportArmour = (armourCode: string | undefined) => {
 }
 
 const exportBlood = (blood: { primary?: string; secondary?: string; infusion?: string } | null) => {
-    console.log(blood)
+
     if (!blood || !blood.primary || !blood.secondary || !blood.infusion) {
         return "000";
     }
@@ -248,7 +248,7 @@ const exportBlood = (blood: { primary?: string; secondary?: string; infusion?: s
 };
 
 export const exportVArenaCode = (build) => {
-    console.log({ build })
+
     const elixir = build.elixir?.arenaCode || "0";
     const coatings = exportCoating(build.coatings);
     const passives = exportPassives(build.passives);
@@ -270,8 +270,8 @@ export const exportVArenaCode = (build) => {
     // const legs = build.legs?.arenaCode || "0";
     // const boots = build.boots?.arenaCode || "0";
     // const gloves = build.gloves?.arenaCode || "0";
-    // console.log(weapons)
-    console.log('ar', armour)
+
+
 
     return elixir + coatings + passives + spells + weapons + amulet + armour + blood;
 }
@@ -304,7 +304,7 @@ export const convertStringToBuild = (input: string) => {
         // gloves: parsed.gloves,
     };
 
-    console.log("build", build);
+
     return build;
 }
 
@@ -359,7 +359,7 @@ export const convertStringToBuild = (input: string) => {
 
 // // Example usage:
 // const parsed = parsePresetString("6271n24t1234j1245312342k3238e0238q5128o3238d023880187p3782l3187144445a2");
-// console.log(parsed);
+
 
 // const generated = generatePresetString({
 //     elixir: "AB_Elixir_Twisted_T01_Buff",
@@ -376,4 +376,3 @@ export const convertStringToBuild = (input: string) => {
 //     boots: "Boots1", // Example placeholder
 //     gloves: "Gloves1", // Example placeholder
 // });
-// console.log(generated);

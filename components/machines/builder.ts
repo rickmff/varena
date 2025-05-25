@@ -1,11 +1,11 @@
-import { assign, enqueueActions, fromCallback, log, raise, setup, spawnChild, stopChild } from 'xstate';
-import { AvailableWeaponSlots, Weapon } from '../vbuilds/WeaponForge';
-import { weaponBuilderMachine } from './weaponBuilder';
-import { toast } from 'sonner';
-import { Coating } from '../vbuilds/CoatingPicker';
-import { StatName } from './calculator';
 import bloodData from '@/data/vbuilds/bloodtypes.json';
 import hotkeys from 'hotkeys-js';
+import { toast } from 'sonner';
+import { assign, enqueueActions, fromCallback, raise, setup, spawnChild, stopChild } from 'xstate';
+import { Coating } from '../vbuilds/CoatingPicker';
+import { AvailableWeaponSlots, Weapon } from '../vbuilds/WeaponForge';
+import { StatName } from './calculator';
+import { weaponBuilderMachine } from './weaponBuilder';
 
 
 export type BloodContext = {
@@ -124,7 +124,7 @@ export const builder = setup({
             focusedWeapon: null as AvailableWeaponSlots | null, // Track the focused weapon slot
         }
 
-        console.log("ctx", ctx)
+
         return ctx
     },
     on: {
@@ -224,7 +224,7 @@ export const builder = setup({
             on: {
                 ADD_BLOOD: {
                     actions: assign({
-                        blood: ({ context, event }) => ({
+                        blood: ({ event }) => ({
                             primary: event.primary,
                             secondary: event.secondary,
                             infusion: event.infusion
@@ -275,7 +275,7 @@ export const builder = setup({
             ],
             on: {
                 ADD_WEAPON: {
-                    actions: enqueueActions(({ enqueue, context, event }) => {
+                    actions: enqueueActions(({ enqueue }) => {
 
                         enqueue.assign({
                             weapons: ({ context, event }) => {

@@ -1,20 +1,22 @@
 import legoWeaponData from "@/data/vbuilds/legendary-weapons.json";
 import epicWeaponData from "@/data/vbuilds/epic-weapons.json";
-import { WeaponData } from "@/components/vbuilds/WeaponForge";
 import { useBuilder } from "../../BuildProvider";
 import { useSelector } from "@xstate/react";
 import { MAX_LEGENDARY_WEAPONS_COUNT } from "@/components/machines/builder";
+import { ActorRef, ActorRefFromLogic } from "xstate";
 export const WeaponSelect = () => {
   const { state, builder } = useBuilder();
+
   const weaponBuilder = useSelector(
     builder,
     (state) => state.children.weaponBuilder
   );
 
-  const legendaryWeaponCount = useSelector(
-    weaponBuilder,
-    (state) => state?.context.legendaryWeaponCount
-  );
+  const legendaryWeaponCount = useSelector(weaponBuilder, (state) => {
+    if (state && "context" in state) {
+      return state?.context.legendaryWeaponCount;
+    }
+  });
 
   return (
     <div className="grid grid-cols-5 gap-4 mt-4">
