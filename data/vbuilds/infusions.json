@@ -1,0 +1,38 @@
+{
+  "blood": {
+    "id": "blood",
+    "name": "Blood",
+    "img": "/images/vbuilds/spellSchools/blood.png",
+    "arenaCode": "1"
+  },
+  "chaos": {
+    "id": "chaos",
+    "name": "Chaos",
+    "img": "/images/vbuilds/spellSchools/Chaos.png",
+    "arenaCode": "2"
+  },
+  "frost": {
+    "id": "frost",
+    "name": "Frost",
+    "img": "/images/vbuilds/spellSchools/frost.png",
+    "arenaCode": "3"
+  },
+  "illusion": {
+    "id": "illusion",
+    "name": "Illusion",
+    "img": "/images/vbuilds/spellSchools/illusion.png",
+    "arenaCode": "4"
+  },
+  "storm": {
+    "id": "storm",
+    "name": "Storm",
+    "img": "/images/vbuilds/spellSchools/storm.png",
+    "arenaCode": "5"
+  },
+  "unholy": {
+    "id": "unholy",
+    "name": "Unholy",
+    "img": "/images/vbuilds/spellSchools/unholy.png",
+    "arenaCode": "6"
+  }
+}

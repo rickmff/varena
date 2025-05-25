@@ -18,15 +18,16 @@ export const PassivePlaceholder = ({ length }: PassivePlaceholderProps) => {
     <div className="flex gap-4 justify-center bg-neutral-900 p-4 rounded-lg">
       {passives.map((passive: Passive) => (
         <img
+          key={passive.id}
           src={passive.img}
           alt={passive.name}
-          className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-300"`}
+          className={`w-16 h-16 object-contain rounded-full border-4 border-emerald-300"`}
         />
       ))}
       {Array.from({ length: length - passives.length }).map((_, index) => (
         <div
           key={`placeholder-${index}`}
-          className="w-16 h-16 mb-2 rounded-full border-4 border-dashed border-gray-500 flex items-center justify-center"
+          className="w-16 h-16 rounded-full border-4 border-dashed border-gray-500 flex items-center justify-center"
         >
           <PlusIcon className="w-8 h-8 text-gray-500" />
         </div>

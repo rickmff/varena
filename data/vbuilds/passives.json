@@ -5,6 +5,7 @@
     "img": "/images/vbuilds/passives/passive-blood_spray.jpg",
     "description": "Increases Physical Critical Chance by 8%. Critical Strikes leech 5% health and there is a 25 chance to spaen a Blood Orb when killing a target affected by Leech.",
     "type": "Elemental",
+    "arenaCode": "1",
     "modifiers": [
       {
         "stat": "Physical Critical Chance",
@@ -19,6 +20,7 @@
     "img": "/images/vbuilds/passives/passive-chaos_kindling.jpg",
     "description": "Increases Spell Cooldown Rate by 7%. Ignite deals 25% increased damage and Chaos Explosions ignite enemies hit.",
     "type": "Elemental",
+    "arenaCode": "5",
     "modifiers": [
       {
         "stat": "Spell Cooldown Rate",
@@ -33,6 +35,7 @@
     "img": "/images/vbuilds/passives/passive-arcane_animator.jpg",
     "description": "16% chance to summon a Skeleton Mage when a Condemned target perishes and minions deal 12% bonus damage.",
     "type": "Elemental",
+    "arenaCode": "9",
     "modifiers": [
       {
         "stat": "Minion Damage",
@@ -53,6 +56,7 @@
     "img": "/images/vbuilds/passives/passive-spiritual_infusion.jpg",
     "description": "Increases Healing Received by 12% and deal 8% increased spell damage to Weakened enemies.",
     "type": "Elemental",
+    "arenaCode": "d",
     "modifiers": [
       {
         "stat": "Healing Received",
@@ -73,6 +77,7 @@
     "img": "/images/vbuilds/passives/passive-cold_soul.jpg",
     "description": "Increases Spell Critical Power by 8% and deal 8% increased damage to Chilled and Frozen enemies.",
     "type": "Elemental",
+    "arenaCode": "h",
     "modifiers": [
       {
         "stat": "Spell Critical Power",
@@ -93,6 +98,7 @@
     "img": "/images/vbuilds/passives/passive-lightning_fast_strikes.jpg",
     "description": "Increases Primary Attack Speed by 7% and Static triggers deals 20% increased damage.",
     "type": "Elemental",
+    "arenaCode": "l",
     "modifiers": [
       {
         "stat": "Attack Speed",
@@ -113,6 +119,7 @@
     "img": "/images/vbuilds/passives/passive-sanguine_mastery.jpg",
     "description": "Deal 8% increased physical damage to enemies affected by Leech and boost the effect of your current blood type by 8%.",
     "type": "Elemental",
+    "arenaCode": "2",
     "modifiers": [
       {
         "stat": "Physical Power",
@@ -133,6 +140,7 @@
     "img": "/images/vbuilds/passives/passive-renewing_flames.jpg",
     "description": "Deal 8% increased spell damage to enemies affected by Ignite and Ignite heals you for up to 25% of your spell power.",
     "type": "Elemental",
+    "arenaCode": "6",
     "modifiers": [
       {
         "stat": "Spell Power",
@@ -154,6 +162,7 @@
     "img": "/images/vbuilds/passives/passive-soul_drinker.jpg",
     "description": "Increases Feed Cooldown Rate by 24% and using Bite summons a Skeleton Warrior.",
     "type": "Elemental",
+    "arenaCode": "a",
     "modifiers": [
       {
         "stat": "Feed Cooldown Rate",
@@ -169,6 +178,7 @@
     "img": "/images/vbuilds/passives/passive-flowing_sorcery.jpg",
     "description": "Increases Spell Cooldown Rate by 7% and there is a 35% chance to not consume Phantasm when triggering a cooldown reset.",
     "type": "Elemental",
+    "arenaCode": "e",
     "modifiers": [
       {
         "stat": "Spell Cooldown Rate",
@@ -189,6 +199,7 @@
     "img": "/images/vbuilds/passives/passive-chill_weave.jpg",
     "description": "Shields absorb 10% additional damage. Breaking Freeze with a damaging attack triggers a frost nova dealing 40% magic damage and inflicting Chill.",
     "type": "Elemental",
+    "arenaCode": "i",
     "modifiers": [
       {
         "stat": "Shield Efficiency",
@@ -209,6 +220,7 @@
     "img": "/images/vbuilds/passives/passive-enhanced_conductivity.jpg",
     "description": "Increases Bonus Spell Power by 7% and spell damage now also triggers bonus damage to enemies affected by Static.",
     "type": "Elemental",
+    "arenaCode": "m",
     "modifiers": [
       {
         "stat": "Bonus Spell Power",
@@ -223,6 +235,7 @@
     "img": "/images/vbuilds/passives/passive-hunger_for_blood.jpg",
     "description": "Increases Primary Attack Leech by 5% and increases damage against V Bloods by 8%.",
     "type": "Vampire",
+    "arenaCode": "3",
     "modifiers": [
       {
         "stat": "Primary Attack Leech",
@@ -243,6 +256,7 @@
     "img": "/images/vbuilds/passives/passive-overpower.jpg",
     "description": "Increases Weapon Cooldown Rate by 7% and Weapon Charge Gain by 6.",
     "type": "Vampire",
+    "arenaCode": "7",
     "modifiers": [
       {
         "stat": "Weapon Cooldown Rate",
@@ -262,6 +276,7 @@
     "img": "/images/vbuilds/passives/passive-lethal_strikes.jpg",
     "description": "Increases Physical Critical Power by 8% and deal 12% increased Physical Damage to enemies below 30% health.",
     "type": "Vampire",
+    "arenaCode": "b",
     "modifiers": [
       {
         "stat": "Physical Critical Power",
@@ -288,9 +303,10 @@
     "img": "/images/vbuilds/passives/passive-feral_haste.jpg",
     "description": "Increases Movement Speed by 4% and Movement Speed while shapeshifted by 15%.",
     "type": "Vampire",
+    "arenaCode": "f",
     "modifiers": [
       {
-        "stat": "Movement Speed",
+        "stat": "Bonus Movement Speed",
         "value": 4,
         "unit": "percent"
       },
@@ -307,6 +323,7 @@
     "img": "/images/vbuilds/passives/passive-bastion.jpg",
     "description": "Increases Maximum Health by 8% and reduces damage taken by 25% when affected by a crowd control effect.",
     "type": "Vampire",
+    "arenaCode": "j",
     "modifiers": [
       {
         "stat": "Max Health",
@@ -327,6 +344,7 @@
     "img": "/images/vbuilds/passives/passive-hunger_for_power.jpg",
     "description": "Increases Spell Leech by 5% and using Bite increases your movement speed by 15% and your spell power by 15% for 5s.",
     "type": "Vampire",
+    "arenaCode": "n",
     "modifiers": [
       {
         "stat": "Spell Leech",
@@ -334,7 +352,7 @@
         "unit": "percent"
       },
       {
-        "stat": "Movement Speed",
+        "stat": "Bonus Movement Speed",
         "value": 15,
         "unit": "percent",
         "calculate": false
@@ -353,6 +371,7 @@
     "img": "/images/vbuilds/passives/passive-rampage.jpg",
     "description": "Increases Physical Critical Chance by 8%. Physical Critical Strikes grants 12% increased Attack Speed for 4s.",
     "type": "Vampire",
+    "arenaCode": "4",
     "modifiers": [
       {
         "stat": "Physical Critical Chance",
@@ -373,6 +392,7 @@
     "img": "/images/vbuilds/passives/passive-ravenous_strikes.jpg",
     "description": "Increases Weapon Skill Power by 8% and Weapon Skill Leech by 5%.",
     "type": "Vampire",
+    "arenaCode": "8",
     "modifiers": [
       {
         "stat": "Weapon Skill Power",
@@ -392,6 +412,7 @@
     "img": "/images/vbuilds/passives/passive-embrace_mayhem.jpg",
     "description": "Increases Ultimate Cooldown Rate by 14% and Ultimate Power by 10%.",
     "type": "Vampire",
+    "arenaCode": "c",
     "modifiers": [
       {
         "stat": "Ultimate Cooldown Rate",
@@ -411,6 +432,7 @@
     "img": "/images/vbuilds/passives/passive-wicked_power.jpg",
     "description": "Increases Spell Critical Chance by 8%. Spell Critical Strikes have a 50% chance to inflict a random spell school effect.",
     "type": "Vampire",
+    "arenaCode": "g",
     "modifiers": [
       {
         "stat": "Spell Critical Chance",
@@ -431,6 +453,7 @@
     "img": "/images/vbuilds/passives/passive-dark_enchantment.jpg",
     "description": "Increases Damage Reduction by 4% and triggers a shield absorbing 270% of your spell power for 4s when you take more than 30% of your maximum health in damage over the last 2s.",
     "type": "Vampire",
+    "arenaCode": "k",
     "modifiers": [
       {
         "stat": "Damage Reduction",
@@ -451,11 +474,13 @@
     "img": "/images/vbuilds/passives/passive-turbulent_velocity.jpg",
     "description": "Increases Movement Speed by 4% and gain 4% additional movement speed for 4s when dealing damage to an enemy.",
     "type": "Vampire",
+    "arenaCode": "o",
     "modifiers": [
       {
-        "stat": "Movement Speed",
+        "stat": "Bonus Movement Speed",
         "value": 4,
-        "unit": "percent"
+        "unit": "percent",
+        "calculate": true
       },
       {
         "stat": "Bonus Movement Speed",
