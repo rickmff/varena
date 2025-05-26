@@ -42,13 +42,16 @@ const SlotTrigger = ({
 
   return (
     <DialogTrigger
-      className={`w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 ${
+      id={`weapon-slot-${slot}`}
+      className={`w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 hover:border-purple-500 transition-all duration-100 ${
         !weaponInSlot
-          ? "border-transparent"
+          ? "border"
           : weaponInSlot.type === "legendary"
-          ? "border-orange-500"
-          : "border-purple-500"
-      } ${state.context.focusedWeapon == slot ? "ring-2 ring-blue-500" : ""}`}
+          ? "border-orange-500/60"
+          : "border-purple-500/60"
+      } ${
+        state.context.focusedWeapon == slot ? "ring-2 ring-emerald-500" : ""
+      }`}
       onClick={() => {
         builder.send({ type: `goto.weaponForge`, slot });
       }}
@@ -129,7 +132,13 @@ export const WeaponForge = () => {
             </SlotTrigger>
           ))}
       </div>
-      <DialogContent className="w-full max-w-3xl" aria-describedby="Passives">
+      <DialogContent
+        className="w-full max-w-4xl"
+        aria-describedby="Weapon Forge"
+        onCloseAutoFocus={(e) => {
+          e.preventDefault();
+        }}
+      >
         <DialogDescription />
         <DialogTitle />
         {weaponState?.matches("pickWeapon") && (
@@ -166,9 +175,9 @@ export const WeaponForge = () => {
                 </h4>
               </div>
             </div>
-            <h2 className="text-2xl font-bold text-gray-100">
-              Select Infusion
-            </h2>
+            <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+              <span className="mr-2">Select Infusion</span>
+            </h3>
             <InfusionSelect />
           </>
         )}
@@ -206,9 +215,12 @@ export const WeaponForge = () => {
               </div>
             </div>
             <div className="flex flex-col gap-4">
-              <h2 className="text-3xl font-bold text-gray-100">
-                Select Effects
-              </h2>
+              <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+                <span className="mr-2">Select Effects</span>
+                <div className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded-full">
+                  Choose 3 Effects
+                </div>
+              </h3>
               <WeaponEffectSelect />
             </div>
           </div>

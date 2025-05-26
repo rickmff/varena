@@ -63,7 +63,7 @@ export const getBloodModifiers = (blood: BloodContext | null) => {
         return perk.map((perk) => {
             const increase = perk.value * (20 / 100)
             const newValue = perk.value + increase
-            return { ...perk, value: newValue }
+            return { ...perk, value: perk.value }
         })
     })
 
@@ -119,7 +119,7 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
 
 
     const bagAndCapeModifiers = [
-        { stat: "Max Health", value: 24, unit: "flat" }, // Tier 3 Cape
+        // { stat: "Max Health", value: 24, unit: "flat" }, // Tier 3 Cape
         { stat: "Max Health", value: 42, unit: "flat" }, // Bat Leather Bag
         { stat: "Resource Yield", value: 10, unit: "percent" },
 

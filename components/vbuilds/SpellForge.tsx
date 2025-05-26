@@ -32,7 +32,7 @@ const SlotTrigger = ({
   if (goto === "ultimate" || !hasSelection) {
     return (
       <SheetTrigger
-        className="w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden"
+        className="w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border hover:border-purple-500 transition-all duration-100"
         onClick={() => builder.send({ type: `goto.spellForge.${goto}` })}
       >
         {children}
@@ -41,10 +41,10 @@ const SlotTrigger = ({
   }
 
   return (
-    <HoverCard>
+    <HoverCard openDelay={0} closeDelay={0}>
       <HoverCardTrigger>
         <SheetTrigger
-          className="w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden"
+          className="w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border hover:border-purple-500 transition-all duration-100"
           onClick={() => builder.send({ type: `goto.spellForge.${goto}` })}
         >
           {children}

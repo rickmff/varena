@@ -19,7 +19,7 @@ export const WeaponEffectSelect = () => {
   });
 
   return (
-    <div>
+    <div className="space-y-8">
       <div className="grid grid-cols-2 gap-4">
         {weaponEffectData.map((effect) => (
           <label
@@ -43,17 +43,18 @@ export const WeaponEffectSelect = () => {
               }}
             />
             <span className="peer-disabled:text-gray-400">
-              {effect.description}
+              {effect.description} by {effect.modifiers[0].value}%
             </span>
           </label>
         ))}
       </div>
       <Button
+        variant="outline"
+        className="w-full text-white relative overflow-hidden group border-red-900/70 bg-red-900/50 hover:bg-red-800"
         onClick={() => weaponBuilder?.send({ type: "ADD_WEAPON" })}
         disabled={selectedEffects.length !== 3}
-        className="mt-4"
       >
-        Add Weapon
+        ADD WEAPON
       </Button>
     </div>
   );

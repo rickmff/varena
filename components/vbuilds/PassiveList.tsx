@@ -66,7 +66,9 @@ export function PassiveList() {
       <PassivePlaceholder length={5} />
       {["Elemental", "Vampire"].map((type) => (
         <div key={type}>
-          <h2 className="text-xl font-bold mb-4">{type}</h2>
+          <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+            <span className="mr-2">{type}</span>
+          </h3>
           <div className="grid lg:grid-cols-6 md:grid-cols-3 grid-cols-2 select-none">
             {groupedPassives[type]?.map(([key, passive]) => {
               const isSelected = activePassives.find(
@@ -80,9 +82,9 @@ export function PassiveList() {
                       draggable={false}
                       src={passive.img}
                       alt={passive.name}
-                      className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-500 ${
+                      className={`w-16 h-16 mb-2 object-contain rounded-full border-4 ${
                         isSelected
-                          ? "border-emerald-300"
+                          ? "border-purple-500"
                           : hasMaximumSelected
                           ? "opacity-10"
                           : "border-gray-700"

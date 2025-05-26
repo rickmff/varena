@@ -20,7 +20,7 @@ const SlotTrigger = ({ children }: { children?: React.ReactNode }) => {
 
   return (
     <DialogTrigger
-      className={`w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden`}
+      className={`w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 hover:border-purple-500 transition-all duration-100`}
       onClick={() => {
         builder.send({ type: "goto.bloodForge" });
       }}

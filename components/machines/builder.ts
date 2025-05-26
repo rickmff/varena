@@ -77,6 +77,7 @@ export const MAX_LEGENDARY_WEAPONS_COUNT = 3;
 const selectWeaponHotkeys = fromCallback(({ sendBack }) => {
     hotkeys('1,2,3,4,5,6,7,8', (e) => {
         sendBack({ type: 'FOCUS_WEAPON', slot: e.key });
+        document.getElementById(`weapon-slot-${e.key}`)?.focus();
     })
 
     hotkeys('0', () => {
@@ -288,7 +289,8 @@ export const builder = setup({
                                 updatedWeapons.set(context.selectedWeaponSlot, event.weapon);
 
                                 return updatedWeapons;
-                            }
+                            },
+                            focusedWeapon: ({ context }) => context.selectedWeaponSlot // Set the focused weapon to the selected slot
                         });
                         enqueue.raise({ type: "goto.overview" });
                     }

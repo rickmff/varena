@@ -11,7 +11,7 @@ const string1 =
 const string2 =
   "border-red-900/50 bg-gradient-to-b to-red-900/20 from-transparent";
 const string3 =
-  "bg-zinc-900 border-2 border-transparent hover:border-purple-500 transition-all duration-100";
+  "bg-zinc-900 border-2 border hover:border-purple-500 transition-all duration-100";
 
 const DropdownItem = ({
   option,
@@ -71,6 +71,7 @@ export const DropdownSelect: React.FC<{
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
+        onFocus={() => null}
         className={`w-20 h-20 text-gray-200 rounded-md flex items-center justify-center ${string3}`}
       >
         {selected ? (

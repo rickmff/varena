@@ -30,11 +30,13 @@ const BuilderPage = () => {
     <BuildProvider stats={baseStats}>
       <BuilderNavBar />
       <div className="flex text-gray-400">
-        <div className="w-3/4 pl-8 flex flex-col gap-8">
+        <div className="w-8/12 pl-8 flex flex-col gap-8">
           <div>
             <div className="flex gap-8">
               <section>
-                <h2 className="text-xl font-bold text-zinc-200 mb-4">Build</h2>
+                <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+                  <span className="mr-2">Build</span>
+                </h3>
                 <div className="flex gap-4">
                   <ArmourPicker />
                   <AmuletPicker />
@@ -55,7 +57,9 @@ const BuilderPage = () => {
                 </div>
               </section>
               <section>
-                <h2 className="text-xl font-bold text-zinc-200 mb-4">Buffs</h2>
+                <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+                  <span className="mr-2">Buffs</span>
+                </h3>
                 <div className="flex gap-4">
                   <ElixerPicker />
                   <BloodForge />
@@ -65,17 +69,26 @@ const BuilderPage = () => {
           </div>
           <div className="flex gap-8">
             <section>
-              <h2 className="text-xl font-bold text-zinc-200 mb-4">Spells</h2>
+              <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+                <span className="mr-2">Spells</span>
+              </h3>
               <SpellForge />
             </section>
             <section>
-              <h2 className="text-xl font-bold text-zinc-200 mb-4">Passives</h2>
+              <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+                <span className="mr-2">Passives</span>
+              </h3>
               <PassiveForge />
             </section>
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-zinc-200">Weapons</h2>
+            <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+              <span className="mr-2">Weapons</span>
+              <div className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded-full">
+                Use keys 1-8 to focus weapon stats
+              </div>
+            </h3>
             <WeaponForge />
             <div className="flex gap-4">
               <CoatingPicker slot={1} />
@@ -89,9 +102,9 @@ const BuilderPage = () => {
             </div>
           </div>
           <section className="space-y-4">
-            <h2 className="text-xl font-bold text-zinc-200">
-              Use this build in V Arena
-            </h2>
+            <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+              <span className="mr-2">Use this build in V Arena</span>
+            </h3>
             <ArenaCode />
           </section>
         </div>
