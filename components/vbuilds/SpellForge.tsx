@@ -31,7 +31,7 @@ const SlotTrigger = ({
     <HoverCard>
       <HoverCardTrigger>
         <SheetTrigger
-          className="w-20 h-20 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden"
+          className="w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden"
           onClick={() => builder.send({ type: `goto.spellForge.${goto}` })}
         >
           {children}

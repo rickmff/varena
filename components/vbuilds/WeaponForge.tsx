@@ -39,13 +39,10 @@ const SlotTrigger = ({
   const { state, builder } = useBuilder();
 
   const weaponInSlot = state.context.weapons.get(slot);
-  console.log("weaponInSlot", {
-    focusedWeapon: state.context.focusedWeapon,
-    slot,
-  });
+
   return (
     <DialogTrigger
-      className={`w-20 h-20 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 ${
+      className={`w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 ${
         !weaponInSlot
           ? "border-transparent"
           : weaponInSlot.type === "legendary"
@@ -154,7 +151,7 @@ export const WeaponForge = () => {
                 <h2 className="text-3xl font-bold text-gray-100 flex items-center gap-2">
                   {weaponState.context.weapon?.name}
                   {weaponState.context.infusion && (
-                    <div className="overflow-hidden w-10 h-10 rounded-md bg-gray-900 flex items-center justify-center">
+                    <div className="overflow-hidden w-10 h-10 rounded-md bg-zinc-900 flex items-center justify-center">
                       <img
                         src={`/images/vbuilds/spellschools/${weaponState.context.infusion}.png`}
                         className={`spellSchool spellSchool-${weaponState.context.infusion} w-10 h-10`}
@@ -202,11 +199,10 @@ export const WeaponForge = () => {
                 <h2 className="text-3xl font-bold text-gray-100 flex items-center gap-2">
                   {weaponState.context.weapon?.name}
                 </h2>
-                <h4 className="text-lg font-bold text-gray-100">
-                  <h2 className="text-lg font-bold text-gray-100">
-                    Weapon Slot {state.context.selectedWeaponSlot}
-                  </h2>
-                </h4>
+
+                <h2 className="text-lg font-bold text-gray-100">
+                  Weapon Slot {state.context.selectedWeaponSlot}
+                </h2>
               </div>
             </div>
             <div className="flex flex-col gap-4">

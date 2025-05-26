@@ -16,7 +16,7 @@ export const InfusionSelect = ({}) => {
       {infusionList.map((infusion) => (
         <button
           key={infusion.id}
-          className="flex items-center justify-center p-2 overflow-hidden h-20 w-20 rounded bg-gray-800"
+          className="flex items-center justify-center p-2 overflow-hidden h-20 w-20 rounded bg-zinc-900"
           onClick={() => {
             weaponBuilder!.send({
               type: "PICK_INFUSION",

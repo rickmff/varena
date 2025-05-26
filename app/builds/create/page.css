@@ -1,0 +1,8 @@
+:root {
+    --popover: 240deg 5.88% 10% / 100%;
+    --background: 240deg 10% 3.92%;
+    --border: 240deg 3.7% 15.88%;
+    --accent: 240deg 3.7% 15.88%;
+    /* --accent-forground */
+    --muted: 240deg 3.7% 15.88%;
+}

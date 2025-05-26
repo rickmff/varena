@@ -1,5 +1,45 @@
 [
   {
+    "name": "Max Health",
+    "value": 0,
+    "unit": "",
+    "cap": null,
+    "defaultValue": 125,
+    "category": "Core Attributes"
+  },
+  {
+    "name": "Physical Power",
+    "value": 0,
+    "unit": "",
+    "cap": null,
+    "defaultValue": 10,
+    "category": "Core Attributes"
+  },
+  {
+    "name": "Spell Power",
+    "value": 0,
+    "unit": "",
+    "cap": null,
+    "defaultValue": 10,
+    "category": "Core Attributes"
+  },
+  {
+    "name": "Movement Speed",
+    "value": 0,
+    "unit": "",
+    "cap": null,
+    "defaultValue": 4.0,
+    "category": "Core Attributes"
+  },
+  {
+    "name": "Resource Harvest Power",
+    "value": 0,
+    "unit": "",
+    "cap": null,
+    "defaultValue": 10,
+    "category": "Core Attributes"
+  },
+  {
     "name": "Bonus Physical Power",
     "value": 0,
     "unit": "%",
@@ -238,45 +278,5 @@
     "cap": 70,
     "defaultValue": 0,
     "category": "Cooldown"
-  },
-  {
-    "name": "Max Health",
-    "value": 0,
-    "unit": "",
-    "cap": null,
-    "defaultValue": 125,
-    "category": "Core Attributes"
-  },
-  {
-    "name": "Physical Power",
-    "value": 0,
-    "unit": "",
-    "cap": null,
-    "defaultValue": 10,
-    "category": "Core Attributes"
-  },
-  {
-    "name": "Spell Power",
-    "value": 0,
-    "unit": "",
-    "cap": null,
-    "defaultValue": 10,
-    "category": "Core Attributes"
-  },
-  {
-    "name": "Movement Speed",
-    "value": 0,
-    "unit": "",
-    "cap": null,
-    "defaultValue": 4.0,
-    "category": "Core Attributes"
-  },
-  {
-    "name": "Resource Harvest Power",
-    "value": 0,
-    "unit": "",
-    "cap": null,
-    "defaultValue": 10,
-    "category": "Core Attributes"
   }
 ]

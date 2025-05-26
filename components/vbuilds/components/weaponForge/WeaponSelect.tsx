@@ -39,7 +39,7 @@ export const WeaponSelect = () => {
             });
           }}
           key={weapon.id}
-          className={`h-20 w-20 rounded bg-gray-800 flex items-center justify-center ${
+          className={`h-20 w-20 rounded bg-zinc-900 flex items-center justify-center ${
             legendaryWeaponCount === MAX_LEGENDARY_WEAPONS_COUNT &&
             "opacity-50 cursor-not-allowed"
           }`}
@@ -70,7 +70,7 @@ export const WeaponSelect = () => {
               },
             });
           }}
-          className="h-20 w-20 rounded bg-gray-800 flex items-center justify-center"
+          className="h-20 w-20 rounded bg-zinc-900 flex items-center justify-center"
         >
           <img
             src={weapon.img}

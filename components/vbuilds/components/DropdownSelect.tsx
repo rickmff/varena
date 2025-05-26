@@ -3,8 +3,15 @@ import {
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuContent,
+  DropdownMenuTrigger,
 } from "../../ui/dropdown-menu";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+
+const string1 =
+  "bg-black/80 backdrop-blur-sm border-2 border-red-900/30 hover:border-red-500 transition-all duration-300 overflow-hidden group block h-full relative";
+const string2 =
+  "border-red-900/50 bg-gradient-to-b to-red-900/20 from-transparent";
+const string3 =
+  "bg-zinc-900 border-2 border-transparent hover:border-purple-500 transition-all duration-100";
 
 const DropdownItem = ({
   option,
@@ -14,7 +21,7 @@ const DropdownItem = ({
   onClick: () => void;
 }) => (
   <DropdownMenuItem
-    className="w-20 h-20 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center"
+    className={`w-20 h-20 text-gray-200 rounded-md flex items-center justify-center ${string3}`}
     onClick={onClick}
   >
     {option.label ? (
@@ -63,7 +70,9 @@ export const DropdownSelect: React.FC<{
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="w-20 h-20 bg-gray-800 text-gray-200 rounded-md flex items-center justify-center">
+      <DropdownMenuTrigger
+        className={`w-20 h-20 text-gray-200 rounded-md flex items-center justify-center ${string3}`}
+      >
         {selected ? (
           <img
             src={options.find((option) => option.id === selected)?.image}
