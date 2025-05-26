@@ -21,11 +21,24 @@ import {
 const SlotTrigger = ({
   children,
   goto,
+  hasSelection,
 }: {
   children?: React.ReactNode;
   goto: "dash" | "spell1" | "spell2" | "ultimate";
+  hasSelection: boolean;
 }) => {
   const { state, builder } = useBuilder();
+
+  if (goto === "ultimate" || !hasSelection) {
+    return (
+      <SheetTrigger
+        className="w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden"
+        onClick={() => builder.send({ type: `goto.spellForge.${goto}` })}
+      >
+        {children}
+      </SheetTrigger>
+    );
+  }
 
   return (
     <HoverCard>
@@ -38,14 +51,17 @@ const SlotTrigger = ({
         </SheetTrigger>
       </HoverCardTrigger>
       <HoverCardContent className="w-96 flex flex-col gap-4">
-        {state.context.spells[goto]?.jewel?.map((jewel: AddSpell) => (
-          <div>
-            {
-              state.context.spells[goto]?.effects?.find((e) => e.key == jewel)
-                ?.description
-            }
-          </div>
-        ))}
+        {state.context.spells[goto]?.jewel?.map(
+          (jewel: AddSpell, index: number) => (
+            <div key={index}>
+              {
+                state.context.spells[goto]?.effects?.find(
+                  (effect: any) => effect.key == jewel
+                )?.description
+              }
+            </div>
+          )
+        )}
       </HoverCardContent>
     </HoverCard>
   );
@@ -106,7 +122,7 @@ export const SpellForge = () => {
       }}
     >
       <div className="flex gap-4 ">
-        <SlotTrigger goto={"dash"}>
+        <SlotTrigger goto={"dash"} hasSelection={spells.dash}>
           {spells.dash ? (
             <SlotImage slot="dash" />
           ) : (
@@ -116,7 +132,7 @@ export const SpellForge = () => {
             />
           )}
         </SlotTrigger>
-        <SlotTrigger goto={"spell1"}>
+        <SlotTrigger goto={"spell1"} hasSelection={spells.spell1}>
           {spells.spell1 ? (
             <SlotImage slot="spell1" />
           ) : (
@@ -126,7 +142,7 @@ export const SpellForge = () => {
             />
           )}
         </SlotTrigger>
-        <SlotTrigger goto={"spell2"}>
+        <SlotTrigger goto={"spell2"} hasSelection={spells.spell2}>
           {spells.spell2 ? (
             <SlotImage slot="spell2" />
           ) : (
@@ -136,7 +152,7 @@ export const SpellForge = () => {
             />
           )}
         </SlotTrigger>
-        <SlotTrigger goto={"ultimate"}>
+        <SlotTrigger goto={"ultimate"} hasSelection={spells.ultimate}>
           {spells.ultimate ? (
             <img src={spells["ultimate"].img} className="w-20 h-20" />
           ) : (
