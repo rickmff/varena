@@ -13,6 +13,7 @@ import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Button } from "../ui/button";
 import { set } from "date-fns";
+import { Check } from "lucide-react";
 
 const SlotTrigger = ({ children }: { children?: React.ReactNode }) => {
   const { builder } = useBuilder();
@@ -26,6 +27,103 @@ const SlotTrigger = ({ children }: { children?: React.ReactNode }) => {
     >
       {children}
     </DialogTrigger>
+  );
+};
+
+const PrimaryBloodDisplay = ({ blood }) => {
+  return (
+    <div>
+      <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+        <span className="mr-2">{blood.name}</span>
+        <div className="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full">
+          All effects included
+        </div>
+      </h3>
+      <div className="space-y-2">
+        {Object.values(blood.effects).map((effect, index) => (
+          <div
+            key={index}
+            className="bg-green-900/20 border border-green-900/30 p-3 rounded-md"
+          >
+            <div className="flex items-center">
+              <div className="bg-green-500/20 text-green-300 text-xs p-1.5 rounded-full mr-2">
+                <Check className="w-4 h-4" />
+              </div>
+              <p className="text-sm text-white">
+                {index + 1}. {effect.description}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const SecondaryBloodDisplay = ({ blood, setInfusion, infusion }) => {
+  return (
+    <div>
+      <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+        <span className="mr-2">{blood.name}</span>
+        <div className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded-full">
+          Choose One Effect ( 1 - 3 )
+        </div>
+      </h3>
+      <div className="space-y-2">
+        {/* Selectable effects (1-3) */}
+        {Object.entries(blood.effects)
+          .slice(0, 3)
+          .map(([key, effect], index) => (
+            <div
+              key={key}
+              className={`flex items-center p-3 rounded-md transition-all cursor-pointer ${
+                key === infusion
+                  ? "bg-red-900/50 border border-red-500/50"
+                  : "bg-black/30 border border-red-900/30 hover:bg-black/40"
+              }`}
+              onClick={() => setInfusion(key)}
+            >
+              <div
+                className={`flex-shrink-0 w-6 h-6 rounded-full mr-3 flex items-center justify-center border ${
+                  infusion === key
+                    ? "bg-red-500/50 border-red-400"
+                    : "bg-black/50 border-gray-600"
+                }`}
+              >
+                {infusion === key && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 text-white"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                )}
+              </div>
+              <p className="text-sm text-white">
+                {index + 1}. {effect.description}
+              </p>
+            </div>
+          ))}
+
+        {/* Always included 4th perk */}
+        <div className="bg-green-900/20 border border-green-900/30 p-3 rounded-md">
+          <div className="flex items-center">
+            <div className="bg-green-500/20 text-green-300 text-xs p-1.5 rounded-full mr-2">
+              <Check className="w-4 h-4" />
+            </div>
+            <p className="text-sm text-white">
+              4. {blood.effects["IV"].description}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -84,17 +182,17 @@ const BloodTabs = ({
   setValue,
   setInfusion,
   primarySelectedValue,
+  infusion,
   value,
   type,
 }: {
   value: string;
   setValue: Dispatch<React.SetStateAction<any>>;
   setInfusion?: Dispatch<React.SetStateAction<any>>;
+  infusion?: string;
   primarySelectedValue?: string | null;
   type: "primary" | "secondary";
 }) => {
-  if (type === "secondary") {
-  }
   return (
     <Tabs
       value={value}
@@ -121,54 +219,14 @@ const BloodTabs = ({
       {bloodList.map((blood) => (
         <TabsContent value={blood.id} key={blood.id} className="space-y-4">
           <div className="space-y-4">
-            <div>
-              <h2 className="text-lg font-bold text-gray-200">{blood.name}</h2>
-            </div>
             <div className="flex flex-col gap-4">
-              <RadioGroup
-                // defaultValue="I"
-                className="space-y-4"
-                onValueChange={(value) => {
-                  setInfusion && setInfusion(value);
-                }}
-              >
-                {Object.entries(blood.effects)
-                  .filter(([key]) => {
-                    if (type === "secondary") {
-                      return !["IV", "V"].includes(key);
-                    }
-                    return true;
-                  })
-                  .map(([effectKey, effectValue]) => {
-                    if (type === "primary") {
-                      return (
-                        <div key={effectKey} className="text-gray-500">
-                          <strong>{effectKey}:</strong>{" "}
-                          {effectValue.description}
-                        </div>
-                      );
-                    }
-                    return (
-                      <div
-                        className="flex gap-4 items-center text-gray-500"
-                        key={effectKey}
-                      >
-                        <RadioGroupItem
-                          id={`${blood.id} - ${effectKey}`}
-                          value={effectKey}
-                        />
-                        <Label htmlFor={`${blood.id} - ${effectKey}`}>
-                          <strong>{effectKey}:</strong>{" "}
-                          {effectValue.description}
-                        </Label>
-                      </div>
-                    );
-                  })}
-              </RadioGroup>
+              {type === "primary" && <PrimaryBloodDisplay blood={blood} />}
               {type === "secondary" && (
-                <div className="border border-red-500 p-4 rounded-md">
-                  {blood.effects["IV"].description}
-                </div>
+                <SecondaryBloodDisplay
+                  blood={blood}
+                  setInfusion={setInfusion}
+                  infusion={infusion}
+                />
               )}
             </div>
           </div>
@@ -223,12 +281,15 @@ export const BloodForge = () => {
               value={primaryBlood === secondaryBlood ? "" : secondaryBlood}
               setValue={setSecondaryBlood}
               setInfusion={setSecondaryBloodInfusion}
+              infusion={secondaryBloodInfusion}
               primarySelectedValue={primaryBlood}
             />
           </div>
         </div>
         {secondaryBloodInfusion && (
           <Button
+            variant="outline"
+            className="w-full text-white relative overflow-hidden group border-red-900/70 bg-red-900/50 hover:bg-red-800"
             onClick={() => {
               builder.send({
                 type: "ADD_BLOOD",
@@ -239,7 +300,7 @@ export const BloodForge = () => {
               });
             }}
           >
-            Create Blood Infusion
+            CREATE BLOOD INFUSION
           </Button>
         )}
       </DialogContent>
