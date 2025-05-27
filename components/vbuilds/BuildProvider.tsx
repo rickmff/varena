@@ -2,6 +2,7 @@
 import { createActorContext } from "@xstate/react";
 import { builder } from "@/components/machines/builder";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 export const BuilderContext = createActorContext(builder);
 
@@ -13,9 +14,8 @@ export function useBuilder() {
 }
 
 import { convertStringToBuild } from "../machines/converter";
-import { useEffect } from "react";
 
-export default function BuildProvider({
+function BuildProviderInner({
   children,
   stats,
 }: {
@@ -40,5 +40,21 @@ export default function BuildProvider({
     >
       {children}
     </BuilderContext.Provider>
+  );
+}
+
+export default function BuildProvider({
+  children,
+  stats,
+}: {
+  children: React.ReactNode;
+  stats: any;
+}) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BuildProviderInner stats={stats}>
+        {children}
+      </BuildProviderInner>
+    </Suspense>
   );
 }
