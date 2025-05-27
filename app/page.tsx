@@ -11,8 +11,34 @@ import NavBar, { menuItems } from "@/components/NavBar"
 import CommandGenerator from "@/components/command-generator"
 import FeatureCarousel from "@/app/components/ui/FeatureCarousel"
 
+// --- START: Icon mapping ---
+// Helper to map icon names from Notion to actual components
+const iconMap: { [key: string]: React.ElementType } = {
+  Castle: Castle,
+  Moon: Moon,
+  Users: Users,
+  Swords: Swords,
+  ShieldCheck: ShieldCheck,
+  CalendarClock: CalendarClock,
+  Terminal: Terminal,
+  // Add more mappings as needed based on the text you store in Notion for 'iconName'
+};
+// --- END: Icon mapping ---
+
+// Define a type for your news items fetched from Notion
+interface NewsItem {
+  id: string; // Notion page ID
+  title: string;
+  date: string; // Or Date object, depending on how you process it
+  excerpt: string;
+  category: string;
+  iconName: string; // e.g., "Castle", "Moon"
+  // Add other fields if necessary
+}
+
 export default function Home() {
   const [scrollY, setScrollY] = useState(0)
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]) // State for news items
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,6 +48,35 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
+
+  // --- START: Fetch news from API route ---
+  useEffect(() => {
+    const fetchNewsFromAPI = async () => {
+      try {
+        const response = await fetch('/api/news');
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.error) {
+          console.error("API returned error:", data.error);
+          setNewsItems([]);
+          return;
+        }
+
+        setNewsItems(data as NewsItem[]);
+      } catch (error) {
+        console.error("Failed to fetch news:", error);
+        setNewsItems([]);
+      }
+    };
+
+    fetchNewsFromAPI();
+  }, []); // Empty dependency array ensures this runs once on mount
+  // --- END: Fetch news from API route ---
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -219,40 +274,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/*       <section className="py-32 relative" id="jewels">
-        <div className="container mx-auto px-4 relative ">
-          <motion.div
-            className="text-center mb-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-          >
-            <div className="inline-block rounded-full bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
-              Guide
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
-              Build your Build
-            </h2>
-            <p className="text-gray-100 max-w-2xl mx-auto text-lg">
-              Generate command for your builds
-            </p>
-          </motion.div>
-          <Button variant="outline" size="lg" asChild className="gap-2 border-white/70 text-white hover:bg-purple-900 relative overflow-hidden group">
-            <Link href="/guides">
-              Go to the page for that
-              <Play className="h-4 w-4 relative z-10" />
-              <motion.span
-                className="absolute inset-0 bg-white/10"
-                initial={{ x: "-100%" }}
-                whileHover={{ x: 0 }}
-                transition={{ duration: 0.3 }}
-              />
-            </Link>
-          </Button>
-        </div>
-      </section> */}
-
       {/* News Section */}
       <section id="news" className="py-20 bg-black relative">
         <div className="container mx-auto px-4 relative">
@@ -280,95 +301,83 @@ export default function Home() {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            {[
-              {
-                title: "New Castle Decorations Coming Soon",
-                date: "April 15, 2025",
-                excerpt: "Customize your castle with new gothic decorations and furniture in the upcoming update.",
-                category: "UPDATE",
-                icon: Castle
-              },
-              {
-                title: "Blood Moon Event This Weekend",
-                date: "April 10, 2025",
-                excerpt: "Join us for a special Blood Moon event with increased drop rates and special enemies.",
-                category: "EVENT",
-                icon: Moon
-              },
-              {
-                title: "Community Spotlight: Castle Designs",
-                date: "April 5, 2025",
-                excerpt: "Check out these amazing castle designs from our community members.",
-                category: "COMMUNITY",
-                icon: Users
-              },
-            ].map((news, index) => (
-              <motion.div
-                key={index}
-                variants={scaleIn}
-                whileHover={{
-                  y: -10,
-                  scale: 1.02,
-                  transition: { duration: 0.2 }
-                }}
-              >
-                <Link
-                  href="#"
-                  className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-red-900/30 hover:border-red-500
-                           transition-all duration-300 overflow-hidden group block h-full relative"
+            {newsItems.length > 0 ? newsItems.slice(0, 3).map((news, index) => {
+              const IconComponent = iconMap[news.iconName] || Terminal; // Default icon if not found
+              return (
+                <motion.div
+                  key={news.id} // Use Notion page ID as key
+                  variants={scaleIn}
+                  whileHover={{
+                    y: -10,
+                    scale: 1.02,
+                    transition: { duration: 0.2 }
+                  }}
                 >
-                  {/* Glow effect on hover */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-red-900/20" />
-                  </div>
+                  <Link
+                    href={`/news/${news.id}`} // Link to dynamic page
+                    className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-red-900/30 hover:border-red-500
+                           transition-all duration-300 overflow-hidden group block h-full relative"
+                  >
+                    {/* Glow effect on hover */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-red-900/20" />
+                    </div>
 
-                  <div className="relative aspect-video">
-                    <Image
-                      src={`/blog${index + 1}.png`}
-                      alt={news.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80" />
+                    <div className="relative aspect-video">
+                      <Image
+                        // You might want to add an 'imageUrl' property to your Notion DB
+                        // or use a placeholder / derive from index for now.
+                        // For a robust solution, fetch an image URL from your Notion data.
+                        src={`/blog${(index % 3) + 1}.png`} // Placeholder, update this based on your data
+                        alt={news.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80" />
 
-                    {/* Category Badge */}
-                    <div className="absolute top-4 right-4 flex items-center gap-2">
-                      <motion.div
-                        className="bg-red-900/80 text-white text-xs px-3 py-1.5 rounded-full font-bold
+                      {/* Category Badge */}
+                      <div className="absolute top-4 right-4 flex items-center gap-2">
+                        <motion.div
+                          className="bg-red-900/80 text-white text-xs px-3 py-1.5 rounded-full font-bold
                                  border border-red-500/50 shadow-lg shadow-red-900/50"
-                        whileHover={{ scale: 1.05 }}
+                          whileHover={{ scale: 1.05 }}
+                        >
+                          <div className="flex items-center gap-2">
+                            {IconComponent && <IconComponent className="w-3 h-3" />}
+                            {news.category}
+                          </div>
+                        </motion.div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 relative">
+                      <div className="text-red-500 text-sm mb-2 font-bold tracking-wider">{new Date(news.date).toLocaleDateString()}</div>
+                      <h3 className="text-xl font-bold mb-3 group-hover:text-red-400 transition-colors">
+                        {news.title}
+                      </h3>
+                      <p className="text-gray-300">{news.excerpt}</p>
+
+                      {/* Read More Button */}
+                      <motion.div
+                        className="mt-6 flex items-center gap-2 text-red-500 text-sm font-bold
+                               group-hover:text-red-400 transition-colors"
+                        initial={{ x: -10, opacity: 0 }}
+                        whileHover={{ x: 5 }}
+                        animate={{ x: 0, opacity: 1 }}
                       >
-                        <div className="flex items-center gap-2">
-                          {news.icon && <news.icon className="w-3 h-3" />}
-                          {news.category}
-                        </div>
+                        READ MORE
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
                       </motion.div>
                     </div>
-                  </div>
-
-                  <div className="p-6 relative">
-                    <div className="text-red-500 text-sm mb-2 font-bold tracking-wider">{news.date}</div>
-                    <h3 className="text-xl font-bold mb-3 group-hover:text-red-400 transition-colors">
-                      {news.title}
-                    </h3>
-                    <p className="text-gray-300">{news.excerpt}</p>
-
-                    {/* Read More Button */}
-                    <motion.div
-                      className="mt-6 flex items-center gap-2 text-red-500 text-sm font-bold
-                               group-hover:text-red-400 transition-colors"
-                      initial={{ x: -10, opacity: 0 }}
-                      whileHover={{ x: 5 }}
-                      animate={{ x: 0, opacity: 1 }}
-                    >
-                      READ MORE
-                      <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
-                    </motion.div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
+                  </Link>
+                </motion.div>
+              )
+            }) : (
+              <p className="text-center col-span-full py-10 text-gray-400">
+                Loading news... If this message persists, please ensure your Notion integration is correctly configured in <code>.env.local</code>.
+              </p>
+            )}
           </motion.div>
 
           {/* View All Button */}
