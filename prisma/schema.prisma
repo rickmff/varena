@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model Build {
+  id               String   @id @default(uuid())
+  name             String   @unique
+  description      String
+  code             String
+  author           String
+  authorTwitchUrl  String
+  authorYoutubeUrl String
+  createdAt        DateTime @default(now())
+}

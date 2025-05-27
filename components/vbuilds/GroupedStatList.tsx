@@ -1,8 +1,14 @@
 "use client";
 
-import { computeFinalStats } from "../machines/builder";
+import { computeFinalStats } from "../machines/calculator";
 import { StatList } from "./StatList";
 import { useBuilder } from "./BuildProvider";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "../ui/accordion";
 
 export function groupStatsByCategoryWithValues(
   flatStats: Record<string, any>,
@@ -30,13 +36,25 @@ export function GroupedStatList({ stats }: { stats: Record<string, any> }) {
   const groupedStats = groupStatsByCategoryWithValues(stats, finalStats);
 
   return (
-    <div className="w-1/4">
-      {Object.entries(groupedStats).map(([category, statsArray]) => (
-        <div key={category} className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-100 mb-4">{category}</h2>
-          <StatList stats={statsArray} />
-        </div>
-      ))}
-    </div>
+    <Accordion
+      type="multiple"
+      defaultValue={["Core Attributes"]}
+      className="bg-zinc-900 rounded-lg"
+    >
+      {Object.entries(groupedStats).map(
+        ([category, statsArray], index, array) => (
+          <AccordionItem
+            key={category}
+            value={category}
+            className={`px-4 ${index + 1 == array.length ? "border-none" : ""}`}
+          >
+            <AccordionTrigger>{category}</AccordionTrigger>
+            <AccordionContent>
+              <StatList stats={statsArray} />
+            </AccordionContent>
+          </AccordionItem>
+        )
+      )}
+    </Accordion>
   );
 }

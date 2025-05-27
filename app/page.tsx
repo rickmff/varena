@@ -1,15 +1,25 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { ChevronRight, Play, Users, Castle, Moon, Swords, ShieldCheck, CalendarClock, Terminal } from "lucide-react"
-import { motion } from "framer-motion"
-import { useState, useEffect } from "react"
-import BloodParticles from "@/components/blood-particles"
-import NavBar, { menuItems } from "@/components/NavBar"
-import CommandGenerator from "@/components/command-generator"
-import FeatureCarousel from "@/app/components/ui/FeatureCarousel"
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import {
+  ChevronRight,
+  Play,
+  Users,
+  Castle,
+  Moon,
+  Swords,
+  ShieldCheck,
+  CalendarClock,
+  Terminal,
+} from "lucide-react";
+import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import BloodParticles from "@/components/blood-particles";
+import NavBar, { menuItems } from "@/components/NavBar";
+import CommandGenerator from "@/components/command-generator";
+import FeatureCarousel from "@/app/components/ui/FeatureCarousel";
 
 // --- START: Icon mapping ---
 // Helper to map icon names from Notion to actual components
@@ -42,12 +52,12 @@ export default function Home() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY)
-    }
+      setScrollY(window.scrollY);
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // --- START: Fetch news from API route ---
   useEffect(() => {
@@ -85,7 +95,7 @@ export default function Home() {
       y: 0,
       transition: { duration: 0.6 },
     },
-  }
+  };
 
   const staggerContainer = {
     hidden: { opacity: 0 },
@@ -95,7 +105,7 @@ export default function Home() {
         staggerChildren: 0.1,
       },
     },
-  }
+  };
 
   const fadeIn = {
     hidden: { opacity: 0 },
@@ -103,7 +113,7 @@ export default function Home() {
       opacity: 1,
       transition: { duration: 0.6 },
     },
-  }
+  };
 
   const scaleIn = {
     hidden: { opacity: 0, scale: 0.9 },
@@ -112,7 +122,7 @@ export default function Home() {
       scale: 1,
       transition: { duration: 0.5 },
     },
-  }
+  };
 
   // Define features data here, or fetch from an API
   const featuresData = [
@@ -127,8 +137,7 @@ export default function Home() {
       icon: "crossed-swords",
       image: "/images/features/Pancake.png",
       title: "Game Modes",
-      description:
-        "Experience unique game modes like Pancake.",
+      description: "Experience unique game modes like Pancake.",
     },
     {
       icon: "calendar-clock",
@@ -172,7 +181,13 @@ export default function Home() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <Image src="/varena-logo.png" alt="Varena Logo" className="mr-10" width={600} height={400} />
+            <Image
+              src="/varena-logo.png"
+              alt="Varena Logo"
+              className="mr-10"
+              width={600}
+              height={400}
+            />
             <motion.div
               className="flex flex-col sm:flex-row gap-4 justify-center mt-12"
               variants={staggerContainer}
@@ -180,14 +195,28 @@ export default function Home() {
               whileInView="visible"
               viewport={{ once: true }}
             >
-              <motion.div variants={fadeIn} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                variants={fadeIn}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button
                   variant="outline"
                   size="lg"
-                  className="gap-2 relative overflow-hidden group border-purple-900 hover:bg-gray-900/70 bg-black text-white flex items-center"
+                  className="gap-2 relative overflow-hidden group border-purple-900 hover:bg-zinc-900/70 bg-black text-white flex items-center"
                 >
-                  <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
-                    <Image src="/discord.svg" alt="Varena Logo" width={20} height={20} className="h-5 w-5 mr-2" />
+                  <Link
+                    href="https://discord.gg/varena"
+                    target="_blank"
+                    className="flex items-center justify-center gap-4"
+                  >
+                    <Image
+                      src="/discord.svg"
+                      alt="Varena Logo"
+                      width={20}
+                      height={20}
+                      className="h-5 w-5 mr-2"
+                    />
                     <span className="relative z-10">JOIN US</span>
                     <motion.span
                       className="absolute inset-0 bg-white/20"
@@ -198,12 +227,16 @@ export default function Home() {
                   </Link>
                 </Button>
               </motion.div>
-              <motion.div variants={fadeIn} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                variants={fadeIn}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button
                   variant="outline"
                   size="lg"
-                  className="gap-2 border-white/70 text-white hover:bg-gray-900/70 bg-black relative overflow-hidden group"
-                  onClick={() => window.location.hash = '#generate-commands'}
+                  className="gap-2 border-white/70 text-white hover:bg-zinc-900/70 bg-black relative overflow-hidden group"
+                  onClick={() => (window.location.hash = "#generate-commands")}
                 >
                   <span className="relative z-10">Get Started</span>
                   <Play className="h-4 w-4 relative z-10" />
@@ -291,7 +324,8 @@ export default function Home() {
               Chronicles of V Rising
             </h2>
             <p className="text-gray-100 max-w-2xl mx-auto text-lg">
-              Stay informed about the latest updates, events, and community highlights
+              Stay informed about the latest updates, events, and community
+              highlights
             </p>
           </motion.div>
           <motion.div
@@ -399,7 +433,9 @@ export default function Home() {
                 className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
                          relative overflow-hidden group px-8 shadow-lg shadow-red-900/20"
               >
-                <span className="relative z-10 font-bold tracking-wider">VIEW ALL NEWS</span>
+                <span className="relative z-10 font-bold tracking-wider">
+                  VIEW ALL NEWS
+                </span>
                 <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
                 <motion.span
                   className="absolute inset-0 bg-gradient-to-r from-red-900/40 to-transparent"
@@ -448,7 +484,9 @@ export default function Home() {
                     United by our thirst for blood
                   </h2>
                   <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-                    Join a community of both new and experienced players. Sharpen your skills, test new playstyles, and join your kin for the hunt!
+                    Join a community of both new and experienced players.
+                    Sharpen your skills, test new playstyles, and join your kin
+                    for the hunt!
                   </p>
                   <motion.div
                     whileHover={{ scale: 1.02 }}
@@ -461,7 +499,11 @@ export default function Home() {
                       className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
                          relative overflow-hidden group px-8 shadow-lg shadow-red-900/20 w-full py-8 gap-4"
                     >
-                      <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
+                      <Link
+                        href="https://discord.gg/varena"
+                        target="_blank"
+                        className="flex items-center justify-center gap-4"
+                      >
                         <Image
                           src="/discord.svg"
                           alt="Discord"
@@ -469,7 +511,9 @@ export default function Home() {
                           height={32}
                           className="h-8 w-8 group-hover:scale-110 transition-transform"
                         />
-                        <span className="text-2xl font-bold tracking-wider">JOIN THE ARENA</span>
+                        <span className="text-2xl font-bold tracking-wider">
+                          JOIN THE ARENA
+                        </span>
                         <motion.span
                           className="absolute inset-0 bg-white/10"
                           initial={{ x: "-100%" }}
@@ -492,7 +536,9 @@ export default function Home() {
                       whileHover={{ scale: 1.05, color: "#fff" }}
                     >
                       <Moon className="h-5 w-5" />
-                      <span className="font-semibold">Active 24/7 as long as Rendy doesn't sleep</span>
+                      <span className="font-semibold">
+                        Active 24/7 as long as Rendy doesn't sleep
+                      </span>
                     </motion.div>
                   </div>
                 </motion.div>
@@ -508,7 +554,9 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <Link href="/" className="flex items-center gap-2 mb-4">
-                <motion.div transition={{ type: "spring", stiffness: 400, damping: 10 }}>
+                <motion.div
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
                   <Image
                     src="/varena-logo.png"
                     alt="Varena Logo"
@@ -522,22 +570,24 @@ export default function Home() {
             <div>
               <h3 className="text-lg font-bold mb-4">Links</h3>
               <ul className="space-y-2 text-sm text-gray-100">
-                {menuItems.map((item: { name: string; href: string }, i: number) => (
-                  <motion.li
-                    key={item.name}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    viewport={{ once: true }}
-                  >
-                    <Link
-                      href={`#${item.href}`}
-                      className="hover:text-white transition-colors"
+                {menuItems.map(
+                  (item: { name: string; href: string }, i: number) => (
+                    <motion.li
+                      key={item.name}
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      viewport={{ once: true }}
                     >
-                      {item.name}
-                    </Link>
-                  </motion.li>
-                ))}
+                      <Link
+                        href={`#${item.href}`}
+                        className="hover:text-white transition-colors"
+                      >
+                        {item.name}
+                      </Link>
+                    </motion.li>
+                  )
+                )}
               </ul>
             </div>
             <div>
@@ -551,7 +601,11 @@ export default function Home() {
                     transition={{ delay: i * 0.1 }}
                     viewport={{ once: true }}
                   >
-                    <Link href={`https://${item.toLowerCase()}.com`} className="hover:text-white transition-colors" target="_blank">
+                    <Link
+                      href={`https://${item.toLowerCase()}.com`}
+                      className="hover:text-white transition-colors"
+                      target="_blank"
+                    >
                       {item}
                     </Link>
                   </motion.li>
@@ -584,13 +638,14 @@ export default function Home() {
             transition={{ delay: 0.5 }}
             viewport={{ once: true }}
           >
-            <p>
-              © {new Date().getFullYear()} V Arena. All rights reserved.
+            <p>© {new Date().getFullYear()} V Arena. All rights reserved.</p>
+            <p className="mt-2">
+              This is a fan-made website and is not affiliated with Stunlock
+              Studios.
             </p>
-            <p className="mt-2">This is a fan-made website and is not affiliated with Stunlock Studios.</p>
           </motion.div>
         </div>
       </footer>
     </div>
-  )
+  );
 }

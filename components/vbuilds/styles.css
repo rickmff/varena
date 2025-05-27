@@ -1,0 +1,34 @@
+
+.spellSchool {
+    display: block;
+    /* background-color: rgba(255, 0, 0, 100); Red overlay with 50% opacity */
+    /* mix-blend-mode: overlay; */
+    /* filter: drop-shadow(0px 100px 0 #fff); */
+    transform: translateY(-100px);    
+}
+
+
+.spellSchool-chaos {
+    filter: drop-shadow(0px 100px 0 #DE5BFB);
+    
+}
+
+.spellSchool-blood {
+    filter: drop-shadow(0px 100px 0 #C42142);
+}
+
+.spellSchool-frost {
+    filter: drop-shadow(0px 100px 0 #009FF9);
+}
+
+.spellSchool-illusion {
+    filter: drop-shadow(0px 100px 0 #39DFB9);
+}
+
+.spellSchool-storm {
+    filter: drop-shadow(0px 100px 0 #FDFF5D);
+}
+
+.spellSchool-unholy {
+    filter: drop-shadow(0px 100px 0 #49B312);
+}

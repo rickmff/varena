@@ -1,12 +1,13 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import passivesData from "@/data/vbuilds/passives.json";
 import { useBuilder } from "@/components/vbuilds/BuildProvider";
 import { useSelector } from "@xstate/react";
-import { Modifier } from "../machines/builder";
 
 import { PassivePlaceholder } from "./PassiveForge";
+import { Checkbox } from "../ui/checkbox";
+import React from "react";
 
 export interface Passive {
   id: string;
@@ -14,6 +15,7 @@ export interface Passive {
   img?: string; // path to image
   description: string;
   type: string;
+  arenaCode: string;
   modifiers: Array<{
     stat: string;
     value: number;
@@ -26,11 +28,8 @@ export type PassiveCollection = Record<string, Passive>;
 
 const passives: PassiveCollection = passivesData as PassiveCollection;
 
-export function PassiveList({
-  setHoverPassive,
-}: {
-  setHoverPassive: Dispatch<SetStateAction<Passive | null>>;
-}) {
+export function PassiveList() {
+  const [hoveredPassive, setHoveredPassive] = useState<Passive | null>(null);
   const { send, builder } = useBuilder();
 
   const activePassives = useSelector(
@@ -64,99 +63,74 @@ export function PassiveList({
 
   return (
     <div className="space-y-8">
+      <PassivePlaceholder length={5} />
       {["Elemental", "Vampire"].map((type) => (
         <div key={type}>
-          <h2 className="text-xl font-bold mb-4">{type}</h2>
-          <div className="grid lg:grid-cols-6 md:grid-cols-3 grid-cols-2">
+          <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+            <span className="mr-2">{type}</span>
+          </h3>
+          <div className="grid lg:grid-cols-6 md:grid-cols-3 grid-cols-2 select-none">
             {groupedPassives[type]?.map(([key, passive]) => {
               const isSelected = activePassives.find(
                 (passive) => passive.id === key
               );
               const hasMaximumSelected = activePassives.length === 5;
               return (
-                <label
-                  key={key}
-                  className={`flex flex-col items-center justify-center p-4 ${activePassives.length === 5 && !isSelected
-                    ? "cursor-not-allowed"
-                    : "cursor-pointer"
-                    }`}
-                  onMouseEnter={() => {
-                    setHoverPassive(passive);
-                  }}
-                  onMouseLeave={() => {
-                    setHoverPassive(null);
-                  }}
-                >
+                <React.Fragment key={key}>
                   {passive.img && (
                     <img
+                      draggable={false}
                       src={passive.img}
                       alt={passive.name}
-                      className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-500 ${isSelected
-                        ? "border-emerald-300"
-                        : hasMaximumSelected
-                          ? "border-purple-800 opacity-10 pointer-events-none"
+                      className={`w-16 h-16 mb-2 object-contain rounded-full border-4 ${
+                        isSelected
+                          ? "border-purple-500"
+                          : hasMaximumSelected
+                          ? "opacity-10"
                           : "border-gray-700"
-                        }`}
+                      }`}
+                      onClick={() => {
+                        handlePassiveChange(passive.id);
+                      }}
+                      onMouseEnter={() => {
+                        if (!hasMaximumSelected || isSelected) {
+                          setHoveredPassive(passive);
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        setHoveredPassive(null);
+                      }}
                     />
                   )}
-                  <input
-                    type="checkbox"
-                    name="passive"
-                    value={key}
-                    className="hidden"
-                    checked={isSelected}
-                    onChange={() => handlePassiveChange(passive.id)}
-                  />
-                </label>
+                </React.Fragment>
               );
             })}
           </div>
         </div>
       ))}
-      <div className="flex gap-4 justify-center bg-neutral-900 p-4 rounded-lg">
-        {activePassives.map((selectedPassive: string) => {
-          const allPassives = Object.values(passives);
-          const passive = allPassives.find(
-            (passive) => passive.id === selectedPassive
-          );
-          if (!passive) return null;
-          return (
-            <label
-              className="flex flex-col items-center justify-center cursor-pointer ab"
-              onMouseEnter={() => {
-                setHoverPassive(passive);
-              }}
-              onMouseLeave={() => {
-                setHoverPassive(null);
-              }}
-            >
-              {passive.img && (
-                <img
-                  src={passive.img}
-                  alt={passive.name}
-                  className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-500 ${activePassives.includes(passive.id)
-                    ? "border-emerald-300"
-                    : "border-gray-700"
-                    }`}
-                />
-              )}
-              <input
-                type="checkbox"
-                name="passive"
-                value={passive.id}
-                className="hidden"
-                checked={
-                  activePassives.find(
-                    (activePassive) => activePassive.id === passive.id
-                  ) !== undefined
-                }
-                onChange={() => handlePassiveChange(passive.id)}
+      {hoveredPassive ? (
+        <div className="space-y-1 rounded-lg p-4  h-44">
+          <div className="flex items-center gap-4">
+            {hoveredPassive.img && (
+              <img
+                src={hoveredPassive.img}
+                alt={hoveredPassive.name}
+                className="w-12 h-12 mb-2 object-contain"
               />
-            </label>
-          );
-        })}
-        <PassivePlaceholder length={activePassives.length} />
-      </div>
+            )}
+            <h3 className="font-bold">{hoveredPassive.name}</h3>
+          </div>
+          <p className="text-sm">{hoveredPassive.description}</p>
+        </div>
+      ) : (
+        <div className="space-y-1  rounded-lg p-4 h-44">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 mb-2 object-contain" />
+            <h3 className="font-bold h-12 w-full"></h3>
+          </div>
+          <p className="text-sm h-12 w-full"></p>
+        </div>
+      )}
     </div>
   );
 }

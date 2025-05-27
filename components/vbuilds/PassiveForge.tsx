@@ -15,30 +15,36 @@ export const PassivePlaceholder = ({ length }: PassivePlaceholderProps) => {
   const passives = useSelector(builder, (state) => state.context.passives);
 
   return (
-    <div className="flex gap-4 justify-center bg-neutral-900 p-4 rounded-lg">
+    <div className="flex gap-4 justify-center bg-zinc-900 p-2 rounded-lg select-none">
       {passives.map((passive: Passive) => (
         <img
+          draggable={false}
+          key={passive.id}
           src={passive.img}
           alt={passive.name}
-          className={`w-16 h-16 mb-2 object-contain rounded-full border-4 border-emerald-300"`}
+          className="w-16 h-16 object-contain rounded-full border-4"
+          onClick={() =>
+            builder.send({ type: "REMOVE_PASSIVE", id: passive.id })
+          }
         />
       ))}
-      {Array.from({ length: length - passives.length }).map((_, index) => (
-        <div
-          key={`placeholder-${index}`}
-          className="w-16 h-16 mb-2 rounded-full border-4 border-dashed border-gray-500 flex items-center justify-center"
-        >
-          <PlusIcon className="w-8 h-8 text-gray-500" />
-        </div>
-      ))}
+      {Array.from({ length: length - passives.length }).map((_, index) => {
+        return (
+          <div
+            key={`placeholder-${index}`}
+            className="w-16 h-16 rounded-full border-4 border-dashed border-gray-500 flex items-center justify-center"
+          >
+            <PlusIcon className="w-8 h-8 text-gray-500" />
+          </div>
+        );
+      })}
     </div>
   );
 };
 
 export const PassiveForge = () => {
-  const [hoveredPassive, setHoveredPassive] = useState<Passive | null>(null);
   const { state, builder } = useBuilder();
-  const passives = useSelector(builder, (state) => state.context.passives);
+  // const passives = useSelector(builder, (state) => state.context.passives);
   return (
     <Dialog
       open={state.matches("passiveForge")}
@@ -55,26 +61,13 @@ export const PassiveForge = () => {
           <PassivePlaceholder length={5} />
         </div>
       </DialogTrigger>
-      <DialogContent className="w-full max-w-3xl" aria-describedby="Passives">
+      <DialogContent
+        className="w-full max-w-2xl overflow-y-auto max-h-screen"
+        aria-describedby="Passives"
+      >
         <DialogDescription />
         <DialogTitle />
-        <PassiveList setHoverPassive={setHoveredPassive} />
-
-        {hoveredPassive && (
-          <div className="space-y-1 w-96 absolute -right-[400px] bg-background rounded-lg p-4 border">
-            <div className="flex items-center gap-4">
-              {hoveredPassive.img && (
-                <img
-                  src={hoveredPassive.img}
-                  alt={hoveredPassive.name}
-                  className="w-12 h-12 mb-2 object-contain"
-                />
-              )}
-              <h3 className="font-bold">{hoveredPassive.name}</h3>
-            </div>
-            <p className="text-sm">{hoveredPassive.description}</p>
-          </div>
-        )}
+        <PassiveList />
       </DialogContent>
     </Dialog>
   );

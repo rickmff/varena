@@ -4,15 +4,15 @@ import stats from "@/data/vbuilds/stats.json";
 import BuildProvider from "@/components/vbuilds/BuildProvider";
 import { GroupedStatList } from "@/components/vbuilds/GroupedStatList";
 import { AmuletPicker } from "@/components/vbuilds/AmuletPicker";
-import { WeaponSheet } from "@/components/vbuilds/WeaponSheet";
 import { ArmourPicker } from "@/components/vbuilds/ArmourPicker";
+import { CoatingPicker } from "@/components/vbuilds/CoatingPicker";
 import { ElixerPicker } from "./ElixirPicker";
-import { PassiveForge, PassivePlaceholder } from "./PassiveForge";
-// import { flattenBaseStats } from "../machines/calculator";
-
-// Base
-// Chest, Legs Boots, Gloves, Cape, Bag
-// 180  + (262 + 21)  + (218 + 18) + (188 + 15) +  (144 + 11) + (24 + 2)  + 42
+import { PassiveForge } from "./PassiveForge";
+import { SpellForge } from "./SpellForge";
+import { WeaponForge } from "./WeaponForge";
+import { BloodForge } from "./BloodForge";
+import ArenaCode from "./components/ArenaCode";
+import BuilderNavBar from "../BuilderNavBar";
 
 export function loadBaseStats(statsArray: any): any {
   const statMap = {} as any;
@@ -24,56 +24,101 @@ export function loadBaseStats(statsArray: any): any {
   return statMap;
 }
 
-const BuilderPage = (user: any) => {
+const BuilderPage = () => {
   const baseStats = loadBaseStats(stats);
   return (
-    <div className="p-8  text-gray-200 flex">
-      {/* <div className="absolute inset-0 bg-[url('/flower.png')] bg-cover bg-center grayscale -z-10 opacity-0"></div> */}
-      <BuildProvider stats={baseStats}>
-        <GroupedStatList stats={stats} />
-        <div className="w-3/4 pl-8 flex flex-col gap-8">
-          <h2 className="text-3xl font-bold text-gray-100 mb-4">Build</h2>
-          <div className="flex gap-4">
-            <ArmourPicker />
-            <AmuletPicker />
-            <ElixerPicker />
-          </div>
+    <BuildProvider stats={baseStats}>
+      <BuilderNavBar />
+      <div className="flex text-gray-400">
+        <div className="w-8/12 pl-8 flex flex-col gap-8">
           <div>
-            <h2 className="text-3xl font-bold text-gray-100 mb-4">Passives</h2>
-            <PassiveForge />
+            <div className="flex gap-8">
+              <section>
+                <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+                  <span className="mr-2">Build</span>
+                </h3>
+                <div className="flex gap-4">
+                  <ArmourPicker />
+                  <AmuletPicker />
+                  <div className="relative w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center overflow-hidden">
+                    <img
+                      src="/images/vbuilds/armour/bag-bat_leather_bag.webp"
+                      alt="bag"
+                      className={`pointer-events-none`}
+                    />
+                  </div>
+                  <div className="relative w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center overflow-hidden">
+                    <img
+                      src="/images/vbuilds/armour/cape-phantom_veil.webp"
+                      alt="cape"
+                      className={`pointer-events-none max-h-20`}
+                    />
+                  </div>
+                </div>
+              </section>
+              <section>
+                <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+                  <span className="mr-2">Buffs</span>
+                </h3>
+                <div className="flex gap-4">
+                  <ElixerPicker />
+                  <BloodForge />
+                </div>
+              </section>
+            </div>
           </div>
-          <div>
-            <h2 className="text-3xl font-bold text-gray-100">Weapons</h2>
+          <div className="flex gap-8">
+            <section>
+              <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+                <span className="mr-2">Spells</span>
+              </h3>
+              <SpellForge />
+            </section>
+            <section>
+              <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+                <span className="mr-2">Passives</span>
+              </h3>
+              <PassiveForge />
+            </section>
+          </div>
 
-            <WeaponSheet />
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+              <span className="mr-2">Weapons</span>
+              <div className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded-full">
+                Use keys 1-8 to focus weapon stats
+              </div>
+            </h3>
+            <WeaponForge />
+            <div className="flex gap-4">
+              <CoatingPicker slot={1} />
+              <CoatingPicker slot={2} />
+              <CoatingPicker slot={3} />
+              <CoatingPicker slot={4} />
+              <CoatingPicker slot={5} />
+              <CoatingPicker slot={6} />
+              <CoatingPicker slot={7} />
+              <CoatingPicker slot={8} />
+            </div>
           </div>
+          <section className="space-y-4">
+            <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+              <span className="mr-2">Use this build in V Arena</span>
+            </h3>
+            <ArenaCode />
+          </section>
         </div>
-      </BuildProvider>
-      {/* <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black "></div> */}
-    </div>
+        {/* <div className="space-y-8 w/1-4"> */}
+        {/* <div className="pr-12">
+            <ArenaCode />
+          </div> */}
+        <div className="max-h-screen overflow-auto pr-8 flex-1 pb-44">
+          <GroupedStatList stats={stats} />
+        </div>
+        {/* </div> */}
+      </div>
+    </BuildProvider>
   );
 };
-
-// {
-//   bp: [{ primary: "rogue", secondary: "warrior", fusion: 3 }],
-//   elixir: "elixir_of_the_archmage",
-//   amulet: "archmage",
-//   armor: "shadowmoon",
-//   spells: [
-//     { id: "spell_1",  jewel: [1, 2, 3, 4] },
-//     { id: "spell_1",  jewel: [1, 2, 3, 4] },
-//     { id: "spell_1",  jewel: [1, 2, 3, 4] },
-//   ],
-//   passives: [
-//     { id: "passive_1",  },
-//     { id: "passive_2",  },
-//     { id: "passive_3",},
-//     { id: "passive_4", },
-//     { id: "passive_5" },
-//   ],
-//   weapons: [
-//     {id: "sword", type: "static",  attributes: [1, 2, 3, 4]},
-//   ]
-// }
 
 export default BuilderPage;
