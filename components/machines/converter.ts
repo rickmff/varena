@@ -13,6 +13,7 @@ import { MAX_LEGENDARY_WEAPONS_COUNT } from "./builder";
 import { armourOptions } from "../vbuilds/ArmourPicker";
 import bloodData from "@/data/vbuilds/bloodtypes.json";
 import spellData from "@/data/vbuilds/spells.json";
+import { hasAdvancedCoatings } from "@/components/vbuilds/CoatingPicker";
 
 
 const importElixir = (char: string) => {
@@ -22,12 +23,27 @@ const importElixir = (char: string) => {
 const importCoatings = (chars: string) => {
     const result = new Map<number, Coating>();
 
-    chars.split("").forEach((char, index) => {
-        const coating = Object.values(coatingData).find((coating) => coating.arenaCode == char);
-        if (coating) {
-            result.set(index + 1, coating);
+    const advanceCoatings = hasAdvancedCoatings(chars)
+
+    if (advanceCoatings.advanced) {
+
+        chars.split("").forEach((char, index) => {
+            const coating = Object.values(coatingData).find((coating) => coating.arenaCode == char);
+            if (coating) {
+                result.set(index + 1, coating);
+            }
+        });
+    }
+
+    if (!advanceCoatings.advanced && advanceCoatings.value) {
+        const coating = Object.values(coatingData).find((coating) => coating.arenaCode == advanceCoatings.value);
+        for (let i = 1; i <= 8; i++) {
+            if (coating) {
+                result.set(i, coating)
+            }
         }
-    });
+    }
+
     return result;
 }
 
@@ -264,16 +280,20 @@ export const exportVArenaCode = (build) => {
 }
 
 
+
+
 export const convertStringToBuild = (input: string) => {
+    const coatings = input.slice(1, 9)
     const build = {
         elixir: importElixir(input[0]),
-        coatings: importCoatings(input.slice(1, 9)),
+        coatings: importCoatings(coatings),
         passives: importPassives(input.slice(9, 14)),
         spells: importSpells(input.slice(14, 30)),
         weapons: importWeapons(input.slice(30, 70)), // Adjusted to get 8 * 5 characters (40 characters) after spells
         amulet: importAmulet(input[70]),
         armour: importArmour(input.slice(71, 75)), // Adjusted to get 4 characters for the armour
-        blood: importBlood(input.slice(75, 78))
+        blood: importBlood(input.slice(75, 78)),
+        advancedCoatings: hasAdvancedCoatings(coatings).advanced, // Assuming the 79th character indicates advanced coatings
     };
 
 

@@ -7,7 +7,6 @@ import { AvailableWeaponSlots, Weapon } from '../vbuilds/WeaponForge';
 import { StatName } from './calculator';
 import { weaponBuilderMachine } from './weaponBuilder';
 
-
 export type BloodContext = {
     primary: keyof typeof bloodData,
     secondary: keyof typeof bloodData,
@@ -31,6 +30,7 @@ export interface BuildContext {
     };
     selectedWeaponSlot: AvailableWeaponSlots | null; // Track the currently selected weapon slot
     focusedWeapon: AvailableWeaponSlots | null; // Track the focused weapon slot
+    advancedCoatings: boolean;
 }
 
 type BuildEvents =
@@ -49,6 +49,9 @@ type BuildEvents =
     | { type: "ADD_BLOOD"; primary: any, secondary: any, infusion: any }
     | { type: "ADD_COATING"; coating: any, slot: AvailableWeaponSlots }
     | { type: "REMOVE_COATING"; slot: AvailableWeaponSlots }
+    | { type: "ADD_ALL_COATINGS"; coating: any }
+    | { type: "REMOVE_ALL_COATINGS" }
+    | { type: "TOGGLE_ADVANCED_COATINGS" }
     | { type: "ADD_ELIXIR"; elixir: any }
     | { type: "REMOVE_ELIXIR"; }
     | { type: "ADD_ARMOUR"; armour: any }
@@ -123,6 +126,7 @@ export const builder = setup({
             blood: input.build.blood || null,
             selectedWeaponSlot: null, // Initialize with null
             focusedWeapon: null as AvailableWeaponSlots | null, // Track the focused weapon slot
+            advancedCoatings: input.build.advancedCoatings || false,
         }
 
 
@@ -201,12 +205,37 @@ export const builder = setup({
                         }
                     })
                 },
+                ADD_ALL_COATINGS: {
+                    actions: assign({
+                        coatings: ({ context, event }) => {
+                            const updatedCoatings = new Map(context.coatings);
+                            for (let i = 1; i <= 8; i++) {
+                                updatedCoatings.set(i as AvailableWeaponSlots, event.coating);
+                            }
+                            return updatedCoatings;
+                        }
+                    })
+                },
+                REMOVE_ALL_COATINGS: {
+                    actions: assign({
+                        coatings: ({ context, event }) => {
+                            return new Map();
+                        }
+                    })
+                },
                 REMOVE_COATING: {
                     actions: assign({
                         coatings: ({ context, event }) => {
                             const updatedCoatings = new Map(context.coatings);
                             updatedCoatings.delete(event.slot);
                             return updatedCoatings;
+                        }
+                    })
+                },
+                TOGGLE_ADVANCED_COATINGS: {
+                    actions: assign({
+                        advancedCoatings: ({ context }) => {
+                            return !context.advancedCoatings
                         }
                     })
                 },

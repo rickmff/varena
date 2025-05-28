@@ -5,7 +5,6 @@ import BuildProvider from "@/components/vbuilds/BuildProvider";
 import { GroupedStatList } from "@/components/vbuilds/GroupedStatList";
 import { AmuletPicker } from "@/components/vbuilds/AmuletPicker";
 import { ArmourPicker } from "@/components/vbuilds/ArmourPicker";
-import { CoatingPicker } from "@/components/vbuilds/CoatingPicker";
 import { ElixerPicker } from "./ElixirPicker";
 import { PassiveForge } from "./PassiveForge";
 import { SpellForge } from "./SpellForge";
@@ -13,6 +12,11 @@ import { WeaponForge } from "./WeaponForge";
 import { BloodForge } from "./BloodForge";
 import ArenaCode from "./components/ArenaCode";
 import BuilderNavBar from "../BuilderNavBar";
+import {
+  SingleCoating,
+  AdvancedCoatings,
+  AdvancedCoatingsSwitch,
+} from "@/components/vbuilds/CoatingPicker";
 
 export function loadBaseStats(statsArray: any): any {
   const statMap = {} as any;
@@ -63,6 +67,7 @@ const BuilderPage = () => {
                 <div className="flex gap-4">
                   <ElixerPicker />
                   <BloodForge />
+                  <SingleCoating />
                 </div>
               </section>
             </div>
@@ -90,16 +95,8 @@ const BuilderPage = () => {
               </div>
             </h3>
             <WeaponForge />
-            <div className="flex gap-4">
-              <CoatingPicker slot={1} />
-              <CoatingPicker slot={2} />
-              <CoatingPicker slot={3} />
-              <CoatingPicker slot={4} />
-              <CoatingPicker slot={5} />
-              <CoatingPicker slot={6} />
-              <CoatingPicker slot={7} />
-              <CoatingPicker slot={8} />
-            </div>
+            <AdvancedCoatings />
+            <AdvancedCoatingsSwitch />
           </div>
           <section className="space-y-4">
             <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
