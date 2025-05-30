@@ -1,11 +1,12 @@
 import bloodData from '@/data/vbuilds/bloodtypes.json';
 import hotkeys from 'hotkeys-js';
 import { toast } from 'sonner';
-import { assign, enqueueActions, fromCallback, raise, setup, spawnChild, stopChild } from 'xstate';
+import { assign, enqueueActions, fromCallback, log, raise, setup, spawnChild, stopChild } from 'xstate';
 import { Coating } from '../vbuilds/CoatingPicker';
 import { AvailableWeaponSlots, Weapon } from '../vbuilds/WeaponForge';
 import { StatName } from './calculator';
 import { weaponBuilderMachine } from './weaponBuilder';
+import { arenaCode } from './converter';
 
 export type BloodContext = {
     primary: keyof typeof bloodData,
@@ -65,6 +66,7 @@ type BuildEvents =
     | { type: 'LEGENDARY_LIMIT_REACHED' }
     | { type: 'FOCUS_WEAPON', slot: AvailableWeaponSlots }
     | { type: 'UNFOCUS_WEAPON' }
+    | { type: 'SAVE_BUILD' }
 
 type StatEntry = {
     name: string;
@@ -98,6 +100,28 @@ export const builder = setup({
         context: {} as BuildContext,
         events: {} as BuildEvents
         // actions: 
+    },
+    actions: {
+        saveBuild: ({ context }) => {
+            // Implement the logic to save the build, e.g., send it to a server or local storage
+            // Convert build to arena code
+            const buildCode = arenaCode(context);
+            console.log("Generated arena code:", buildCode);
+
+            // Get existing arena codes from localStorage or initialize empty array
+            const savedCodes = JSON.parse(localStorage.getItem('vbuilds') || '[]');
+
+            // Add the new code with timestamp
+            savedCodes.push({
+                code: buildCode,
+                timestamp: new Date().toISOString(),
+                name: `Build ${savedCodes.length + 1}` // Default name
+            });
+
+            // Save back to localStorage
+            localStorage.setItem('vbuilds', JSON.stringify(savedCodes));
+            toast.success("Build saved successfully!");
+        }
     },
     actors: {
         weaponBuilder: weaponBuilderMachine,
@@ -159,6 +183,9 @@ export const builder = setup({
             actions: assign({
                 selectedWeaponSlot: ({ event }) => event.slot // Set the selected weapon slot
             })
+        },
+        'SAVE_BUILD': {
+            actions: 'saveBuild'
         },
     },
     states: {
@@ -354,7 +381,7 @@ export const builder = setup({
                         spells: ({ context, event }) => ({
                             ...context.spells, [event.slot]: { ...event.spell, jewel: event.jewel }
                         })
-                    }), raise({ type: "goto.overview" })]
+                    }), log(({ event }) => event), raise({ type: "goto.overview" })]
                 },
             }
         },

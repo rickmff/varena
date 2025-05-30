@@ -3,6 +3,7 @@ import { createActorContext } from "@xstate/react";
 import { builder } from "@/components/machines/builder";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import stats from "@/data/vbuilds/stats.json";
 
 export const BuilderContext = createActorContext(builder);
 
@@ -15,13 +16,17 @@ export function useBuilder() {
 
 import { convertStringToBuild } from "../machines/converter";
 
-function BuildProviderInner({
-  children,
-  stats,
-}: {
-  children: React.ReactNode;
-  stats: any;
-}) {
+export function loadBaseStats(statsArray: any): any {
+  const statMap = {} as any;
+
+  for (const stat of statsArray) {
+    statMap[stat.name] = stat;
+  }
+
+  return statMap;
+}
+
+function BuildProviderInner({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
   let importCode = searchParams.get("build") || "";
 
@@ -33,7 +38,7 @@ function BuildProviderInner({
       logic={builder}
       options={{
         input: {
-          stats,
+          stats: loadBaseStats(stats),
           build: convertStringToBuild(importCode),
         },
       }}
@@ -45,16 +50,12 @@ function BuildProviderInner({
 
 export default function BuildProvider({
   children,
-  stats,
 }: {
   children: React.ReactNode;
-  stats: any;
 }) {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <BuildProviderInner stats={stats}>
-        {children}
-      </BuildProviderInner>
+      <BuildProviderInner>{children}</BuildProviderInner>
     </Suspense>
   );
 }

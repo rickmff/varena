@@ -1,30 +1,31 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import Link from 'next/link'
-import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import GameMenu from './game-menu'
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import GameMenu from "./game-menu";
 
 export const menuItems = [
   { name: "FEATURES", href: "#features" },
   { name: "COMMANDS", href: "#generate-commands" },
   { name: "NEWS", href: "#news" },
-]
+  { name: "BUILDS", href: "/builds" },
+];
 
 export default function NavBar() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [scrollY, setScrollY] = useState(0)
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY)
-    }
+      setScrollY(window.scrollY);
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
@@ -40,7 +41,8 @@ export default function NavBar() {
           <motion.div
             initial={false}
             animate={{
-              backgroundColor: scrollY > 50 ? "rgba(0, 0, 0, 0.8)" : "rgba(0, 0, 0, 0)",
+              backgroundColor:
+                scrollY > 50 ? "rgba(0, 0, 0, 0.8)" : "rgba(0, 0, 0, 0)",
               backdropFilter: scrollY > 50 ? "blur(12px)" : "blur(0px)",
             }}
             transition={{
@@ -48,13 +50,16 @@ export default function NavBar() {
               stiffness: 100,
               damping: 20,
               mass: 1,
-              duration: 0.5
+              duration: 0.5,
             }}
             className="absolute inset-0"
           />
 
           <Link href="/" className="flex items-center gap-2 z-50">
-            <motion.div whileHover={{ rotate: 10 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
+            <motion.div
+              whileHover={{ rotate: 10 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
               <Image
                 src="/logo.png"
                 alt="V Rising Logo"
@@ -65,33 +70,40 @@ export default function NavBar() {
             </motion.div>
           </Link>
           <nav className="hidden md:flex items-center gap-6 relative z-50 ml-14">
-            {menuItems.map((item: { name: string; href: string }, i: number) => (
-              <motion.div
-                key={item.name}
-                whileHover={{ y: -2, color: "#ffffff" }}
-                transition={{ type: "spring", stiffness: 400, damping: 10, delay: i * 0.1 }}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
+            {menuItems.map(
+              (item: { name: string; href: string }, i: number) => (
                 <motion.div
-                  animate={{
-                    color: scrollY > 50 ? "rgb(209 213 219)" : "#ffffff",
-                  }}
+                  key={item.name}
+                  whileHover={{ y: -2, color: "#ffffff" }}
                   transition={{
                     type: "spring",
-                    stiffness: 100,
-                    damping: 20,
+                    stiffness: 400,
+                    damping: 10,
+                    delay: i * 0.1,
                   }}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
                 >
-                  <Link
-                    href={item.href}
-                    className="text-sm hover:text-white transition-colors duration-200"
+                  <motion.div
+                    animate={{
+                      color: scrollY > 50 ? "rgb(209 213 219)" : "#ffffff",
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 100,
+                      damping: 20,
+                    }}
                   >
-                    {item.name}
-                  </Link>
+                    <Link
+                      href={item.href}
+                      className="text-sm hover:text-white transition-colors duration-200"
+                    >
+                      {item.name}
+                    </Link>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            ))}
+              )
+            )}
           </nav>
           <motion.div
             whileHover={{ scale: 1.05 }}
@@ -100,8 +112,10 @@ export default function NavBar() {
           >
             <motion.div
               animate={{
-                borderColor: scrollY > 50 ? "rgb(127 29 29)" : "rgba(255, 255, 255, 0.3)",
-                backgroundColor: scrollY > 50 ? "rgba(127, 29, 29, 0.1)" : "transparent",
+                borderColor:
+                  scrollY > 50 ? "rgb(127 29 29)" : "rgba(255, 255, 255, 0.3)",
+                backgroundColor:
+                  scrollY > 50 ? "rgba(127, 29, 29, 0.1)" : "transparent",
               }}
               transition={{
                 type: "spring",
@@ -112,9 +126,13 @@ export default function NavBar() {
               <Button
                 variant="outline"
                 size="sm"
-                className="hidden md:flex text-xs font-bold text-white hover:bg-gray-900/70 transition-all duration-300"
+                className="hidden md:flex text-xs font-bold text-white hover:bg-zinc-900/70 transition-all duration-300"
               >
-                <Link href="https://discord.gg/varena" target="_blank" className="flex items-center justify-center gap-4">
+                <Link
+                  href="https://discord.gg/varena"
+                  target="_blank"
+                  className="flex items-center justify-center gap-4"
+                >
                   <Image
                     src="/discord.svg"
                     alt="Discord Logo"
@@ -154,8 +172,5 @@ export default function NavBar() {
         </motion.div>
       </header>
     </>
-  )
+  );
 }
-
-
-

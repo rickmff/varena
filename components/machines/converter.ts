@@ -9,7 +9,7 @@ import infusionData from "@/data/vbuilds/infusions.json";
 import weaponEffectData from "@/data/vbuilds/weaponEffects.json";
 import amuletData from "@/data/vbuilds/amulets.json";
 import { AvailableWeaponSlots, Weapon } from "../vbuilds/WeaponForge";
-import { MAX_LEGENDARY_WEAPONS_COUNT } from "./builder";
+import { MAX_LEGENDARY_WEAPONS_COUNT, BuildContext } from "./builder";
 import { armourOptions } from "../vbuilds/ArmourPicker";
 import bloodData from "@/data/vbuilds/bloodtypes.json";
 import spellData from "@/data/vbuilds/spells.json";
@@ -43,6 +43,8 @@ const importCoatings = (chars: string) => {
             }
         }
     }
+
+    console.log(result, "imported coatings");
 
     return result;
 }
@@ -262,6 +264,18 @@ const exportBlood = (blood: { primary?: string; secondary?: string; infusion?: s
 
     return primary + secondary + infusion;
 };
+
+export const arenaCode = (context: BuildContext) => exportVArenaCode({
+    elixir: context.elixir,
+    coatings: context.coatings,
+    passives: context.passives,
+    spells: context.spells,
+    weapons: context.weapons,
+    amulet: context.amulet,
+    armour: context.armour,
+    blood: context.blood,
+})
+
 
 export const exportVArenaCode = (build) => {
 
