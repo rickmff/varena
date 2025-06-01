@@ -191,7 +191,7 @@ export default function NewsPage() {
                           src={news.coverImageUrl || `/news.png`}
                           alt={news.title}
                           fill
-                          className="object-cover transition-transform duration-500 group-hover:scale-110"
+                          className="object-cover transition-transform duration-500 group-hover:scale-110 filter brightness-60"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             if (target.src !== '/news.png') {
@@ -199,7 +199,6 @@ export default function NewsPage() {
                             }
                           }}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80" />
 
                         {/* Category Badge */}
                         <div className="absolute top-4 right-4 flex items-center gap-2">
