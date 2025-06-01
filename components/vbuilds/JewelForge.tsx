@@ -5,7 +5,13 @@ import { Button } from "../ui/button";
 export type Spell = {
   id: string;
   name: string;
-  effects: Array<{ key: number; description: string }>;
+  img: string;
+  effects: Array<{
+    key: number;
+    description: string;
+    min: number | null;
+    max: number | null;
+  }>;
   spellSchool: "storm" | "chaos" | "frost" | "blood" | "unholy" | "illusion";
 };
 

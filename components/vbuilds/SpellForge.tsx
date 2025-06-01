@@ -10,7 +10,7 @@ import {
 } from "../ui/sheet";
 import SpellTabs from "./SpellTabs";
 import { DashForge } from "./DashForge";
-import { Spell } from "./JewelForge";
+import { Spell, SpellWithJewel } from "./JewelForge";
 import UltimateForge from "./UltimateForge";
 
 import {
@@ -41,6 +41,8 @@ const SlotTrigger = ({
     );
   }
 
+  const spell = state.context.spells[goto] as SpellWithJewel;
+
   return (
     <HoverCard openDelay={0} closeDelay={0}>
       <HoverCardTrigger>
@@ -52,17 +54,40 @@ const SlotTrigger = ({
         </SheetTrigger>
       </HoverCardTrigger>
       <HoverCardContent className="w-96 flex flex-col gap-4">
-        {state.context.spells[goto]?.jewel?.map(
-          (jewel: string, index: number) => (
-            <div key={index}>
-              {
-                state.context.spells[goto]?.effects?.find(
-                  (effect: any) => effect.key == jewel
-                )?.description
-              }
+        <>
+          <div className="flex items-center gap-4">
+            <div className="relative w-10 h-10 rounded overflow-hidden">
+              <img src={spell.img} className="w-10 h-10" />
+              <img
+                src={`/images/vbuilds/jewels/jewel-${spell.spellSchool}_tier4.webp`}
+                className="absolute bottom-0 right-0 h-4 w-4"
+              />
             </div>
-          )
-        )}
+            <span className={`spellSchool-${spell.spellSchool}`}>
+              {spell.name}
+            </span>
+          </div>
+          {spell?.jewel?.map((jewel: number, index: number) => {
+            const effect = spell?.effects?.find(
+              (effect: any) => effect.key == jewel
+            );
+            return (
+              <div>
+                <div className="flex gap-4 items-center text-sm">
+                  <img
+                    src={
+                      effect.max === null
+                        ? "/images/vbuilds/attributes/Attribute_TierIndicator_Fixed.png"
+                        : "/images/vbuilds/attributes/Attribute_TierIndicator_5.png"
+                    }
+                    className="flex-grow-0 w-6 h-6"
+                  />
+                  <div key={index}>{effect?.description}</div>
+                </div>
+              </div>
+            );
+          })}
+        </>
       </HoverCardContent>
     </HoverCard>
   );

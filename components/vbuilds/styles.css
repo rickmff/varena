@@ -1,5 +1,30 @@
 
-.spellSchool {
+.spellSchool-chaos {
+    color: #DE5BFB;
+}
+
+.spellSchool-blood {
+    color: #C42142;
+}
+
+.spellSchool-frost {
+    color: #009FF9;
+}
+
+.spellSchool-illusion {
+    color: #39DFB9;
+}
+
+.spellSchool-storm {
+    color: #FDFF5D;
+}
+
+.spellSchool-unholy {
+    color: #49B312;
+}
+
+
+img.spellSchool {
     display: block;
     /* background-color: rgba(255, 0, 0, 100); Red overlay with 50% opacity */
     /* mix-blend-mode: overlay; */
@@ -7,28 +32,28 @@
     transform: translateY(-100px);    
 }
 
-
 .spellSchool-chaos {
+    
     filter: drop-shadow(0px 100px 0 #DE5BFB);
     
 }
 
-.spellSchool-blood {
+img.spellSchool-blood {
     filter: drop-shadow(0px 100px 0 #C42142);
 }
 
-.spellSchool-frost {
+img.spellSchool-frost {
     filter: drop-shadow(0px 100px 0 #009FF9);
 }
 
-.spellSchool-illusion {
+img.spellSchool-illusion {
     filter: drop-shadow(0px 100px 0 #39DFB9);
 }
 
-.spellSchool-storm {
+img.spellSchool-storm {
     filter: drop-shadow(0px 100px 0 #FDFF5D);
 }
 
-.spellSchool-unholy {
+img.spellSchool-unholy {
     filter: drop-shadow(0px 100px 0 #49B312);
 }
