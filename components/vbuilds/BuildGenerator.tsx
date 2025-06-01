@@ -16,6 +16,9 @@ import {
   AdvancedCoatings,
   AdvancedCoatingsSwitch,
 } from "@/components/vbuilds/CoatingPicker";
+import ArenaCode, {
+  SearchParamsBuildCodeUpdater,
+} from "./components/ArenaCode";
 
 const BuilderPage = () => {
   return (
@@ -150,6 +153,7 @@ const BuilderPage = () => {
           </div>
         </div>
       </div>
+      <SearchParamsBuildCodeUpdater />
     </div>
   );
 };

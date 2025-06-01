@@ -43,7 +43,7 @@ const HoverInfoCard = ({
   weapon: Weapon | undefined;
 }) => {
   if (!weapon) {
-    return null;
+    return <>{children}</>;
   }
   return (
     <HoverCard openDelay={0} closeDelay={0}>
@@ -51,10 +51,11 @@ const HoverInfoCard = ({
       <HoverCardContent className="space-y-4 w-96" side="top">
         <div className="flex gap-4 items-center">
           <div
-            className={`relative rounded-md overflow-hidden w-10 h-10 border ${weapon?.type === "legendary"
+            className={`relative rounded-md overflow-hidden w-10 h-10 border ${
+              weapon?.type === "legendary"
                 ? "border-orange-500"
                 : "border-purple-500"
-              }`}
+            }`}
           >
             <img src={weapon?.img} className="w-10 h-10" />
             {weapon.infusion && (
@@ -68,10 +69,11 @@ const HoverInfoCard = ({
           </div>
           <div>
             <div
-              className={`capitalize ${weapon?.type === "legendary"
+              className={`capitalize ${
+                weapon?.type === "legendary"
                   ? "text-orange-500"
                   : "text-purple-500"
-                }`}
+              }`}
             >
               {weapon?.name}
             </div>
@@ -115,13 +117,15 @@ const SlotTrigger = ({
     <HoverInfoCard weapon={weaponInSlot}>
       <DialogTrigger
         id={`weapon-slot-${slot}`}
-        className={`w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 hover:border-purple-500 transition-all duration-100 ${!weaponInSlot
+        className={`w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 hover:border-purple-500 transition-all duration-100 ${
+          !weaponInSlot
             ? "border"
             : weaponInSlot.type === "legendary"
-              ? "border-orange-500/60"
-              : "border-purple-500/60"
-          } ${state.context.focusedWeapon == slot ? "ring-2 ring-emerald-500" : ""
-          }`}
+            ? "border-orange-500/60"
+            : "border-purple-500/60"
+        } ${
+          state.context.focusedWeapon == slot ? "ring-2 ring-emerald-500" : ""
+        }`}
         onClick={() => {
           builder.send({ type: `goto.weaponForge`, slot });
         }}
@@ -145,8 +149,9 @@ export const WeaponSlotPlaceholder: React.FC<{
         <img
           src={placeholderImage}
           alt="Select Weapon"
-          className={`${!weaponInSlot && "grayscale brightness-50 opacity-60"
-            } pointer-events-none`}
+          className={`${
+            !weaponInSlot && "grayscale brightness-50 opacity-60"
+          } pointer-events-none`}
         />
         <span className="absolute inset-0 flex items-center justify-center text-white">
           {weaponInSlot ? null : `Slot ${slot}`}
@@ -253,10 +258,11 @@ export const WeaponForge = () => {
           <div className="space-y-8">
             <div className="flex items-center gap-4">
               <div
-                className={`relative border-2 ${weaponState.context.weapon?.type === "legendary"
-                  ? "border-orange-500"
-                  : "border-purple-500"
-                  } rounded-md overflow-hidden`}
+                className={`relative border-2 ${
+                  weaponState.context.weapon?.type === "legendary"
+                    ? "border-orange-500"
+                    : "border-purple-500"
+                } rounded-md overflow-hidden`}
               >
                 <img
                   src={weaponState.context.weapon?.img}
