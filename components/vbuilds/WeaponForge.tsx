@@ -6,8 +6,14 @@ import { WeaponSelect } from "./components/weaponForge/WeaponSelect";
 import { WeaponEffectSelect } from "./components/weaponForge/WeaponEffectSelect";
 
 import epicWeaponData from "@/data/vbuilds/epic-weapons.json";
+import weaponEffectData from "@/data/vbuilds/weaponEffects.json";
 import { InfusionSelect } from "./components/weaponForge/InfusionSelect";
 import { WeaponBuilderContext } from "../machines/weaponBuilder";
+import {
+  HoverCard,
+  HoverCardTrigger,
+  HoverCardContent,
+} from "../ui/hover-card";
 
 export type AvailableWeaponSlots = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
@@ -29,6 +35,71 @@ export type WeaponData = {
   arenaCode: string; // Arena code for the weapon
 };
 
+const HoverInfoCard = ({
+  children,
+  weapon,
+}: {
+  children: React.ReactNode;
+  weapon: Weapon | undefined;
+}) => {
+  if (!weapon) {
+    return null;
+  }
+  return (
+    <HoverCard openDelay={0} closeDelay={0}>
+      <HoverCardTrigger>{children}</HoverCardTrigger>
+      <HoverCardContent className="space-y-4 w-96" side="top">
+        <div className="flex gap-4 items-center">
+          <div
+            className={`relative rounded-md overflow-hidden w-10 h-10 border ${weapon?.type === "legendary"
+                ? "border-orange-500"
+                : "border-purple-500"
+              }`}
+          >
+            <img src={weapon?.img} className="w-10 h-10" />
+            {weapon.infusion && (
+              <div className="overflow-hidden w-5 h-5 rounded-md bg-black/80 flex items-center justify-center absolute right-0 bottom-0 border-l-2 border-t-2 border-purple-500 rounded-bl-none rounded-tr-none">
+                <img
+                  src={`/images/vbuilds/spellschools/${weapon.infusion}.png`}
+                  className={`spellSchool spellSchool-${weapon.infusion} w-4 h-4`}
+                />
+              </div>
+            )}
+          </div>
+          <div>
+            <div
+              className={`capitalize ${weapon?.type === "legendary"
+                  ? "text-orange-500"
+                  : "text-purple-500"
+                }`}
+            >
+              {weapon?.name}
+            </div>
+            <div className={`capitalize spellSchool-${weapon.infusion}`}>
+              {weapon?.infusion}
+            </div>
+          </div>
+        </div>
+        <div className="space-y-4">
+          {weapon?.effects
+            .map((e) => weaponEffectData.find((data) => data.id === e))
+            .map((effect) => (
+              <div className="flex gap-4 items-center text-sm" key={effect?.id}>
+                <img
+                  src="/images/vbuilds/attributes/Attribute_TierIndicator_5.png"
+                  className="flex-grow-0 w-6 h-6"
+                />
+                <div>
+                  {effect?.description} {effect?.modifiers[0].value}%
+                </div>
+              </div>
+            ))}
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  );
+};
+
 const SlotTrigger = ({
   children,
   slot,
@@ -41,21 +112,23 @@ const SlotTrigger = ({
   const weaponInSlot = state.context.weapons.get(slot);
 
   return (
-    <DialogTrigger
-      id={`weapon-slot-${slot}`}
-      className={`w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 hover:border-purple-500 transition-all duration-100 ${!weaponInSlot
-          ? "border"
-          : weaponInSlot.type === "legendary"
-            ? "border-orange-500/60"
-            : "border-purple-500/60"
-        } ${state.context.focusedWeapon == slot ? "ring-2 ring-emerald-500" : ""
-        }`}
-      onClick={() => {
-        builder.send({ type: `goto.weaponForge`, slot });
-      }}
-    >
-      {children}
-    </DialogTrigger>
+    <HoverInfoCard weapon={weaponInSlot}>
+      <DialogTrigger
+        id={`weapon-slot-${slot}`}
+        className={`w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 hover:border-purple-500 transition-all duration-100 ${!weaponInSlot
+            ? "border"
+            : weaponInSlot.type === "legendary"
+              ? "border-orange-500/60"
+              : "border-purple-500/60"
+          } ${state.context.focusedWeapon == slot ? "ring-2 ring-emerald-500" : ""
+          }`}
+        onClick={() => {
+          builder.send({ type: `goto.weaponForge`, slot });
+        }}
+      >
+        {children}
+      </DialogTrigger>
+    </HoverInfoCard>
   );
 };
 
@@ -181,8 +254,8 @@ export const WeaponForge = () => {
             <div className="flex items-center gap-4">
               <div
                 className={`relative border-2 ${weaponState.context.weapon?.type === "legendary"
-                    ? "border-orange-500"
-                    : "border-purple-500"
+                  ? "border-orange-500"
+                  : "border-purple-500"
                   } rounded-md overflow-hidden`}
               >
                 <img

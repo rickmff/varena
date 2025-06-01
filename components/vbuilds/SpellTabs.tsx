@@ -25,9 +25,11 @@ const spellSchools = Array.from(
 const SpellTabs = ({
   spell,
   onAdd,
+  filter = () => true,
 }: {
   spell?: SpellWithJewel;
   onAdd: (params: AddSpellWithJewel) => void;
+  filter: (spell: any) => boolean;
 }) => {
   const [selectedSpell, setSelectedSpell] = useState<
     SpellWithJewel | undefined
@@ -64,6 +66,7 @@ const SpellTabs = ({
             }}
           >
             {Object.values(spellsData)
+              .filter((spell) => filter(spell))
               .filter((spell) => {
                 if (!selectedSpell) {
                   return true;

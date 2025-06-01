@@ -64,6 +64,7 @@
     "name": "Elixir of the Crow",
     "image": "/images/vbuilds/elixirs/elixir-crow.webp",
     "arenaCode": "4",
+    "description": "An elixir that increases Weapon Leech by +5% and Weapon Cooldown Recovery Rate by +7% for 60 minutes. Effect persists through death.",
     "modifiers": [
       {
         "stat": "Weapon Skill Leech",
