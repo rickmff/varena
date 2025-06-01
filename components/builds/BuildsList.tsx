@@ -3,15 +3,24 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { ClipboardCopyIcon } from "lucide-react";
+import { ClipboardCopyIcon, Plus, Swords, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
+import Link from "next/link";
 import { convertStringToBuild } from "../machines/converter";
 import bloodData from "@/data/vbuilds/bloodtypes.json";
+import { Button } from "@/components/ui/button";
 
 type Build = {
   name: string;
   code: string;
 };
+
+interface BuildsListProps {
+  maxBuilds?: number; // Maximum number of builds to show
+  showViewAllButton?: boolean; // Whether to show the "View All" button
+  onBuildsLoaded?: (hasBuilds: boolean) => void; // Callback when builds are loaded
+}
 
 const Img = ({ src, alt = "" }: { src: string | undefined; alt?: string }) => {
   return src ? <img src={src} className="w-6 h-6" alt={alt} /> : null;
@@ -20,97 +29,115 @@ const Img = ({ src, alt = "" }: { src: string | undefined; alt?: string }) => {
 const BuildContent = ({ code }: { code: string }) => {
   const build = convertStringToBuild(code);
 
-  console.log(build.coatings);
-
   return (
-    <div className="space-y-4">
-      <div className="flex gap-4">
-        <div>
-          <div>Armour</div>
-          <div className="flex">
-            <Img src={build.armour?.image} />
-            <Img src={build.amulet?.image} />
+    <div className="space-y-6">
+      {/* Top Row - Armor, Buffs, Blood */}
+      <div className="grid grid-cols-3 gap-4">
+        {/* Armor Section */}
+        <div className="space-y-2">
+          <div className="text-xs font-bold text-red-400 uppercase tracking-wider">Armor</div>
+          <div className="flex gap-1">
+            <div className="relative w-8 h-8 bg-zinc-900/50 rounded border border-red-900/30 flex items-center justify-center overflow-hidden">
+              <Img src={build.armour?.image} alt="Armor" />
+            </div>
+            <div className="relative w-8 h-8 bg-zinc-900/50 rounded border border-red-900/30 flex items-center justify-center overflow-hidden">
+              <Img src={build.amulet?.image} alt="Amulet" />
+            </div>
           </div>
         </div>
-        <div>
-          <div>Buffs</div>
 
-          <div className="flex">
-            <Img src={build.elixir?.image} />
+        {/* Buffs Section */}
+        <div className="space-y-2">
+          <div className="text-xs font-bold text-red-400 uppercase tracking-wider">Buffs</div>
+          <div className="flex gap-1">
+            <div className="relative w-8 h-8 bg-zinc-900/50 rounded border border-red-900/30 flex items-center justify-center overflow-hidden">
+              <Img src={build.elixir?.image} alt="Elixir" />
+            </div>
             {build.coatings &&
-              Array.from(build.coatings.values()).map((coating, index) => {
-                if (coating && coating.image) {
-                  return (
-                    <Img
-                      key={index}
-                      src={coating.image}
-                      alt={`Coating ${index}`}
-                    />
-                  );
-                }
-                return null;
-              })}
+              Array.from(build.coatings.values()).slice(0, 2).map((coating, index) => (
+                coating && coating.image ? (
+                  <div key={index} className="relative w-8 h-8 bg-zinc-900/50 rounded border border-red-900/30 flex items-center justify-center overflow-hidden">
+                    <Img src={coating.image} alt={`Coating ${index}`} />
+                  </div>
+                ) : null
+              ))}
           </div>
         </div>
-        <div>
-          <div>Blood</div>
-          <div className="flex">
+
+        {/* Blood Section */}
+        <div className="space-y-2">
+          <div className="text-xs font-bold text-red-400 uppercase tracking-wider">Blood</div>
+          <div className="flex gap-1">
             {build.blood?.primary && (
-              <Img
-                src={
-                  bloodData[build.blood.primary as keyof typeof bloodData]
-                    ?.image
-                }
-                alt={`Blood: ${build.blood.primary}`}
-              />
+              <div className="relative w-8 h-8 bg-zinc-900/50 rounded border border-red-900/30 flex items-center justify-center overflow-hidden">
+                <Img
+                  src={bloodData[build.blood.primary as keyof typeof bloodData]?.image}
+                  alt={`Blood: ${build.blood.primary}`}
+                />
+              </div>
             )}
             {build.blood?.secondary && (
-              <Img
-                src={
-                  bloodData[build.blood.secondary as keyof typeof bloodData]
-                    ?.image
-                }
-                alt={`Blood: ${build.blood.secondary}`}
-              />
+              <div className="relative w-8 h-8 bg-zinc-900/50 rounded border border-red-900/30 flex items-center justify-center overflow-hidden">
+                <Img
+                  src={bloodData[build.blood.secondary as keyof typeof bloodData]?.image}
+                  alt={`Blood: ${build.blood.secondary}`}
+                />
+              </div>
             )}
           </div>
         </div>
       </div>
-      <div className="flex gap-4">
-        <div>
-          <div>Spells</div>
-          <div className="flex gap-1">
+
+      {/* Middle Row - Spells and Passives */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* Spells Section */}
+        <div className="space-y-2">
+          <div className="text-xs font-bold text-red-400 uppercase tracking-wider">Spells</div>
+          <div className="grid grid-cols-4 gap-1">
             {build.spells.dash && (
-              <Img src={build.spells.dash.img} alt="Veil" />
+              <div className="relative w-8 h-8 bg-zinc-900/50 rounded border border-red-900/30 flex items-center justify-center overflow-hidden">
+                <Img src={build.spells.dash.img} alt="Veil" />
+              </div>
             )}
             {build.spells.spell1 && (
-              <Img src={build.spells.spell1.img} alt="Spell 1" />
+              <div className="relative w-8 h-8 bg-zinc-900/50 rounded border border-red-900/30 flex items-center justify-center overflow-hidden">
+                <Img src={build.spells.spell1.img} alt="Spell 1" />
+              </div>
             )}
             {build.spells.spell2 && (
-              <Img src={build.spells.spell2.img} alt="Spell 2" />
+              <div className="relative w-8 h-8 bg-zinc-900/50 rounded border border-red-900/30 flex items-center justify-center overflow-hidden">
+                <Img src={build.spells.spell2.img} alt="Spell 2" />
+              </div>
             )}
             {build.spells.ultimate && (
-              <Img src={build.spells.ultimate.img} alt="Ultimate" />
+              <div className="relative w-8 h-8 bg-zinc-900/50 rounded border border-red-900/30 flex items-center justify-center overflow-hidden">
+                <Img src={build.spells.ultimate.img} alt="Ultimate" />
+              </div>
             )}
           </div>
         </div>
-        <div>
-          <div>Passives</div>
-          <div className="flex gap-1">
-            {build.passives.map((passive) => (
-              <Img src={passive.img} />
+
+        {/* Passives Section */}
+        <div className="space-y-2">
+          <div className="text-xs font-bold text-red-400 uppercase tracking-wider">Passives</div>
+          <div className="grid grid-cols-3 gap-1">
+            {build.passives.slice(0, 6).map((passive, index) => (
+              <div key={index} className="relative w-8 h-8 bg-zinc-900/50 rounded border border-red-900/30 flex items-center justify-center overflow-hidden">
+                <Img src={passive.img} alt={`Passive ${index}`} />
+              </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div>
-        <div>Weapons</div>
-        <div className="flex gap-0.5">
-          {Array.from(build.weapons.values()).map((weapon) => (
-            <span className="bg-black">
-              <Img src={weapon.img} />
-            </span>
+      {/* Bottom Row - Weapons */}
+      <div className="space-y-2">
+        <div className="text-xs font-bold text-red-400 uppercase tracking-wider">Weapons</div>
+        <div className="flex gap-1 flex-wrap">
+          {Array.from(build.weapons.values()).map((weapon, index) => (
+            <div key={index} className="relative w-8 h-8 bg-zinc-900/50 rounded border border-red-900/30 flex items-center justify-center overflow-hidden">
+              <Img src={weapon.img} alt={`Weapon ${index}`} />
+            </div>
           ))}
         </div>
       </div>
@@ -118,7 +145,11 @@ const BuildContent = ({ code }: { code: string }) => {
   );
 };
 
-export default function BuildsList() {
+export default function BuildsList({
+  maxBuilds,
+  showViewAllButton = false,
+  onBuildsLoaded
+}: BuildsListProps = {}) {
   const [builds, setBuilds] = useState<Build[]>([]);
   const router = useRouter();
 
@@ -129,16 +160,21 @@ export default function BuildsList() {
         const storedBuilds = localStorage.getItem("vbuilds");
         if (storedBuilds) {
           const parsedBuilds = JSON.parse(storedBuilds);
-          setBuilds(Array.isArray(parsedBuilds) ? parsedBuilds : []);
+          const buildsArray = Array.isArray(parsedBuilds) ? parsedBuilds : [];
+          setBuilds(buildsArray);
+          onBuildsLoaded?.(buildsArray.length > 0);
+        } else {
+          onBuildsLoaded?.(false);
         }
       } catch (error) {
         console.error("Failed to load builds from localStorage:", error);
         setBuilds([]);
+        onBuildsLoaded?.(false);
       }
     };
 
     fetchBuilds();
-  }, []);
+  }, [onBuildsLoaded]);
 
   const handleBuildClick = (code: string) => {
     router.push(`/builds/create?build=${encodeURIComponent(code)}`);
@@ -176,47 +212,185 @@ export default function BuildsList() {
     }
   };
 
+  // Get the builds to display (limited by maxBuilds if specified)
+  const buildsToShow = maxBuilds ? builds.slice(0, maxBuilds) : builds;
+
   if (builds.length === 0) {
     return (
-      <p className="text-white text-center">
-        No builds found. Create some builds to see them here!
-      </p>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center py-16"
+      >
+        <div className="max-w-2xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6 mb-8 text-sm">
+            <div className="bg-red-900/20 border border-red-900/30 rounded-lg p-4">
+              <div className="text-white font-bold mb-2">CREATE</div>
+              <p className="text-gray-300">Design builds with our intuitive builder tool</p>
+            </div>
+            <div className="bg-red-900/20 border border-red-900/30 rounded-lg p-4">
+              <div className="text-white font-bold mb-2">STORE</div>
+              <p className="text-gray-300">Save unlimited builds for different strategies</p>
+            </div>
+            <div className="bg-red-900/20 border border-red-900/30 rounded-lg p-4">
+              <div className="text-white font-bold mb-2">IMPORT</div>
+              <p className="text-gray-300">Use builds in-game with simple commands</p>
+            </div>
+          </div>
+          <Link
+            href="/builds/create"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-red-900/50 border border-red-900/50 text-white font-bold rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group text-lg"
+          >
+            <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-200" />
+            Create Your Build
+          </Link>
+        </div>
+      </motion.div>
     );
   }
 
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-      {builds.map((build, index) => (
-        <Card
-          key={index}
-          className="bg-gray-800 text-white border-gray-700 cursor-pointer hover:bg-gray-700 transition-colors relative"
-          onClick={() => handleBuildClick(build.code)}
-        >
-          <div className="absolute top-2 right-2 flex gap-2">
-            <button
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-full w-6 h-6 flex items-center justify-center transition-colors"
-              onClick={(e) => handleCopyCommand(e, build.code)}
-              aria-label="Copy build command"
-            >
-              <ClipboardCopyIcon size={14} />
-            </button>
-            <button
-              className="bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center transition-colors"
-              onClick={(e) => handleDelete(e, index)}
-              aria-label="Delete build"
-            >
-              ×
-            </button>
-          </div>
+  const scaleIn = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.5 },
+    },
+  };
 
-          <CardHeader>
-            <CardTitle>{build.name || "Unnamed Build"}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <BuildContent code={build.code} />
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  return (
+    <>
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
+        {buildsToShow.map((build, index) => (
+          <motion.div
+            key={index}
+            variants={scaleIn}
+            whileHover={{
+              y: -10,
+              scale: 1.02,
+              transition: { duration: 0.2 }
+            }}
+          >
+            <Card
+              className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-red-900/30 hover:border-red-500
+                       transition-all duration-300 overflow-hidden group cursor-pointer h-full relative"
+              onClick={() => handleBuildClick(build.code)}
+            >
+              {/* Glow effect on hover */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-red-900/20" />
+              </div>
+
+              <div className="absolute top-4 right-4 flex gap-2 z-10">
+                <motion.button
+                  className="bg-blue-600/80 hover:bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-blue-500/50"
+                  onClick={(e) => handleCopyCommand(e, build.code)}
+                  aria-label="Copy build command"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <ClipboardCopyIcon size={16} />
+                </motion.button>
+                <motion.button
+                  className="bg-red-600/80 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-red-500/50"
+                  onClick={(e) => handleDelete(e, index)}
+                  aria-label="Delete build"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  ×
+                </motion.button>
+              </div>
+
+              <CardHeader className="relative">
+                <div className="flex items-center gap-2 mb-2">
+                  <Swords className="w-5 h-5 text-red-500" />
+                  <span className="text-red-500 text-sm font-bold tracking-wider uppercase">
+                    Build
+                  </span>
+                </div>
+                <CardTitle className="text-xl font-bold group-hover:text-red-400 transition-colors">
+                  {build.name || "Unnamed Build"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="relative">
+                <BuildContent code={build.code} />
+
+                {/* Edit indicator */}
+                <motion.div
+                  className="mt-4 flex items-center gap-2 text-red-500 text-sm font-bold
+                           group-hover:text-red-400 transition-colors"
+                  initial={{ x: -10, opacity: 0 }}
+                  whileHover={{ x: 5 }}
+                  animate={{ x: 0, opacity: 1 }}
+                >
+                  EDIT BUILD
+                  <motion.div
+                    className="w-4 h-4 group-hover:translate-x-2 transition-transform"
+                    initial={{ rotate: 0 }}
+                    whileHover={{ rotate: 90 }}
+                  >
+                    ⚔️
+                  </motion.div>
+                </motion.div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* View All Button - Only show when requested and there are more builds */}
+      {showViewAllButton && builds.length > 0 && maxBuilds && builds.length > maxBuilds && (
+        <motion.div
+          className="text-center mt-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="inline-block"
+          >
+            <Button
+              variant="outline"
+              size="lg"
+              className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
+                       relative overflow-hidden group px-8 shadow-lg shadow-red-900/20"
+            >
+              <Link href="/builds" className="flex items-center">
+                <span className="relative z-10 font-bold tracking-wider">
+                  VIEW ALL BUILDS ({builds.length})
+                </span>
+                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
+              </Link>
+              <motion.span
+                className="absolute inset-0 bg-gradient-to-r from-red-900/40 to-transparent"
+                initial={{ x: "-100%" }}
+                whileHover={{ x: 0 }}
+                transition={{ duration: 0.3 }}
+              />
+            </Button>
+          </motion.div>
+        </motion.div>
+      )}
+    </>
   );
 }

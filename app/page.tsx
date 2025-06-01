@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   CalendarClock,
   Terminal,
+  Plus,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
@@ -20,6 +21,7 @@ import BloodParticles from "@/components/blood-particles";
 import NavBar, { menuItems } from "@/components/NavBar";
 import CommandGenerator from "@/components/command-generator";
 import FeatureCarousel from "@/app/components/ui/FeatureCarousel";
+import BuildsList from "@/components/builds/BuildsList";
 
 // --- START: Icon mapping ---
 // Helper to map icon names from Notion to actual components
@@ -45,12 +47,25 @@ interface NewsItem {
   iconName: string; // e.g., "Castle", "Moon"
   slug?: string; // Optional slug for news posts
   coverImageUrl?: string; // Cover image from Notion
+  // Additional optional properties that might come from different APIs
+  _id?: string; // Alternative ID field
+  name?: string; // Alternative title field
+  createdAt?: string; // Alternative date field
+  created_time?: string; // Another alternative date field
+  description?: string; // Alternative excerpt field
+  content?: string; // Full content field
+  type?: string; // Alternative category field
+  image?: string; // Alternative cover image field
+  cover?: string; // Another alternative cover image field
   // Add other fields if necessary
 }
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0)
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]) // State for news items
+  const [isLoadingNews, setIsLoadingNews] = useState(true) // Add loading state
+  const [newsError, setNewsError] = useState<string | null>(null) // Add error state
+  const [hasBuilds, setHasBuilds] = useState(false) // State for whether user has builds
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,30 +76,59 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    const fetchNewsFromAPI = async () => {
-      try {
-        const response = await fetch('/api/news');
+  const fetchNewsFromAPI = async (retryCount = 0) => {
+    const maxRetries = 2;
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (data.error) {
-          console.error("API returned error:", data.error);
-          setNewsItems([]);
-          return;
-        }
-
-        setNewsItems(data as NewsItem[]);
-      } catch (error) {
-        console.error("Failed to fetch news:", error);
-        setNewsItems([]);
+    try {
+      if (retryCount === 0) {
+        setIsLoadingNews(true);
       }
-    };
+      setNewsError(null); // Clear any previous errors
 
+      const response = await fetch('/api/news', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Add cache control to prevent stale data
+        cache: 'no-cache'
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      } else {
+        // Ensure data is an array and has items
+        const newsData = Array.isArray(data) ? data : [];
+
+        // Set the news items immediately
+        setNewsItems(newsData);
+        setNewsError(null);
+
+        // Success - set loading to false immediately
+        setIsLoadingNews(false);
+      }
+    } catch (error) {
+      // Retry logic
+      if (retryCount < maxRetries) {
+        setTimeout(() => {
+          fetchNewsFromAPI(retryCount + 1);
+        }, (retryCount + 1) * 1000); // Exponential backoff
+      } else {
+        // Max retries reached
+        setNewsError(error instanceof Error ? error.message : "Failed to fetch news after multiple attempts");
+        setNewsItems([]);
+        setIsLoadingNews(false);
+      }
+    }
+  };
+
+  useEffect(() => {
     fetchNewsFromAPI();
   }, []);
 
@@ -154,6 +198,50 @@ export default function Home() {
         "Maintaining a safe and enjoyable environment for all players.",
     },
   ];
+
+  // News Card Skeleton Component
+  const NewsCardSkeleton = () => (
+    <motion.div
+      variants={scaleIn}
+      className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-red-900/30 overflow-hidden h-full relative"
+    >
+      {/* Image Skeleton */}
+      <div className="relative aspect-video bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 animate-pulse">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-zinc-700/50 to-transparent animate-shimmer"></div>
+
+        {/* Category Badge Skeleton */}
+        <div className="absolute top-4 right-4">
+          <div className="bg-zinc-800 rounded-full px-3 py-1.5 animate-pulse">
+            <div className="w-16 h-3 bg-zinc-700 rounded"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Skeleton */}
+      <div className="p-6 space-y-3">
+        {/* Date Skeleton */}
+        <div className="w-24 h-3 bg-zinc-800 rounded animate-pulse"></div>
+
+        {/* Title Skeleton */}
+        <div className="space-y-2">
+          <div className="w-full h-5 bg-zinc-800 rounded animate-pulse"></div>
+          <div className="w-3/4 h-5 bg-zinc-800 rounded animate-pulse"></div>
+        </div>
+
+        {/* Excerpt Skeleton */}
+        <div className="space-y-2 pt-2">
+          <div className="w-full h-3 bg-zinc-800 rounded animate-pulse"></div>
+          <div className="w-full h-3 bg-zinc-800 rounded animate-pulse"></div>
+          <div className="w-2/3 h-3 bg-zinc-800 rounded animate-pulse"></div>
+        </div>
+
+        {/* Read More Button Skeleton */}
+        <div className="pt-4">
+          <div className="w-20 h-3 bg-zinc-800 rounded animate-pulse"></div>
+        </div>
+      </div>
+    </motion.div>
+  );
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
@@ -307,6 +395,78 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Builds Section */}
+      <section id="builds" className="py-20 bg-black relative">
+        <div className="container mx-auto px-4 relative">
+          <motion.div
+            className="text-center mb-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            <div className="inline-block rounded-md bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
+              BUILD COLLECTION
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
+              Your Arsenal
+            </h2>
+            <p className="text-gray-100 max-w-2xl mx-auto text-lg">
+              Manage your saved builds and create new combinations
+            </p>
+          </motion.div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <BuildsList
+              maxBuilds={3}
+              showViewAllButton={true}
+              onBuildsLoaded={setHasBuilds}
+            />
+          </motion.div>
+
+          {/* View All Builds Button - Only show when builds exist */}
+          {hasBuilds && (
+            <motion.div
+              className="text-center mt-12"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              viewport={{ once: true }}
+            >
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-block"
+              >
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
+                           relative overflow-hidden group px-8 shadow-lg shadow-red-900/20"
+                >
+                  <Link href="/builds" className="flex items-center">
+                    <span className="relative z-10 font-bold tracking-wider">
+                      MANAGE ALL BUILDS
+                    </span>
+                    <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
+                  </Link>
+                  <motion.span
+                    className="absolute inset-0 bg-gradient-to-r from-red-900/40 to-transparent"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </Button>
+              </motion.div>
+            </motion.div>
+          )}
+        </div>
+      </section>
+
       {/* News Section */}
       <section id="news" className="py-20 bg-black relative">
         <div className="container mx-auto px-4 relative">
@@ -330,127 +490,183 @@ export default function Home() {
           </motion.div>
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
           >
-            {newsItems.length > 0 ? newsItems.slice(0, 3).map((news, index) => {
-              const IconComponent = iconMap[news.iconName] || Terminal; // Default icon if not found
+            {(() => {
+              // Loading state
+              if (isLoadingNews) {
+                return [...Array(3)].map((_, index) => (
+                  <NewsCardSkeleton key={`skeleton-${index}`} />
+                ));
+              }
+
+              // Error state
+              if (newsError) {
+                return (
+                  <motion.div
+                    className="col-span-full text-center py-12"
+                    variants={fadeInUp}
+                  >
+                    <div className="text-6xl mb-4">⚠️</div>
+                    <h3 className="text-2xl font-semibold text-red-400 mb-2">
+                      Failed to Load News
+                    </h3>
+                    <p className="text-gray-400 mb-4">
+                      {newsError}
+                    </p>
+                    <button
+                      onClick={() => fetchNewsFromAPI()}
+                      className="px-4 py-2 bg-red-900/50 border border-red-900/50 text-white rounded-lg hover:bg-red-900/70 transition-colors"
+                    >
+                      Try Again
+                    </button>
+                  </motion.div>
+                );
+              }
+
+              // Check if we have valid news items
+              if (Array.isArray(newsItems) && newsItems.length > 0) {
+                return newsItems.slice(0, 3).map((news, index) => {
+                  // More flexible validation - check if we have at least some content
+                  if (!news) {
+                    return null;
+                  }
+
+                  // Use fallbacks for missing properties
+                  const newsId = news.id || news._id || `news-${index}`;
+                  const newsTitle = news.title || news.name || `News Item ${index + 1}`;
+                  const newsSlug = news.slug || newsId;
+                  const newsDate = news.date || news.createdAt || news.created_time || new Date().toISOString();
+                  const newsExcerpt = news.excerpt || news.description || news.content?.substring(0, 150) || 'Read more to discover the latest updates...';
+                  const newsCategory = news.category || news.type || 'News';
+                  const newsCoverImage = news.coverImageUrl || news.image || news.cover || '/news.png';
+
+                  const IconComponent = iconMap[news.iconName] || Terminal;
+
+                  return (
+                    <motion.div
+                      key={newsId}
+                      className="relative z-10"
+                      initial={{ opacity: 1, scale: 1 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      whileHover={{
+                        y: -10,
+                        scale: 1.02,
+                        transition: { duration: 0.2 }
+                      }}
+                    >
+                      <Link
+                        href={`/news/${newsSlug}`}
+                        className="bg-black/90 backdrop-blur-sm rounded-lg border-2 border-red-900/50 hover:border-red-500
+                               transition-all duration-300 overflow-hidden group block h-full relative z-10"
+                      >
+                        {/* Glow effect on hover */}
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0">
+                          <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-red-900/20" />
+                        </div>
+
+                        <div className="relative aspect-video z-10">
+                          <img
+                            src={newsCoverImage}
+                            alt={newsTitle}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              if (target.src !== '/news.png') {
+                                target.src = '/news.png';
+                              }
+                            }}
+                          />
+
+                          {/* Category Badge */}
+                          <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
+                            <div className="bg-red-900/90 text-white text-xs px-3 py-1.5 rounded-full font-bold border border-red-500/50 shadow-lg shadow-red-900/50 flex items-center gap-2">
+                              {IconComponent && <IconComponent className="w-3 h-3" />}
+                              {newsCategory}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-6 relative z-10">
+                          <div className="text-red-500 text-sm mb-2 font-bold tracking-wider">
+                            {new Date(newsDate).toLocaleDateString()}
+                          </div>
+                          <h3 className="text-xl font-bold mb-3 text-white group-hover:text-red-400 transition-colors">
+                            {newsTitle}
+                          </h3>
+                          <p className="text-gray-300 mb-4">{newsExcerpt}</p>
+
+                          {/* Read More Button */}
+                          <div className="flex items-center gap-2 text-red-500 text-sm font-bold group-hover:text-red-400 transition-colors">
+                            READ MORE
+                            <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  );
+                }).filter(Boolean); // Remove any null items
+              }
+
+              // Empty state
               return (
                 <motion.div
-                  key={news.id} // Use Notion page ID as key
-                  variants={scaleIn}
-                  whileHover={{
-                    y: -10,
-                    scale: 1.02,
-                    transition: { duration: 0.2 }
-                  }}
+                  className="col-span-full text-center py-12"
+                  variants={fadeInUp}
                 >
-                  <Link
-                    href={`/news/${news.slug || news.id}`} // Link to dynamic news page
-                    className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-red-900/30 hover:border-red-500
-                           transition-all duration-300 overflow-hidden group block h-full relative"
-                  >
-                    {/* Glow effect on hover */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent" />
-                      <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-red-900/20" />
-                    </div>
-
-                    <div className="relative aspect-video">
-                      <Image
-                        // Use Notion cover image if available, otherwise fallback to news.png
-                        src={news.coverImageUrl || `/news.png`}
-                        alt={news.title}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          if (target.src !== '/news.png') {
-                            target.src = '/news.png';
-                          }
-                        }}
-                      />
-
-                      {/* Category Badge */}
-                      <div className="absolute top-4 right-4 flex items-center gap-2">
-                        <motion.div
-                          className="bg-red-900/80 text-white text-xs px-3 py-1.5 rounded-full font-bold
-                                 border border-red-500/50 shadow-lg shadow-red-900/50"
-                          whileHover={{ scale: 1.05 }}
-                        >
-                          <div className="flex items-center gap-2">
-                            {IconComponent && <IconComponent className="w-3 h-3" />}
-                            {news.category}
-                          </div>
-                        </motion.div>
-                      </div>
-                    </div>
-
-                    <div className="p-6 relative">
-                      <div className="text-red-500 text-sm mb-2 font-bold tracking-wider">{new Date(news.date).toLocaleDateString()}</div>
-                      <h3 className="text-xl font-bold mb-3 group-hover:text-red-400 transition-colors">
-                        {news.title}
-                      </h3>
-                      <p className="text-gray-300">{news.excerpt}</p>
-
-                      {/* Read More Button */}
-                      <motion.div
-                        className="mt-6 flex items-center gap-2 text-red-500 text-sm font-bold
-                               group-hover:text-red-400 transition-colors"
-                        initial={{ x: -10, opacity: 0 }}
-                        whileHover={{ x: 5 }}
-                        animate={{ x: 0, opacity: 1 }}
-                      >
-                        READ MORE
-                        <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
-                      </motion.div>
-                    </div>
-                  </Link>
+                  <div className="text-6xl mb-4">📰</div>
+                  <h3 className="text-2xl font-semibold text-gray-300 mb-2">
+                    No News Available
+                  </h3>
+                  <p className="text-gray-400 mb-4">
+                    Check back later for the latest updates and announcements.
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    If this persists, please ensure your Notion integration is correctly configured.
+                  </p>
                 </motion.div>
-              )
-            }) : (
-              <p className="text-center col-span-full py-10 text-gray-400">
-                Loading news... If this message persists, please ensure your Notion integration is correctly configured in <code>.env.local</code>.
-              </p>
-            )}
+              );
+            })()}
           </motion.div>
 
-          {/* View All Button */}
-          <motion.div
-            className="text-center mt-12"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            viewport={{ once: true }}
-          >
+          {/* View All Button - Only show when not loading and has news */}
+          {!isLoadingNews && !newsError && newsItems && newsItems.length > 0 && (
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-block"
+              className="text-center mt-12"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              viewport={{ once: true }}
             >
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
-                         relative overflow-hidden group px-8 shadow-lg shadow-red-900/20"
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-block"
               >
-                <Link href="/news" className="flex items-center">
-                  <span className="relative z-10 font-bold tracking-wider">
-                    VIEW ALL NEWS
-                  </span>
-                  <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
-                </Link>
-                <motion.span
-                  className="absolute inset-0 bg-gradient-to-r from-red-900/40 to-transparent"
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: 0 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
+                           relative overflow-hidden group px-8 shadow-lg shadow-red-900/20"
+                >
+                  <Link href="/news" className="flex items-center">
+                    <span className="relative z-10 font-bold tracking-wider">
+                      VIEW ALL NEWS
+                    </span>
+                    <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
+                  </Link>
+                  <motion.span
+                    className="absolute inset-0 bg-gradient-to-r from-red-900/40 to-transparent"
+                    initial={{ x: "-100%" }}
+                    whileHover={{ x: 0 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </Button>
+              </motion.div>
             </motion.div>
-          </motion.div>
+          )}
         </div>
       </section>
 
@@ -534,7 +750,7 @@ export default function Home() {
                       whileHover={{ scale: 1.05, color: "#fff" }}
                     >
                       <Users className="h-5 w-5" />
-                      <span className="font-semibold">6,200+ Members</span>
+                      <span className="font-semibold">7,200+ Members</span>
                     </motion.div>
                     <motion.div
                       className="flex items-center gap-2"

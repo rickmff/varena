@@ -169,7 +169,7 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
         <div id="bg-image-2" className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out opacity-0"></div>
       </div>
 
-      <div className="container mx-auto px-4 relative z-50">
+      <div className="container mx-auto px-4 relative z-20">
         <motion.div
           className="text-center mb-16"
           initial="hidden"

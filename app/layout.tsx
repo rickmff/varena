@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     siteName: 'V Arena',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
         alt: 'V Arena - V Rising Community Server',
@@ -94,6 +94,18 @@ export default function RootLayout({
       <head>
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="msapplication-TileImage" content="/mstile-144x144.png" />
+        <meta name="description" content="Join V Arena, the premier V Rising community server featuring custom game modes, events, and an active community of vampire enthusiasts." />
+        <meta property="og:url" content="https://v-arena.com" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="V Arena - V Rising Community Server" />
+        <meta property="og:description" content="Join V Arena, the premier V Rising community server featuring custom game modes, events, and an active community of vampire enthusiasts." />
+        <meta property="og:image" content="https://v-arena.com/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="twitter:domain" content="v-arena.com" />
+        <meta property="twitter:url" content="https://v-arena.com" />
+        <meta name="twitter:title" content="V Arena - V Rising Community Server" />
+        <meta name="twitter:description" content="Join V Arena, the premier V Rising community server featuring custom game modes, events, and an active community of vampire enthusiasts." />
+        <meta name="twitter:image" content="https://v-arena.com/og-image.png" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />

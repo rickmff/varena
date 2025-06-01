@@ -12,6 +12,7 @@ export const menuItems = [
   { name: "COMMANDS", href: "#generate-commands" },
   { name: "NEWS", href: "/news" },
   { name: "BUILDS", href: "/builds" },
+  { name: "CREATE BUILD", href: "/builds/create" },
 ];
 
 export default function NavBar() {
