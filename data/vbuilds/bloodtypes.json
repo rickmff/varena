@@ -84,7 +84,7 @@
         "description": "10% Increased Physical Power and Veil attacks deal 30% bonus damage.",
         "modifiers": [
           {
-            "stat": "Physical Power",
+            "stat": "Bonus Physical Power",
             "value": 10,
             "unit": "percent",
             "calculate": true
@@ -251,7 +251,7 @@
             "calculate": true
           },
           {
-            "stat": "Physical Power",
+            "stat": "Bonus Physical Power",
             "value": 5,
             "unit": "percent",
             "calculate": true
@@ -326,7 +326,7 @@
         "description": "14% Increased Spell Power and 10% Shield Efficiency.",
         "modifiers": [
           {
-            "stat": "Spell Power",
+            "stat": "Bonus Spell Power",
             "value": 14,
             "unit": "percent",
             "calculate": true
@@ -395,7 +395,7 @@
         "description": "14% Increased Spell Power and 10% increased Shapeshift Speed.",
         "modifiers": [
           {
-            "stat": "Spell Power",
+            "stat": "Bonus Spell Power",
             "value": 14,
             "unit": "percent",
             "calculate": true
@@ -470,7 +470,7 @@
         "description": "14% Increased Spell Power and 8% increased Spell Critical Power.",
         "modifiers": [
           {
-            "stat": "Spell Power",
+            "stat": "Bonus Spell Power",
             "value": 14,
             "unit": "percent",
             "calculate": true

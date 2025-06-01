@@ -36,7 +36,7 @@ const BuilderPage = () => {
         {/* Main Content Area */}
         <div className="flex-1 space-y-6 lg:space-y-8">
           {/* Build Section */}
-          <div className="bg-grey-900/40 backdrop-blur-sm border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
+          <div className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
               <section className="flex-1">
                 <div className="flex items-center gap-3 mb-4 sm:mb-6">
@@ -89,7 +89,7 @@ const BuilderPage = () => {
 
           {/* Spells & Passives Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
-            <section className="bg-grey-900/40 backdrop-blur-sm border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
+            <section className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="w-1 h-6 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full" />
                 <h3 className="text-lg sm:text-xl font-bold text-grey-100 tracking-wide">
@@ -100,7 +100,7 @@ const BuilderPage = () => {
               <SpellForge />
             </section>
 
-            <section className="bg-grey-900/40 backdrop-blur-sm border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
+            <section className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="w-1 h-6 bg-gradient-to-b from-green-400 to-green-600 rounded-full" />
                 <h3 className="text-lg sm:text-xl font-bold text-grey-100 tracking-wide">
@@ -113,7 +113,7 @@ const BuilderPage = () => {
           </div>
 
           {/* Weapons Section */}
-          <div className="bg-grey-900/40 backdrop-blur-sm border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
+          <div className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4 sm:mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-1 h-6 bg-gradient-to-b from-orange-400 to-orange-600 rounded-full" />
@@ -121,7 +121,7 @@ const BuilderPage = () => {
                   WEAPONS
                 </h3>
               </div>
-              <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs px-3 py-1.5 rounded-full font-medium backdrop-blur-sm w-fit">
+              <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs px-3 py-1.5 rounded-full font-medium  w-fit">
                 Use keys 1-8 to focus weapon stats
               </div>
               <div className="hidden sm:block flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
@@ -137,7 +137,7 @@ const BuilderPage = () => {
         {/* Sidebar - Mobile: Full width below content, Desktop: Fixed sidebar */}
         <div className="w-full lg:w-1/3 space-y-4 lg:space-y-6 order-first lg:order-last">
           {/* Stats Panel */}
-          <div className="bg-grey-900/40 backdrop-blur-sm border border-grey-700/50 rounded-xl shadow-2xl overflow-hidden">
+          <div className="bg-grey-900/40  border border-grey-700/50 rounded-xl shadow-2xl overflow-hidden">
             <div className="p-3 sm:p-4 border-b border-grey-700/50 bg-grey-800/30">
               <div className="flex items-center gap-3">
                 <div className="w-1 h-5 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full" />

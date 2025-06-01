@@ -51,7 +51,7 @@
     "name": "Attack Speed",
     "value": 0,
     "unit": "%",
-    "cap": 135,
+    "cap": 140,
     "defaultValue": 100,
     "category": "Physical"
   },
@@ -115,7 +115,7 @@
     "name": "Ultimate Power",
     "value": 0,
     "unit": "%",
-    "cap": 150,
+    "cap": 155,
     "defaultValue": 100,
     "category": "Spell"
   },
@@ -147,7 +147,7 @@
     "name": "Shapeshift Speed",
     "value": 0,
     "unit": "%",
-    "cap": 50,
+    "cap": 56,
     "defaultValue": 0,
     "category": "Speed"
   },
@@ -155,7 +155,7 @@
     "name": "Mount Speed",
     "value": 0,
     "unit": "%",
-    "cap": 40,
+    "cap": 45,
     "defaultValue": 0,
     "category": "Speed"
   },
@@ -171,7 +171,7 @@
     "name": "Shield Efficiency",
     "value": 0,
     "unit": "%",
-    "cap": 50,
+    "cap": 58,
     "defaultValue": 0,
     "category": "Defense"
   },
