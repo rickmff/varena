@@ -119,7 +119,7 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
 
 
     const bagAndCapeModifiers = [
-        // { stat: "Max Health", value: 24, unit: "flat" }, // Tier 3 Cape
+        { stat: "Max Health", value: 24, unit: "flat" }, // Tier 3 Cape
         { stat: "Max Health", value: 42, unit: "flat" }, // Bat Leather Bag
         { stat: "Resource Yield", value: 10, unit: "percent" },
 

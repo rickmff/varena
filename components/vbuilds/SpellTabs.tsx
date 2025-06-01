@@ -5,7 +5,7 @@ import spellsData from "@/data/vbuilds/spells.json";
 import "./styles.css";
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group";
 import { useState } from "react";
-import { JewelForge, AddSpellWithJewel } from "./JewelForge";
+import { AddSpellWithJewel, JewelForge, SpellWithJewel } from "./JewelForge";
 import { XIcon } from "lucide-react";
 
 import { Spell } from "./JewelForge";
@@ -23,15 +23,18 @@ const spellSchools = Array.from(
 );
 
 const SpellTabs = ({
+  spell,
   onAdd,
-  filter,
 }: {
+  spell?: SpellWithJewel;
   onAdd: (params: AddSpellWithJewel) => void;
-  filter: (spell: any) => boolean;
 }) => {
-  const [selectedSpell, setSelectedSpell] = useState<string>("");
+  const [selectedSpell, setSelectedSpell] = useState<
+    SpellWithJewel | undefined
+  >(() => spell);
+
   return (
-    <Tabs defaultValue="veil">
+    <Tabs defaultValue={selectedSpell?.spellSchool}>
       {!selectedSpell && (
         <TabsList className="w-full">
           {spellSchools.map((school) => (
@@ -53,17 +56,19 @@ const SpellTabs = ({
           <ToggleGroup
             type="single"
             className="flex flex-col gap-4 justify-start items-start"
+            defaultValue={selectedSpell?.id}
             onValueChange={(value) => {
-              setSelectedSpell(value);
+              setSelectedSpell(
+                value ? (spellsData as SpellsData)[value] : undefined
+              );
             }}
           >
             {Object.values(spellsData)
-              .filter(filter)
               .filter((spell) => {
                 if (!selectedSpell) {
                   return true;
                 }
-                return selectedSpell === spell.id;
+                return selectedSpell.id === spell.id;
               })
               .filter(
                 (spell) =>
@@ -71,8 +76,11 @@ const SpellTabs = ({
               )
               .map((spell) => (
                 <ToggleGroupItem
+                  data-state={selectedSpell?.id === spell.id ? "on" : "off"}
+                  aria-checked={selectedSpell?.id === spell.id}
                   value={spell.id}
                   key={spell.id}
+                  defaultChecked={selectedSpell?.id === spell.id}
                   className="flex justify-between h-16 w-full"
                 >
                   <div className="flex gap-4 justify-start items-center">
@@ -89,7 +97,10 @@ const SpellTabs = ({
           </ToggleGroup>
           {selectedSpell && (
             <JewelForge
-              spell={(spellsData as SpellsData)[selectedSpell]}
+              spell={selectedSpell}
+              selectedJewelEffects={
+                selectedSpell.jewel?.map((jewel) => Number(jewel)) || []
+              }
               onAdd={onAdd}
             />
           )}

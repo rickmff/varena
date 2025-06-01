@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Button } from "../ui/button";
 import { set } from "date-fns";
 import { Check } from "lucide-react";
+import { useSelector } from "@xstate/react";
 
 const SlotTrigger = ({ children }: { children?: React.ReactNode }) => {
   const { builder } = useBuilder();
@@ -239,9 +240,12 @@ const BloodTabs = ({
 export const BloodForge = () => {
   const { state, builder } = useBuilder();
 
-  const [primaryBlood, setPrimaryBlood] = useState("rogue");
-  const [secondaryBlood, setSecondaryBlood] = useState("");
-  const [secondaryBloodInfusion, setSecondaryBloodInfusion] = useState<any>();
+  const blood = useSelector(builder, (state) => state.context.blood);
+  const [primaryBlood, setPrimaryBlood] = useState(blood?.primary || "rogue");
+  const [secondaryBlood, setSecondaryBlood] = useState(blood?.secondary || "");
+  const [secondaryBloodInfusion, setSecondaryBloodInfusion] = useState<any>(
+    blood?.infusion || ""
+  );
 
   return (
     <Dialog

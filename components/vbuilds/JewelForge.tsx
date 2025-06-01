@@ -1,29 +1,54 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "../ui/button";
 
 export type Spell = {
-  id: String;
-  name: String;
+  id: string;
+  name: string;
   effects: Array<{ key: number; description: string }>;
   spellSchool: "storm" | "chaos" | "frost" | "blood" | "unholy" | "illusion";
 };
 
+export type SpellWithJewel = {
+  jewel?: number[];
+} & Spell;
+
 export type AddSpell = {
   spell: Spell;
 };
+
 export type AddSpellWithJewel = {
   jewel?: number[];
 } & AddSpell;
 
 export const JewelForge = ({
   spell,
+  selectedJewelEffects = [],
   onAdd,
 }: {
   spell: Spell;
+  selectedJewelEffects?: number[];
   onAdd: (params: AddSpellWithJewel) => void;
 }) => {
-  const [selectedEffects, setSelectedEffects] = useState<number[]>([]);
+  const [selectedEffects, setSelectedEffects] = useState<number[]>(
+    () => selectedJewelEffects || []
+  );
+
+  const prevSpellIdRef = useRef<String>(spell.id);
+
+  // Reset selected effects when spell changes
+  useEffect(() => {
+    // Only reset if the spell ID actually changed
+    if (prevSpellIdRef.current !== spell.id) {
+      setSelectedEffects([]);
+      prevSpellIdRef.current = spell.id;
+    }
+  }, [spell.id]);
+
+  // Move the console.log outside of the render to help debug
+  useEffect(() => {
+    console.log(selectedEffects, "selected effects");
+  }, [selectedEffects]);
 
   const toggleEffectSelection = (key: number) => {
     setSelectedEffects((prev) => {
@@ -36,18 +61,24 @@ export const JewelForge = ({
     });
   };
 
-  useEffect(() => {
-    setSelectedEffects([]);
-  }, [spell]);
-
   return (
     <div className="space-y-4">
-      <div className="flex gap-4 justify-start items-center mb-4 pt-8">
-        <img
-          src={`/images/vbuilds/jewels/jewel-${spell.spellSchool}_tier4.webp`}
-          className="w-12 h-12"
-        />
-        <h2 className="text-xl font-bold">Create Jewel</h2>
+      <div className="flex justify-between items-center py-4">
+        <div className="flex gap-4 justify-start items-center">
+          <img
+            src={`/images/vbuilds/jewels/jewel-${spell.spellSchool}_tier4.webp`}
+            className="w-12 h-12"
+          />
+
+          <h3 className="text-lg font-semibold text-red-400 flex justifty-between items-center">
+            <span className="mr-2">Create Jewel</span>
+          </h3>
+        </div>
+        <div>
+          <div className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded-full">
+            Choose 4 Effects
+          </div>
+        </div>
       </div>
       <ul className="space-y-4">
         {spell.effects.map((effect) => (
@@ -64,11 +95,14 @@ export const JewelForge = ({
           </li>
         ))}
       </ul>
+
       <Button
-        disabled={selectedEffects.length < 4}
+        variant="outline"
+        className="w-full text-white relative overflow-hidden group border-red-900/70 bg-red-900/50 hover:bg-red-800"
         onClick={() => onAdd({ spell, jewel: selectedEffects })}
+        disabled={selectedEffects.length < 4}
       >
-        Add Spell
+        ADD SPELL
       </Button>
     </div>
   );

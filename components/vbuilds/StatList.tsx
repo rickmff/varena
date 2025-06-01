@@ -10,20 +10,43 @@ export function StatList({ stats }: { stats: Array<any> }) {
         const overCap = stat.cap && totalValue > stat.cap;
 
         return (
-          <li key={index} className="rounded text-sm">
-            <div className="flex justify-between mb-1">
-              <span className="font-medium">{stat.name}</span>
-              <span className="font-medium">
-                {stat.cap
-                  ? `${totalValue} / ${stat.cap}${stat.unit}`
-                  : `${totalValue}${stat.unit}`}
+          <li
+            key={index}
+            className={`rounded text-sm ${overCap ? "animate-pulse" : ""}`}
+          >
+            <div className={`flex justify-between mb-1`}>
+              <span className={`font-medium ${overCap ? "text-white" : ""}`}>
+                {stat.name}
+              </span>
+              <span className="">
+                {stat.cap ? (
+                  <>
+                    <span
+                      className={`font-bold ${
+                        overCap ? "text-red-800" : "text-red-400"
+                      }`}
+                    >
+                      {totalValue}
+                    </span>{" "}
+                    /{" "}
+                    <span>
+                      {stat.cap}
+                      {stat.unit}
+                    </span>
+                  </>
+                ) : (
+                  <span>
+                    {totalValue}
+                    {stat.unit}
+                  </span>
+                )}
               </span>
             </div>
             {stat.cap && (
-              <div className="w-full bg-gray-700 rounded h-2">
+              <div className={`w-full bg-gray-700 rounded h-2`}>
                 <div
                   className={`${
-                    overCap ? "bg-red-500" : "bg-purple-500"
+                    overCap ? "bg-red-800" : "bg-red-400"
                   } h-2 rounded`}
                   style={{ width: `${progressWidth}%` }}
                 ></div>

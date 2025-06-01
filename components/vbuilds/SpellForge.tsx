@@ -10,7 +10,7 @@ import {
 } from "../ui/sheet";
 import SpellTabs from "./SpellTabs";
 import { DashForge } from "./DashForge";
-import { AddSpell } from "./JewelForge";
+import { Spell } from "./JewelForge";
 import UltimateForge from "./UltimateForge";
 
 import {
@@ -18,6 +18,7 @@ import {
   HoverCard,
   HoverCardContent,
 } from "../ui/hover-card";
+import { Button } from "../ui/button";
 const SlotTrigger = ({
   children,
   goto,
@@ -52,7 +53,7 @@ const SlotTrigger = ({
       </HoverCardTrigger>
       <HoverCardContent className="w-96 flex flex-col gap-4">
         {state.context.spells[goto]?.jewel?.map(
-          (jewel: AddSpell, index: number) => (
+          (jewel: string, index: number) => (
             <div key={index}>
               {
                 state.context.spells[goto]?.effects?.find(
@@ -100,6 +101,13 @@ const SlotImage = ({ slot }: { slot: "dash" | "spell1" | "spell2" }) => {
       />
     </>
   );
+};
+
+const sectionTitle = {
+  dash: "Veil",
+  spell1: "Spell 1",
+  spell2: "Spell 2",
+  ultimate: "Ultimate",
 };
 
 export const SpellForge = () => {
@@ -165,30 +173,29 @@ export const SpellForge = () => {
       </div>
       <SheetContent
         showCloseButton={false}
-        className="w-1/3 sm:max-w-3/4 p-8"
+        className="w-1/3 sm:max-w-3/4 h-screen overflow-hidden flex flex-col"
         aria-describedby="Spells"
       >
-        <div className="flex justify-end">
-          <SheetClose className="bg-red-500 px-3 py-2">EXIT</SheetClose>
+        <div className="flex items-center justify-between px-8 pt-8">
+          <h3 className="text-2xl font-semibold mb-3 text-red-400 flex items-center">
+            <span className="mr-2">{sectionTitle[state.value.spellForge]}</span>
+          </h3>
+          <SheetClose asChild>
+            <Button variant="outline">EXIT</Button>
+          </SheetClose>
         </div>
         <SheetTitle />
-        {state.matches({ spellForge: "dash" }) && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-100 mb-4">Veil</h2>
+        <div className="overflow-auto px-8 pb-8">
+          {state.matches({ spellForge: "dash" }) && (
             <DashForge
               onAdd={({ spell, jewel }) => {
                 builder.send({ type: "ADD_SPELL", spell, slot: "dash", jewel });
               }}
             />
-          </div>
-        )}
-        {state.matches({ spellForge: "spell1" }) && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-100 mb-4">
-              Spell slot 1
-            </h2>
+          )}
+          {state.matches({ spellForge: "spell1" }) && (
             <SpellTabs
-              filter={filterOutSelectedSpells}
+              spell={spells.spell1}
               onAdd={({ spell, jewel }) => {
                 builder.send({
                   type: "ADD_SPELL",
@@ -198,15 +205,10 @@ export const SpellForge = () => {
                 });
               }}
             />
-          </div>
-        )}
-        {state.matches({ spellForge: "spell2" }) && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-100 mb-4">
-              Spell slot 2
-            </h2>
+          )}
+          {state.matches({ spellForge: "spell2" }) && (
             <SpellTabs
-              filter={filterOutSelectedSpells}
+              spell={spells.spell2}
               onAdd={({ spell, jewel }) => {
                 builder.send({
                   type: "ADD_SPELL",
@@ -216,16 +218,9 @@ export const SpellForge = () => {
                 });
               }}
             />
-          </div>
-        )}
-        {state.matches({ spellForge: "ultimate" }) && (
-          <div>
-            <h2 className="text-xl font-bold text-gray-100 mb-4">
-              Ultimate spell slot
-            </h2>
-            <UltimateForge />
-          </div>
-        )}
+          )}
+          {state.matches({ spellForge: "ultimate" }) && <UltimateForge />}
+        </div>
       </SheetContent>
     </Sheet>
   );

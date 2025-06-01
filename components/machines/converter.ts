@@ -9,10 +9,11 @@ import infusionData from "@/data/vbuilds/infusions.json";
 import weaponEffectData from "@/data/vbuilds/weaponEffects.json";
 import amuletData from "@/data/vbuilds/amulets.json";
 import { AvailableWeaponSlots, Weapon } from "../vbuilds/WeaponForge";
-import { MAX_LEGENDARY_WEAPONS_COUNT } from "./builder";
+import { MAX_LEGENDARY_WEAPONS_COUNT, BuildContext } from "./builder";
 import { armourOptions } from "../vbuilds/ArmourPicker";
 import bloodData from "@/data/vbuilds/bloodtypes.json";
 import spellData from "@/data/vbuilds/spells.json";
+import { hasAdvancedCoatings } from "@/components/vbuilds/CoatingPicker";
 
 
 const importElixir = (char: string) => {
@@ -22,12 +23,29 @@ const importElixir = (char: string) => {
 const importCoatings = (chars: string) => {
     const result = new Map<number, Coating>();
 
-    chars.split("").forEach((char, index) => {
-        const coating = Object.values(coatingData).find((coating) => coating.arenaCode == char);
-        if (coating) {
-            result.set(index + 1, coating);
+    const advanceCoatings = hasAdvancedCoatings(chars)
+
+    if (advanceCoatings.advanced) {
+
+        chars.split("").forEach((char, index) => {
+            const coating = Object.values(coatingData).find((coating) => coating.arenaCode == char);
+            if (coating) {
+                result.set(index + 1, coating);
+            }
+        });
+    }
+
+    if (!advanceCoatings.advanced && advanceCoatings.value) {
+        const coating = Object.values(coatingData).find((coating) => coating.arenaCode == advanceCoatings.value);
+        for (let i = 1; i <= 8; i++) {
+            if (coating) {
+                result.set(i, coating)
+            }
         }
-    });
+    }
+
+    console.log(result, "imported coatings");
+
     return result;
 }
 
@@ -63,9 +81,9 @@ const importSpells = (chars: string) => {
     const ultimate = ultimates.find(spell => spell.arenaCode === chars[15]);
 
     const output = {
-        dash: veil ? { ...veil, jewel: [chars[1], chars[2], chars[3], chars[4]] } : null,
-        spell1: spell1 ? { ...spell1, jewel: [chars[6], chars[7], chars[8], chars[9]] } : null,
-        spell2: spell2 ? { ...spell2, jewel: [chars[11], chars[12], chars[13], chars[14]] } : null,
+        spell1: spell1 ? { ...spell1, jewel: [chars[1], chars[2], chars[3], chars[4]] } : null,
+        spell2: spell2 ? { ...spell2, jewel: [chars[6], chars[7], chars[8], chars[9]] } : null,
+        dash: veil ? { ...veil, jewel: [chars[11], chars[12], chars[13], chars[14]] } : null,
         ultimate: ultimate || null
     };
 
@@ -247,6 +265,18 @@ const exportBlood = (blood: { primary?: string; secondary?: string; infusion?: s
     return primary + secondary + infusion;
 };
 
+export const arenaCode = (context: BuildContext) => exportVArenaCode({
+    elixir: context.elixir,
+    coatings: context.coatings,
+    passives: context.passives,
+    spells: context.spells,
+    weapons: context.weapons,
+    amulet: context.amulet,
+    armour: context.armour,
+    blood: context.blood,
+})
+
+
 export const exportVArenaCode = (build) => {
 
     const elixir = build.elixir?.arenaCode || "0";
@@ -257,122 +287,29 @@ export const exportVArenaCode = (build) => {
     const amulet = build.amulet?.arenaCode || "0";
     const armour = exportArmour(build.armour?.arenaCode);
     const blood = exportBlood(build.blood)
-    // const amu
-    // const spells = build.spells
-    // const passives = build.passives.map((passive) => passive.arenaCode).join("");
-    // const veil = build.veil?.arenaCode || "0";
-    // const ability1 = build.ability1?.arenaCode || "0";
-    // const ability2 = build.ability2?.arenaCode || "0";
-    // const ultimate = build.ultimate?.arenaCode || "0";
-    // const weapons = Array.from(build.weapons.values()).map((weapon) => weapon.arenaCode).join("");
-    // const amulet = build.amulet?.arenaCode || "0";
-    // const chest = build.chest?.arenaCode || "0";
-    // const legs = build.legs?.arenaCode || "0";
-    // const boots = build.boots?.arenaCode || "0";
-    // const gloves = build.gloves?.arenaCode || "0";
 
 
 
     return elixir + coatings + passives + spells + weapons + amulet + armour + blood;
 }
 
-// 6271n24t1234j1245312342k3238e0238q5128o3238d023880187p3782l3187144445a2
+
+
 
 export const convertStringToBuild = (input: string) => {
+    const coatings = input.slice(1, 9)
     const build = {
         elixir: importElixir(input[0]),
-        coatings: importCoatings(input.slice(1, 9)),
+        coatings: importCoatings(coatings),
         passives: importPassives(input.slice(9, 14)),
         spells: importSpells(input.slice(14, 30)),
         weapons: importWeapons(input.slice(30, 70)), // Adjusted to get 8 * 5 characters (40 characters) after spells
         amulet: importAmulet(input[70]),
         armour: importArmour(input.slice(71, 75)), // Adjusted to get 4 characters for the armour
         blood: importBlood(input.slice(75, 78)),
-        // passives: parsed.passives,
-        // elixir: parsed.elixir,
-        // coating: parsed.coating,
-        // passives: parsed.passives,
-        // veil: parsed.veil,
-        // ability1: parsed.ability1,
-        // ability2: parsed.ability2,
-        // ultimate: parsed.ultimate,
-        // weapons: parsed.weapons,
-        // amulet: parsed.amulet,
-        // chest: parsed.chest,
-        // legs: parsed.legs,
-        // boots: parsed.boots,
-        // gloves: parsed.gloves,
+        advancedCoatings: hasAdvancedCoatings(coatings).advanced, // Assuming the 79th character indicates advanced coatings
     };
 
 
     return build;
 }
-
-// passives: [],
-// spells: {
-//     dash: null,
-//     spell1: null,
-//     spell2: null,
-//     ultimate: null,
-// },
-// weapons: new Map(), // Initialize weapons as an empty Map
-// armour: null,
-// amulet: null,
-// elixir: null,
-// coating: null,
-// blood: null,
-// selectedWeaponSlot: null, // Initialize with null
-
-
-// export function generatePresetString(data: Record<string, string | string[]>) {
-//     let result = "";
-
-//     for (const section of sectionDefinitions) {
-//         const { name, length, map } = section;
-//         const value = data[name];
-
-//         if (length === 1) {
-//             // Single value
-//             const char = Object.keys(map).find(key => map[key] === value);
-//             if (!char) {
-//                 throw new Error(`Invalid value '${value}' for section '${name}'`);
-//             }
-//             result += char;
-//         } else {
-//             // Range of values
-//             if (!Array.isArray(value)) {
-//                 throw new Error(`Expected an array for section '${name}', got '${typeof value}'`);
-//             }
-//             const chars = value.map(item => {
-//                 const char = Object.keys(map).find(key => map[key] === item);
-//                 if (!char) {
-//                     throw new Error(`Invalid value '${item}' in section '${name}'`);
-//                 }
-//                 return char;
-//             });
-//             result += chars.join("");
-//         }
-//     }
-
-//     return result;
-// }
-
-// // Example usage:
-// const parsed = parsePresetString("6271n24t1234j1245312342k3238e0238q5128o3238d023880187p3782l3187144445a2");
-
-
-// const generated = generatePresetString({
-//     elixir: "AB_Elixir_Twisted_T01_Buff",
-//     coating: "AB_Vampire_Coating_Chaos_Buff",
-//     passives: ["Passive_Mistrance", "Passive_Tempest", "Passive_Juggernaut", "Passive_Knight", "Passive_Enigma"],
-//     veil: "Passive_Mistrance",
-//     ability1: ["Passive_Tempest", "Passive_Juggernaut", "Passive_Knight", "Passive_Enigma"],
-//     ability2: ["Passive_Quickness", "Passive_Overload", "Passive_Dominance"],
-//     ultimate: "Ultimate_Elixir_Bat_T01_Buff",
-//     weapons: ["Weapon1", "Weapon2", "Weapon3"], // Example placeholders
-//     amulet: "Amulet1", // Example placeholder
-//     chest: "Chest1", // Example placeholder
-//     legs: "Legs1", // Example placeholder
-//     boots: "Boots1", // Example placeholder
-//     gloves: "Gloves1", // Example placeholder
-// });

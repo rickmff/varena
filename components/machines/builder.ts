@@ -1,12 +1,12 @@
 import bloodData from '@/data/vbuilds/bloodtypes.json';
 import hotkeys from 'hotkeys-js';
 import { toast } from 'sonner';
-import { assign, enqueueActions, fromCallback, raise, setup, spawnChild, stopChild } from 'xstate';
+import { assign, enqueueActions, fromCallback, log, raise, setup, spawnChild, stopChild } from 'xstate';
 import { Coating } from '../vbuilds/CoatingPicker';
 import { AvailableWeaponSlots, Weapon } from '../vbuilds/WeaponForge';
 import { StatName } from './calculator';
 import { weaponBuilderMachine } from './weaponBuilder';
-
+import { arenaCode } from './converter';
 
 export type BloodContext = {
     primary: keyof typeof bloodData,
@@ -31,6 +31,7 @@ export interface BuildContext {
     };
     selectedWeaponSlot: AvailableWeaponSlots | null; // Track the currently selected weapon slot
     focusedWeapon: AvailableWeaponSlots | null; // Track the focused weapon slot
+    advancedCoatings: boolean;
 }
 
 type BuildEvents =
@@ -49,6 +50,9 @@ type BuildEvents =
     | { type: "ADD_BLOOD"; primary: any, secondary: any, infusion: any }
     | { type: "ADD_COATING"; coating: any, slot: AvailableWeaponSlots }
     | { type: "REMOVE_COATING"; slot: AvailableWeaponSlots }
+    | { type: "ADD_ALL_COATINGS"; coating: any }
+    | { type: "REMOVE_ALL_COATINGS" }
+    | { type: "TOGGLE_ADVANCED_COATINGS" }
     | { type: "ADD_ELIXIR"; elixir: any }
     | { type: "REMOVE_ELIXIR"; }
     | { type: "ADD_ARMOUR"; armour: any }
@@ -62,6 +66,7 @@ type BuildEvents =
     | { type: 'LEGENDARY_LIMIT_REACHED' }
     | { type: 'FOCUS_WEAPON', slot: AvailableWeaponSlots }
     | { type: 'UNFOCUS_WEAPON' }
+    | { type: 'SAVE_BUILD' }
 
 type StatEntry = {
     name: string;
@@ -96,6 +101,28 @@ export const builder = setup({
         events: {} as BuildEvents
         // actions: 
     },
+    actions: {
+        saveBuild: ({ context }) => {
+            // Implement the logic to save the build, e.g., send it to a server or local storage
+            // Convert build to arena code
+            const buildCode = arenaCode(context);
+            console.log("Generated arena code:", buildCode);
+
+            // Get existing arena codes from localStorage or initialize empty array
+            const savedCodes = JSON.parse(localStorage.getItem('vbuilds') || '[]');
+
+            // Add the new code with timestamp
+            savedCodes.push({
+                code: buildCode,
+                timestamp: new Date().toISOString(),
+                name: `Build ${savedCodes.length + 1}` // Default name
+            });
+
+            // Save back to localStorage
+            localStorage.setItem('vbuilds', JSON.stringify(savedCodes));
+            toast.success("Build saved successfully!");
+        }
+    },
     actors: {
         weaponBuilder: weaponBuilderMachine,
         hotkeys: selectWeaponHotkeys
@@ -123,6 +150,7 @@ export const builder = setup({
             blood: input.build.blood || null,
             selectedWeaponSlot: null, // Initialize with null
             focusedWeapon: null as AvailableWeaponSlots | null, // Track the focused weapon slot
+            advancedCoatings: input.build.advancedCoatings || false,
         }
 
 
@@ -155,6 +183,9 @@ export const builder = setup({
             actions: assign({
                 selectedWeaponSlot: ({ event }) => event.slot // Set the selected weapon slot
             })
+        },
+        'SAVE_BUILD': {
+            actions: 'saveBuild'
         },
     },
     states: {
@@ -201,12 +232,37 @@ export const builder = setup({
                         }
                     })
                 },
+                ADD_ALL_COATINGS: {
+                    actions: assign({
+                        coatings: ({ context, event }) => {
+                            const updatedCoatings = new Map(context.coatings);
+                            for (let i = 1; i <= 8; i++) {
+                                updatedCoatings.set(i as AvailableWeaponSlots, event.coating);
+                            }
+                            return updatedCoatings;
+                        }
+                    })
+                },
+                REMOVE_ALL_COATINGS: {
+                    actions: assign({
+                        coatings: ({ context, event }) => {
+                            return new Map();
+                        }
+                    })
+                },
                 REMOVE_COATING: {
                     actions: assign({
                         coatings: ({ context, event }) => {
                             const updatedCoatings = new Map(context.coatings);
                             updatedCoatings.delete(event.slot);
                             return updatedCoatings;
+                        }
+                    })
+                },
+                TOGGLE_ADVANCED_COATINGS: {
+                    actions: assign({
+                        advancedCoatings: ({ context }) => {
+                            return !context.advancedCoatings
                         }
                     })
                 },
@@ -325,7 +381,7 @@ export const builder = setup({
                         spells: ({ context, event }) => ({
                             ...context.spells, [event.slot]: { ...event.spell, jewel: event.jewel }
                         })
-                    }), raise({ type: "goto.overview" })]
+                    }), log(({ event }) => event), raise({ type: "goto.overview" })]
                 },
             }
         },

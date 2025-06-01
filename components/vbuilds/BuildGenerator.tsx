@@ -1,11 +1,10 @@
 "use client";
 
 import stats from "@/data/vbuilds/stats.json";
-import BuildProvider from "@/components/vbuilds/BuildProvider";
+import BuildProvider, { useBuilder } from "@/components/vbuilds/BuildProvider";
 import { GroupedStatList } from "@/components/vbuilds/GroupedStatList";
 import { AmuletPicker } from "@/components/vbuilds/AmuletPicker";
 import { ArmourPicker } from "@/components/vbuilds/ArmourPicker";
-import { CoatingPicker } from "@/components/vbuilds/CoatingPicker";
 import { ElixerPicker } from "./ElixirPicker";
 import { PassiveForge } from "./PassiveForge";
 import { SpellForge } from "./SpellForge";
@@ -13,21 +12,18 @@ import { WeaponForge } from "./WeaponForge";
 import { BloodForge } from "./BloodForge";
 import ArenaCode from "./components/ArenaCode";
 import BuilderNavBar from "../BuilderNavBar";
-
-export function loadBaseStats(statsArray: any): any {
-  const statMap = {} as any;
-
-  for (const stat of statsArray) {
-    statMap[stat.name] = stat;
-  }
-
-  return statMap;
-}
+import {
+  SingleCoating,
+  AdvancedCoatings,
+  AdvancedCoatingsSwitch,
+} from "@/components/vbuilds/CoatingPicker";
+import { Card } from "../ui/card";
+import { Button } from "../ui/button";
 
 const BuilderPage = () => {
-  const baseStats = loadBaseStats(stats);
+  const { builder } = useBuilder();
   return (
-    <BuildProvider stats={baseStats}>
+    <>
       <BuilderNavBar />
       <div className="flex text-gray-400">
         <div className="w-8/12 pl-8 flex flex-col gap-8">
@@ -63,6 +59,7 @@ const BuilderPage = () => {
                 <div className="flex gap-4">
                   <ElixerPicker />
                   <BloodForge />
+                  <SingleCoating />
                 </div>
               </section>
             </div>
@@ -90,34 +87,37 @@ const BuilderPage = () => {
               </div>
             </h3>
             <WeaponForge />
-            <div className="flex gap-4">
-              <CoatingPicker slot={1} />
-              <CoatingPicker slot={2} />
-              <CoatingPicker slot={3} />
-              <CoatingPicker slot={4} />
-              <CoatingPicker slot={5} />
-              <CoatingPicker slot={6} />
-              <CoatingPicker slot={7} />
-              <CoatingPicker slot={8} />
-            </div>
+            <AdvancedCoatings />
+            <AdvancedCoatingsSwitch />
           </div>
-          <section className="space-y-4">
+          {/* <section className="space-y-4">
             <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
               <span className="mr-2">Use this build in V Arena</span>
             </h3>
             <ArenaCode />
-          </section>
+          </section> */}
         </div>
         {/* <div className="space-y-8 w/1-4"> */}
         {/* <div className="pr-12">
             <ArenaCode />
           </div> */}
-        <div className="max-h-screen overflow-auto pr-8 flex-1 pb-44">
-          <GroupedStatList stats={stats} />
+        <div className="flex flex-col flex-1 space-y-8 max-h-screen overflow-hidden">
+          <Card className="bg-gradient-to-br from-black via-red-950/10 to-black p-6 rounded-lg border border-red-900/30 hover:border-red-500/50 transition-all duration-500 relative overflow-hidden group backdrop-blur-sm mr-8">
+            <Button onClick={() => builder.send({ type: "SAVE_BUILD" })}>
+              Save Build
+            </Button>
+            <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
+              <span className="mr-2">Use Build In-Game</span>
+              <ArenaCode />
+            </h3>
+          </Card>
+          <div className="max-h-screen overflow-auto pr-8 flex-1 pb-44">
+            <GroupedStatList stats={stats} />
+          </div>
         </div>
         {/* </div> */}
       </div>
-    </BuildProvider>
+    </>
   );
 };
 
