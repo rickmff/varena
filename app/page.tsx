@@ -22,6 +22,7 @@ import NavBar, { DiscordButton, menuItems } from "@/components/NavBar";
 import CommandGenerator from "@/components/command-generator";
 import FeatureCarousel from "@/app/components/ui/FeatureCarousel";
 import BuildsList from "@/components/builds/BuildsList";
+import SectionHeader from "@/app/components/ui/SectionHeader";
 
 // --- START: Icon mapping ---
 // Helper to map icon names from Notion to actual components
@@ -343,39 +344,14 @@ export default function Home() {
       {/* Features Section - Now uses the FeatureCarousel component */}
       <FeatureCarousel features={featuresData} />
 
-      <section className="py-32 relative" id="generate-commands">
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black to-transparent"></div>
-        <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black"></div>
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/background/Powers.png"
-            alt="Spellbook Background"
-            fill
-            className="object-cover"
-            priority
+      {/* Command Generator Section */}
+      <section id="commands" className="py-20 bg-black relative">
+        <div className="container mx-auto px-4 relative">
+          <SectionHeader
+            title="Command Generator"
+            subtitle="Server Commands"
+            description="Generate commands for our V Arena Server"
           />
-        </div>
-        <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            className="text-center mb-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-          >
-            <div className="mb-8">
-              <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2 font-['Junge'] ">
-                COMMAND GENERATOR
-                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
-              </span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase ">
-              Server Commands
-            </h2>
-            <p className="text-gray-100 max-w-2xl mx-auto text-lg">
-              Generate commands for our servers
-            </p>
-          </motion.div>
           <CommandGenerator />
         </div>
       </section>
@@ -383,27 +359,11 @@ export default function Home() {
       {/* Builds Section */}
       <section id="builds" className="py-20 bg-black relative">
         <div className="container mx-auto px-4 relative">
-          <motion.div
-            className="text-center mb-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-          >
-            <div className="mb-8">
-              <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2 font-['Junge'] ">
-                BUILD COLLECTION
-                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
-              </span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
-              Your Builds
-            </h2>
-            <p className="text-gray-100 max-w-2xl mx-auto text-lg">
-              Manage your saved builds, create new ones, import them into the
-              game
-            </p>
-          </motion.div>
+          <SectionHeader
+            title="Build Collection"
+            subtitle="Your Builds"
+            description="Manage your saved builds and create new combinations"
+          />
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -459,27 +419,11 @@ export default function Home() {
       {/* News Section */}
       <section id="news" className="py-20 bg-black relative">
         <div className="container mx-auto px-4 relative">
-          <motion.div
-            className="text-center mb-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-          >
-            <div className="mb-8">
-              <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2 font-['Junge'] ">
-                NEWS & UPDATES
-                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
-              </span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
-              Echoes of V Arena
-            </h2>
-            <p className="text-gray-100 max-w-2xl mx-auto text-lg">
-              Stay informed about the latest updates, events, and community
-              highlights
-            </p>
-          </motion.div>
+          <SectionHeader
+            title="News & Updates"
+            subtitle="Chronicles of V Rising"
+            description="Stay informed about the latest updates, events, and community highlights"
+          />
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             initial={{ opacity: 1 }}

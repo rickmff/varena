@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import NavBar from "@/components/NavBar";
 import BuildsList from "@/components/builds/BuildsList";
+import SectionHeader from "@/app/components/ui/SectionHeader";
 
 export default function Builds() {
   const fadeInUp = {
@@ -47,23 +48,11 @@ export default function Builds() {
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            className="text-center mb-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-          >
-            <div className="mb-8">
-              <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2 font-['Junge'] ">
-                BUILD COLLECTION
-                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
-              </span>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white uppercase tracking-wider">
-              Your Builds
-            </h1>
-          </motion.div>
+          <SectionHeader
+            title="Build Collection"
+            subtitle="⚔️ Your Builds"
+            // description="Manage your saved builds, create new combinations"
+          />
         </div>
       </section>
 
