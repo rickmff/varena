@@ -10,7 +10,7 @@ import GameMenu from './game-menu'
 export const menuItems = [
   { name: "FEATURES", href: "#features" },
   { name: "COMMANDS", href: "#generate-commands" },
-  { name: "NEWS", href: "#news" },
+  { name: "NEWS", href: "/news" },
 ]
 
 export default function NavBar() {

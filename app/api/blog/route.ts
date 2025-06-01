@@ -22,7 +22,6 @@ export async function GET() {
       category: 'News',
       iconName: 'Terminal', // Default icon, you can customize this
       slug: post.id, // Use the Notion page ID as slug
-      coverImageUrl: post.coverImageUrl, // Include cover image URL
     }));
 
     return NextResponse.json(newsItems);

@@ -43,6 +43,8 @@ interface NewsItem {
   excerpt: string;
   category: string;
   iconName: string; // e.g., "Castle", "Moon"
+  slug?: string; // Optional slug for news posts
+  coverImageUrl?: string; // Cover image from Notion
   // Add other fields if necessary
 }
 
@@ -59,7 +61,6 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // --- START: Fetch news from API route ---
   useEffect(() => {
     const fetchNewsFromAPI = async () => {
       try {
@@ -85,8 +86,7 @@ export default function Home() {
     };
 
     fetchNewsFromAPI();
-  }, []); // Empty dependency array ensures this runs once on mount
-  // --- END: Fetch news from API route ---
+  }, []);
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -348,7 +348,7 @@ export default function Home() {
                   }}
                 >
                   <Link
-                    href={`/news/${news.id}`} // Link to dynamic page
+                    href={`/news/${news.slug || news.id}`} // Link to dynamic news page
                     className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-red-900/30 hover:border-red-500
                            transition-all duration-300 overflow-hidden group block h-full relative"
                   >
@@ -360,13 +360,17 @@ export default function Home() {
 
                     <div className="relative aspect-video">
                       <Image
-                        // You might want to add an 'imageUrl' property to your Notion DB
-                        // or use a placeholder / derive from index for now.
-                        // For a robust solution, fetch an image URL from your Notion data.
-                        src={`/blog${(index % 3) + 1}.png`} // Placeholder, update this based on your data
+                        // Use Notion cover image if available, otherwise fallback to news.png
+                        src={news.coverImageUrl || `/news.png`}
                         alt={news.title}
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-110"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          if (target.src !== '/news.png') {
+                            target.src = '/news.png';
+                          }
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80" />
 
@@ -433,10 +437,12 @@ export default function Home() {
                 className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
                          relative overflow-hidden group px-8 shadow-lg shadow-red-900/20"
               >
-                <span className="relative z-10 font-bold tracking-wider">
-                  VIEW ALL NEWS
-                </span>
-                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
+                <Link href="/news" className="flex items-center">
+                  <span className="relative z-10 font-bold tracking-wider">
+                    VIEW ALL NEWS
+                  </span>
+                  <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
+                </Link>
                 <motion.span
                   className="absolute inset-0 bg-gradient-to-r from-red-900/40 to-transparent"
                   initial={{ x: "-100%" }}

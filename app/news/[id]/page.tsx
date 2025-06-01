@@ -1,233 +1,330 @@
 "use client";
 
-import { useEffect, useState, ReactNode, ReactElement } from 'react';
-import { useParams } from 'next/navigation'; // To get the [id] from URL
+import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { Client } from '@notionhq/client';
-import { BlockObjectResponse } from "@notionhq/client/build/src/api-endpoints"; // For block types
-// For a more robust layout, you might import your existing NavBar and Footer
-// import NavBar from '@/components/NavBar';
-// import Footer from '@/components/Footer'; // Assuming you have a Footer component
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { formatDistanceToNow } from 'date-fns';
+import NotionRenderer from '@/components/NotionRenderer';
+import NavBar from '@/components/NavBar';
+import { Skeleton } from '@/components/ui/skeleton';
 
-// Define a type for the full news article
-interface FullNewsArticle {
-  id: string;
-  title: string;
-  date: string;
-  // category?: string; // Optional if you want to display it
-  // iconName?: string; // Optional
-  contentBlocks: BlockObjectResponse[]; // To store Notion page content blocks
+interface NewsPostPageProps {
+  params: Promise<{
+    id: string;
+  }>;
 }
 
-// Simple component to render Notion blocks (expand this for more block types and styling)
-const renderBlock = (block: BlockObjectResponse) => {
-  switch (block.type) {
-    case 'paragraph':
-      return (
-        <p key={block.id} className="my-4 leading-relaxed">
-          {block.paragraph.rich_text.map((rt, index) => (
-            <span key={index} style={{ fontWeight: rt.annotations.bold ? 'bold' : 'normal', fontStyle: rt.annotations.italic ? 'italic' : 'normal', textDecoration: rt.annotations.underline ? 'underline' : (rt.annotations.strikethrough ? 'line-through' : 'none'), color: rt.annotations.color !== 'default' ? rt.annotations.color : undefined }}>
-              {rt.href ? <a href={rt.href} target="_blank" rel="noopener noreferrer" className="text-red-400 hover:underline">{rt.plain_text}</a> : rt.plain_text}
-            </span>
-          ))}
-        </p>
-      );
-    case 'heading_1':
-      return <h1 key={block.id} className="text-4xl font-bold my-6 text-red-300">{block.heading_1.rich_text.map(rt => rt.plain_text).join('')}</h1>;
-    case 'heading_2':
-      return <h2 key={block.id} className="text-3xl font-semibold my-5 text-red-300">{block.heading_2.rich_text.map(rt => rt.plain_text).join('')}</h2>;
-    case 'heading_3':
-      return <h3 key={block.id} className="text-2xl font-semibold my-4 text-red-300">{block.heading_3.rich_text.map(rt => rt.plain_text).join('')}</h3>;
-    case 'bulleted_list_item':
-      // For proper list rendering, you might need to group consecutive list items
-      return <li key={block.id} className="ml-6 list-disc">{block.bulleted_list_item.rich_text.map(rt => rt.plain_text).join('')}</li>;
-    case 'numbered_list_item':
-      // Similar to bulleted list, grouping might be needed for ol > li structure
-      return <li key={block.id} className="ml-6 list-decimal">{block.numbered_list_item.rich_text.map(rt => rt.plain_text).join('')}</li>;
-    case 'image':
-      const imageUrl = block.image.type === 'external' ? block.image.external.url : block.image.file.url;
-      return (
-        <div key={block.id} className="my-6">
-          <Image src={imageUrl} alt={block.image.caption.map(rt => rt.plain_text).join('') || "News image"} width={800} height={600} className="rounded-lg shadow-md mx-auto" />
-          {block.image.caption.length > 0 && <p className="text-sm text-center text-gray-400 mt-2">{block.image.caption.map(rt => rt.plain_text).join('')}</p>}
+function NewsPostSkeleton() {
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <NavBar />
+
+      <div className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
+        <div className="absolute inset-0 z-0 opacity-20">
+          <Image
+            src="/hero-bg.png"
+            alt="V Rising Background"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black"></div>
         </div>
-      );
-    case 'code':
-      return (
-        <pre key={block.id} className="bg-gray-800/50 p-4 rounded-md my-4 overflow-x-auto text-sm">
-          <code>{block.code.rich_text.map(rt => rt.plain_text).join('')}</code>
-        </pre>
-      );
-    case 'quote':
-      return (
-        <blockquote key={block.id} className="border-l-4 border-red-500 pl-4 italic my-4 text-gray-300">
-          {block.quote.rich_text.map(rt => rt.plain_text).join('')}
-        </blockquote>
-      );
-    // Add more block types as needed (e.g., callout, divider, video, etc.)
-    default:
-      console.warn("Unsupported block type:", block.type);
-      return <p key={block.id} className="my-2 text-gray-500">[Unsupported content block: {block.type}]</p>;
-  }
-};
 
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto">
+            {/* Navigation skeleton */}
+            <nav className="mb-8">
+              <Skeleton className="w-32 h-6" />
+            </nav>
 
-export default function NewsArticlePage() {
-  const params = useParams();
-  const newsId = params.id as string;
-  const [article, setArticle] = useState<FullNewsArticle | null>(null);
+            {/* Header skeleton */}
+            <header className="mb-12 text-center">
+              <Skeleton className="w-16 h-16 rounded-full mx-auto mb-6" />
+              <Skeleton className="w-3/4 h-12 mx-auto mb-4" />
+              <Skeleton className="w-1/2 h-12 mx-auto mb-6" />
+              <div className="flex items-center justify-center space-x-4">
+                <Skeleton className="w-40 h-6" />
+                <Skeleton className="w-32 h-6" />
+              </div>
+            </header>
+
+            {/* Content skeleton */}
+            <article className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-red-900/30 p-8 md:p-12">
+              <div className="space-y-4">
+                <Skeleton className="w-full h-6" />
+                <Skeleton className="w-full h-6" />
+                <Skeleton className="w-3/4 h-6" />
+                <Skeleton className="w-full h-32 mt-8" />
+                <Skeleton className="w-full h-6" />
+                <Skeleton className="w-2/3 h-6" />
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function NewsPostPage({ params }: NewsPostPageProps) {
+  const resolvedParams = use(params);
+  const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!newsId) {
-      setError("Article ID not found.");
-      setLoading(false);
-      return;
-    }
-
-    const fetchArticleContent = async () => {
-      setLoading(true);
-      setError(null);
-      const notionApiKey = process.env.NEXT_PUBLIC_NOTION_API_KEY;
-
-      if (!notionApiKey) {
-        console.error("Notion API Key is not configured in .env.local. Cannot fetch article.");
-        setError("Configuration error: Notion API Key is missing.");
-        setLoading(false);
-        return;
-      }
-
-      const notion = new Client({ auth: notionApiKey });
-
+    const fetchPost = async () => {
       try {
-        // 1. Fetch page properties (title, date etc.)
-        // Ensure you adjust "Name" and "Date" to your actual Notion property names
-        const pageResponse: any = await notion.pages.retrieve({ page_id: newsId });
-        const title = pageResponse.properties.Name?.title[0]?.plain_text || "Untitled Article";
-        // Ensure 'Date' is the correct name of your date property in Notion
-        const date = pageResponse.properties.Date?.date?.start || new Date().toISOString();
+        setLoading(true);
+        const response = await fetch(`/api/news/${resolvedParams.id}`);
 
-        // 2. Fetch page content (blocks)
-        const blocksResponse = await notion.blocks.children.list({
-          block_id: newsId,
-          page_size: 100, // Notion defaults to 100, adjust if you expect more blocks
-        });
-        const contentBlocks = blocksResponse.results as BlockObjectResponse[];
+        if (!response.ok) {
+          if (response.status === 404) {
+            setError('Post not found');
+          } else {
+            setError('Failed to load post');
+          }
+          return;
+        }
 
-        setArticle({
-          id: newsId,
-          title,
-          date,
-          contentBlocks,
-        });
+        const postData = await response.json();
 
-      } catch (err: any) {
-        console.error("Failed to fetch article from Notion:", err);
-        setError(`Failed to load article. ${err.message || 'Unknown error'}`);
+        if (postData.error) {
+          setError(postData.error);
+          return;
+        }
+
+        setPost(postData);
+      } catch (error) {
+        console.error('Error fetching post:', error);
+        setError('Failed to load post');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchArticleContent();
-  }, [newsId]);
+    fetchPost();
+  }, [resolvedParams.id]);
 
   if (loading) {
+    return <NewsPostSkeleton />;
+  }
+
+  if (error || !post) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="container mx-auto px-4 py-20 text-center">
-          <p className="text-xl">Loading article...</p>
-          {/* Optional: Add a spinner component here */}
+      <div className="min-h-screen bg-black text-white">
+        <NavBar />
+        <div className="container mx-auto px-4 py-24">
+          <div className="text-center">
+            <div className="text-6xl mb-4">❌</div>
+            <h1 className="text-3xl font-bold text-red-400 mb-4">News Post Not Found</h1>
+            <p className="text-gray-400 mb-8">
+              {error || 'The news post you\'re looking for doesn\'t exist or has been removed.'}
+            </p>
+            <Link
+              href="/news"
+              className="inline-flex items-center px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200"
+            >
+              ← Back to News
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="container mx-auto px-4 py-20 text-center">
-          <p className="text-xl text-red-500">Error: {error}</p>
-          <Link href="/#news" className="mt-8 inline-block bg-red-700 hover:bg-red-600 text-white font-bold py-3 px-6 rounded transition-colors">
-            &larr; Back to News
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  if (!article) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="container mx-auto px-4 py-20 text-center">
-          <p className="text-xl">Article not found.</p>
-          <Link href="/#news" className="mt-8 inline-block bg-red-700 hover:bg-red-600 text-white font-bold py-3 px-6 rounded transition-colors">
-            &larr; Back to News
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  // Naive way to render lists. For proper nested lists, you'd need a more complex renderer.
-  let listItems: ReactNode[] = [];
-  const renderedBlocks = article.contentBlocks.reduce((acc, block, index, allBlocks) => {
-    if (block.type === 'bulleted_list_item' || block.type === 'numbered_list_item') {
-      listItems.push(renderBlock(block) as ReactElement);
-      // If it's the last item or the next item is not a list item of the same type, render the list
-      const nextBlock = allBlocks[index + 1];
-      if (!nextBlock || (nextBlock.type !== block.type)) {
-        if (block.type === 'bulleted_list_item') {
-          acc.push(<ul key={`ul-${block.id}`} className="list-disc space-y-1 my-4 pl-8">{listItems}</ul>);
-        } else {
-          acc.push(<ol key={`ol-${block.id}`} className="list-decimal space-y-1 my-4 pl-8">{listItems}</ol>);
-        }
-        listItems = []; // Reset for the next list
-      }
-    } else {
-      acc.push(renderBlock(block) as ReactElement);
-    }
-    return acc;
-  }, [] as ReactElement[]);
-
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6 },
+    },
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* <NavBar /> Uncomment if you have and want to use NavBar */}
-      <main className="container mx-auto px-4 py-12 pt-20 md:pt-24"> {/* Added top padding */}
-        <article className="max-w-3xl mx-auto"> {/* Removed prose for more control if needed, or add back prose prose-invert */}
-          <header className="mb-8 md:mb-12">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 md:mb-4 text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-600">
-              {article.title}
-            </h1>
-            <p className="text-gray-400 text-sm md:text-base">
-              Published on: {new Date(article.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-            </p>
-          </header>
+      <NavBar />
 
-          {/* Render Notion Blocks */}
-          <div className="text-gray-200 leading-relaxed space-y-2">
-            {renderedBlocks.map((blockComponent, index) => (
-              <div key={index}>{blockComponent}</div> // Each block component already has a key from renderBlock
-            ))}
-          </div>
+      <div className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
+        <div className="absolute inset-0 z-0 opacity-20">
+          <Image
+            src="/hero-bg.png"
+            alt="V Rising Background"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black"></div>
+        </div>
 
-          <div className="mt-10 md:mt-16 pt-6 border-t border-gray-700">
-            <Link href="/#news" className="inline-flex items-center text-red-500 hover:text-red-400 transition-colors group">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 transform group-hover:-translate-x-1 transition-transform" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-              </svg>
-              Back to News
-            </Link>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto">
+            {/* Navigation */}
+            <motion.nav
+              className="mb-8"
+              initial="hidden"
+              animate="visible"
+              variants={fadeInUp}
+            >
+              <Link
+                href="/news"
+                className="inline-flex items-center text-red-400 hover:text-red-300 font-medium transition-colors"
+              >
+                ← Back to News
+              </Link>
+            </motion.nav>
+
+            {/* Article Header */}
+            <motion.header
+              className="mb-12 text-center"
+              initial="hidden"
+              animate="visible"
+              variants={fadeInUp}
+            >
+              {/* Cover Image */}
+              {post.coverImageUrl && (
+                <motion.div
+                  className="mb-8 relative aspect-video max-w-3xl mx-auto rounded-lg overflow-hidden shadow-2xl shadow-red-900/50"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <Image
+                    src={post.coverImageUrl}
+                    alt={post.title}
+                    fill
+                    className="object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/30" />
+                </motion.div>
+              )}
+
+              {/* Icon */}
+              {post.icon && (
+                <motion.div
+                  className="text-6xl mb-6"
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  {post.icon}
+                </motion.div>
+              )}
+              {post.iconUrl && (
+                <motion.div
+                  className="mb-6"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <img
+                    src={post.iconUrl}
+                    alt={post.title}
+                    className="w-24 h-24 object-cover rounded-full mx-auto border-2 border-red-900/50"
+                  />
+                </motion.div>
+              )}
+
+              {/* Title */}
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight uppercase tracking-wider">
+                {post.title}
+              </h1>
+
+              {/* Meta Information */}
+              <div className="flex items-center justify-center space-x-6 text-gray-400">
+                {post.publishedDate && (
+                  <time dateTime={post.publishedDate} className="flex items-center">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Published {formatDistanceToNow(new Date(post.publishedDate), { addSuffix: true })}
+                  </time>
+                )}
+
+                {post.publicUrl && (
+                  <a
+                    href={post.publicUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    View in Notion
+                  </a>
+                )}
+              </div>
+            </motion.header>
+
+            {/* Article Content */}
+            <motion.article
+              className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-red-900/30 p-8 md:p-12 shadow-2xl shadow-red-900/10"
+              initial="hidden"
+              animate="visible"
+              variants={fadeInUp}
+            >
+              {post.content && post.content.length > 0 ? (
+                <div className="prose prose-lg max-w-none prose-invert">
+                  <NotionRenderer blocks={post.content} />
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="text-4xl mb-4">📄</div>
+                  <p className="text-gray-400">
+                    This news post doesn't have any content yet.
+                  </p>
+                </div>
+              )}
+            </motion.article>
+
+            {/* Footer Navigation */}
+            <motion.footer
+              className="mt-12 pt-8 border-t border-red-900/30"
+              initial="hidden"
+              animate="visible"
+              variants={fadeInUp}
+            >
+              <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
+                <Link
+                  href="/news"
+                  className="inline-flex items-center px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200"
+                >
+                  ← Back to News
+                </Link>
+
+                <div className="flex items-center space-x-4">
+                  {post.publicUrl && (
+                    <a
+                      href={post.publicUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 border border-red-900/50 text-gray-300 font-medium rounded-lg hover:bg-red-900/20 hover:border-red-500 transition-all duration-200"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                      Edit in Notion
+                    </a>
+                  )}
+
+                  <Link
+                    href="/"
+                    className="inline-flex items-center px-4 py-2 border border-red-900/50 text-gray-300 font-medium rounded-lg hover:bg-red-900/20 hover:border-red-500 transition-all duration-200"
+                  >
+                    Home
+                  </Link>
+                </div>
+              </div>
+            </motion.footer>
           </div>
-        </article>
-      </main>
-      {/* <Footer /> Uncomment if you have and want to use Footer */}
+        </div>
+      </div>
     </div>
   );
 }
-
-// Need to import Image from next/image if not already globally available in this context
-// For client components using next/image, ensure it's imported.
-import Image from 'next/image';
