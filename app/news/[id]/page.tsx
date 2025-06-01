@@ -231,7 +231,7 @@ export default function NewsPostPage({ params }: NewsPostPageProps) {
               )}
 
               {/* Title */}
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight uppercase tracking-wider">
+              <h1 className="text-2xl md:text-4xl font-bold text-white mb-6 leading-tight uppercase tracking-wider">
                 {post.title}
               </h1>
 
@@ -293,7 +293,7 @@ export default function NewsPostPage({ params }: NewsPostPageProps) {
               <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
                 <Link
                   href="/news"
-                  className="inline-flex items-center px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200"
+                  className="inline-flex items-center py-3 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200"
                 >
                   ← Back to News
                 </Link>
