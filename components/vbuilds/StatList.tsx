@@ -22,9 +22,8 @@ export function StatList({ stats }: { stats: Array<any> }) {
                 {stat.cap ? (
                   <>
                     <span
-                      className={`font-bold ${
-                        overCap ? "text-red-800" : "text-red-400"
-                      }`}
+                      className={`font-bold ${overCap ? "text-red-800" : "text-red-400"
+                        }`}
                     >
                       {totalValue}
                     </span>{" "}
@@ -45,9 +44,8 @@ export function StatList({ stats }: { stats: Array<any> }) {
             {stat.cap && (
               <div className={`w-full bg-gray-700 rounded h-2`}>
                 <div
-                  className={`${
-                    overCap ? "bg-red-800" : "bg-red-400"
-                  } h-2 rounded`}
+                  className={`${overCap ? "bg-red-800" : "bg-red-400"
+                    } h-2 rounded`}
                   style={{ width: `${progressWidth}%` }}
                 ></div>
               </div>
