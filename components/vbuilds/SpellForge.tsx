@@ -220,6 +220,10 @@ export const SpellForge = () => {
           )}
           {state.matches({ spellForge: "spell1" }) && (
             <SpellTabs
+              filter={(spell: Spell) => {
+                console.log("spell", spell);
+                return spell.id !== spells.spell2?.id;
+              }}
               spell={spells.spell1}
               onAdd={({ spell, jewel }) => {
                 builder.send({
@@ -233,6 +237,10 @@ export const SpellForge = () => {
           )}
           {state.matches({ spellForge: "spell2" }) && (
             <SpellTabs
+              filter={(spell: Spell) => {
+                console.log("spell", spell);
+                return spell.id !== spells.spell1?.id;
+              }}
               spell={spells.spell2}
               onAdd={({ spell, jewel }) => {
                 builder.send({
