@@ -63,25 +63,6 @@ export default function Builds() {
               Manage your saved builds, create new combinations
             </p>
           </motion.div>
-
-          {/* Quick Actions */}
-          <motion.div
-            className="flex justify-center gap-4 mb-8"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp}>
-              <Link
-                href="/builds/create"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
-              >
-                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
-                Create New Build
-              </Link>
-            </motion.div>
-          </motion.div>
         </div>
       </section>
 
@@ -104,7 +85,7 @@ export default function Builds() {
         <div className="container mx-auto px-4 text-center">
           <Link
             href="/"
-            className="inline-flex items-center px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200"
+            className="inline-flex items-center py-3text-white font-medium transition-all duration-200 hover:scale-105"
           >
             ← Back to Home
           </Link>

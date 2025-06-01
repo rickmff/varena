@@ -215,41 +215,6 @@ export default function BuildsList({
   // Get the builds to display (limited by maxBuilds if specified)
   const buildsToShow = maxBuilds ? builds.slice(0, maxBuilds) : builds;
 
-  if (builds.length === 0) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-center py-16"
-      >
-        <div className="max-w-2xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-6 mb-8 text-sm">
-            <div className="bg-red-900/20 border border-red-900/30 rounded-lg p-4">
-              <div className="text-white font-bold mb-2">CREATE</div>
-              <p className="text-gray-300">Design builds with our intuitive builder tool</p>
-            </div>
-            <div className="bg-red-900/20 border border-red-900/30 rounded-lg p-4">
-              <div className="text-white font-bold mb-2">STORE</div>
-              <p className="text-gray-300">Save unlimited builds for different strategies</p>
-            </div>
-            <div className="bg-red-900/20 border border-red-900/30 rounded-lg p-4">
-              <div className="text-white font-bold mb-2">IMPORT</div>
-              <p className="text-gray-300">Use builds in-game with simple commands</p>
-            </div>
-          </div>
-          <Link
-            href="/builds/create"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-red-900/50 border border-red-900/50 text-white font-bold rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group text-lg"
-          >
-            <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform duration-200" />
-            Create Your Build
-          </Link>
-        </div>
-      </motion.div>
-    );
-  }
-
   const scaleIn = {
     hidden: { opacity: 0, scale: 0.9 },
     visible: {
@@ -355,6 +320,27 @@ export default function BuildsList({
           </motion.div>
         ))}
       </motion.div>
+
+      {builds.length === 0 && (
+
+        <motion.div
+          className="flex justify-center gap-4 mb-8"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerContainer}
+        >
+          <motion.div>
+            <Link
+              href="/builds/create"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
+            >
+              <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+              Create Your Build
+            </Link>
+          </motion.div>
+        </motion.div>
+      )}
 
       {/* View All Button - Only show when requested and there are more builds */}
       {showViewAllButton && builds.length > 0 && maxBuilds && builds.length > maxBuilds && (

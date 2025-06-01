@@ -273,7 +273,7 @@ export default function NewsPage() {
         <div className="container mx-auto px-4 text-center">
           <Link
             href="/"
-            className="inline-flex items-center px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200"
+            className="inline-flex items-center py-3text-white font-medium transition-all duration-200 hover:scale-105"
           >
             ← Back to Home
           </Link>

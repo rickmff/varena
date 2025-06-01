@@ -409,7 +409,7 @@ export default function Home() {
               BUILD COLLECTION
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
-              Your Arsenal
+              Your Builds
             </h2>
             <p className="text-gray-100 max-w-2xl mx-auto text-lg">
               Manage your saved builds and create new combinations
