@@ -19,6 +19,8 @@ import {
 import ArenaCode, {
   SearchParamsBuildCodeUpdater,
 } from "./components/ArenaCode";
+import { HoverCard, HoverCardContent } from "../ui/hover-card";
+import { HoverCardTrigger } from "@radix-ui/react-hover-card";
 
 const BuilderPage = () => {
   return (
@@ -54,18 +56,55 @@ const BuilderPage = () => {
                     <AmuletPicker />
                   </div>
                   <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-grey-800/60 border border-grey-600/50 rounded-lg flex items-center justify-center overflow-hidden group hover:border-grey-500/70 transition-all duration-200 hover:shadow-lg hover:shadow-grey-900/50">
-                    <img
-                      src="/images/vbuilds/armour/bag-bat_leather_bag.webp"
-                      alt="bag"
-                      className="pointer-events-none group-hover:scale-105 transition-transform duration-200"
-                    />
+                    <HoverCard openDelay={0} closeDelay={0}>
+                      <HoverCardTrigger>
+                        <img
+                          src="/images/vbuilds/armour/bag-bat_leather_bag.webp"
+                          alt="bag"
+                          className="pointer-events-none group-hover:scale-105 transition-transform duration-200"
+                        />
+                      </HoverCardTrigger>
+                      <HoverCardContent>
+                        <p></p>
+
+                        <div className="text-gray-300 space-y-4">
+                          <p className="flex gap-4">Bat Leather Bag</p>
+                          <div className="space-y-2 text-sm">
+                            <p>+18 Inventory Slots</p>
+                            <p>+500 Silver Coin Carry Immunity</p>
+                            <p>+42 Max Health</p>
+                            <p>+10% Resource Yield</p>
+                            <p>+25 Sun Resistance Rating</p>
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </div>
                   <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-grey-800/60 border border-grey-600/50 rounded-lg flex items-center justify-center overflow-hidden group hover:border-grey-500/70 transition-all duration-200 hover:shadow-lg hover:shadow-grey-900/50">
-                    <img
-                      src="/images/vbuilds/armour/cape-phantom_veil.webp"
-                      alt="cape"
-                      className="pointer-events-none max-h-16 sm:max-h-20 group-hover:scale-105 transition-transform duration-200"
-                    />
+                    <HoverCard openDelay={0} closeDelay={0}>
+                      <HoverCardTrigger>
+                        <img
+                          src="/images/vbuilds/armour/cape-phantom_veil.webp"
+                          alt="cape"
+                          className="pointer-events-none max-h-16 sm:max-h-20 group-hover:scale-105 transition-transform duration-200"
+                        />
+                      </HoverCardTrigger>
+                      <HoverCardContent>
+                        <p></p>
+
+                        <div className="text-gray-300 space-y-4">
+                          <p className="flex gap-4">Tier 3 Cape</p>
+                          <div className="space-y-2 text-sm">
+                            <p>+24 Max Health </p>
+                            <p>+15 Sun Resistance Rating </p>
+                            <p>+15 Garlic Resistance Rating </p>
+                            <p>+15 Silver Resistance Rating</p>
+                            <p>+15 Fire Resistance Rating</p>
+                            <p>+15 Holy Resistance Rating</p>
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </div>
                 </div>
               </section>

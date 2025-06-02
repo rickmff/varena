@@ -3,36 +3,42 @@
     "id": "blood",
     "name": "Blood Coating",
     "image": "/images/vbuilds/consumables/BloodCoating.webp",
+    "description": "Imbue your equipped weapon with the essence of blood. Your next primary attack inflicts Leech and Vampiric Curse, dealing 40% magic damage after 2s and spawning a Blood Orb. The on hit effect recharges every 12s and the imbuement lasts for 60 minutes. Effect persists through death.",
     "arenaCode": "1"
   },
   "chaos": {
     "id": "chaos",
     "name": "Chaos Coating",
     "image": "/images/vbuilds/consumables/ChaosCoating.webp",
+    "description": "Imbue your equipped weapon with blazing chaos. Your next primary attack triggers a Chaos Explosion dealing 50% magic damage in an area and inflicting Ignite. The on hit effect recharges every 12s and the imbuement lasts for 60 minutes. Effect persists through death.",
     "arenaCode": "2"
   },
   "frost": {
     "id": "frost",
     "name": "Frost Coating",
     "image": "/images/vbuilds/consumables/FrostCoating.webp",
+    "description": "Imbue your equipped weapon with chilling frost. Your next primary attack triggers a [[|Frost Nova]] dealing 30% magic damage in an area and inflicting Chill. The on hit effect recharges every 12s and the imbuement lasts for 60 minutes. Effect persists through death.",
     "arenaCode": "3"
   },
   "illusion": {
     "id": "illusion",
     "name": "Illusion Coating",
     "image": "/images/vbuilds/consumables/IllusionCoating.webp",
+    "description": "Imbue your equipped weapon with spectral energy. Your next primary attack triggers an Energy Burst dealing 30% magic damage in an area, inflicting Weaken and granting 4 stacks of Phantasm. The on hit effect recharges every 12s and the imbuement lasts for 60 minutes. Effect persists through death.",
     "arenaCode": "4"
   },
   "storm": {
     "id": "storm",
     "name": "Storm Coating",
     "image": "/images/vbuilds/consumables/StormCoating.webp",
+    "description": "Imbue your equipped weapon with crackling thunder. Your next primary attack deals 40% bonus magic damage and triggers Chain Lightning. The on hit effect recharges every 12s and the imbuement lasts for 60 minutes. Effect persists through death.",
     "arenaCode": "5"
   },
   "unholy": {
     "id": "unholy",
     "name": "Unholy Coating",
     "image": "/images/vbuilds/consumables/UnholyCoating.webp",
+    "description": "Imbue your equipped weapon with unholy corruption. Your next primary attack deals 40% bonus magic damage, inflicts Condemn and conjures a bone spirit that circles around the target dealing 50% damage and inflicting Condemn to any enemy it hits. The on hit effect recharges every 12s and the imbuement lasts for 60 minutes. Effect persists through death.",
     "arenaCode": "6"
   }
 }
