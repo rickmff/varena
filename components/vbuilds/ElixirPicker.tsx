@@ -1,8 +1,8 @@
-import {
-  HoverCard,
-  HoverCardTrigger,
-  HoverCardContent,
-} from "../ui/hover-card";
+// import {
+//   HoverCard,
+//   HoverCardTrigger,
+//   HoverCardContent,
+// } from "../ui/hover-card";
 import { useBuilder } from "./BuildProvider";
 import {
   DropdownSelect,
@@ -18,7 +18,8 @@ const ElixirDescription = ({
   elixir: (typeof elixirData)[keyof typeof elixirData];
 }) => {
   return (
-    <div className="text-gray-300">
+    <div className="text-gray-300 space-y-4">
+      <p className="flex gap-4 text-lg">{elixir.name}</p>
       <p>
         An elixir that increases{" "}
         {elixir.modifiers
@@ -30,46 +31,29 @@ const ElixirDescription = ({
   );
 };
 
-const HoverInfoCard = ({ children, isVisible = false, description }) => {
-  console.log(isVisible);
-  if (!isVisible) {
-    return <>{children}</>;
-  }
-
-  return (
-    <HoverCard openDelay={0} closeDelay={0}>
-      <HoverCardTrigger>{children}</HoverCardTrigger>
-      <HoverCardContent className="w-96 p-4 bg-zinc-900 text-gray-200">
-        {description}
-      </HoverCardContent>
-    </HoverCard>
-  );
-};
-
 export const ElixerPicker: React.FC = () => {
   const { state, builder } = useBuilder();
-  console.log(state.context.elixir);
   return (
-    <HoverInfoCard
-      isVisible={state.context.elixir !== null}
-      description={<ElixirDescription elixir={state.context.elixir} />}
-    >
-      <DropdownSelect
-        options={[...elixerOptions]}
-        defaultValue={state.context.elixir?.id}
-        selected={state.context.elixir?.id}
-        clear={() => builder.send({ type: "REMOVE_ELIXIR" })}
-        onSelect={(id: string) => {
-          const elixirId = id as keyof typeof elixirData;
-          builder.send({ type: "ADD_ELIXIR", elixir: elixirData[elixirId] });
-        }}
-        placeholder={
-          <DropdownSelectPlaceholder
-            image="/images/vbuilds/elixirs/elixir-prowler.webp"
-            text="Select Elixir"
-          />
-        }
-      />
-    </HoverInfoCard>
+    <DropdownSelect
+      hoverIsVisible={state.context.elixir !== null}
+      hoverDescription={<ElixirDescription elixir={state.context.elixir} />}
+      hoverOptionDescription={(option: any) => (
+        <ElixirDescription elixir={option} />
+      )}
+      options={[...elixerOptions]}
+      defaultValue={state.context.elixir?.id}
+      selected={state.context.elixir?.id}
+      clear={() => builder.send({ type: "REMOVE_ELIXIR" })}
+      onSelect={(id: string) => {
+        const elixirId = id as keyof typeof elixirData;
+        builder.send({ type: "ADD_ELIXIR", elixir: elixirData[elixirId] });
+      }}
+      placeholder={
+        <DropdownSelectPlaceholder
+          image="/images/vbuilds/elixirs/elixir-prowler.webp"
+          text="Select Elixir"
+        />
+      }
+    />
   );
 };

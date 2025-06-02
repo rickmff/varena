@@ -16,6 +16,11 @@ import {
   AdvancedCoatings,
   AdvancedCoatingsSwitch,
 } from "@/components/vbuilds/CoatingPicker";
+import ArenaCode, {
+  SearchParamsBuildCodeUpdater,
+} from "./components/ArenaCode";
+import { HoverCard, HoverCardContent } from "../ui/hover-card";
+import { HoverCardTrigger } from "@radix-ui/react-hover-card";
 
 const BuilderPage = () => {
   return (
@@ -33,7 +38,7 @@ const BuilderPage = () => {
         {/* Main Content Area */}
         <div className="flex-1 space-y-6 lg:space-y-8">
           {/* Build Section */}
-          <div className="bg-grey-900/40 backdrop-blur-sm border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
+          <div className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
             <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
               <section className="flex-1">
                 <div className="flex items-center gap-3 mb-4 sm:mb-6">
@@ -51,18 +56,55 @@ const BuilderPage = () => {
                     <AmuletPicker />
                   </div>
                   <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-grey-800/60 border border-grey-600/50 rounded-lg flex items-center justify-center overflow-hidden group hover:border-grey-500/70 transition-all duration-200 hover:shadow-lg hover:shadow-grey-900/50">
-                    <img
-                      src="/images/vbuilds/armour/bag-bat_leather_bag.webp"
-                      alt="bag"
-                      className="pointer-events-none group-hover:scale-105 transition-transform duration-200"
-                    />
+                    <HoverCard openDelay={0} closeDelay={0}>
+                      <HoverCardTrigger>
+                        <img
+                          src="/images/vbuilds/armour/bag-bat_leather_bag.webp"
+                          alt="bag"
+                          className="pointer-events-none group-hover:scale-105 transition-transform duration-200"
+                        />
+                      </HoverCardTrigger>
+                      <HoverCardContent>
+                        <p></p>
+
+                        <div className="text-gray-300 space-y-4">
+                          <p className="flex gap-4">Bat Leather Bag</p>
+                          <div className="space-y-2 text-sm">
+                            <p>+18 Inventory Slots</p>
+                            <p>+500 Silver Coin Carry Immunity</p>
+                            <p>+42 Max Health</p>
+                            <p>+10% Resource Yield</p>
+                            <p>+25 Sun Resistance Rating</p>
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </div>
                   <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-grey-800/60 border border-grey-600/50 rounded-lg flex items-center justify-center overflow-hidden group hover:border-grey-500/70 transition-all duration-200 hover:shadow-lg hover:shadow-grey-900/50">
-                    <img
-                      src="/images/vbuilds/armour/cape-phantom_veil.webp"
-                      alt="cape"
-                      className="pointer-events-none max-h-16 sm:max-h-20 group-hover:scale-105 transition-transform duration-200"
-                    />
+                    <HoverCard openDelay={0} closeDelay={0}>
+                      <HoverCardTrigger>
+                        <img
+                          src="/images/vbuilds/armour/cape-phantom_veil.webp"
+                          alt="cape"
+                          className="pointer-events-none max-h-16 sm:max-h-20 group-hover:scale-105 transition-transform duration-200"
+                        />
+                      </HoverCardTrigger>
+                      <HoverCardContent>
+                        <p></p>
+
+                        <div className="text-gray-300 space-y-4">
+                          <p className="flex gap-4">Tier 3 Cape</p>
+                          <div className="space-y-2 text-sm">
+                            <p>+24 Max Health </p>
+                            <p>+15 Sun Resistance Rating </p>
+                            <p>+15 Garlic Resistance Rating </p>
+                            <p>+15 Silver Resistance Rating</p>
+                            <p>+15 Fire Resistance Rating</p>
+                            <p>+15 Holy Resistance Rating</p>
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </div>
                 </div>
               </section>
@@ -86,7 +128,7 @@ const BuilderPage = () => {
 
           {/* Spells & Passives Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
-            <section className="bg-grey-900/40 backdrop-blur-sm border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
+            <section className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="w-1 h-6 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full" />
                 <h3 className="text-lg sm:text-xl font-bold text-grey-100 tracking-wide">
@@ -97,7 +139,7 @@ const BuilderPage = () => {
               <SpellForge />
             </section>
 
-            <section className="bg-grey-900/40 backdrop-blur-sm border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
+            <section className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="w-1 h-6 bg-gradient-to-b from-green-400 to-green-600 rounded-full" />
                 <h3 className="text-lg sm:text-xl font-bold text-grey-100 tracking-wide">
@@ -110,7 +152,7 @@ const BuilderPage = () => {
           </div>
 
           {/* Weapons Section */}
-          <div className="bg-grey-900/40 backdrop-blur-sm border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
+          <div className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4 sm:mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-1 h-6 bg-gradient-to-b from-orange-400 to-orange-600 rounded-full" />
@@ -118,7 +160,7 @@ const BuilderPage = () => {
                   WEAPONS
                 </h3>
               </div>
-              <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs px-3 py-1.5 rounded-full font-medium backdrop-blur-sm w-fit">
+              <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs px-3 py-1.5 rounded-full font-medium  w-fit">
                 Use keys 1-8 to focus weapon stats
               </div>
               <div className="hidden sm:block flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
@@ -134,7 +176,7 @@ const BuilderPage = () => {
         {/* Sidebar - Mobile: Full width below content, Desktop: Fixed sidebar */}
         <div className="w-full lg:w-1/3 space-y-4 lg:space-y-6 order-first lg:order-last">
           {/* Stats Panel */}
-          <div className="bg-grey-900/40 backdrop-blur-sm border border-grey-700/50 rounded-xl shadow-2xl overflow-hidden">
+          <div className="bg-grey-900/40  border border-grey-700/50 rounded-xl shadow-2xl overflow-hidden">
             <div className="p-3 sm:p-4 border-b border-grey-700/50 bg-grey-800/30">
               <div className="flex items-center gap-3">
                 <div className="w-1 h-5 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full" />
@@ -150,6 +192,7 @@ const BuilderPage = () => {
           </div>
         </div>
       </div>
+      <SearchParamsBuildCodeUpdater />
     </div>
   );
 };

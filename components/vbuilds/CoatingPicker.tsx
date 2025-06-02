@@ -14,6 +14,7 @@ export interface Coating {
   name: string;
   image: string;
   arenaCode: string;
+  description: string;
 }
 
 export type CoatingCollection = Record<string, Coating>;
@@ -125,6 +126,9 @@ export function CoatingPicker({
 
   return (
     <DropdownSelect
+      hoverIsVisible={state.context.coatings.get(slot) !== undefined}
+      hoverDescription={state.context.coatings.get(slot)?.description}
+      hoverOptionDescription={(option: any) => option.description}
       options={Object.values(coatings)}
       defaultValue={state.context.coatings.get(slot)?.id!}
       selected={state.context.coatings.get(slot)?.id!}

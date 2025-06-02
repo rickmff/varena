@@ -98,7 +98,13 @@ const getWeaponSlotModifiers = (weapons: Map<AvailableWeaponSlots, Weapon>, slot
         return modifiers
     });
 
-    return modifiers
+    // All weaponse give Physical Power, so we add it here
+    return [{
+        "stat": "Physical Power",
+        "value": 33.7,
+        "unit": "flat",
+        "calculate": true
+    }, ...modifiers]
 }
 
 
@@ -159,12 +165,28 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
         } else if (mod.unit === "percent") {
             finalStats[mod.stat] = base + mod.value;
         }
+    }
 
-        // Cap enforcement (optional per modifier or after all modifiers are applied)
-        // const cap = context.baseStats[mod.stat]?.cap;
-        // if (cap !== null && cap !== undefined && finalStats[mod.stat] > cap) {
-        //     finalStats[mod.stat] = cap;
-        // }
+    // Apply percentage bonuses to base stats
+    if ("Bonus Spell Power" in finalStats) {
+        const bonusPercent = finalStats["Bonus Spell Power"] / 100; // Convert to decimal
+        finalStats["Spell Power"] = Number((finalStats["Spell Power"] * (1 + bonusPercent)).toFixed(1));
+    }
+
+    if ("Bonus Physical Power" in finalStats) {
+        const bonusPercent = finalStats["Bonus Physical Power"] / 100; // Convert to decimal
+        finalStats["Physical Power"] = Number((finalStats["Physical Power"] * (1 + bonusPercent)).toFixed(1));
+    }
+
+    // Apply other percentage-based bonuses
+    if ("Bonus Maximum Health" in finalStats) {
+        const bonusPercent = finalStats["Bonus Maximum Health"] / 100;
+        finalStats["Max Health"] = Number((finalStats["Max Health"] * (1 + bonusPercent)).toFixed(1));
+    }
+
+    if ("Bonus Movement Speed" in finalStats) {
+        const bonusPercent = finalStats["Bonus Movement Speed"] / 100;
+        finalStats["Movement Speed"] = Number((finalStats["Movement Speed"] * (1 + bonusPercent)).toFixed(1));
     }
 
     return finalStats;

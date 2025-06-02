@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "../ui/button";
+import { Check } from "lucide-react";
 
 export type Spell = {
   id: string;
@@ -81,25 +82,78 @@ export const JewelForge = ({
           </h3>
         </div>
         <div>
-          <div className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded-full">
+          <div
+            className={`${
+              selectedEffects.length === 4
+                ? "bg-green-500/20 text-green-400"
+                : "bg-yellow-500/20 text-yellow-400"
+            } text-xs px-2 py-1 rounded-full`}
+          >
             Choose 4 Effects
           </div>
         </div>
       </div>
       <ul className="space-y-4">
-        {spell.effects.map((effect) => (
-          <li key={effect.key} className="flex items-center gap-4">
-            <Checkbox
-              checked={selectedEffects.includes(effect.key)}
-              onCheckedChange={() => toggleEffectSelection(effect.key)}
-              disabled={
-                !selectedEffects.includes(effect.key) &&
-                selectedEffects.length >= 4
-              }
-            />
-            {effect.description}
-          </li>
-        ))}
+        {spell.effects.map((effect) => {
+          if (selectedEffects.includes(effect.key)) {
+            return (
+              <div
+                className="bg-green-900/20 border border-green-900/30 p-2 rounded-md cursor-pointer"
+                onClick={() => toggleEffectSelection(effect.key)}
+                key={effect.key}
+              >
+                <div className="flex items-center">
+                  <div className="bg-green-500/20 text-green-300 text-xs p-1.5 rounded-full mr-2">
+                    <Check className="w-2 h-2" />
+                  </div>
+                  <p className="text-xs text-white">{effect.description}</p>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div>
+              <div
+                key={effect.key}
+                className={`flex items-center p-2 rounded-md transition-all cursor-pointer ${
+                  selectedEffects.includes(effect.key)
+                    ? "bg-red-900/50 border border-red-500/50"
+                    : "bg-black/30 border border-red-900/30 hover:bg-black/40"
+                } ${
+                  selectedEffects.length >= 4
+                    ? "cursor-not-allowed opacity-30"
+                    : ""
+                }`}
+                onClick={() => toggleEffectSelection(effect.key)}
+              >
+                <div
+                  className={`flex-shrink-0 w-5 h-5 rounded-full mr-2 flex items-center justify-center border ${
+                    selectedEffects.includes(effect.key)
+                      ? "bg-red-500/50 border-red-400"
+                      : "bg-black/50 border-gray-600"
+                  }`}
+                >
+                  {selectedEffects.includes(effect.key) && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-2 w-2 text-white"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                </div>
+                <p className="text-xs text-white">{effect.description}</p>
+              </div>
+            </div>
+          );
+        })}
       </ul>
 
       <Button

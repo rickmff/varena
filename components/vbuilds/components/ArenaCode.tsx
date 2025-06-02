@@ -1,11 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useBuilder } from "../BuildProvider";
 import { arenaCode } from "@/components/machines/converter";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
+
+export const SearchParamsBuildCodeUpdater = () => {
+  const { state } = useBuilder();
+  const searchParams = useSearchParams();
+  const code = arenaCode(state.context);
+
+  useEffect(() => {
+    if (code) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("build", code);
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState({ path: newUrl }, "", newUrl);
+    }
+  }, [code, searchParams]);
+  return null;
+};
 
 const ArenaCode: React.FC = () => {
   const { state } = useBuilder();
+
   const exportCommand = `.import-build ${arenaCode(state.context)}`;
 
   const copyBuildCommand = async () => {

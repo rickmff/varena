@@ -140,10 +140,31 @@ export const armourOptions = [
 type ArmourOption = (typeof armourOptions)[number];
 type ArmourId = ArmourOption["id"];
 
+const AmuletDescription = ({ armour }: { armour: Armour }) => {
+  return (
+    <div className="text-gray-300 space-y-4">
+      <p className="flex gap-4">{armour.name}</p>
+      <div className="space-y-2 text-sm">
+        {armour.modifiers.map((mod) => (
+          <p key={mod.stat}>
+            {`${mod.stat} by +${mod.value}`}
+            {mod.unit === "percent" ? "%" : null}
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export const ArmourPicker: React.FC = () => {
   const { state, builder } = useBuilder();
   return (
     <DropdownSelect
+      hoverIsVisible={state.context.armour !== null}
+      hoverDescription={<AmuletDescription armour={state.context.armour} />}
+      hoverOptionDescription={(option: any) => (
+        <AmuletDescription armour={option} />
+      )}
       selected={state.context.armour?.id}
       clear={() => builder.send({ type: "REMOVE_ARMOUR" })}
       onSelect={(id: string) => {

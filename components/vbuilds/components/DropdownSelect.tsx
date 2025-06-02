@@ -5,6 +5,12 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../../ui/dropdown-menu";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { hover } from "framer-motion";
 
 const string1 =
   "bg-black/80 backdrop-blur-sm border-2 border-red-900/30 hover:border-red-500 transition-all duration-300 overflow-hidden group block h-full relative";
@@ -42,6 +48,21 @@ type ClearOption = { label: string; image?: string; name?: string };
 type Option = { id: string; name: string; image: string; [key: string]: any };
 type OptionId = Option["id"];
 
+const HoverInfoCard = ({ children, isVisible = false, description }) => {
+  if (!isVisible) {
+    return <>{children}</>;
+  }
+
+  return (
+    <HoverCard openDelay={0} closeDelay={0}>
+      <HoverCardTrigger>{children}</HoverCardTrigger>
+      <HoverCardContent className="w-96 p-4 bg-zinc-900 text-gray-200">
+        {description}
+      </HoverCardContent>
+    </HoverCard>
+  );
+};
+
 export const DropdownSelectPlaceholder: React.FC<{
   text?: string;
   image: string;
@@ -65,38 +86,61 @@ export const DropdownSelect: React.FC<{
   onSelect?: (id: OptionId) => void;
   clear?: () => void;
   selected: OptionId;
-}> = ({ defaultValue, options, placeholder, onSelect, clear, selected }) => {
+  hoverIsVisible?: boolean;
+  hoverDescription?: any;
+  hoverOptionDescription?: any;
+}> = ({
+  defaultValue,
+  options,
+  placeholder,
+  onSelect,
+  clear,
+  selected,
+  hoverIsVisible,
+  hoverDescription,
+  hoverOptionDescription,
+}) => {
   // const [selected, setSelected] = useState<OptionId | null>(defaultValue);
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        onFocus={() => null}
-        className={`w-20 h-20 text-gray-200 rounded-md flex items-center justify-center ${string3}`}
-      >
-        {selected ? (
-          <img
-            src={options.find((option) => option.id === selected)?.image}
-            alt={options.find((option) => option.id === selected)?.name}
-            className="pointer-events-none"
-          />
-        ) : (
-          <span>{placeholder || "Select an option"}</span>
-        )}
-      </DropdownMenuTrigger>
+      <HoverInfoCard isVisible={hoverIsVisible} description={hoverDescription}>
+        <DropdownMenuTrigger
+          onFocus={() => null}
+          className={`w-20 h-20 text-gray-200 rounded-md flex items-center justify-center ${string3}`}
+        >
+          {selected ? (
+            <img
+              src={options.find((option) => option.id === selected)?.image}
+              alt={options.find((option) => option.id === selected)?.name}
+              className="pointer-events-none"
+            />
+          ) : (
+            <span>{placeholder || "Select an option"}</span>
+          )}
+        </DropdownMenuTrigger>
+      </HoverInfoCard>
       <DropdownMenuContent className="p-0 min-w-0 space-y-1 overflow-auto">
         <div className="flex flex-wrap gap-2 p-2">
           {options
             .filter((option) => option.id !== selected)
             .map((option) => (
-              <DropdownItem
+              <HoverInfoCard
                 key={option.id}
-                option={option}
-                onClick={() => {
-                  // setSelected(option.id);
-                  onSelect && onSelect(option.id);
-                }}
-              />
+                isVisible={hoverOptionDescription}
+                description={
+                  hoverOptionDescription && hoverOptionDescription(option)
+                }
+              >
+                <DropdownItem
+                  key={option.id}
+                  option={option}
+                  onClick={() => {
+                    // setSelected(option.id);
+                    onSelect && onSelect(option.id);
+                  }}
+                />
+              </HoverInfoCard>
             ))}
           {selected && clear && (
             <DropdownItem
