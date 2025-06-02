@@ -409,12 +409,12 @@ export default function Home() {
             variants={fadeInUp}
           >
             <div className="mb-8">
-              <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2">
+              <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2 font-['Junge'] ">
                 BUILD COLLECTION
                 <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
               </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider font-['Junge']">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
               Your Builds
             </h2>
             <p className="text-gray-100 max-w-2xl mx-auto text-lg">
@@ -484,12 +484,12 @@ export default function Home() {
             variants={fadeInUp}
           >
             <div className="mb-8">
-              <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2">
+              <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2 font-['Junge'] ">
                 NEWS & UPDATES
                 <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
               </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider font-['Junge']">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
               Chronicles of V Rising
             </h2>
             <p className="text-gray-100 max-w-2xl mx-auto text-lg">

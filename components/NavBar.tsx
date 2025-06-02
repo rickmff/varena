@@ -141,7 +141,7 @@ export default function NavBar() {
                     height={20}
                     className="h-5 w-5 mr-2"
                   />
-                  JOIN US
+                  <span className="pt-1">JOIN US</span>
                 </Link>
               </Button>
             </motion.div>

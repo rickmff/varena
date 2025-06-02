@@ -53,11 +53,14 @@ export default function Builds() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="inline-block rounded-md bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
-              BUILD COLLECTION
+            <div className="mb-8">
+              <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2 font-['Junge'] ">
+                BUILD COLLECTION
+                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
+              </span>
             </div>
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white uppercase tracking-wider">
-              ⚔️ Your Builds
+              Your Builds
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Manage your saved builds, create new combinations

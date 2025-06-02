@@ -177,12 +177,15 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
           viewport={{ once: true }}
           variants={fadeInUp}
         >
-          <div className="inline-block rounded-md bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
-            V ARENA FEATURES
+          <div className="mb-8">
+            <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2 font-['Junge'] ">
+              VARENA FEATURES
+              <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
+            </span>
           </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">UNLEASH YOUR POTENTIAL</h2>
           <p className="text-gray-100 max-w-2xl mx-auto">
-            Discover the unique features of V Arena that enhance your gaming experience.
+            Discover the unique features of VArena that enhance your gaming experience.
           </p>
         </motion.div>
         <motion.div
