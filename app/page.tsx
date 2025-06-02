@@ -381,10 +381,13 @@ export default function Home() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="inline-block rounded-md bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
-              COMMAND GENERATOR
+            <div className="mb-8">
+              <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2 font-['Junge'] ">
+                COMMAND GENERATOR
+                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
+              </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase ">
               Server Commands
             </h2>
             <p className="text-gray-100 max-w-2xl mx-auto text-lg">
@@ -405,10 +408,13 @@ export default function Home() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="inline-block rounded-md bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
-              BUILD COLLECTION
+            <div className="mb-8">
+              <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2">
+                BUILD COLLECTION
+                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
+              </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider font-['Junge']">
               Your Builds
             </h2>
             <p className="text-gray-100 max-w-2xl mx-auto text-lg">
@@ -477,10 +483,13 @@ export default function Home() {
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <div className="inline-block rounded-md bg-red-900/50 border border-red-900/50 px-6 py-2 text-xs mb-6 shadow-lg shadow-red-900/20">
-              NEWS & UPDATES
+            <div className="mb-8">
+              <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2">
+                NEWS & UPDATES
+                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
+              </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider font-['Junge']">
               Chronicles of V Rising
             </h2>
             <p className="text-gray-100 max-w-2xl mx-auto text-lg">

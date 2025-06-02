@@ -43,7 +43,7 @@ const HoverInfoCard = ({
   weapon: Weapon | undefined;
 }) => {
   if (!weapon) {
-    return null;
+    return <>{children}</>;
   }
   return (
     <HoverCard openDelay={0} closeDelay={0}>
@@ -52,8 +52,8 @@ const HoverInfoCard = ({
         <div className="flex gap-4 items-center">
           <div
             className={`relative rounded-md overflow-hidden w-10 h-10 border ${weapon?.type === "legendary"
-                ? "border-orange-500"
-                : "border-purple-500"
+              ? "border-orange-500"
+              : "border-purple-500"
               }`}
           >
             <img src={weapon?.img} className="w-10 h-10" />
@@ -69,8 +69,8 @@ const HoverInfoCard = ({
           <div>
             <div
               className={`capitalize ${weapon?.type === "legendary"
-                  ? "text-orange-500"
-                  : "text-purple-500"
+                ? "text-orange-500"
+                : "text-purple-500"
                 }`}
             >
               {weapon?.name}
@@ -116,10 +116,10 @@ const SlotTrigger = ({
       <DialogTrigger
         id={`weapon-slot-${slot}`}
         className={`w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 hover:border-purple-500 transition-all duration-100 ${!weaponInSlot
-            ? "border"
-            : weaponInSlot.type === "legendary"
-              ? "border-orange-500/60"
-              : "border-purple-500/60"
+          ? "border"
+          : weaponInSlot.type === "legendary"
+            ? "border-orange-500/60"
+            : "border-purple-500/60"
           } ${state.context.focusedWeapon == slot ? "ring-2 ring-emerald-500" : ""
           }`}
         onClick={() => {

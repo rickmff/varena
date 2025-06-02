@@ -113,6 +113,7 @@ export default function RootLayout({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+        <link href="https://fonts.googleapis.com/css2?family=Junge&display=swap" rel="stylesheet"></link>
         <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body className={inter.className}>

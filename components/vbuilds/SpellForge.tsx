@@ -53,7 +53,7 @@ const SlotTrigger = ({
           {children}
         </SheetTrigger>
       </HoverCardTrigger>
-      <HoverCardContent className="w-96 flex flex-col gap-4">
+      <HoverCardContent className="w-96 flex flex-col gap-4 z-[100]">
         <>
           <div className="flex items-center gap-4">
             <div className="relative w-10 h-10 rounded overflow-hidden">
@@ -72,17 +72,17 @@ const SlotTrigger = ({
               (effect: any) => effect.key == jewel
             );
             return (
-              <div>
+              <div key={`${jewel}-${index}`}>
                 <div className="flex gap-4 items-center text-sm">
                   <img
                     src={
-                      effect.max === null
+                      !effect || effect.max === null
                         ? "/images/vbuilds/attributes/Attribute_TierIndicator_Fixed.png"
                         : "/images/vbuilds/attributes/Attribute_TierIndicator_5.png"
                     }
                     className="flex-grow-0 w-6 h-6"
                   />
-                  <div key={index}>{effect?.description}</div>
+                  <div>{effect?.description}</div>
                 </div>
               </div>
             );
@@ -133,6 +133,7 @@ const sectionTitle = {
   spell1: "Spell 1",
   spell2: "Spell 2",
   ultimate: "Ultimate",
+  idle: "Spells",
 };
 
 export const SpellForge = () => {
@@ -203,7 +204,12 @@ export const SpellForge = () => {
       >
         <div className="flex items-center justify-between px-8 pt-8">
           <h3 className="text-2xl font-semibold mb-3 text-red-400 flex items-center">
-            <span className="mr-2">{sectionTitle[state.value.spellForge]}</span>
+            <span className="mr-2">
+              {(() => {
+                const currentState = typeof state.value === 'object' ? state.value.spellForge : 'dash';
+                return sectionTitle[currentState as keyof typeof sectionTitle] || 'Spells';
+              })()}
+            </span>
           </h3>
           <SheetClose asChild>
             <Button variant="outline">EXIT</Button>
