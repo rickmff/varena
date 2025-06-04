@@ -24,7 +24,7 @@ import { HoverCardTrigger } from "@radix-ui/react-hover-card";
 
 const BuilderPage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-grey-950 via-grey-900 to-grey-950 relative overflow-hidden">
+    <div className="flex-grow overflow-auto bg-gradient-to-br from-grey-950 via-grey-900 to-grey-950 relative">
       {/* Subtle grid pattern overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.007)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.007)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none" />
 
@@ -34,7 +34,7 @@ const BuilderPage = () => {
 
       <BuilderNavBar />
 
-      <div className="relative max-w-screen-2xl mx-auto flex flex-col lg:flex-row text-grey-300 p-3 sm:p-4 lg:p-6 gap-4 lg:gap-6">
+      <div className="flex-grow relative max-w-screen-2xl mx-auto flex flex-col lg:flex-row text-grey-300 p-3 sm:p-4 lg:p-6 gap-4 lg:gap-6">
         {/* Main Content Area */}
         <div className="flex-1 space-y-6 lg:space-y-8">
           {/* Build Section */}
@@ -127,7 +127,7 @@ const BuilderPage = () => {
           </div>
 
           {/* Spells & Passives Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
             <section className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="w-1 h-6 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full" />
@@ -171,6 +171,21 @@ const BuilderPage = () => {
               <AdvancedCoatingsSwitch />
             </div>
           </div>
+
+          <div className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4 sm:mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-6 bg-gradient-to-b from-orange-400 to-orange-600 rounded-full" />
+                <h3 className="text-lg sm:text-xl font-bold text-grey-100 tracking-wide">
+                  USE IN GAME
+                </h3>
+              </div>
+              <div className="hidden sm:block flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
+            </div>
+            <div className="space-y-4">
+              <ArenaCode />
+            </div>
+          </div>
         </div>
 
         {/* Sidebar - Mobile: Full width below content, Desktop: Fixed sidebar */}
@@ -186,7 +201,7 @@ const BuilderPage = () => {
                 <div className="flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
               </div>
             </div>
-            <div className="max-h-[300px] sm:max-h-[500px] lg:max-h-[calc(100vh-300px)] overflow-auto p-3 sm:p-4 custom-scrollbar">
+            <div className="overflow-auto p-3 sm:p-4 custom-scrollbar">
               <GroupedStatList stats={stats} />
             </div>
           </div>

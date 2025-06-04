@@ -102,7 +102,7 @@ export const AdvancedCoatings = () => {
   if (!advancedCoatings) return null;
 
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-4 flex-wrap">
       <CoatingPicker slot={1} />
       <CoatingPicker slot={2} />
       <CoatingPicker slot={3} />

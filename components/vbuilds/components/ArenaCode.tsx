@@ -46,11 +46,11 @@ const ArenaCode: React.FC = () => {
 
   return (
     <div className="flex gap-4">
-      {/* <input
+      <input
         readOnly
         className="text-gray-300 text-base bg-black/50 bg-black px-4 py-2 rounded-md border w-3/4 text-center"
         value={exportCommand}
-      /> */}
+      />
       <Button
         onClick={copyBuildCommand}
         className="px-3 py-2 text-white group border-red-900/70  bg-red-900/50 hover:bg-red-800 transition-colors"
