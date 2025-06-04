@@ -3,6 +3,7 @@
     "id": "StatMod_AttackSpeed",
     "key": "1",
     "description": "Increases attack speed",
+    "category": "physical",
     "modifiers": [
       {
         "stat": "Attack Speed",
@@ -16,6 +17,7 @@
     "id": "StatMod_CriticalStrikePhysical",
     "key": "2",
     "description": "Improves physical critical strike chance",
+    "category": "physical",
     "modifiers": [
       {
         "stat": "Physical Critical Chance",
@@ -29,6 +31,7 @@
     "id": "StatMod_CriticalStrikePhysicalPower",
     "key": "3",
     "description": "Enhances physical critical strike power",
+    "category": "physical",
     "modifiers": [
       {
         "stat": "Physical Critical Power",
@@ -42,6 +45,7 @@
     "id": "StatMod_CriticalStrikeSpellPower",
     "key": "4",
     "description": "Boosts spell critical strike power",
+    "category": "spell",
     "modifiers": [
       {
         "stat": "Spell Critical Power",
@@ -55,6 +59,7 @@
     "id": "StatMod_CriticalStrikeSpells",
     "key": "5",
     "description": "Increases spell critical strike chance",
+    "category": "spell",
     "modifiers": [
       {
         "stat": "Spell Critical Chance",
@@ -68,6 +73,7 @@
     "id": "StatMod_MaxHealth",
     "key": "6",
     "description": "Increases maximum health",
+    "category": "utility",
     "modifiers": [
       {
         "stat": "Bonus Maximum Health",
@@ -81,6 +87,7 @@
     "id": "StatMod_MovementSpeed",
     "key": "7",
     "description": "Improves movement speed",
+    "category": "utility",
     "modifiers": [
       {
         "stat": "Bonus Movement Speed",
@@ -94,6 +101,7 @@
     "id": "StatMod_PhysicalPower",
     "key": "8",
     "description": "Enhances physical power",
+    "category": "physical",
     "modifiers": [
       {
         "stat": "Bonus Physical Power",
@@ -107,6 +115,7 @@
     "id": "StatMod_SpellCooldownReduction",
     "key": "9",
     "description": "Reduces spell cooldowns",
+    "category": "spell",
     "modifiers": [
       {
         "stat": "Spell Cooldown Rate",
@@ -120,6 +129,7 @@
     "id": "StatMod_SpellLeech",
     "key": "A",
     "description": "Grants spell leech ability",
+    "category": "spell",
     "modifiers": [
       {
         "stat": "Spell Leech",
@@ -133,6 +143,7 @@
     "id": "StatMod_SpellPower",
     "key": "B",
     "description": "Increases spell power",
+    "category": "spell",
     "modifiers": [
       {
         "stat": "Bonus Spell Power",
@@ -146,6 +157,7 @@
     "id": "StatMod_TravelCooldownReduction",
     "key": "C",
     "description": "Reduces veil cooldowns",
+    "category": "utility",
     "modifiers": [
       {
         "stat": "Veil Cooldown Rate",
@@ -159,6 +171,7 @@
     "id": "StatMod_WeaponCooldownReduction",
     "key": "D",
     "description": "Reduces weapon cooldowns",
+    "category": "physical",
     "modifiers": [
       {
         "stat": "Weapon Cooldown Rate",
@@ -172,6 +185,7 @@
     "id": "StatMod_WeaponSkillPower",
     "key": "E",
     "description": "Enhances weapon skill power",
+    "category": "physical",
     "modifiers": [
       {
         "stat": "Weapon Skill Power",
