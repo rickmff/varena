@@ -823,20 +823,24 @@ export default function Home() {
             <div>
               <h3 className="text-lg font-bold mb-4">Community</h3>
               <ul className="space-y-2 text-sm text-gray-100">
-                {["Discord", "Twitter", "YouTube", "Twitch"].map((item, i) => (
+                {[{ name: "Discord", href: "https://www.discord.gg/varena" },
+                  { name: "Twitter", href: "https://www.x.com/VRisingVArena" },
+                  { name: "YouTube", href: "https://www.youtube.com/@VRisingArena" },
+                  { name: "Twitch", href: "https://www.twitch.tv/varenatv" },
+                ].map((item, i) => (
                   <motion.li
-                    key={item}
+                    key={item.name}
                     initial={{ opacity: 0, x: -10 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.1 }}
                     viewport={{ once: true }}
                   >
                     <Link
-                      href={`https://${item.toLowerCase()}.com`}
+                      href={item.href}
                       className="hover:text-white transition-colors"
                       target="_blank"
                     >
-                      {item}
+                      {item.name}
                     </Link>
                   </motion.li>
                 ))}

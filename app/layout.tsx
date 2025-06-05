@@ -17,7 +17,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: 'V Arena - V Rising Community Server',
-  description: 'Join V Arena, the premier V Rising community server featuring custom game modes, events, and an active community of vampire enthusiasts.',
+  description: 'Join a community of both new and experienced players. Sharpen your skills, test new playstyles, and join your kin for the hunt!',
   keywords: 'V Rising, V Arena, gaming, vampire, community server, PvP, events',
   authors: [{ name: 'V Arena Team' }],
   creator: 'V Arena',
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'V Arena - V Rising Community Server',
-    description: 'Join V Arena, the premier V Rising community server featuring custom game modes, events, and an active community of vampire enthusiasts.',
+    description: 'Join a community of both new and experienced players. Sharpen your skills, test new playstyles, and join your kin for the hunt!',
     url: 'https://v-arena.com',
     siteName: 'V Arena',
     images: [
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'V Arena - V Rising Community Server',
-    description: 'Join V Arena, the premier V Rising community server featuring custom game modes, events, and an active community of vampire enthusiasts.',
+    description: 'Join a community of both new and experienced players. Sharpen your skills, test new playstyles, and join your kin for the hunt!',
     images: ['/twitter-image.jpg'],
     creator: '@varena',
   },
@@ -94,17 +94,17 @@ export default function RootLayout({
       <head>
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="msapplication-TileImage" content="/mstile-144x144.png" />
-        <meta name="description" content="Join V Arena, the premier V Rising community server featuring custom game modes, events, and an active community of vampire enthusiasts." />
+        <meta name="description" content="Join a community of both new and experienced players. Sharpen your skills, test new playstyles, and join your kin for the hunt!" />
         <meta property="og:url" content="https://v-arena.com" />
         <meta property="og:type" content="website" />
         <meta property="og:title" content="V Arena - V Rising Community Server" />
-        <meta property="og:description" content="Join V Arena, the premier V Rising community server featuring custom game modes, events, and an active community of vampire enthusiasts." />
+        <meta property="og:description" content="Join a community of both new and experienced players. Sharpen your skills, test new playstyles, and join your kin for the hunt!" />
         <meta property="og:image" content="https://v-arena.com/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta property="twitter:domain" content="v-arena.com" />
         <meta property="twitter:url" content="https://v-arena.com" />
         <meta name="twitter:title" content="V Arena - V Rising Community Server" />
-        <meta name="twitter:description" content="Join V Arena, the premier V Rising community server featuring custom game modes, events, and an active community of vampire enthusiasts." />
+        <meta name="twitter:description" content="Join a community of both new and experienced players. Sharpen your skills, test new playstyles, and join your kin for the hunt!" />
         <meta name="twitter:image" content="https://v-arena.com/og-image.png" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />

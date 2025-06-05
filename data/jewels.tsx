@@ -157,18 +157,62 @@ const spellData: Record<string, Jewel> = {
       { id: 6, name: "Increase MS (8 - 12%) during channel" }
     ]
   },
+  "chaosvolley": {
+    name: "Chaos Volley",
+    image: "/images/spells/chaosvolley.png",
+    wiki: "https://vrising.fandom.com/wiki/Chaos_Volley",
+    school: "chaos",
+    effects: [
+      { id: 1, name: "Increase damage (8 - 20%)" },
+      { id: 2, name: "Hitting a different enemy with the second projectile deals damage (40 - 60%)" },
+      { id: 3, name: "Hit on an enemy affected by Ignite applies Agonising Flames" },
+      { id: 4, name: "Decrease CD (8 - 12%)" },
+      { id: 5, name: "Hit pushes enemies back (0.8 - 1.6m)" },
+      { id: 6, name: "Increase projectile range and speed (12 - 24%)" }
+    ]
+  },
+  "powersurge": {
+    name: "Power Surge",
+    image: "/images/spells/powersurge.png",
+    wiki: "https://vrising.fandom.com/wiki/Power_Surge",
+    school: "chaos",
+    effects: [
+      { id: 1, name: "Increase AS (6 - 10%)" },
+      { id: 2, name: "Increase physical damage (8 - 16%)" },
+      { id: 3, name: "Increase MS (2 - 6%)" },
+      { id: 4, name: "Lethal attacks during the effect increase duration by 1s (1 - 5 max)" },
+      { id: 5, name: "Increase effect duration (12 - 24%)" },
+      { id: 6, name: "Recast to remove the effect and conjure an AoE that deals damage (40 - 60%) and applies Ignite" },
+      { id: 7, name: "Apply a shield (40 - 60%)" },
+      { id: 8, name: "Removes all negative effects" }
+    ]
+  },
+  "void": {
+    name: "Void",
+    image: "/images/spells/chaosvoid.png",
+    wiki: "https://vrising.fandom.com/wiki/Void",
+    school: "chaos",
+    effects: [
+      { id: 1, name: "Increase damage (8 - 20%)" },
+      { id: 2, name: "Explosion leaves behind an AoE that deals damage (8 - 16%) (3 max)" },
+      { id: 3, name: "Explosion conjures 3 AoEs that explode to deal damage (12 - 24%) and apply Ignite" },
+      { id: 4, name: "Increase recharge rate (8 - 20%)" },
+      { id: 5, name: "Explosion on an enemy affected by Ignite applies Agonising Flames" },
+      { id: 6, name: "Increase range (8 - 20%)" }
+    ]
+  },
   "rainofchaos": {
     name: "Rain of Chaos",
     image: "/images/spells/rainofchaos.png",
     wiki: "/",
     school: "chaos",
     effects: [
-      { id: 1, name: "Increase damage (8 - 16%)" },
-      { id: 2, name: "Hit applies a fading Snare (0.8 - 1.6s)" },
-      { id: 3, name: "Hit on an enemy affected by Ignite applies Agonising Flames" },
-      { id: 4, name: "Decrease CD (8 - 12%)" },
-      { id: 5, name: "Increase projectile range (12 - 24%)" },
-      { id: 6, name: "Increase AoE size (12 - 24%)" }
+      { id: 1, name: "Additional meteor strikes the center dealing (40 - 80%) when the effect ends" },
+      { id: 2, name: "First meteor engulf the area dealing (8 - 16%) " },
+      { id: 3, name: "There is 30% chance to spawn bigger meteor dealing (24 - 40%)" },
+      { id: 4, name: "Inflict a fading snare on enemies lasting (0.4 - 1.2s)" },
+      { id: 5, name: "Hitting a target affected by Ignite applies Agonising Flames" },
+      { id: 6, name: "Reduce cooldown by (8 - 12%)" }
     ]
   },
   "veiloffrost": {
@@ -314,12 +358,11 @@ const spellData: Record<string, Jewel> = {
     wiki: "https://vrising.fandom.com/wiki/Mosquito_(Spell)",
     school: "illusion",
     effects: [
-      { id: 1, name: "Increase damage (8 - 16%)" },
-      { id: 2, name: "Hit applies Weaken" },
-      { id: 3, name: "Hit on an enemy affected by Weaken applies Stun (0.4 - 1.2s)" },
-      { id: 4, name: "Decrease CD (8 - 12%)" },
-      { id: 5, name: "Increase projectile range (12 - 24%)" },
-      { id: 6, name: "Increase AoE size (12 - 24%)" }
+      { id: 1, name: "Increase damage (20 - 40%)" },
+      { id: 2, name: "Increase Fear duration (0.4 - 0.8s)" },
+      { id: 3, name: "Increase summon max HP (20 - 40%)" },
+      { id: 4, name: "Cast shields (40 - 60%) caster and allies" },
+      { id: 5, name: "Explosion summons 3 Wisps that heal the caster and allies (30 - 50%) when walked over" }
     ]
   },
 
@@ -393,16 +436,16 @@ const spellData: Record<string, Jewel> = {
     wiki: "https://vrising.fandom.com/wiki/Veil_of_Storm",
     school: "lightning",
     effects: [
-      { id: 1, name: "Increase damage (8 - 16%)" },
-      { id: 2, name: "Hit applies Weaken" },
-      { id: 3, name: "Hit on an enemy affected by Weaken applies Stun (0.4 - 1.2s)" },
-      { id: 4, name: "Decrease CD (8 - 12%)" },
-      { id: 5, name: "Increase projectile range (12 - 24%)" },
-      { id: 6, name: "Increase AoE size (12 - 24%)" }
+      { id: 1, name: "Next primary attack within 3s consumes Static to apply Stun (0.3 - 0.5s)" },
+      { id: 2, name: "Next primary attack within 3s deals damage (12 - 24%)" },
+      { id: 3, name: "Increase Elude duration (8 - 20%)" },
+      { id: 4, name: "Next primary attack within 3s applies a fading Snare (1.2 - 2s)" },
+      { id: 5, name: "Dash through an enemy to apply Static" },
+      { id: 6, name: "Illusion conjures an AoE that deals tick damage (12 - 20%) and applies Static" }
     ]
   },
   "balllightning": {
-    name: "Ball Storm",
+    name: "Ball Lightning",
     image: "/images/spells/balllightning.png",
     wiki: "https://vrising.fandom.com/wiki/Ball_Storm",
     school: "lightning",
@@ -446,31 +489,44 @@ const spellData: Record<string, Jewel> = {
     ]
   },
   "lightningcurtain": {
-    name: "Storm Curtain",
+    name: "Lightning Curtain",
     image: "/images/spells/lcurtain.png",
     wiki: "https://vrising.fandom.com/wiki/Storm_Curtain",
     school: "lightning",
     effects: [
-      { id: 1, name: "Increase damage (8 - 16%)" },
-      { id: 2, name: "Hit applies Weaken" },
-      { id: 3, name: "Hit on an enemy affected by Weaken applies Stun (0.4 - 1.2s)" },
-      { id: 4, name: "Decrease CD (8 - 12%)" },
-      { id: 5, name: "Increase projectile range (12 - 24%)" },
-      { id: 6, name: "Increase AoE size (12 - 24%)" }
+      { id: 1, name: "Hit on caster or ally grants a shield (30 - 50%)" },
+      { id: 2, name: "Increase tick damage (4 - 12%)" },
+      { id: 3, name: "Block projectiles (3 max) for the next 3 primary attacks within 6s to deal damage (12 - 24%) and apply Static" },
+      { id: 4, name: "Hit applies a fading Snare (0.8 - 1.6s)" },
+      { id: 5, name: "Increase MS (8 - 16%)" }
+    ]
+  },
+  "polarityshift": {
+    name: "Polarity Shift",
+    image: "/images/spells/polshift.png",
+    wiki: "https://vrising.fandom.com/wiki/Polarity_Shift",
+    school: "lightning",
+    effects: [
+      { id: 1, name: "Hit applies a fading Snare (0.8 - 1.6s)" },
+      { id: 2, name: "Increase projectile range and speed (12 - 24%)" },
+      { id: 3, name: "Hit consumes Static for the next 3 primary attacks within 6s to deal damage (12 - 24%) and apply Static" },
+      { id: 4, name: "Teleport conjures an AoE at the target's location that deals damage (40 - 60%) and applies Static" },
+      { id: 5, name: "Hit conjures an AoE at the caster's location that deals damage (40 - 60%) and applies Static" }
     ]
   },
   "lightningtendrils": {
-    name: "Storm Tendrils",
+    name: "Lightning Tendrils",
     image: "/images/spells/tendrils.png",
     wiki: "https://vrising.fandom.com/wiki/Storm_Tendrils",
     school: "lightning",
     effects: [
-      { id: 1, name: "Increase damage (8 - 16%)" },
-      { id: 2, name: "Hit applies Weaken" },
-      { id: 3, name: "Hit on an enemy affected by Weaken applies Stun (0.4 - 1.2s)" },
-      { id: 4, name: "Decrease CD (8 - 12%)" },
-      { id: 5, name: "Increase projectile range (12 - 24%)" },
-      { id: 6, name: "Increase AoE size (12 - 24%)" }
+      { id: 1, name: "Lightning bolts deal (4 - 12%) increased damage" },
+      { id: 2, name: "Launch 1 additional lightning bolt" },
+      { id: 3, name: "There is (20 - 36%) chance to trigger Chain Lightning on hit" },
+      { id: 4, name: "Increase MS when casting and channeling by (16 - 24%)" },
+      { id: 5, name: "Hitting 6 bolts in a row on the same target inflicts a stun (0.8 - 1.6s)" },
+      { id: 6, name: "Increase cast rate by (12 - 24%)" },
+      { id: 7, name: "Increase projectile range and speed by (12 - 24%)" }
     ]
   },
   "veilofbones": {
@@ -494,12 +550,15 @@ const spellData: Record<string, Jewel> = {
     wiki: "https://vrising.fandom.com/wiki/Bone_Explosion",
     school: "unholy",
     effects: [
-      { id: 1, name: "Increase damage (8 - 16%)" },
-      { id: 2, name: "Hit applies a fading Snare (0.8 - 1.6s)" },
-      { id: 3, name: "Hit on an enemy affected by Weaken applies Stun (0.4 - 1.2s)" },
-      { id: 4, name: "Decrease CD (8 - 12%)" },
-      { id: 5, name: "Increase projectile range (12 - 24%)" },
-      { id: 6, name: "Increase AoE size (12 - 24%)" }
+      { id: 1, name: "Increase damage (12 - 24%)" },
+      { id: 2, name: "Explosion conjures an AoE that deals damage (30 - 50%) and applies Condemn" },
+      { id: 3, name: "Explosion heals allied skeletons (40 - 80% summon max HP) and resets their uptime" },
+      { id: 4, name: "Hit on an enemy under 30% max HP deals damage (18 - 30%). Lethal attacks reduce CD (1.2 - 2.4s)" },
+      { id: 5, name: "Explosion conjures 8 projectiles that deal damage (30 - 50%) and apply Condemn" },
+      { id: 6, name: "Explosion applies a fading Snare (0.8 - 1.6s)" },
+      { id: 7, name: "Decrease CD (8 - 12%)" },
+      { id: 8, name: "Increase range (8 - 20%)" },
+      { id: 9, name: "Hitting an ally skeleton make it explode after 2.5s dealing (40 - 80%) and inflict Condemn" }
     ]
   },
   "corruptedskull": {
@@ -508,12 +567,12 @@ const spellData: Record<string, Jewel> = {
     wiki: "https://vrising.fandom.com/wiki/Corrupted_Skull",
     school: "unholy",
     effects: [
-      { id: 1, name: "Increase damage (8 - 16%)" },
-      { id: 2, name: "Hit applies Weaken" },
-      { id: 3, name: "Hit on an enemy affected by Weaken applies Stun (0.4 - 1.2s)" },
-      { id: 4, name: "Decrease CD (8 - 12%)" },
-      { id: 5, name: "Increase projectile range (12 - 24%)" },
-      { id: 6, name: "Increase AoE size (12 - 24%)" }
+      { id: 1, name: "Hit conjures a projectile that circles around the enemy that deals damage (8 - 16%) and applies Condemn" },
+      { id: 2, name: "Increase damage (8 - 20%)" },
+      { id: 3, name: "Launch 2 projectiles that deal damage (30 - 50% original damage) and apply Condemn" },
+      { id: 4, name: "Hit pushes enemies (1.6 - 3.2m)" },
+      { id: 5, name: "Increase projectile range and speed (12 - 24%)" },
+      { id: 6, name: "Hit on allied skeleton causes it to explode in an AoE after 2.5s dealing (40 - 80%) and apply Condemn" }
     ]
   },
   "deathknight": {
@@ -522,12 +581,12 @@ const spellData: Record<string, Jewel> = {
     wiki: "https://vrising.fandom.com/wiki/Death_Knight",
     school: "unholy",
     effects: [
-      { id: 1, name: "Increase damage (8 - 16%)" },
-      { id: 2, name: "Hit applies Weaken" },
-      { id: 3, name: "Hit on an enemy affected by Weaken applies Stun (0.4 - 1.2s)" },
-      { id: 4, name: "Decrease CD (8 - 12%)" },
-      { id: 5, name: "Increase projectile range (12 - 24%)" },
-      { id: 6, name: "Increase AoE size (12 - 24%)" }
+      { id: 1, name: "Increase summon damage (12 - 20%)" },
+      { id: 2, name: "Increase summon uptime (20 - 40%)" },
+      { id: 3, name: "Heal caster (12 - 24% summon damage)" },
+      { id: 4, name: "Increase summon max HP (20 - 40%)" },
+      { id: 5, name: "Uptime expiration summons a Skeleton Mage with increased damage (20 - 40%)" },
+      { id: 6, name: "Cast applies a fading Snare (1 - 1.8s)" }
     ]
   },
   "soulburn": {
@@ -536,12 +595,14 @@ const spellData: Record<string, Jewel> = {
     wiki: "https://vrising.fandom.com/wiki/Soulburn",
     school: "unholy",
     effects: [
-      { id: 1, name: "Increase damage (8 - 16%)" },
-      { id: 2, name: "Hit applies Weaken" },
-      { id: 3, name: "Hit on an enemy affected by Weaken applies Stun (0.4 - 1.2s)" },
-      { id: 4, name: "Decrease CD (8 - 12%)" },
-      { id: 5, name: "Increase projectile range (12 - 24%)" },
-      { id: 6, name: "Increase AoE size (12 - 24%)" }
+      { id: 1, name: "Inflict a fading snare (1.2 - 2.4s)" },
+      { id: 2, name: "Increase cast rate by (12 - 24%)" },
+      { id: 3, name: "Explode skeleton after 2.5s inflicting (40 - 80%)" },
+      { id: 4, name: "Increase damage by (8 - 16%)" },
+      { id: 5, name: "Increase life drain (12 - 24%)" },
+      { id: 6, name: "Increase targets hit by 1" },
+      { id: 7, name: "Shield self for (24 - 40%) of your spell power for each enemy hit" },
+      { id: 8, name: "Chances to spawn a skeleton warrior for each enemy hit (60 - 100%)" }
     ]
   },
   "wardofthedamned": {
@@ -550,12 +611,15 @@ const spellData: Record<string, Jewel> = {
     wiki: "https://vrising.fandom.com/wiki/Ward_of_the_Damned",
     school: "unholy",
     effects: [
-      { id: 1, name: "Increase damage (8 - 16%)" },
-      { id: 2, name: "Hit applies Weaken" },
-      { id: 3, name: "Hit on an enemy affected by Weaken applies Stun (0.4 - 1.2s)" },
-      { id: 4, name: "Decrease CD (8 - 12%)" },
-      { id: 5, name: "Increase projectile range (12 - 24%)" },
-      { id: 6, name: "Increase AoE size (12 - 24%)" }
+      { id: 1, name: "Increase MS (8 - 12%) during channel" },
+      { id: 2, name: "Explode skeleton after 2.5s inflicting (40 - 80%)" },
+      { id: 3, name: "Increase recast damage (12 - 20%)" },
+      { id: 4, name: "Barrier hit (melee) deals damage (30 - 50%) to attacker" },
+      { id: 5, name: "Recast increases allied skeleton damage (19 - 30%) for 8s" },
+      { id: 6, name: "Barrier hit (projectile) heals (25 - 45%)" },
+      { id: 7, name: "Recast pushes enemies (1.6 - 3.2m)" },
+      { id: 8, name: "Barrier hit has a chance (20 - 40%) to summon a Skeleton Mage" },
+      { id: 9, name: "Recast shields (60 - 120%) allied skeletons for 4s" }
     ]
   },
   "unholychains": {
@@ -564,69 +628,15 @@ const spellData: Record<string, Jewel> = {
     wiki: "https://vrising.fandom.com/wiki/Unholy_Chains",
     school: "unholy",
     effects: [
-      { id: 1, name: "Increase damage (8 - 16%)" },
-      { id: 2, name: "Hit applies Weaken" },
-      { id: 3, name: "Hit on an enemy affected by Weaken applies Stun (0.4 - 1.2s)" },
-      { id: 4, name: "Decrease CD (8 - 12%)" },
-      { id: 5, name: "Increase projectile range (12 - 24%)" },
-      { id: 6, name: "Increase AoE size (12 - 24%)" }
-    ]
-  },
-  "powersurge": {
-    name: "Power Surge",
-    image: "/images/spells/powersurge.png",
-    wiki: "https://vrising.fandom.com/wiki/Power_Surge",
-    school: "chaos",
-    effects: [
-      { id: 1, name: "Increase AS (6 - 10%)" },
-      { id: 2, name: "Increase physical damage (8 - 16%)" },
-      { id: 3, name: "Increase MS (2 - 6%)" },
-      { id: 4, name: "Lethal attacks during the effect increase duration by 1s (1 - 5 max)" },
-      { id: 5, name: "Increase effect duration (12 - 24%)" },
-      { id: 6, name: "Recast to remove the effect and conjure an AoE that deals damage (40 - 60%) and applies Ignite" },
-      { id: 7, name: "Apply a shield (40 - 60%)" },
-      { id: 8, name: "Removes all negative effects" }
-    ]
-  },
-  "void": {
-    name: "Void",
-    image: "/images/spells/chaosvoid.png",
-    wiki: "https://vrising.fandom.com/wiki/Void",
-    school: "chaos",
-    effects: [
-      { id: 1, name: "Increase damage (8 - 20%)" },
-      { id: 2, name: "Explosion leaves behind an AoE that deals damage (8 - 16%) (3 max)" },
-      { id: 3, name: "Hit on an enemy affected by Ignite applies Agonising Flames" },
-      { id: 4, name: "Decrease CD (8 - 12%)" },
-      { id: 5, name: "Increase projectile range (12 - 24%)" },
-      { id: 6, name: "Increase AoE size (12 - 24%)" }
-    ]
-  },
-  "chaosvolley": {
-    name: "Chaos Volley",
-    image: "/images/spells/chaosvolley.png",
-    wiki: "https://vrising.fandom.com/wiki/Chaos_Volley",
-    school: "chaos",
-    effects: [
-      { id: 1, name: "Increase damage (8 - 20%)" },
-      { id: 2, name: "Hitting a different enemy with the second projectile deals damage (40 - 60%)" },
-      { id: 3, name: "Hit on an enemy affected by Ignite applies Agonising Flames" },
-      { id: 4, name: "Decrease CD (8 - 12%)" },
-      { id: 5, name: "Hit pushes enemies back (0.8 - 1.6m)" },
-      { id: 6, name: "Increase projectile range and speed (12 - 24%)" }
-    ]
-  },
-  "polarityshift": {
-    name: "Polarity Shift",
-    image: "/images/spells/polshift.png",
-    wiki: "https://vrising.fandom.com/wiki/Polarity_Shift",
-    school: "lightning",
-    effects: [
-      { id: 1, name: "Hit applies a fading Snare (0.8 - 1.6s)" },
-      { id: 2, name: "Increase projectile range and speed (12 - 24%)" },
-      { id: 3, name: "Hit consumes Static for the next 3 primary attacks within 6s to deal damage (12 - 24%) and apply Static" },
-      { id: 4, name: "Teleport conjures an AoE at the target's location that deals damage (40 - 60%) and applies Static" },
-      { id: 5, name: "Hit conjures an AoE at the caster's location that deals damage (40 - 60%) and applies Static" }
+      { id: 1, name: "Conjure a bone spirit arround the target dealing (8 - 16%) " },
+      { id: 2, name: "Deals (35 - 55%) damage every 0.7s but reduce the damage by (50 - 90%)" },
+      { id: 3, name: "Increase duration by (0.2 - 0.4s) and the damage done by (40 - 60%)" },
+      { id: 4, name: "Inflict a fading snare (0.6 - 1.4s)" },
+      { id: 5, name: "Increase MS while channeling by (4 - 12%)" },
+      { id: 6, name: "Heal self for (12 - 20%)" },
+      { id: 7, name: "Reduce damage taken while channeling by (12 - 24%)" },
+      { id: 8, name: "Spawns a nova of projectiles dealing (30 - 50%) each" },
+      { id: 9, name: "Reduces the MS of the target by (4 - 12%)" }
     ]
   }
 }
