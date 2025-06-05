@@ -52,11 +52,6 @@ export const JewelForge = ({
     }
   }, [spell.id]);
 
-  // Move the console.log outside of the render to help debug
-  useEffect(() => {
-    console.log(selectedEffects, "selected effects");
-  }, [selectedEffects]);
-
   const toggleEffectSelection = (key: number) => {
     setSelectedEffects((prev) => {
       if (prev.includes(key)) {

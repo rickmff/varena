@@ -19,7 +19,13 @@ import {
 import ArenaCode, {
   SearchParamsBuildCodeUpdater,
 } from "./components/ArenaCode";
-import { HoverCard, HoverCardContent } from "../ui/hover-card";
+import SaveBuild from "./components/SaveBuild";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardDescription,
+  HoverCardTitle,
+} from "../ui/hover-card";
 import { HoverCardTrigger } from "@radix-ui/react-hover-card";
 
 const BuilderPage = () => {
@@ -68,13 +74,23 @@ const BuilderPage = () => {
                         <p></p>
 
                         <div className="space-y-4 ">
-                          <p className="flex gap-4">Bat Leather Bag</p>
+                          <HoverCardTitle>Bat Leather Bag</HoverCardTitle>
                           <div className="space-y-2 text-sm">
-                            <p>+18 Inventory Slots</p>
-                            <p>+500 Silver Coin Carry Immunity</p>
-                            <p>+42 Max Health</p>
-                            <p>+10% Resource Yield</p>
-                            <p>+25 Sun Resistance Rating</p>
+                            <HoverCardDescription>
+                              +18 Inventory Slots
+                            </HoverCardDescription>
+                            <HoverCardDescription>
+                              +500 Silver Coin Carry Immunity
+                            </HoverCardDescription>
+                            <HoverCardDescription>
+                              +42 Max Health
+                            </HoverCardDescription>
+                            <HoverCardDescription>
+                              +10% Resource Yield
+                            </HoverCardDescription>
+                            <HoverCardDescription>
+                              +25 Sun Resistance Rating
+                            </HoverCardDescription>
                           </div>
                         </div>
                       </HoverCardContent>
@@ -93,14 +109,26 @@ const BuilderPage = () => {
                         <p></p>
 
                         <div className="space-y-4 ">
-                          <p className="flex gap-4">Tier 3 Cape</p>
+                          <HoverCardTitle>Tier 3 Cape</HoverCardTitle>
                           <div className="space-y-2 text-sm">
-                            <p>+24 Max Health </p>
-                            <p>+15 Sun Resistance Rating </p>
-                            <p>+15 Garlic Resistance Rating </p>
-                            <p>+15 Silver Resistance Rating</p>
-                            <p>+15 Fire Resistance Rating</p>
-                            <p>+15 Holy Resistance Rating</p>
+                            <HoverCardDescription>
+                              +24 Max Health{" "}
+                            </HoverCardDescription>
+                            <HoverCardDescription>
+                              +15 Sun Resistance Rating{" "}
+                            </HoverCardDescription>
+                            <HoverCardDescription>
+                              +15 Garlic Resistance Rating{" "}
+                            </HoverCardDescription>
+                            <HoverCardDescription>
+                              +15 Silver Resistance Rating
+                            </HoverCardDescription>
+                            <HoverCardDescription>
+                              +15 Fire Resistance Rating
+                            </HoverCardDescription>
+                            <HoverCardDescription>
+                              +15 Holy Resistance Rating
+                            </HoverCardDescription>
                           </div>
                         </div>
                       </HoverCardContent>
@@ -171,19 +199,34 @@ const BuilderPage = () => {
               <AdvancedCoatingsSwitch />
             </div>
           </div>
-
-          <div className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4 sm:mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-1 h-6 bg-gradient-to-b from-orange-400 to-orange-600 rounded-full" />
-                <h3 className="text-lg sm:text-xl font-bold text-grey-100 tracking-wide">
-                  USE IN GAME
-                </h3>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4 sm:mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-1 h-6 bg-gradient-to-b from-teal-400 to-teal-600 rounded-full" />
+                  <h3 className="text-lg sm:text-xl font-bold text-grey-100 tracking-wide">
+                    USE IN GAME
+                  </h3>
+                </div>
+                <div className="hidden sm:block flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
               </div>
-              <div className="hidden sm:block flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
+              <div className="space-y-4">
+                <ArenaCode />
+              </div>
             </div>
-            <div className="space-y-4">
-              <ArenaCode />
+            <div className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300 flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4 sm:mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-1 h-6 bg-gradient-to-b from-rose-400 to-rose-600 rounded-full" />
+                  <h3 className="text-lg sm:text-xl font-bold text-grey-100 tracking-wide">
+                    SAVE TO YOUR BUILDS
+                  </h3>
+                </div>
+                <div className="hidden sm:block flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
+              </div>
+              <div className="space-y-4">
+                <SaveBuild />
+              </div>
             </div>
           </div>
         </div>

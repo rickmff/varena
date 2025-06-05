@@ -61,4 +61,44 @@ const ArenaCode: React.FC = () => {
   );
 };
 
+export const ArenaCodeOutsideBuilder: React.FC<{
+  code: string;
+}> = ({ code }) => {
+  const exportCommand = `.import-build ${code}`;
+
+  const copyBuildCommand = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(exportCommand);
+      toast("Build Command Copied", {
+        className: "bg-black text-white",
+        description: "Paste in-game chat to import.",
+      });
+    } catch (error) {
+      toast.error("Failed to copy command");
+    }
+  };
+
+  return (
+    <div className="flex gap-4">
+      <input
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        readOnly
+        className="text-base bg-black/50 px-4 py-2 rounded-md border w-3/4 text-center text-gray-400"
+        value={exportCommand}
+      />
+      <Button
+        onClick={copyBuildCommand}
+        className="px-3 py-2 text-white group border-red-900/70  bg-red-900/50 hover:bg-red-800 transition-colors"
+      >
+        COPY COMMAND
+      </Button>
+    </div>
+  );
+};
+
 export default ArenaCode;

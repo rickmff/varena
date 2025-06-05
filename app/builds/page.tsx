@@ -1,10 +1,10 @@
 "use client";
 
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Hammer, Plus, Swords } from 'lucide-react';
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Hammer, Plus, Swords } from "lucide-react";
 import BuilderNavBar from "@/components/BuilderNavBar";
 import BuildsList from "@/components/builds/BuildsList";
 
@@ -62,16 +62,13 @@ export default function Builds() {
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white uppercase tracking-wider">
               Your Builds
             </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Manage your saved builds, create new combinations
-            </p>
           </motion.div>
         </div>
       </section>
 
       {/* Builds Section */}
-      <section className="py-20 bg-black relative">
-        <div className="container mx-auto px-4 relative">
+      <section className="pb-20 bg-black relative">
+        <div className="container px-4 absolute z-10 left-1/2 transform -translate-x-1/2 -top-32">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -80,18 +77,6 @@ export default function Builds() {
           >
             <BuildsList />
           </motion.div>
-        </div>
-      </section>
-
-      {/* Back to Home */}
-      <section className="py-12 bg-black border-t border-red-900/30">
-        <div className="container mx-auto px-4 text-center">
-          <Link
-            href="/"
-            className="inline-flex items-center py-3text-white font-medium transition-all duration-200 hover:scale-105"
-          >
-            ← Back to Home
-          </Link>
         </div>
       </section>
     </div>

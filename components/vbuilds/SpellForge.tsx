@@ -17,6 +17,7 @@ import {
   HoverCardTrigger,
   HoverCard,
   HoverCardContent,
+  HoverCardTitle,
 } from "../ui/hover-card";
 import { Button } from "../ui/button";
 const SlotTrigger = ({
@@ -188,7 +189,20 @@ export const SpellForge = () => {
         </SlotTrigger>
         <SlotTrigger goto={"ultimate"} hasSelection={spells.ultimate}>
           {spells.ultimate ? (
-            <img src={spells["ultimate"].img} className="w-20 h-20" />
+            <HoverCard openDelay={0} closeDelay={0}>
+              <HoverCardTrigger>
+                <img src={spells["ultimate"].img} className="w-20 h-20" />
+              </HoverCardTrigger>
+              <HoverCardContent>
+                <HoverCardTitle>
+                  <span
+                    className={`spellSchool-${spells.ultimate.spellSchool} font-bold`}
+                  >
+                    {spells.ultimate.name}
+                  </span>
+                </HoverCardTitle>
+              </HoverCardContent>
+            </HoverCard>
           ) : (
             <SlotPlaceholder
               placeholderImage="/images/vbuilds/spells/spell-chaos-merciless_charge.png"
@@ -233,7 +247,6 @@ export const SpellForge = () => {
           {state.matches({ spellForge: "spell1" }) && (
             <SpellTabs
               filter={(spell: Spell) => {
-                console.log("spell", spell);
                 return spell.id !== spells.spell2?.id;
               }}
               spell={spells.spell1}
@@ -250,7 +263,6 @@ export const SpellForge = () => {
           {state.matches({ spellForge: "spell2" }) && (
             <SpellTabs
               filter={(spell: Spell) => {
-                console.log("spell", spell);
                 return spell.id !== spells.spell1?.id;
               }}
               spell={spells.spell2}

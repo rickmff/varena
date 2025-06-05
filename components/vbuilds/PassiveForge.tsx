@@ -70,7 +70,10 @@ export const PassiveForge = () => {
               </HoverCardTrigger>
               <HoverCardContent className="w-[400px] p-4 text-gray-200 *:py-2 -my-2 divide-y-2">
                 {passives.map((passive) => (
-                  <div className="flex justify-center items-center gap-2">
+                  <div
+                    className="flex justify-center items-center gap-2"
+                    key={passive.id}
+                  >
                     <img
                       src={passive.img}
                       alt={passive.name}

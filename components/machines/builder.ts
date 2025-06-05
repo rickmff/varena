@@ -1,7 +1,7 @@
 import bloodData from '@/data/vbuilds/bloodtypes.json';
 import hotkeys from 'hotkeys-js';
 import { toast } from 'sonner';
-import { assign, enqueueActions, fromCallback, log, raise, setup, spawnChild, stopChild } from 'xstate';
+import { assertEvent, assign, enqueueActions, fromCallback, log, raise, setup, spawnChild, stopChild } from 'xstate';
 import { Coating } from '../vbuilds/CoatingPicker';
 import { AvailableWeaponSlots, Weapon } from '../vbuilds/WeaponForge';
 import { StatName } from './calculator';
@@ -66,7 +66,7 @@ type BuildEvents =
     | { type: 'LEGENDARY_LIMIT_REACHED' }
     | { type: 'FOCUS_WEAPON', slot: AvailableWeaponSlots }
     | { type: 'UNFOCUS_WEAPON' }
-    | { type: 'SAVE_BUILD' }
+    | { type: 'SAVE_BUILD', name?: string }
 
 type StatEntry = {
     name: string;
@@ -124,9 +124,13 @@ export const builder = setup({
         // actions: 
     },
     actions: {
-        saveBuild: ({ context }) => {
+        saveBuild: ({ context, event }) => {
             // Implement the logic to save the build, e.g., send it to a server or local storage
             // Convert build to arena code
+
+            assertEvent(event, 'SAVE_BUILD');
+
+            console.log(event)
             const buildCode = arenaCode(context);
             console.log("Generated arena code:", buildCode);
 
@@ -137,12 +141,13 @@ export const builder = setup({
             savedCodes.push({
                 code: buildCode,
                 timestamp: new Date().toISOString(),
-                name: `Build ${savedCodes.length + 1}` // Default name
+                name: event.name || `Build ${savedCodes.length + 1}` // Default name
             });
 
             // Save back to localStorage
             localStorage.setItem('vbuilds', JSON.stringify(savedCodes));
-            toast.success("Build saved successfully!");
+            //redirect to /builds push state
+            window.location.href = '/builds';
         }
     },
     actors: {

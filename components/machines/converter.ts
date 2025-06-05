@@ -44,8 +44,6 @@ const importCoatings = (chars: string) => {
         }
     }
 
-    console.log(result, "imported coatings");
-
     return result;
 }
 

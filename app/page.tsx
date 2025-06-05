@@ -61,11 +61,11 @@ interface NewsItem {
 }
 
 export default function Home() {
-  const [scrollY, setScrollY] = useState(0)
-  const [newsItems, setNewsItems] = useState<NewsItem[]>([]) // State for news items
-  const [isLoadingNews, setIsLoadingNews] = useState(true) // Add loading state
-  const [newsError, setNewsError] = useState<string | null>(null) // Add error state
-  const [hasBuilds, setHasBuilds] = useState(false) // State for whether user has builds
+  const [scrollY, setScrollY] = useState(0);
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]); // State for news items
+  const [isLoadingNews, setIsLoadingNews] = useState(true); // Add loading state
+  const [newsError, setNewsError] = useState<string | null>(null); // Add error state
+  const [hasBuilds, setHasBuilds] = useState(false); // State for whether user has builds
 
   useEffect(() => {
     const handleScroll = () => {
@@ -85,17 +85,19 @@ export default function Home() {
       }
       setNewsError(null); // Clear any previous errors
 
-      const response = await fetch('/api/news', {
-        method: 'GET',
+      const response = await fetch("/api/news", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         // Add cache control to prevent stale data
-        cache: 'no-cache'
+        cache: "no-cache",
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+        throw new Error(
+          `HTTP error! status: ${response.status} - ${response.statusText}`
+        );
       }
 
       const data = await response.json();
@@ -121,7 +123,11 @@ export default function Home() {
         }, (retryCount + 1) * 1000); // Exponential backoff
       } else {
         // Max retries reached
-        setNewsError(error instanceof Error ? error.message : "Failed to fetch news after multiple attempts");
+        setNewsError(
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch news after multiple attempts"
+        );
         setNewsItems([]);
         setIsLoadingNews(false);
       }
@@ -181,7 +187,8 @@ export default function Home() {
       icon: "crossed-swords",
       image: "/images/features/Pancake.png",
       title: "Game Modes",
-      description: "Experience unique game modes, including the fan-favorite, Capture the Pancake.",
+      description:
+        "Experience unique game modes, including the fan-favorite, Capture the Pancake.",
     },
     {
       icon: "calendar-clock",
@@ -418,7 +425,8 @@ export default function Home() {
               Your Builds
             </h2>
             <p className="text-gray-100 max-w-2xl mx-auto text-lg">
-              Manage your saved builds, create new ones, export them into the game
+              Manage your saved builds, create new ones, import them into the
+              game
             </p>
           </motion.div>
           <motion.div
@@ -521,9 +529,7 @@ export default function Home() {
                     <h3 className="text-2xl font-semibold text-red-400 mb-2">
                       Failed to Load News
                     </h3>
-                    <p className="text-gray-400 mb-4">
-                      {newsError}
-                    </p>
+                    <p className="text-gray-400 mb-4">{newsError}</p>
                     <button
                       onClick={() => fetchNewsFromAPI()}
                       className="px-4 py-2 bg-red-900/50 border border-red-900/50 text-white rounded-lg hover:bg-red-900/70 transition-colors"
@@ -536,87 +542,105 @@ export default function Home() {
 
               // Check if we have valid news items
               if (Array.isArray(newsItems) && newsItems.length > 0) {
-                return newsItems.slice(0, 3).map((news, index) => {
-                  // More flexible validation - check if we have at least some content
-                  if (!news) {
-                    return null;
-                  }
+                return newsItems
+                  .slice(0, 3)
+                  .map((news, index) => {
+                    // More flexible validation - check if we have at least some content
+                    if (!news) {
+                      return null;
+                    }
 
-                  // Use fallbacks for missing properties
-                  const newsId = news.id || news._id || `news-${index}`;
-                  const newsTitle = news.title || news.name || `News Item ${index + 1}`;
-                  const newsSlug = news.slug || newsId;
-                  const newsDate = news.date || news.createdAt || news.created_time || new Date().toISOString();
-                  const newsExcerpt = news.excerpt || news.description || news.content?.substring(0, 150) || 'Read more to discover the latest updates...';
-                  const newsCategory = news.category || news.type || 'News';
-                  const newsCoverImage = news.coverImageUrl || news.image || news.cover || '/news.png';
+                    // Use fallbacks for missing properties
+                    const newsId = news.id || news._id || `news-${index}`;
+                    const newsTitle =
+                      news.title || news.name || `News Item ${index + 1}`;
+                    const newsSlug = news.slug || newsId;
+                    const newsDate =
+                      news.date ||
+                      news.createdAt ||
+                      news.created_time ||
+                      new Date().toISOString();
+                    const newsExcerpt =
+                      news.excerpt ||
+                      news.description ||
+                      news.content?.substring(0, 150) ||
+                      "Read more to discover the latest updates...";
+                    const newsCategory = news.category || news.type || "News";
+                    const newsCoverImage =
+                      news.coverImageUrl ||
+                      news.image ||
+                      news.cover ||
+                      "/news.png";
 
-                  const IconComponent = iconMap[news.iconName] || Terminal;
+                    const IconComponent = iconMap[news.iconName] || Terminal;
 
-                  return (
-                    <motion.div
-                      key={newsId}
-                      className="relative z-10"
-                      initial={{ opacity: 1, scale: 1 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileHover={{
-                        y: -10,
-                        scale: 1.02,
-                        transition: { duration: 0.2 }
-                      }}
-                    >
-                      <Link
-                        href={`/news/${newsSlug}`}
-                        className="bg-black/90 backdrop-blur-sm rounded-lg border-2 border-red-900/50 hover:border-red-500
-                               transition-all duration-300 overflow-hidden group block h-full relative z-10"
+                    return (
+                      <motion.div
+                        key={newsId}
+                        className="relative z-10"
+                        initial={{ opacity: 1, scale: 1 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        whileHover={{
+                          y: -10,
+                          scale: 1.02,
+                          transition: { duration: 0.2 },
+                        }}
                       >
-                        {/* Glow effect on hover */}
-                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0">
-                          <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent" />
-                          <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-red-900/20" />
-                        </div>
+                        <Link
+                          href={`/news/${newsSlug}`}
+                          className="bg-black/90 backdrop-blur-sm rounded-lg border-2 border-red-900/50 hover:border-red-500
+                               transition-all duration-300 overflow-hidden group block h-full relative z-10"
+                        >
+                          {/* Glow effect on hover */}
+                          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0">
+                            <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent" />
+                            <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-red-900/20" />
+                          </div>
 
-                        <div className="relative aspect-video z-10">
-                          <img
-                            src={newsCoverImage}
-                            alt={newsTitle}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              if (target.src !== '/news.png') {
-                                target.src = '/news.png';
-                              }
-                            }}
-                          />
+                          <div className="relative aspect-video z-10">
+                            <img
+                              src={newsCoverImage}
+                              alt={newsTitle}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                if (target.src !== "/news.png") {
+                                  target.src = "/news.png";
+                                }
+                              }}
+                            />
 
-                          {/* Category Badge */}
-                          <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
-                            <div className="bg-red-900/90 text-white text-xs px-3 py-1.5 rounded-full font-bold border border-red-500/50 shadow-lg shadow-red-900/50 flex items-center gap-2">
-                              {IconComponent && <IconComponent className="w-3 h-3" />}
-                              {newsCategory}
+                            {/* Category Badge */}
+                            <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
+                              <div className="bg-red-900/90 text-white text-xs px-3 py-1.5 rounded-full font-bold border border-red-500/50 shadow-lg shadow-red-900/50 flex items-center gap-2">
+                                {IconComponent && (
+                                  <IconComponent className="w-3 h-3" />
+                                )}
+                                {newsCategory}
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="p-6 relative z-10">
-                          <div className="text-red-500 text-sm mb-2 font-bold tracking-wider">
-                            {new Date(newsDate).toLocaleDateString()}
-                          </div>
-                          <h3 className="text-xl font-bold mb-3 text-white group-hover:text-red-400 transition-colors">
-                            {newsTitle}
-                          </h3>
-                          <p className="text-gray-300 mb-4">{newsExcerpt}</p>
+                          <div className="p-6 relative z-10">
+                            <div className="text-red-500 text-sm mb-2 font-bold tracking-wider">
+                              {new Date(newsDate).toLocaleDateString()}
+                            </div>
+                            <h3 className="text-xl font-bold mb-3 text-white group-hover:text-red-400 transition-colors">
+                              {newsTitle}
+                            </h3>
+                            <p className="text-gray-300 mb-4">{newsExcerpt}</p>
 
-                          {/* Read More Button */}
-                          <div className="flex items-center gap-2 text-red-500 text-sm font-bold group-hover:text-red-400 transition-colors">
-                            READ MORE
-                            <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                            {/* Read More Button */}
+                            <div className="flex items-center gap-2 text-red-500 text-sm font-bold group-hover:text-red-400 transition-colors">
+                              READ MORE
+                              <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  );
-                }).filter(Boolean); // Remove any null items
+                        </Link>
+                      </motion.div>
+                    );
+                  })
+                  .filter(Boolean); // Remove any null items
               }
 
               // Empty state
@@ -633,7 +657,8 @@ export default function Home() {
                     Check back later for the latest updates and announcements.
                   </p>
                   <p className="text-sm text-gray-500">
-                    If this persists, please ensure your Notion integration is correctly configured.
+                    If this persists, please ensure your Notion integration is
+                    correctly configured.
                   </p>
                 </motion.div>
               );
@@ -641,41 +666,44 @@ export default function Home() {
           </motion.div>
 
           {/* View All Button - Only show when not loading and has news */}
-          {!isLoadingNews && !newsError && newsItems && newsItems.length > 0 && (
-            <motion.div
-              className="text-center mt-12"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              viewport={{ once: true }}
-            >
+          {!isLoadingNews &&
+            !newsError &&
+            newsItems &&
+            newsItems.length > 0 && (
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-block"
+                className="text-center mt-12"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                viewport={{ once: true }}
               >
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
-                           relative overflow-hidden group px-8 shadow-lg shadow-red-900/20"
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-block"
                 >
-                  <Link href="/news" className="flex items-center">
-                    <span className="relative z-10 font-bold tracking-wider">
-                      VIEW ALL NEWS
-                    </span>
-                    <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
-                  </Link>
-                  <motion.span
-                    className="absolute inset-0 bg-gradient-to-r from-red-900/40 to-transparent"
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: 0 }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
+                           relative overflow-hidden group px-8 shadow-lg shadow-red-900/20"
+                  >
+                    <Link href="/news" className="flex items-center">
+                      <span className="relative z-10 font-bold tracking-wider">
+                        VIEW ALL NEWS
+                      </span>
+                      <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
+                    </Link>
+                    <motion.span
+                      className="absolute inset-0 bg-gradient-to-r from-red-900/40 to-transparent"
+                      initial={{ x: "-100%" }}
+                      whileHover={{ x: 0 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </Button>
+                </motion.div>
               </motion.div>
-            </motion.div>
-          )}
+            )}
         </div>
       </section>
 
@@ -823,9 +851,13 @@ export default function Home() {
             <div>
               <h3 className="text-lg font-bold mb-4">Community</h3>
               <ul className="space-y-2 text-sm text-gray-100">
-                {[{ name: "Discord", href: "https://www.discord.gg/varena" },
+                {[
+                  { name: "Discord", href: "https://www.discord.gg/varena" },
                   { name: "Twitter", href: "https://www.x.com/VRisingVArena" },
-                  { name: "YouTube", href: "https://www.youtube.com/@VRisingArena" },
+                  {
+                    name: "YouTube",
+                    href: "https://www.youtube.com/@VRisingArena",
+                  },
                   { name: "Twitch", href: "https://www.twitch.tv/varenatv" },
                 ].map((item, i) => (
                   <motion.li
