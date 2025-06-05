@@ -127,7 +127,7 @@ export default function NewsPage() {
               Chronicles of V Rising
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Stay informed about the latest updates, events, and community highlights from the V Arena
+              Stay informed about the latest updates, events, and community highlights
             </p>
           </motion.div>
         </div>
