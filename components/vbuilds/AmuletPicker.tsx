@@ -8,6 +8,8 @@ import {
   DropdownSelectPlaceholder,
 } from "./components/DropdownSelect";
 import { attachReactRefresh } from "next/dist/build/webpack-config";
+import { HoverCard } from "@radix-ui/react-hover-card";
+import { HoverCardDescription, HoverCardTitle } from "../ui/hover-card";
 
 export interface Amulet {
   id: string;
@@ -29,14 +31,15 @@ const amulets: AmuletCollection = amuletsData as AmuletCollection;
 
 const AmuletDescription = ({ amulet }: { amulet: Amulet }) => {
   return (
-    <div className="text-gray-300 space-y-4">
-      <p className="flex gap-4">{amulet.name}</p>
+    <div className="space-y-4 ">
+      <HoverCardTitle>{amulet.name}</HoverCardTitle>
       <div className="space-y-2 text-sm">
         {amulet.attributes.map((attr) => (
-          <p key={attr.stat}>
-            {`${attr.stat} by +${attr.value}`}
-            {attr.unit === "percent" ? "%" : null}
-          </p>
+          <HoverCardDescription>
+            {`- ${attr.stat} by +${attr.value}${
+              attr.unit === "percent" ? "%" : ""
+            }`}
+          </HoverCardDescription>
         ))}
       </div>
     </div>

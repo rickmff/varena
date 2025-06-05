@@ -63,7 +63,7 @@ const SlotTrigger = ({
                 className="absolute bottom-0 right-0 h-4 w-4"
               />
             </div>
-            <span className={`spellSchool-${spell.spellSchool}`}>
+            <span className={`spellSchool-${spell.spellSchool} font-bold`}>
               {spell.name}
             </span>
           </div>
@@ -73,7 +73,7 @@ const SlotTrigger = ({
             );
             return (
               <div key={`${jewel}-${index}`}>
-                <div className="flex gap-4 items-center text-sm">
+                <div className="flex gap-4 items-center text-sm text-zinc-300">
                   <img
                     src={
                       !effect || effect.max === null
@@ -206,8 +206,14 @@ export const SpellForge = () => {
           <h3 className="text-2xl font-semibold mb-3 text-red-400 flex items-center">
             <span className="mr-2">
               {(() => {
-                const currentState = typeof state.value === 'object' ? state.value.spellForge : 'dash';
-                return sectionTitle[currentState as keyof typeof sectionTitle] || 'Spells';
+                const currentState =
+                  typeof state.value === "object"
+                    ? state.value.spellForge
+                    : "dash";
+                return (
+                  sectionTitle[currentState as keyof typeof sectionTitle] ||
+                  "Spells"
+                );
               })()}
             </span>
           </h3>

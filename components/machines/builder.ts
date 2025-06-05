@@ -80,18 +80,40 @@ export const MAX_LEGENDARY_WEAPONS_COUNT = 3;
 
 
 const selectWeaponHotkeys = fromCallback(({ sendBack }) => {
-    hotkeys('1,2,3,4,5,6,7,8', (e) => {
-        sendBack({ type: 'FOCUS_WEAPON', slot: e.key });
-        document.getElementById(`weapon-slot-${e.key}`)?.focus();
-    })
+    // Support both QWERTY (1-8) and AZERTY (&é"'(-è_) number keys
+    hotkeys('1,2,3,4,5,6,7,8,&,é,",(,-,è,_,ç', (e) => {
+        let slot;
 
-    hotkeys('0', () => {
+        // Map AZERTY number keys to slots 1-8
+        switch (e.key) {
+            case '&': slot = '1'; break;
+            case 'é': slot = '2'; break;
+            case '"': slot = '3'; break;
+            case "'": case "'": slot = '4'; break; // Handle different apostrophe characters
+            case '(': slot = '5'; break;
+            case '-': slot = '6'; break;
+            case 'è': slot = '7'; break;
+            case '_': case 'ç': slot = '8'; break; // AZERTY varies by region
+            default: slot = e.key; // For QWERTY layout, use the key directly
+        }
+
+        // Convert to number and ensure it's in valid range
+        const numSlot = parseInt(slot);
+        if (numSlot >= 1 && numSlot <= 8) {
+            sendBack({ type: 'FOCUS_WEAPON', slot: numSlot as AvailableWeaponSlots });
+            document.getElementById(`weapon-slot-${numSlot}`)?.focus();
+        }
+    });
+
+    // Support both layouts for resetting focus (0 and à)
+    hotkeys('0,à', () => {
         sendBack({ type: 'UNFOCUS_WEAPON' });
-    })
+    });
 
     return () => {
-        hotkeys.unbind('1,2,3,4,5,6,7,8')
-    }
+        // Unbind all hotkeys when component unmounts
+        hotkeys.unbind('1,2,3,4,5,6,7,8,&,é,",(,-,è,_,ç,0,à');
+    };
 })
 
 export const builder = setup({

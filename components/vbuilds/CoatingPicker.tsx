@@ -8,6 +8,7 @@ import {
 import { AvailableWeaponSlots } from "./WeaponForge";
 import { useSelector } from "@xstate/react";
 import { Switch } from "../ui/switch";
+import { HoverCardDescription, HoverCardTitle } from "../ui/hover-card";
 
 export interface Coating {
   id: string;
@@ -115,6 +116,15 @@ export const AdvancedCoatings = () => {
   );
 };
 
+const HoverCardInfo = ({ coating }: { coating: Coating }) => {
+  return (
+    <div className="space-y-4">
+      <HoverCardTitle>{coating.name}</HoverCardTitle>
+      <HoverCardDescription>{coating.description}</HoverCardDescription>
+    </div>
+  );
+};
+
 export function CoatingPicker({
   slot,
   all = false,
@@ -127,8 +137,12 @@ export function CoatingPicker({
   return (
     <DropdownSelect
       hoverIsVisible={state.context.coatings.get(slot) !== undefined}
-      hoverDescription={state.context.coatings.get(slot)?.description}
-      hoverOptionDescription={(option: any) => option.description}
+      hoverDescription={
+        <HoverCardInfo coating={state.context.coatings.get(slot) as Coating} />
+      }
+      hoverOptionDescription={(option: any) => (
+        <HoverCardInfo coating={option} />
+      )}
       options={Object.values(coatings)}
       defaultValue={state.context.coatings.get(slot)?.id!}
       selected={state.context.coatings.get(slot)?.id!}

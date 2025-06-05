@@ -17,7 +17,7 @@
     "id": "frost",
     "name": "Frost Coating",
     "image": "/images/vbuilds/consumables/FrostCoating.webp",
-    "description": "Imbue your equipped weapon with chilling frost. Your next primary attack triggers a [[|Frost Nova]] dealing 30% magic damage in an area and inflicting Chill. The on hit effect recharges every 12s and the imbuement lasts for 60 minutes. Effect persists through death.",
+    "description": "Imbue your equipped weapon with chilling frost. Your next primary attack triggers a Frost Nova dealing 30% magic damage in an area and inflicting Chill. The on hit effect recharges every 12s and the imbuement lasts for 60 minutes. Effect persists through death.",
     "arenaCode": "3"
   },
   "illusion": {

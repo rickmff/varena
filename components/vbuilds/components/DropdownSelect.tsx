@@ -56,7 +56,7 @@ const HoverInfoCard = ({ children, isVisible = false, description }) => {
   return (
     <HoverCard openDelay={0} closeDelay={0}>
       <HoverCardTrigger>{children}</HoverCardTrigger>
-      <HoverCardContent className="w-96 p-4 bg-zinc-900 text-gray-200">
+      <HoverCardContent className="w-96 p-4 text-gray-200">
         {description}
       </HoverCardContent>
     </HoverCard>

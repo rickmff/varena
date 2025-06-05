@@ -3,6 +3,7 @@
 //   HoverCardTrigger,
 //   HoverCardContent,
 // } from "../ui/hover-card";
+import { HoverCardDescription, HoverCardTitle } from "../ui/hover-card";
 import { useBuilder } from "./BuildProvider";
 import {
   DropdownSelect,
@@ -18,15 +19,15 @@ const ElixirDescription = ({
   elixir: (typeof elixirData)[keyof typeof elixirData];
 }) => {
   return (
-    <div className="text-gray-300 space-y-4">
-      <p className="flex gap-4 text-lg">{elixir.name}</p>
-      <p>
+    <div className="space-y-4 ">
+      <HoverCardTitle>{elixir.name}</HoverCardTitle>
+      <HoverCardDescription>
         An elixir that increases{" "}
         {elixir.modifiers
           .map((mod) => `${mod.stat} by +${mod.value}%`)
-          .join(" and ")}{" "}
-        for 60 Minutes. Effect persists through death.
-      </p>
+          .join(" and ")}
+      </HoverCardDescription>
+      <p></p>
     </div>
   );
 };

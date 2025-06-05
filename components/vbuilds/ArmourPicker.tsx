@@ -5,6 +5,7 @@ import {
 } from "./components/DropdownSelect";
 import { useBuilder } from "./BuildProvider";
 import { Modifier } from "../machines/calculator";
+import { HoverCardDescription, HoverCardTitle } from "../ui/hover-card";
 
 export const armourOptions = [
   {
@@ -142,14 +143,16 @@ type ArmourId = ArmourOption["id"];
 
 const AmuletDescription = ({ armour }: { armour: Armour }) => {
   return (
-    <div className="text-gray-300 space-y-4">
-      <p className="flex gap-4">{armour.name}</p>
+    <div className="space-y-4 ">
+      <HoverCardTitle>{armour.name}</HoverCardTitle>
+
       <div className="space-y-2 text-sm">
         {armour.modifiers.map((mod) => (
-          <p key={mod.stat}>
-            {`${mod.stat} by +${mod.value}`}
-            {mod.unit === "percent" ? "%" : null}
-          </p>
+          <HoverCardDescription key={mod.stat}>
+            {`- ${mod.stat} by +${mod.value}${
+              mod.unit === "percent" ? "%" : ""
+            }`}
+          </HoverCardDescription>
         ))}
       </div>
     </div>

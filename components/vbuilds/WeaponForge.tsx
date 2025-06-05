@@ -69,7 +69,7 @@ const HoverInfoCard = ({
           </div>
           <div>
             <div
-              className={`capitalize ${
+              className={`capitalize font-bold ${
                 weapon?.type === "legendary"
                   ? "text-orange-500"
                   : "text-purple-500"
@@ -77,7 +77,9 @@ const HoverInfoCard = ({
             >
               {weapon?.name}
             </div>
-            <div className={`capitalize spellSchool-${weapon.infusion}`}>
+            <div
+              className={`capitalize text-sm spellSchool-${weapon.infusion}`}
+            >
               {weapon?.infusion}
             </div>
           </div>
@@ -86,7 +88,10 @@ const HoverInfoCard = ({
           {weapon?.effects
             .map((e) => weaponEffectData.find((data) => data.id === e))
             .map((effect) => (
-              <div className="flex gap-4 items-center text-sm" key={effect?.id}>
+              <div
+                className="flex gap-4 items-center text-sm text-zinc-300"
+                key={effect?.id}
+              >
                 <img
                   src="/images/vbuilds/attributes/Attribute_TierIndicator_5.png"
                   className="flex-grow-0 w-6 h-6"

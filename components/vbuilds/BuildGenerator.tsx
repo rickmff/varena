@@ -67,7 +67,7 @@ const BuilderPage = () => {
                       <HoverCardContent>
                         <p></p>
 
-                        <div className="text-gray-300 space-y-4">
+                        <div className="space-y-4 ">
                           <p className="flex gap-4">Bat Leather Bag</p>
                           <div className="space-y-2 text-sm">
                             <p>+18 Inventory Slots</p>
@@ -92,7 +92,7 @@ const BuilderPage = () => {
                       <HoverCardContent>
                         <p></p>
 
-                        <div className="text-gray-300 space-y-4">
+                        <div className="space-y-4 ">
                           <p className="flex gap-4">Tier 3 Cape</p>
                           <div className="space-y-2 text-sm">
                             <p>+24 Max Health </p>

@@ -5,6 +5,11 @@ import { PlusIcon } from "lucide-react";
 import { useBuilder } from "./BuildProvider";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { useSelector } from "@xstate/react";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card";
 
 interface PassivePlaceholderProps {
   length: number;
@@ -44,7 +49,7 @@ export const PassivePlaceholder = ({ length }: PassivePlaceholderProps) => {
 
 export const PassiveForge = () => {
   const { state, builder } = useBuilder();
-  // const passives = useSelector(builder, (state) => state.context.passives);
+  const passives = useSelector(builder, (state) => state.context.passives);
   return (
     <Dialog
       open={state.matches("passiveForge")}
@@ -58,7 +63,32 @@ export const PassiveForge = () => {
         onClick={() => builder.send({ type: "goto.passiveForge" })}
       >
         <div className="flex gap-4">
-          <PassivePlaceholder length={5} />
+          {passives.length > 0 ? (
+            <HoverCard openDelay={0} closeDelay={0}>
+              <HoverCardTrigger>
+                <PassivePlaceholder length={5} />
+              </HoverCardTrigger>
+              <HoverCardContent className="w-[400px] p-4 text-gray-200 *:py-2 -my-2 divide-y-2">
+                {passives.map((passive) => (
+                  <div className="flex justify-center items-center gap-2">
+                    <img
+                      src={passive.img}
+                      alt={passive.name}
+                      className="w-8 h-8 inline-block mr-2 rounded"
+                    />
+                    <div className="text-left space-y-1">
+                      <p className="font-bold text-white">{passive.name}</p>
+                      <p className="text-zinc-400 text-sm">
+                        {passive.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </HoverCardContent>
+            </HoverCard>
+          ) : (
+            <PassivePlaceholder length={5} />
+          )}
         </div>
       </DialogTrigger>
       <DialogContent
