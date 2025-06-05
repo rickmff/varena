@@ -18,12 +18,26 @@ export default function NavBar() {
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
+    const scrollContainer = document.getElementById("builder-page");
+
     const handleScroll = () => {
-      setScrollY(window.scrollY);
+      if (scrollContainer) {
+        setScrollY(scrollContainer.scrollTop);
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    // Add the event listener to the scrolling container
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", handleScroll);
+      handleScroll(); // Initial position
+    }
+
+    // Clean up
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener("scroll", handleScroll);
+      }
+    };
   }, []);
 
   return (

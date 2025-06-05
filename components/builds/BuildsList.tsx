@@ -326,15 +326,14 @@ export default function BuildsList({
                 </motion.button> */}
                   <Tooltip delayDuration={0}>
                     <TooltipTrigger>
-                      <motion.button
+                      <div
+                        role="button"
                         className="bg-red-600/80 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-red-500/50"
                         onClick={(e) => handleDelete(e, index)}
                         aria-label="Delete build"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
                       >
                         ×
-                      </motion.button>
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent side="left">Delete Build</TooltipContent>
                   </Tooltip>

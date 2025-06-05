@@ -2,9 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { Hammer, Plus, Swords } from "lucide-react";
 import BuilderNavBar from "@/components/BuilderNavBar";
 import BuildsList from "@/components/builds/BuildsList";
 
@@ -29,7 +27,10 @@ export default function Builds() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div
+      className="min-h-screen bg-black text-white overflow-auto"
+      id="builder-page"
+    >
       <BuilderNavBar />
 
       {/* Hero Section */}
@@ -67,7 +68,7 @@ export default function Builds() {
       </section>
 
       {/* Builds Section */}
-      <section className="pb-20 bg-black relative">
+      <section className="bg-black relative h-full min-h-0">
         <div className="container px-4 absolute z-10 left-1/2 transform -translate-x-1/2 -top-32">
           <motion.div
             initial="hidden"
@@ -79,6 +80,7 @@ export default function Builds() {
           </motion.div>
         </div>
       </section>
+      <section className="py-40 bg-black"></section>
     </div>
   );
 }
