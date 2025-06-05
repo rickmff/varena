@@ -175,27 +175,27 @@ export default function Home() {
       image: "/images/features/Horse.png",
       title: "Easy Commands",
       description:
-        "Commands to make it easier to practice and improve your skills.",
+        "Enjoy a consequence free environment with commands designed for smooth practice.",
     },
     {
       icon: "crossed-swords",
       image: "/images/features/Pancake.png",
       title: "Game Modes",
-      description: "Experience unique game modes like Pancake.",
+      description: "Experience unique game modes, including the fan-favorite, Capture the Pancake.",
     },
     {
       icon: "calendar-clock",
       image: "/images/features/Events.png",
       title: "Events",
       description:
-        "Participate in exciting events and challenges to earn rewards.",
+        "Participate in regular events and tournaments with the PvP community.",
     },
     {
       icon: "moderation",
       image: "/images/features/Moderation.png",
       title: "Moderation",
       description:
-        "Maintaining a safe and enjoyable environment for all players.",
+        "Enjoy a protected, safe space with active moderation and support.",
     },
   ];
 
@@ -391,7 +391,7 @@ export default function Home() {
               Server Commands
             </h2>
             <p className="text-gray-100 max-w-2xl mx-auto text-lg">
-              Generate commands for our V Arena Server
+              Generate commands for our servers
             </p>
           </motion.div>
           <CommandGenerator />
@@ -418,7 +418,7 @@ export default function Home() {
               Your Builds
             </h2>
             <p className="text-gray-100 max-w-2xl mx-auto text-lg">
-              Manage your saved builds and create new combinations
+              Manage your saved builds, create new ones, export them into the game
             </p>
           </motion.div>
           <motion.div
@@ -490,7 +490,7 @@ export default function Home() {
               </span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white uppercase tracking-wider">
-              Chronicles of V Rising
+              Echoes of V Arena
             </h2>
             <p className="text-gray-100 max-w-2xl mx-auto text-lg">
               Stay informed about the latest updates, events, and community
@@ -759,7 +759,7 @@ export default function Home() {
                       whileHover={{ scale: 1.05, color: "#fff" }}
                     >
                       <Users className="h-5 w-5" />
-                      <span className="font-semibold">7,200+ Members</span>
+                      <span className="font-semibold">7,000+ Members</span>
                     </motion.div>
                     <motion.div
                       className="flex items-center gap-2"

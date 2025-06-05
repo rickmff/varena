@@ -185,7 +185,7 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
           </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">UNLEASH YOUR POTENTIAL</h2>
           <p className="text-gray-100 max-w-2xl mx-auto">
-            Discover the unique features of VArena that enhance your gaming experience.
+            Discover the unique features of V Arena
           </p>
         </motion.div>
         <motion.div
@@ -238,7 +238,7 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
                       )}
                     </div>
                   </motion.div>
-                  <h3 className="text-xl font-bold mb-2 tracking-wider text-red-100">
+                  <h3 className="text-xl font-bold mb-2 tracking-wider text-gray-100">
                     {feature.title.toUpperCase()}
                   </h3>
                 </div>
