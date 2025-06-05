@@ -273,8 +273,8 @@ export default function Home() {
               src="/varena-logo.png"
               alt="Varena Logo"
               className="mr-10"
-              width={600}
-              height={400}
+              width={550}
+              height={379}
             />
             <motion.div
               className="flex flex-col sm:flex-row gap-4 justify-center mt-12"
