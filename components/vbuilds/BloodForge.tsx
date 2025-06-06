@@ -1,4 +1,4 @@
-import { Dispatch, useState } from "react";
+import { Dispatch, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -247,6 +247,11 @@ export const BloodForge = () => {
     blood?.infusion || ""
   );
 
+  useEffect(() => {
+    if (primaryBlood === secondaryBlood) {
+      setSecondaryBloodInfusion("");
+    }
+  }, [primaryBlood, secondaryBlood, setSecondaryBloodInfusion]);
   return (
     <Dialog
       open={state.matches("bloodForge")}
