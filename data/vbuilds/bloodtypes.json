@@ -245,7 +245,7 @@
         "description": "14% Increased Primary Attack Speed and gain 5% increased Physical Power.",
         "modifiers": [
           {
-            "stat": "Primary Attack Speed",
+            "stat": "Attack Speed",
             "value": 14,
             "unit": "percent",
             "calculate": true

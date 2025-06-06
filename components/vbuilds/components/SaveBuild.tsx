@@ -5,7 +5,7 @@ import { useBuilder } from "../BuildProvider";
 import { Input } from "@/components/ui/input";
 
 const SaveBuild: React.FC = () => {
-  const { state, builder } = useBuilder();
+  const { builder } = useBuilder();
   const savedCodes = JSON.parse(localStorage.getItem("vbuilds") || "[]");
   const initialName = `Build ${savedCodes.length + 1}`;
   const [name, setName] = React.useState(initialName);

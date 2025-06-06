@@ -17,8 +17,6 @@ export function groupStatsByCategoryWithValues(
   const groupedStats: Record<string, any[]> = {};
 
   Object.values(flatStats).forEach((stat) => {
-    console.log(finalValues["INCREASE_CAP"]);
-    console.log("Stat:", stat);
     if (!groupedStats[stat.category]) {
       groupedStats[stat.category] = [];
     }

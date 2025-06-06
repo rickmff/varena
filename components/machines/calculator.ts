@@ -82,7 +82,6 @@ export const getBloodModifiers = (blood: BloodContext | null) => {
 
 
     const bloodModifiers = [...primaryPerks, ...secondaryPerks, ...primaryBloodEffect["V"].modifiers]
-    console.log('bloodModifiers', bloodModifiers)
 
     return bloodModifiers
 };
@@ -172,7 +171,6 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
 
     // Apply each modifier
     for (const mod of allModifiers) {
-        console.log('all', allModifiers)
         if (mod.calculate === false) {
             continue;
         }
@@ -188,7 +186,7 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
         if (mod?.increaseCap) {
             finalStats["INCREASE_CAP"] = {
                 ...finalStats["INCREASE_CAP"],
-                [mod.stat]: mod.increaseCap
+                [mod.stat]: (finalStats["INCREASE_CAP"]?.[mod.stat] || 0) + mod.increaseCap
             };
         }
 

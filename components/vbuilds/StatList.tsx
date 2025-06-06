@@ -2,7 +2,6 @@ export function StatList({ stats }: { stats: Array<any> }) {
   return (
     <ul className="space-y-4">
       {stats.map((stat, index) => {
-        console.log("Stat:", stats);
         const totalValue = stat.finalValue;
         const progressWidth = stat.cap
           ? Math.min((totalValue / stat.cap) * 100, 100)
