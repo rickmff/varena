@@ -3,8 +3,13 @@ export function StatList({ stats }: { stats: Array<any> }) {
     <ul className="space-y-4">
       {stats.map((stat, index) => {
         const totalValue = stat.finalValue;
+        const defaultValue = stat.defaultValue || 0;
+
         const progressWidth = stat.cap
-          ? Math.min((totalValue / stat.cap) * 100, 100)
+          ? Math.min(
+              ((totalValue - defaultValue) / (stat.cap - defaultValue)) * 100,
+              100
+            )
           : 100;
 
         const overCap = stat.cap && totalValue > stat.cap;

@@ -10,6 +10,8 @@ import {
   AccordionContent,
 } from "../ui/accordion";
 
+import { spellSchoolMasteryModifiers } from "../machines/calculator";
+
 export function groupStatsByCategoryWithValues(
   flatStats: Record<string, any>,
   finalValues: Record<string, number>
@@ -50,11 +52,26 @@ function customRound(value: number): number {
   return firstDecimal >= 5 ? Math.ceil(value) : Math.floor(value);
 }
 
-export function GroupedStatList({ stats }: { stats: Record<string, any> }) {
+export function GroupedStatList({ stats }: { stats: Record<string, any>[] }) {
   const { state } = useBuilder();
 
+  const baseStatsWithMasteries = stats.map((originalStat) => {
+    const stat = { ...originalStat };
+
+    spellSchoolMasteryModifiers.forEach((modifier) => {
+      if (stat.name === modifier.stat) {
+        stat.defaultValue += modifier.value;
+      }
+    });
+
+    return stat;
+  });
+
   const finalStats = computeFinalStats(state.context);
-  const groupedStats = groupStatsByCategoryWithValues(stats, finalStats);
+  const groupedStats = groupStatsByCategoryWithValues(
+    baseStatsWithMasteries,
+    finalStats
+  );
 
   return (
     <Accordion

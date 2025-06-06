@@ -119,6 +119,18 @@ const getWeaponSlotModifiers = (weapons: Map<AvailableWeaponSlots, Weapon>, slot
 
 
 
+export const spellSchoolMasteryModifiers = [
+    { stat: "Blood Drain Reduction", value: 15, unit: "percent" }, // Blood Mastery
+    { stat: "Veil Cooldown Rate", value: 5, unit: "percent" }, // Chaos Mastery
+    { stat: "Ultimate Power", value: 5, unit: "percent" }, // Chaos Mastery
+    // { stat: "Health Regeneration", value: 15, unit: "percent" }, // Unholy Mastery
+    { stat: "Spell Cooldown Rate", value: 5, unit: "percent" }, // Illusion Mastery
+    { stat: "Shapeshift Speed", value: 6, unit: "percent" }, // Illusion Mastery
+    { stat: "Shield Efficiency", value: 8, unit: "percent" }, // Frost Mastery
+    { stat: "Attack Speed", value: 5, unit: "percent" }, // Storm Mastery
+    { stat: "Mount Speed", value: 5, unit: "percent" }, // Storm Mastery
+] as Modifier[]
+
 export function computeFinalStats(context: BuildContext): Record<string, number> {
     const finalStats: Record<string, number | any> = {};
 
@@ -141,21 +153,7 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
 
     ] as Modifier[]
 
-    const spellSchoolMasteryModifiers = [
-        { stat: "Blood Drain Reduction", value: 15, unit: "percent" }, // Blood Mastery
-        { stat: "Veil Cooldown Rate", value: 5, unit: "percent" }, // Chaos Mastery
-        { stat: "Ultimate Power", value: 5, unit: "percent" }, // Chaos Mastery
-        // { stat: "Health Regeneration", value: 15, unit: "percent" }, // Unholy Mastery
-        { stat: "Spell Cooldown Rate", value: 5, unit: "percent" }, // Illusion Mastery
-        { stat: "Shapeshift Speed", value: 6, unit: "percent" }, // Illusion Mastery
-        { stat: "Shield Efficiency", value: 8, unit: "percent" }, // Frost Mastery
-        { stat: "Attack Speed", value: 5, unit: "percent" }, // Storm Mastery
-        { stat: "Mount Speed", value: 5, unit: "percent" }, // Storm Mastery
-    ] as Modifier[]
-
     const selectedWeaponModifiers = getWeaponSlotModifiers(context.weapons, context.focusedWeapon) || [];
-
-
 
     const allModifiers: Modifier[] = [
         ...armour,
