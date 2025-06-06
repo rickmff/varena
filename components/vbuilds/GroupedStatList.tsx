@@ -17,16 +17,39 @@ export function groupStatsByCategoryWithValues(
   const groupedStats: Record<string, any[]> = {};
 
   Object.values(flatStats).forEach((stat) => {
+    console.log(finalValues["INCREASE_CAP"]);
+    console.log("Stat:", stat);
     if (!groupedStats[stat.category]) {
       groupedStats[stat.category] = [];
     }
     groupedStats[stat.category].push({
       ...stat,
-      finalValue: finalValues[stat.name] ?? stat.defaultValue,
+      cap:
+        stat.cap && finalValues["INCREASE_CAP"]?.[stat.name]
+          ? customRound(
+              stat.cap + Number(finalValues["INCREASE_CAP"][stat.name])
+            )
+          : stat.cap,
+      finalValue: ["Physical Power", "Spell Power", "Movement Speed"].includes(
+        stat.name
+      )
+        ? finalValues[stat.name] ?? stat.defaultValue
+        : customRound(finalValues[stat.name]),
     });
   });
 
   return groupedStats;
+}
+
+// Helper function to round based on the first decimal
+function customRound(value: number): number {
+  if (value === undefined || isNaN(value)) return 0;
+
+  // Get the first decimal place
+  const firstDecimal = Math.abs(Math.floor((value * 10) % 10));
+
+  // Round up if first decimal is 5 or higher, otherwise round down
+  return firstDecimal >= 5 ? Math.ceil(value) : Math.floor(value);
 }
 
 export function GroupedStatList({ stats }: { stats: Record<string, any> }) {

@@ -65,10 +65,10 @@
         "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
         "modifiers": [
           {
-            "stat": "Blood Effect Boost",
+            "stat": "Blood Efficiency",
             "value": 20,
             "unit": "percent",
-            "calculate": false
+            "calculate": true
           }
         ]
       }
@@ -121,7 +121,7 @@
             "stat": "Weapon Skill Power",
             "value": 16,
             "unit": "percent",
-            "calculate": false
+            "calculate": true
           },
           {
             "stat": "Full Health Damage",
@@ -146,10 +146,10 @@
         "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
         "modifiers": [
           {
-            "stat": "Blood Effect Boost",
+            "stat": "Blood Efficiency",
             "value": 20,
             "unit": "percent",
-            "calculate": false
+            "calculate": true
           }
         ]
       }
@@ -226,10 +226,10 @@
         "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
         "modifiers": [
           {
-            "stat": "Blood Effect Boost",
+            "stat": "Blood Efficiency",
             "value": 20,
             "unit": "percent",
-            "calculate": false
+            "calculate": true
           }
         ]
       }
@@ -307,10 +307,10 @@
         "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
         "modifiers": [
           {
-            "stat": "Blood Effect Boost",
+            "stat": "Blood Efficiency",
             "value": 20,
             "unit": "percent",
-            "calculate": false
+            "calculate": true
           }
         ]
       }
@@ -346,7 +346,7 @@
             "stat": "Spell Cooldown Rate",
             "value": 14,
             "unit": "percent",
-            "calculate": false
+            "calculate": true
           }
         ]
       },
@@ -376,10 +376,10 @@
         "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
         "modifiers": [
           {
-            "stat": "Blood Effect Boost",
+            "stat": "Blood Efficiency",
             "value": 20,
             "unit": "percent",
-            "calculate": false
+            "calculate": true
           }
         ]
       }
@@ -451,10 +451,10 @@
         "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
         "modifiers": [
           {
-            "stat": "Blood Effect Boost",
+            "stat": "Blood Efficiency",
             "value": 20,
             "unit": "percent",
-            "calculate": false
+            "calculate": true
           }
         ]
       }
@@ -532,10 +532,10 @@
         "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
         "modifiers": [
           {
-            "stat": "Blood Effect Boost",
+            "stat": "Blood Efficiency",
             "value": 20,
             "unit": "percent",
-            "calculate": false
+            "calculate": true
           }
         ]
       }
@@ -619,10 +619,10 @@
         "description": "Boost all above effects by 20% and increases the maximum cap of blood effects with an equal amount.",
         "modifiers": [
           {
-            "stat": "Blood Effect Boost",
+            "stat": "Blood Efficiency",
             "value": 20,
             "unit": "percent",
-            "calculate": false
+            "calculate": true
           }
         ]
       }

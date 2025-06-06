@@ -47,9 +47,17 @@ export interface Modifier {
     value: number;
     unit: "flat" | "percent";
     calculate?: boolean; // whether to apply this modifier in calculations, default true
+    increaseCap?: number; // optional, used for displaying the cap increase
 }
 
 
+const increaseCap = (modifiers: any[]) => {
+    return modifiers.map((modifier) => {
+        const increase = modifier.value * (20 / 100)
+        const newValue = modifier.value + increase
+        return { ...modifier, value: newValue, increaseCap: increase }
+    })
+}
 export const getBloodModifiers = (blood: BloodContext | null) => {
     if (!blood) return [];
 
@@ -59,19 +67,22 @@ export const getBloodModifiers = (blood: BloodContext | null) => {
     const perk3 = primaryBloodEffect["III"].modifiers
     const perk4 = primaryBloodEffect["IV"].modifiers
 
-    const perks = [perk1, perk2, perk3, perk4].flatMap((perk) => {
-        return perk.map((perk) => {
-            const increase = perk.value * (20 / 100)
-            const newValue = perk.value + increase
-            return { ...perk, value: perk.value }
-        })
+    const primaryPerks = [perk1, perk2, perk3, perk4].flatMap((perks) => {
+        return increaseCap(perks || [])
     })
 
-    const infusionEffects = bloodData[blood.secondary]?.effects?.[blood.infusion]?.modifiers
+
+    const secondaryBloodEffects = bloodData[blood.secondary].effects || {};
+    const secondarySelectedModifier = secondaryBloodEffects?.[blood.infusion]?.modifiers
+    const secondaryTier4Modifiers = secondaryBloodEffects?.['IV']?.modifiers
+
+    const secondaryPerks = [secondarySelectedModifier, secondaryTier4Modifiers].flatMap((perks) => {
+        return increaseCap(perks || [])
+    })
 
 
-    const bloodModifiers = [...perks, ...infusionEffects]
-
+    const bloodModifiers = [...primaryPerks, ...secondaryPerks, ...primaryBloodEffect["V"].modifiers]
+    console.log('bloodModifiers', bloodModifiers)
 
     return bloodModifiers
 };
@@ -110,7 +121,7 @@ const getWeaponSlotModifiers = (weapons: Map<AvailableWeaponSlots, Weapon>, slot
 
 
 export function computeFinalStats(context: BuildContext): Record<string, number> {
-    const finalStats: Record<string, number> = {};
+    const finalStats: Record<string, number | any> = {};
 
     // Start from defaultValue for each stat
     for (const [statName, statEntry] of Object.entries(context.baseStats)) {
@@ -131,6 +142,18 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
 
     ] as Modifier[]
 
+    const spellSchoolMasteryModifiers = [
+        { stat: "Blood Drain Reduction", value: 15, unit: "percent" }, // Blood Mastery
+        { stat: "Veil Cooldown Rate", value: 5, unit: "percent" }, // Chaos Mastery
+        { stat: "Ultimate Power", value: 5, unit: "percent" }, // Chaos Mastery
+        // { stat: "Health Regeneration", value: 15, unit: "percent" }, // Unholy Mastery
+        { stat: "Spell Cooldown Rate", value: 5, unit: "percent" }, // Illusion Mastery
+        { stat: "Shapeshift Speed", value: 6, unit: "percent" }, // Illusion Mastery
+        { stat: "Shield Efficiency", value: 8, unit: "percent" }, // Frost Mastery
+        { stat: "Attack Speed", value: 5, unit: "percent" }, // Storm Mastery
+        { stat: "Mount Speed", value: 5, unit: "percent" }, // Storm Mastery
+    ] as Modifier[]
+
     const selectedWeaponModifiers = getWeaponSlotModifiers(context.weapons, context.focusedWeapon) || [];
 
 
@@ -142,13 +165,14 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
         ...bloodModifiers,
         ...bagAndCapeModifiers,
         ...passiveModifiers,
-        ...selectedWeaponModifiers
-
+        ...selectedWeaponModifiers,
+        ...spellSchoolMasteryModifiers
     ];
 
 
     // Apply each modifier
     for (const mod of allModifiers) {
+        console.log('all', allModifiers)
         if (mod.calculate === false) {
             continue;
         }
@@ -156,9 +180,18 @@ export function computeFinalStats(context: BuildContext): Record<string, number>
         if (!(mod.stat in finalStats)) {
             // Stat not found in base, create new (optional depending on your needs)
             finalStats[mod.stat] = 0;
+
         }
 
         const base = finalStats[mod.stat];
+
+        if (mod?.increaseCap) {
+            finalStats["INCREASE_CAP"] = {
+                ...finalStats["INCREASE_CAP"],
+                [mod.stat]: mod.increaseCap
+            };
+        }
+
 
         if (mod.unit === "flat") {
             finalStats[mod.stat] = base + mod.value;

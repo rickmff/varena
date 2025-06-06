@@ -2,15 +2,10 @@ export function StatList({ stats }: { stats: Array<any> }) {
   return (
     <ul className="space-y-4">
       {stats.map((stat, index) => {
+        console.log("Stat:", stats);
         const totalValue = stat.finalValue;
-        const defaultValue = stat.defaultValue || 0;
-
-        // Calculate progress based on how much has been added above default value
         const progressWidth = stat.cap
-          ? Math.min(
-              ((totalValue - defaultValue) / (stat.cap - defaultValue)) * 100,
-              100
-            )
+          ? Math.min((totalValue / stat.cap) * 100, 100)
           : 100;
 
         const overCap = stat.cap && totalValue > stat.cap;

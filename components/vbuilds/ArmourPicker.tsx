@@ -66,7 +66,7 @@ export const armourOptions = [
       },
       {
         stat: "Damage Reduction",
-        value: 5,
+        value: 4,
         unit: "percent",
         calculate: true,
       },
@@ -92,13 +92,13 @@ export const armourOptions = [
       },
       {
         stat: "Weapon Skill Power",
-        value: 10,
+        value: 8,
         unit: "percent",
         calculate: true,
       },
       {
         stat: "Weapon Cooldown Rate",
-        value: 5,
+        value: 7,
         unit: "percent",
         calculate: true,
       },
@@ -119,7 +119,7 @@ export const armourOptions = [
       {
         stat: "Bonus Spell Power",
         value: 7.2,
-        unit: "parcent",
+        unit: "percent",
         calculate: true,
       },
       {

@@ -32,14 +32,6 @@
     "category": "Core Attributes"
   },
   {
-    "name": "Resource Harvest Power",
-    "value": 0,
-    "unit": "",
-    "cap": null,
-    "defaultValue": 10,
-    "category": "Core Attributes"
-  },
-  {
     "name": "Bonus Physical Power",
     "value": 0,
     "unit": "%",

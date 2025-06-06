@@ -130,9 +130,8 @@ export const builder = setup({
 
             assertEvent(event, 'SAVE_BUILD');
 
-            console.log(event)
+
             const buildCode = arenaCode(context);
-            console.log("Generated arena code:", buildCode);
 
             // Get existing arena codes from localStorage or initialize empty array
             const savedCodes = JSON.parse(localStorage.getItem('vbuilds') || '[]');
