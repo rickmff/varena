@@ -22,16 +22,36 @@ export const PassivePlaceholder = ({ length }: PassivePlaceholderProps) => {
   return (
     <div className="flex gap-4 justify-center bg-zinc-900 p-2 rounded-lg select-none">
       {passives.map((passive: Passive) => (
-        <img
-          draggable={false}
-          key={passive.id}
-          src={passive.img}
-          alt={passive.name}
-          className="w-16 h-16 object-contain rounded-full border-4"
-          onClick={() =>
-            builder.send({ type: "REMOVE_PASSIVE", id: passive.id })
-          }
-        />
+        <HoverCard openDelay={0} closeDelay={0}>
+          <HoverCardTrigger>
+            <img
+              draggable={false}
+              key={passive.id}
+              src={passive.img}
+              alt={passive.name}
+              className="w-16 h-16 object-contain rounded-full border-4"
+              onClick={() =>
+                builder.send({ type: "REMOVE_PASSIVE", id: passive.id })
+              }
+            />
+          </HoverCardTrigger>
+          <HoverCardContent className="w-80 p-4 text-gray-200 *:py-2 -my-2 divide-y-2">
+            <div
+              className="flex justify-center items-center gap-2"
+              key={passive.id}
+            >
+              <img
+                src={passive.img}
+                alt={passive.name}
+                className="w-8 h-8 inline-block mr-2 rounded"
+              />
+              <div className="text-left space-y-1">
+                <p className="font-bold text-white">{passive.name}</p>
+                <p className="text-zinc-400 text-sm">{passive.description}</p>
+              </div>
+            </div>
+          </HoverCardContent>
+        </HoverCard>
       ))}
       {Array.from({ length: length - passives.length }).map((_, index) => {
         return (
@@ -63,35 +83,7 @@ export const PassiveForge = () => {
         onClick={() => builder.send({ type: "goto.passiveForge" })}
       >
         <div className="flex gap-4">
-          {passives.length > 0 ? (
-            <HoverCard openDelay={0} closeDelay={0}>
-              <HoverCardTrigger>
-                <PassivePlaceholder length={5} />
-              </HoverCardTrigger>
-              <HoverCardContent className="w-[400px] p-4 text-gray-200 *:py-2 -my-2 divide-y-2">
-                {passives.map((passive) => (
-                  <div
-                    className="flex justify-center items-center gap-2"
-                    key={passive.id}
-                  >
-                    <img
-                      src={passive.img}
-                      alt={passive.name}
-                      className="w-8 h-8 inline-block mr-2 rounded"
-                    />
-                    <div className="text-left space-y-1">
-                      <p className="font-bold text-white">{passive.name}</p>
-                      <p className="text-zinc-400 text-sm">
-                        {passive.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </HoverCardContent>
-            </HoverCard>
-          ) : (
-            <PassivePlaceholder length={5} />
-          )}
+          <PassivePlaceholder length={5} />
         </div>
       </DialogTrigger>
       <DialogContent
