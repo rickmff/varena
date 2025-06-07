@@ -13,6 +13,7 @@ export function StatList({ stats }: { stats: Array<any> }) {
           : 100;
 
         const overCap = stat.cap && totalValue > stat.cap;
+        console.log(progressWidth);
 
         return (
           <li
@@ -23,12 +24,16 @@ export function StatList({ stats }: { stats: Array<any> }) {
               <span className={`font-medium ${overCap ? "text-white" : ""}`}>
                 {stat.name}
               </span>
-              <span className="">
+              <span className="text-sm">
                 {stat.cap ? (
                   <>
                     <span
                       className={`font-bold ${
-                        overCap ? "text-red-800" : "text-red-400"
+                        overCap
+                          ? "text-red-800"
+                          : progressWidth === 0
+                          ? "text-zinc-500"
+                          : "text-red-400"
                       }`}
                     >
                       {totalValue}
@@ -48,7 +53,7 @@ export function StatList({ stats }: { stats: Array<any> }) {
               </span>
             </div>
             {stat.cap && (
-              <div className={`w-full bg-gray-700 rounded h-2`}>
+              <div className={`w-full bg-zinc-600 rounded h-2`}>
                 <div
                   className={`${
                     overCap ? "bg-red-800" : "bg-red-400"
