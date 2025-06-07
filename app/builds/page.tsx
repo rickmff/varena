@@ -1,32 +1,16 @@
-"use client";
-
 import React from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import NavBar from "@/components/NavBar";
 import BuildsList from "@/components/builds/BuildsList";
 import SectionHeader from "@/app/components/ui/SectionHeader";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
+export const metadata = {
+  title: "V Arena - Builds",
+};
 
 export default function Builds() {
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
-  };
-
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
   return (
     <div
       className="min-h-screen bg-black text-white overflow-auto"
@@ -59,14 +43,7 @@ export default function Builds() {
       {/* Builds Section */}
       <section className="bg-black relative h-full min-h-0">
         <div className="container px-4 absolute z-10 left-1/2 transform -translate-x-1/2 -top-32">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            <BuildsList />
-          </motion.div>
+          <BuildsList />
         </div>
       </section>
       <section className="py-40 bg-black"></section>

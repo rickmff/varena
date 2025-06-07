@@ -1,7 +1,13 @@
 import "./page.css";
 import BuildProvider from "@/components/vbuilds/BuildProvider";
 import BuildGenerator from "@/components/vbuilds/BuildGenerator";
-export default function Guides() {
+
+export const metadata = {
+  title: "V Arena - Build Editor",
+  description: "Create and manage your builds",
+};
+
+export default function BuildEditor() {
   return (
     <div className="pt-20 h-screen bg-zinc-950 bg-blend-lighten overflow-hidden space-y-8 flex">
       <BuildProvider>

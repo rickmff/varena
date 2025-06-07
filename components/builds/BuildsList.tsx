@@ -119,7 +119,7 @@ const BuildContent = ({ code }: { code: string }) => {
           <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
             Spells
           </div>
-          <div className="grid grid-cols-4 gap-1">
+          <div className="flex flex-1 gap-1">
             {build.spells.dash && (
               <div className="relative w-8 h-8 bg-zinc-900/50 rounded border border-red-900/30 flex items-center justify-center overflow-hidden">
                 <Img src={build.spells.dash.img} alt="Veil" />
@@ -148,7 +148,7 @@ const BuildContent = ({ code }: { code: string }) => {
           <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
             Passives
           </div>
-          <div className="grid grid-cols-5 gap-1">
+          <div className="flex gap-1">
             {build.passives.slice(0, 6).map((passive, index) => (
               <div
                 key={index}
@@ -284,6 +284,23 @@ export default function BuildsList({
 
   return (
     <TooltipProvider>
+      {builds.length > 0 && (
+        <motion.div
+          className="w-full flex justify-end"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          <Button
+            className="mb-4 ml-auto text-white group border-red-900/70  bg-red-900/50 hover:bg-red-800 transition-colors uppercase"
+            variant={"outline"}
+            size="lg"
+          >
+            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+            <Link href="/builds/create">Create A New Build</Link>
+          </Button>
+        </motion.div>
+      )}
       <motion.div
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         variants={staggerContainer}
@@ -406,7 +423,7 @@ export default function BuildsList({
               className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
             >
               <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
-              Create Your Build
+              CREATE YOUR FIRST BUILD
             </Link>
           </motion.div>
         </motion.div>
@@ -436,7 +453,7 @@ export default function BuildsList({
               >
                 <Link href="/builds" className="flex items-center">
                   <span className="relative z-10 font-bold tracking-wider">
-                    VIEW ALL BUILDS ({builds.length})
+                    MANAGE ALL BUILDS ({builds.length})
                   </span>
                   <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
                 </Link>

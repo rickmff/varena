@@ -306,17 +306,15 @@ export default function Home() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="gap-2 border-white/70 text-white hover:bg-zinc-900/70 bg-black relative overflow-hidden group"
-                  onClick={() => (window.location.hash = "#generate-commands")}
+                  className="hidden md:flex text-xs font-bold  border-white/70 text-white hover:bg-zinc-900/70 bg-black transition-all duration-300"
                 >
-                  <span className="relative z-10">Get Started</span>
-                  <Play className="h-4 w-4 relative z-10" />
-                  <motion.span
-                    className="absolute inset-0 bg-white/10"
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: 0 }}
-                    transition={{ duration: 0.3 }}
-                  />
+                  <Link
+                    href="/#commands"
+                    className="flex items-center justify-center gap-2 relative"
+                  >
+                    <span className="relative z-10">Get Started</span>
+                    <Play className="h-4 w-4 relative z-10" />
+                  </Link>
                 </Button>
               </motion.div>
             </motion.div>
@@ -376,43 +374,6 @@ export default function Home() {
               onBuildsLoaded={setHasBuilds}
             />
           </motion.div>
-
-          {/* View All Builds Button - Only show when builds exist */}
-          {hasBuilds && (
-            <motion.div
-              className="text-center mt-12"
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="inline-block"
-              >
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
-                           relative overflow-hidden group px-8 shadow-lg shadow-red-900/20"
-                >
-                  <Link href="/builds" className="flex items-center">
-                    <span className="relative z-10 font-bold tracking-wider">
-                      MANAGE ALL BUILDS
-                    </span>
-                    <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
-                  </Link>
-                  <motion.span
-                    className="absolute inset-0 bg-gradient-to-r from-red-900/40 to-transparent"
-                    initial={{ x: "-100%" }}
-                    whileHover={{ x: 0 }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </Button>
-              </motion.div>
-            </motion.div>
-          )}
         </div>
       </section>
 
