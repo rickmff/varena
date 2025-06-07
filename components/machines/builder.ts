@@ -343,7 +343,7 @@ export const builder = setup({
                     // Make sure to handle the case where the weapon might be undefined
                     const weapon = context.selectedWeaponSlot ? context.weapons.get(context.selectedWeaponSlot) || null : null;
 
-                    if (context.selectedWeaponSlot && context.weapons.has(context.selectedWeaponSlot)) {
+                    if (context.selectedWeaponSlot && context.weapons.has(context.selectedWeaponSlot) && weapon?.type === "legendary") {
                         return { legendaryWeaponCount: weaponLength - 1, weapon }
                     }
                     return {
@@ -391,7 +391,7 @@ export const builder = setup({
                     })
                 },
                 LEGENDARY_LIMIT_REACHED: {
-                    actions: [() => toast.error(`You can only use ${MAX_LEGENDARY_WEAPONS_COUNT} artifact weapons.`)],
+                    actions: [log('calling'), () => toast.error(`You can only use ${MAX_LEGENDARY_WEAPONS_COUNT} artifact weapons.`)],
                 }
             }
         },

@@ -223,25 +223,21 @@ export default function BuildsList({
 
     toast("Are you sure you want to delete this build?", {
       closeButton: true,
-      action: (
-        <Button
-          className="bg-red-500 hover:bg-red-700 px-2 py-1 text-xs"
-          onClick={() => {
-            const updatedBuilds = [...builds];
-            updatedBuilds.splice(index, 1);
-
-            // Update state and localStorage
-            setBuilds(updatedBuilds);
-            try {
-              localStorage.setItem("vbuilds", JSON.stringify(updatedBuilds));
-            } catch (error) {
-              console.error("Failed to update localStorage:", error);
-            }
-          }}
-        >
-          Delete
-        </Button>
-      ),
+      actionButtonStyle: { backgroundColor: "#f87171" },
+      action: {
+        label: "Delete",
+        onClick: () => {
+          const updatedBuilds = [...builds];
+          updatedBuilds.splice(index, 1);
+          // Update state and localStorage
+          setBuilds(updatedBuilds);
+          try {
+            localStorage.setItem("vbuilds", JSON.stringify(updatedBuilds));
+          } catch (error) {
+            console.error("Failed to update localStorage:", error);
+          }
+        },
+      },
     });
   };
 
