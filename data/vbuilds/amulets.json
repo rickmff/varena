@@ -47,7 +47,7 @@
         "calculate": true
       },
       {
-        "stat": "Spell Life Leech",
+        "stat": "Spell Leech",
         "value": 5,
         "unit": "percent",
         "calculate": true

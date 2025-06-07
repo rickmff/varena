@@ -171,7 +171,19 @@
             "calculate": true
           },
           {
-            "stat": "Life Leech",
+            "stat": "Weapon Skill Leech",
+            "value": 5,
+            "unit": "percent",
+            "calculate": true
+          },
+          {
+            "stat": "Spell Leech",
+            "value": 5,
+            "unit": "percent",
+            "calculate": true
+          },
+          {
+            "stat": "Primary Attack Leech",
             "value": 5,
             "unit": "percent",
             "calculate": true
@@ -262,7 +274,7 @@
         "description": "10% Primary Attack Life Leech and 4% increased Damage Reduction.",
         "modifiers": [
           {
-            "stat": "Primary Attack Life Leech",
+            "stat": "Primary Attack Leech",
             "value": 10,
             "unit": "percent",
             "calculate": true
@@ -504,7 +516,7 @@
         "description": "10% Increased Spell Leech and 3% increased Spell Charge Gain.",
         "modifiers": [
           {
-            "stat": "Spell Life Leech",
+            "stat": "Spell Leech",
             "value": 10,
             "unit": "percent",
             "calculate": true
