@@ -4,28 +4,77 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { Button, type ButtonProps } from "@/components/ui/button";
 import GameMenu from "./game-menu";
 
 export const menuItems = [
-  { name: "FEATURES", href: "#features" },
-  { name: "COMMANDS", href: "#generate-commands" },
-  { name: "NEWS", href: "/news" },
+  { name: "FEATURES", href: "/#features" },
+  { name: "COMMANDS", href: "/#generate-commands" },
   { name: "BUILDS", href: "/builds" },
-  { name: "CREATE BUILD", href: "/builds/create" },
+  { name: "NEWS", href: "/news" },
 ];
+
+export const DiscordButton = ({
+  size = "sm",
+}: {
+  size?: ButtonProps["size"];
+}) => (
+  <Button
+    variant="outline"
+    size={size}
+    className="hidden md:flex text-xs font-bold text-white bg-[#5865F2] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300"
+  >
+    <Link
+      href="https://discord.gg/varena"
+      target="_blank"
+      className="flex items-center justify-center gap-2"
+    >
+      <Image
+        src="/discord.svg"
+        alt="Discord Logo"
+        width={20}
+        height={20}
+        className="h-5 w-5"
+      />
+      <span className="pt-1">JOIN US</span>
+    </Link>
+  </Button>
+);
 
 export default function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
+    let scrollContainer;
+
+    scrollContainer = document.getElementById("builder-page");
+
+    if (!scrollContainer) {
+      scrollContainer = window; // Fallback to documentElement if not found
+    }
+
     const handleScroll = () => {
-      setScrollY(window.scrollY);
+      if (scrollContainer !== window) {
+        // HTMLElement has scrollTop property
+        setScrollY((scrollContainer as HTMLElement).scrollTop);
+      } else {
+        setScrollY(window.scrollY);
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    // Add the event listener to the scrolling container
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", handleScroll);
+      handleScroll(); // Initial position
+    }
+
+    // Clean up
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener("scroll", handleScroll);
+      }
+    };
   }, []);
 
   return (
@@ -124,26 +173,7 @@ export default function NavBar() {
                 damping: 20,
               }}
             >
-              <Button
-                variant="outline"
-                size="sm"
-                className="hidden md:flex text-xs font-bold text-white hover:bg-zinc-900/70 transition-all duration-300"
-              >
-                <Link
-                  href="https://discord.gg/varena"
-                  target="_blank"
-                  className="flex items-center justify-center gap-4"
-                >
-                  <Image
-                    src="/discord.svg"
-                    alt="Discord Logo"
-                    width={20}
-                    height={20}
-                    className="h-5 w-5 mr-2"
-                  />
-                  <span className="pt-1">JOIN US</span>
-                </Link>
-              </Button>
+              <DiscordButton />
             </motion.div>
           </motion.div>
           <Button

@@ -18,7 +18,7 @@ import {
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import BloodParticles from "@/components/blood-particles";
-import NavBar, { menuItems } from "@/components/NavBar";
+import NavBar, { DiscordButton, menuItems } from "@/components/NavBar";
 import CommandGenerator from "@/components/command-generator";
 import FeatureCarousel from "@/app/components/ui/FeatureCarousel";
 import BuildsList from "@/components/builds/BuildsList";
@@ -295,32 +295,7 @@ export default function Home() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="gap-2 relative overflow-hidden group border-purple-900 hover:bg-zinc-900/70 bg-black text-white flex items-center"
-                >
-                  <Link
-                    href="https://discord.gg/varena"
-                    target="_blank"
-                    className="flex items-center justify-center gap-4"
-                  >
-                    <Image
-                      src="/discord.svg"
-                      alt="Varena Logo"
-                      width={20}
-                      height={20}
-                      className="h-5 w-5 mr-2"
-                    />
-                    <span className="relative z-10">JOIN US</span>
-                    <motion.span
-                      className="absolute inset-0 bg-white/20"
-                      initial={{ x: "-100%" }}
-                      whileHover={{ x: 0 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  </Link>
-                </Button>
+                <DiscordButton size="lg" />
               </motion.div>
               <motion.div
                 variants={fadeIn}
@@ -754,8 +729,7 @@ export default function Home() {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
-                         relative overflow-hidden group px-8 shadow-lg shadow-red-900/20 w-full py-8 gap-4"
+                      className="text-white bg-[#5865F2] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 relative overflow-hidden group px-8 w-full py-8 gap-4"
                     >
                       <Link
                         href="https://discord.gg/varena"

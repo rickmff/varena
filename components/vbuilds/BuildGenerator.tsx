@@ -10,7 +10,7 @@ import { PassiveForge } from "./PassiveForge";
 import { SpellForge } from "./SpellForge";
 import { FocusedWeapon, WeaponForge } from "./WeaponForge";
 import { BloodForge } from "./BloodForge";
-import BuilderNavBar from "../BuilderNavBar";
+import NavBar from "../NavBar";
 import {
   SingleCoating,
   AdvancedCoatings,
@@ -39,7 +39,7 @@ const BuilderPage = () => {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-500/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
 
-      <BuilderNavBar />
+      <NavBar />
 
       <div className="flex-grow relative max-w-screen-2xl mx-auto flex flex-col lg:flex-row text-grey-300 p-3 sm:p-4 lg:p-6 gap-4 lg:gap-6">
         {/* Main Content Area */}

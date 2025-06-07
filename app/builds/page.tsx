@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import BuilderNavBar from "@/components/BuilderNavBar";
+import NavBar from "@/components/NavBar";
 import BuildsList from "@/components/builds/BuildsList";
 
 export default function Builds() {
@@ -31,7 +31,7 @@ export default function Builds() {
       className="min-h-screen bg-black text-white overflow-auto"
       id="builder-page"
     >
-      <BuilderNavBar />
+      <NavBar />
 
       {/* Hero Section */}
       <section className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
