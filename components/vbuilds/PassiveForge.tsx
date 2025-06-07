@@ -22,11 +22,10 @@ export const PassivePlaceholder = ({ length }: PassivePlaceholderProps) => {
   return (
     <div className="flex gap-4 justify-center bg-zinc-900 p-2 rounded-lg select-none">
       {passives.map((passive: Passive) => (
-        <HoverCard openDelay={0} closeDelay={0}>
+        <HoverCard openDelay={0} closeDelay={0} key={passive.id}>
           <HoverCardTrigger>
             <img
               draggable={false}
-              key={passive.id}
               src={passive.img}
               alt={passive.name}
               className="w-16 h-16 object-contain rounded-full border-4"

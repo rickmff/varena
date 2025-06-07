@@ -64,7 +64,7 @@ type BuildEvents =
     | { type: 'ADD_SPELL'; spell: any, slot: "dash" | "ultimate" | "spell1" | "spell2", jewel?: number[] }
     | { type: 'REMOVE_SPELL'; id: string }
     | { type: 'LEGENDARY_LIMIT_REACHED' }
-    | { type: 'FOCUS_WEAPON', slot: AvailableWeaponSlots }
+    | { type: 'FOCUS_WEAPON', slot: AvailableWeaponSlots | null }
     | { type: 'UNFOCUS_WEAPON' }
     | { type: 'SAVE_BUILD', name?: string }
 
@@ -157,7 +157,6 @@ export const builder = setup({
     id: 'builder',
     initial: 'overview',
     context: ({ input }) => {
-
         const ctx = {
             baseStats: input.stats,
             activeSources: [],
@@ -175,7 +174,7 @@ export const builder = setup({
             coatings: input.build.coatings || new Map(),
             blood: input.build.blood || null,
             selectedWeaponSlot: null, // Initialize with null
-            focusedWeapon: null as AvailableWeaponSlots | null, // Track the focused weapon slot
+            focusedWeapon: input.build.weapons.size != 0 ? input.build.weapons.entries().next().value[0] : null as AvailableWeaponSlots | null,
             advancedCoatings: input.build.advancedCoatings || false,
         }
 
@@ -341,12 +340,15 @@ export const builder = setup({
                     const weaponLength = Array.from(context.weapons.values())
                         .filter(w => w.type === "legendary").length
 
-                    if (context.selectedWeaponSlot && context.weapons.has(context.selectedWeaponSlot)) {
+                    // Make sure to handle the case where the weapon might be undefined
+                    const weapon = context.selectedWeaponSlot ? context.weapons.get(context.selectedWeaponSlot) || null : null;
 
-                        return { legendaryWeaponCount: weaponLength - 1 }
+                    if (context.selectedWeaponSlot && context.weapons.has(context.selectedWeaponSlot)) {
+                        return { legendaryWeaponCount: weaponLength - 1, weapon }
                     }
                     return {
-                        legendaryWeaponCount: weaponLength
+                        legendaryWeaponCount: weaponLength,
+                        weapon
                     }
                 }
             })],
@@ -379,6 +381,7 @@ export const builder = setup({
                     )
                 },
                 REMOVE_WEAPON: {
+                    target: 'overview',
                     actions: assign({
                         weapons: ({ context, event }) => {
                             const updatedWeapons = new Map(context.weapons);

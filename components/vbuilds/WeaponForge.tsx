@@ -14,6 +14,17 @@ import {
   HoverCardTrigger,
   HoverCardContent,
 } from "../ui/hover-card";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
+import { builder } from "../machines/builder";
+import { XIcon } from "lucide-react";
+import { useEffect } from "react";
+import { Button } from "../ui/button";
 
 export type AvailableWeaponSlots = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
@@ -35,6 +46,83 @@ export type WeaponData = {
   arenaCode: string; // Arena code for the weapon
 };
 
+export const FocusedWeapon = ({
+  side = "bottom",
+  align = "center",
+}: {
+  side?: "bottom" | "top" | "right" | "left" | undefined;
+  align?: "start" | "center" | "end";
+}) => {
+  const { state, builder } = useBuilder();
+  const focusedWeaponSlot = state.context.focusedWeapon;
+  const weapons = state.context.weapons;
+  const weapon = focusedWeaponSlot ? weapons.get(focusedWeaponSlot) : undefined;
+
+  if (weapons.size === 0) {
+    return null;
+  }
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="bg-zinc-900 px-2 py-1 rounded border hover:border-purple-500">
+        {weapon ? (
+          <div className="text-xs flex gap-1 items-center">
+            <div
+              className={`text-white ${
+                weapon?.type === "legendary" && "text-orange-500"
+              } ${weapon?.type === "epic" && "text-purple-500"}`}
+            >
+              Current Weapon
+            </div>
+            <img
+              src={weapon?.img}
+              className={`h-6 w-6 border rounded ${
+                weapon?.type === "legendary"
+                  ? "border-orange-500"
+                  : "border-purple-500"
+              }`}
+            />
+          </div>
+        ) : (
+          <div className="text-xs text-white h-6 flex items-center">
+            Select Weapon
+          </div>
+        )}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        onCloseAutoFocus={(e) => e.preventDefault()}
+        className="bg-zinc-900 z-50 w-80 rounded-md p-2 mt-2 mb-2 border"
+        side={side}
+        align={align}
+      >
+        {weapons
+          .entries()
+          .toArray()
+          .map(([slot, weapon]) => (
+            <DropdownMenuItem
+              key={slot}
+              // className="hover:bg-zinc-700"
+              onSelect={() => builder.send({ type: "FOCUS_WEAPON", slot })}
+            >
+              <img src={weapon?.img} className="w-6 h-6 mr-2" />
+              <span>{weapon.name}</span>
+              <DropdownMenuShortcut>{slot}</DropdownMenuShortcut>
+            </DropdownMenuItem>
+          ))}
+        <DropdownMenuItem
+          // className="hover:bg-zinc-700"
+          onSelect={() => builder.send({ type: "FOCUS_WEAPON", slot: null })}
+        >
+          <div className="flex items-center gap-4 text-red-500">
+            <XIcon className="w-6 h-6 ml-2 " />
+            Clear selected weapon
+          </div>
+          <DropdownMenuShortcut>0</DropdownMenuShortcut>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
 const HoverInfoCard = ({
   children,
   weapon,
@@ -48,7 +136,11 @@ const HoverInfoCard = ({
   return (
     <HoverCard openDelay={0} closeDelay={0}>
       <HoverCardTrigger>{children}</HoverCardTrigger>
-      <HoverCardContent className="space-y-4 w-96" side="top">
+      <HoverCardContent
+        className="space-y-4 w-96"
+        side="top"
+        onFocus={(e) => e.preventDefault()}
+      >
         <div className="flex gap-4 items-center">
           <div
             className={`relative rounded-md overflow-hidden w-10 h-10 border ${
@@ -145,7 +237,7 @@ export const WeaponSlotPlaceholder: React.FC<{
   placeholderImage?: string;
   slot: AvailableWeaponSlots;
 }> = ({ placeholderImage, slot }) => {
-  const { state, builder } = useBuilder();
+  const { state } = useBuilder();
   const weaponInSlot = state.context.weapons.get(slot);
 
   if (!weaponInSlot) {
@@ -190,6 +282,13 @@ export const WeaponForge = () => {
     matches: (value: string) => boolean;
     context: WeaponBuilderContext;
   };
+
+  const selectedEffects = useSelector(weaponSelector, (state) => {
+    if (state && "context" in state) {
+      return state.context.effects;
+    }
+    return [];
+  });
 
   return (
     <Dialog
@@ -291,11 +390,45 @@ export const WeaponForge = () => {
                   Weapon Slot {state.context.selectedWeaponSlot}
                 </h2>
               </div>
+              <div className="flex gap-4 justify-end ml-auto">
+                <Button
+                  variant={"outline"}
+                  className="border-zinc-800 text-white"
+                  onClick={() => {
+                    weaponSelector?.send({ type: "goto.pickWeapon" });
+                  }}
+                >
+                  Change Weapon
+                </Button>
+                {state.context.weapons.has(
+                  state.context.selectedWeaponSlot as AvailableWeaponSlots
+                ) && (
+                  <Button
+                    variant={"outline"}
+                    className="border-red-500 text-red-500 hover:bg-red-500/10"
+                    onClick={() => {
+                      builder.send({
+                        type: "REMOVE_WEAPON",
+                        position: state.context
+                          .selectedWeaponSlot as AvailableWeaponSlots,
+                      });
+                    }}
+                  >
+                    Clear Weapon Slot
+                  </Button>
+                )}
+              </div>
             </div>
             <div className="flex flex-col gap-4">
               <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
                 <span className="mr-2">Select Effects</span>
-                <div className="bg-yellow-500/20 text-yellow-400 text-xs px-2 py-1 rounded-full">
+                <div
+                  className={`${
+                    selectedEffects.length === 3
+                      ? "bg-green-500/20 text-green-400"
+                      : "bg-yellow-500/20 text-yellow-400"
+                  } text-xs px-2 py-1 rounded-full`}
+                >
                   Choose 3 Effects
                 </div>
               </h3>

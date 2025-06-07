@@ -8,7 +8,7 @@ import { ArmourPicker } from "@/components/vbuilds/ArmourPicker";
 import { ElixerPicker } from "./ElixirPicker";
 import { PassiveForge } from "./PassiveForge";
 import { SpellForge } from "./SpellForge";
-import { WeaponForge } from "./WeaponForge";
+import { FocusedWeapon, WeaponForge } from "./WeaponForge";
 import { BloodForge } from "./BloodForge";
 import BuilderNavBar from "../BuilderNavBar";
 import {
@@ -29,6 +29,7 @@ import {
 import { HoverCardTrigger } from "@radix-ui/react-hover-card";
 
 const BuilderPage = () => {
+  const { state } = useBuilder();
   return (
     <div className="flex-grow overflow-auto bg-gradient-to-br from-grey-950 via-grey-900 to-grey-950 relative">
       {/* Subtle grid pattern overlay */}
@@ -188,9 +189,13 @@ const BuilderPage = () => {
                   WEAPONS
                 </h3>
               </div>
-              <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs px-3 py-1.5 rounded-full font-medium  w-fit">
-                Use keys 1-8 to focus weapon stats
+              <FocusedWeapon side="top" />
+              {/* <div className="bg-green-500/10 border border-green-500/30 text-green-300 text-xs px-3 py-1.5 rounded-full font-medium  w-fit">
+                Press keys 1-8 to select a weapon
               </div>
+              <div className="bg-red-500/10 border border-red-500/30 text-red-300 text-xs px-3 py-1.5 rounded-full font-medium  w-fit">
+                Press 0 to clear selected weapon
+              </div> */}
               <div className="hidden sm:block flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
             </div>
             <div className="space-y-4">
@@ -235,7 +240,7 @@ const BuilderPage = () => {
         <div className="w-full lg:w-1/3 space-y-4 lg:space-y-6 order-first lg:order-last">
           {/* Stats Panel */}
           <div className="bg-grey-900/40  border border-grey-700/50 rounded-xl shadow-2xl overflow-hidden">
-            <div className="p-3 sm:p-4 border-b border-grey-700/50 bg-grey-800/30">
+            <div className="p-3 sm:p-4 border-b border-grey-700/50 bg-grey-800/30 flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <div className="w-1 h-5 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full" />
                 <h3 className="text-base sm:text-lg font-bold text-grey-100 tracking-wide">
@@ -243,6 +248,7 @@ const BuilderPage = () => {
                 </h3>
                 <div className="flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
               </div>
+              <FocusedWeapon align="end" />
             </div>
             <div className="overflow-auto p-3 sm:p-4 custom-scrollbar">
               <GroupedStatList stats={stats} />

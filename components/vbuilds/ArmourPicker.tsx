@@ -141,7 +141,7 @@ export const armourOptions = [
 type ArmourOption = (typeof armourOptions)[number];
 type ArmourId = ArmourOption["id"];
 
-const AmuletDescription = ({ armour }: { armour: Armour }) => {
+const ArmourDescription = ({ armour }: { armour: Armour }) => {
   return (
     <div className="space-y-4 ">
       <HoverCardTitle>{armour.name}</HoverCardTitle>
@@ -164,9 +164,9 @@ export const ArmourPicker: React.FC = () => {
   return (
     <DropdownSelect
       hoverIsVisible={state.context.armour !== null}
-      hoverDescription={<AmuletDescription armour={state.context.armour} />}
+      hoverDescription={<ArmourDescription armour={state.context.armour} />}
       hoverOptionDescription={(option: any) => (
-        <AmuletDescription armour={option} />
+        <ArmourDescription armour={option} />
       )}
       selected={state.context.armour?.id}
       clear={() => builder.send({ type: "REMOVE_ARMOUR" })}

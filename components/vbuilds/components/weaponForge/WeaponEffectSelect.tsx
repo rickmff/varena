@@ -3,8 +3,11 @@ import weaponEffectData from "@/data/vbuilds/weaponEffects.json";
 import { useBuilder } from "../../BuildProvider";
 import { useSelector } from "@xstate/react";
 import { Button } from "@/components/ui/button";
+import { AvailableWeaponSlots } from "../../WeaponForge";
 export const WeaponEffectSelect = () => {
   const { builder } = useBuilder();
+
+  const state = useSelector(builder, (state) => state);
 
   const weaponBuilder = useSelector(
     builder,
@@ -54,7 +57,11 @@ export const WeaponEffectSelect = () => {
         onClick={() => weaponBuilder?.send({ type: "ADD_WEAPON" })}
         disabled={selectedEffects.length !== 3}
       >
-        ADD WEAPON
+        {state.context.weapons.has(
+          state.context.selectedWeaponSlot as AvailableWeaponSlots
+        )
+          ? "UPDATE WEAPON SLOT"
+          : "ADD WEAPON"}
       </Button>
     </div>
   );

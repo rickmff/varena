@@ -1,4 +1,4 @@
-import { setup, assign, sendParent, sendTo } from 'xstate';
+import { setup, assign, sendParent, sendTo, log, raise } from 'xstate';
 import { toast } from 'sonner';
 
 export interface WeaponBuilderContext {
@@ -15,6 +15,9 @@ export type WeaponBuilderEvents =
     | { type: 'REMOVE_EFFECT'; effectId: string }
     | { type: 'RESET'; }
     | { type: 'ADD_WEAPON'; }
+    | { type: 'goto.pickWeapon' }
+    | { type: 'goto.pickEffect' }
+    | { type: 'CLEAR_WEAPON' }
 
 import { Weapon } from '../vbuilds/WeaponForge'; // Adjust the import path as necessary
 
@@ -25,20 +28,47 @@ export const weaponBuilderMachine = setup({
     types: {
         context: {} as WeaponBuilderContext,
         events: {} as WeaponBuilderEvents,
-        input: {} as { legendaryWeaponCount: number },
+        input: {} as { legendaryWeaponCount: number, weapon: Weapon | null },
     },
 }).createMachine({
     id: 'weaponBuilder',
-    initial: 'pickWeapon',
+    initial: 'determine',
     context: ({ input }) => ({
         legendaryWeaponCount: input.legendaryWeaponCount || 0,
-        weapon: null,
-        infusion: null,
-        effects: [],
+        weapon: input.weapon || null,
+        infusion: input.weapon?.infusion || null,
+        effects: input.weapon?.effects || [],
     }),
     states: {
-        pickWeapon: {
+        determine: {
+            entry: [
+                ({ context, self }) => {
+                    if (context.weapon?.effects?.length === 3) {
+                        self.send({ type: 'goto.pickEffect' });
+                    } else {
+                        self.send({ type: 'goto.pickWeapon' });
+                    }
+                }
+            ],
             on: {
+                'goto.pickEffect': {
+                    target: 'pickEffect'
+                },
+                'goto.pickWeapon': {
+                    target: 'pickWeapon'
+                }
+            }
+        },
+        pickWeapon: {
+            entry: [raise({ type: "CLEAR_WEAPON" })],
+            on: {
+                CLEAR_WEAPON: {
+                    actions: assign({
+                        weapon: null,
+                        infusion: null,
+                        effects: [],
+                    })
+                },
                 PICK_WEAPON: [
                     {
                         guard: ({ context, event }) => {
@@ -77,6 +107,7 @@ export const weaponBuilderMachine = setup({
         },
         pickEffect: {
             on: {
+                'goto.pickWeapon': { target: 'pickWeapon' },
                 ADD_EFFECT: {
                     guard: ({ context }) => context.effects.length < 3,
                     actions: assign({
