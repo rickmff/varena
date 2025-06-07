@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Terminal, Swords, CalendarClock, ShieldCheck } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import SectionHeader from "./SectionHeader";
 
 // Define the props for the FeatureCarousel component
 interface Feature {
@@ -46,21 +47,29 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
   const [isHoveringCard, setIsHoveringCard] = useState(false);
   // currentBgIndex stores the index of the feature image currently visible/active.
   const [currentBgIndex, setCurrentBgIndex] = useState(0);
-  const [activeBgLayer, setActiveBgLayer] = useState<'bg-image-1' | 'bg-image-2'>('bg-image-1');
+  const [activeBgLayer, setActiveBgLayer] = useState<
+    "bg-image-1" | "bg-image-2"
+  >("bg-image-1");
 
   useEffect(() => {
     // Get DOM elements once after mount
-    bg1Ref.current = document.getElementById('bg-image-1') as HTMLDivElement;
-    bg2Ref.current = document.getElementById('bg-image-2') as HTMLDivElement;
+    bg1Ref.current = document.getElementById("bg-image-1") as HTMLDivElement;
+    bg2Ref.current = document.getElementById("bg-image-2") as HTMLDivElement;
   }, []);
 
   // Effect for preloading images and setting initial background state
   useEffect(() => {
-    if (!features || features.length === 0 || !bg1Ref.current || !bg2Ref.current) return;
+    if (
+      !features ||
+      features.length === 0 ||
+      !bg1Ref.current ||
+      !bg2Ref.current
+    )
+      return;
 
     // Preload all images
-    features.forEach(feature => {
-      const img = new (globalThis.Image)();
+    features.forEach((feature) => {
+      const img = new globalThis.Image();
       img.src = feature.image;
     });
 
@@ -68,8 +77,8 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
     const bg2 = bg2Ref.current;
 
     bg1.style.backgroundImage = `url(${features[0].image})`;
-    bg1.style.opacity = '1';
-    bg2.style.opacity = '0';
+    bg1.style.opacity = "1";
+    bg2.style.opacity = "0";
 
     if (features.length > 1) {
       bg2.style.backgroundImage = `url(${features[1].image})`;
@@ -78,14 +87,19 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
       bg2.style.backgroundImage = `url(${features[0].image})`;
     }
 
-    setActiveBgLayer('bg-image-1');
+    setActiveBgLayer("bg-image-1");
     setCurrentBgIndex(0); // features[0] is now active
-
   }, [features]); // Rerun only if features array changes
 
   // Effect for Intersection Observer and Interval Logic for carousel
   useEffect(() => {
-    if (!features || features.length <= 1 || !carouselRef.current || !bg1Ref.current || !bg2Ref.current) {
+    if (
+      !features ||
+      features.length <= 1 ||
+      !carouselRef.current ||
+      !bg1Ref.current ||
+      !bg2Ref.current
+    ) {
       return; // No carousel for 0 or 1 image, or if refs aren't set
     }
 
@@ -98,14 +112,18 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
         if (!isHoveringCard) {
           const nextImageIndex = (currentBgIndex + 1) % features.length;
 
-          const currentActiveDOMElement = activeBgLayer === 'bg-image-1' ? bg1 : bg2;
-          const currentInactiveDOMElement = activeBgLayer === 'bg-image-1' ? bg2 : bg1;
+          const currentActiveDOMElement =
+            activeBgLayer === "bg-image-1" ? bg1 : bg2;
+          const currentInactiveDOMElement =
+            activeBgLayer === "bg-image-1" ? bg2 : bg1;
 
           currentInactiveDOMElement.style.backgroundImage = `url(${features[nextImageIndex].image})`;
-          currentActiveDOMElement.style.opacity = '0';
-          currentInactiveDOMElement.style.opacity = '1';
+          currentActiveDOMElement.style.opacity = "0";
+          currentInactiveDOMElement.style.opacity = "1";
 
-          setActiveBgLayer(activeBgLayer === 'bg-image-1' ? 'bg-image-2' : 'bg-image-1');
+          setActiveBgLayer(
+            activeBgLayer === "bg-image-1" ? "bg-image-2" : "bg-image-1"
+          );
           setCurrentBgIndex(nextImageIndex);
         }
       }, 5000);
@@ -139,17 +157,21 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
     const bg1 = bg1Ref.current;
     const bg2 = bg2Ref.current;
 
-    const currentActiveDOMElement = activeBgLayer === 'bg-image-1' ? bg1 : bg2;
-    const currentInactiveDOMElement = activeBgLayer === 'bg-image-1' ? bg2 : bg1;
+    const currentActiveDOMElement = activeBgLayer === "bg-image-1" ? bg1 : bg2;
+    const currentInactiveDOMElement =
+      activeBgLayer === "bg-image-1" ? bg2 : bg1;
 
     currentInactiveDOMElement.style.backgroundImage = `url(${featureImage})`;
-    currentActiveDOMElement.style.opacity = '0';
-    currentInactiveDOMElement.style.opacity = '1';
+    currentActiveDOMElement.style.opacity = "0";
+    currentInactiveDOMElement.style.opacity = "1";
 
-    const newActiveLayerId = activeBgLayer === 'bg-image-1' ? 'bg-image-2' : 'bg-image-1';
+    const newActiveLayerId =
+      activeBgLayer === "bg-image-1" ? "bg-image-2" : "bg-image-1";
     setActiveBgLayer(newActiveLayerId);
 
-    const hoveredImageIndex = features.findIndex(f => f.image === featureImage);
+    const hoveredImageIndex = features.findIndex(
+      (f) => f.image === featureImage
+    );
     if (hoveredImageIndex !== -1) {
       setCurrentBgIndex(hoveredImageIndex);
     }
@@ -160,34 +182,31 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
   };
 
   return (
-    <section id="features" className="py-60 bg-black relative" ref={carouselRef}>
+    <section
+      id="features"
+      className="py-60 bg-black relative"
+      ref={carouselRef}
+    >
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/50 to-black z-10"></div>
 
       {/* Background carousel container */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <div id="bg-image-1" className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out opacity-0"></div>
-        <div id="bg-image-2" className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out opacity-0"></div>
+        <div
+          id="bg-image-1"
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out opacity-0"
+        ></div>
+        <div
+          id="bg-image-2"
+          className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out opacity-0"
+        ></div>
       </div>
 
       <div className="container mx-auto px-4 relative z-20">
-        <motion.div
-          className="text-center mb-16"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUp}
-        >
-          <div className="mb-8">
-            <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2 font-['Junge'] ">
-              VARENA FEATURES
-              <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
-            </span>
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">UNLEASH YOUR POTENTIAL</h2>
-          <p className="text-gray-100 max-w-2xl mx-auto">
-            Discover the unique features of V Arena
-          </p>
-        </motion.div>
+        <SectionHeader
+          title="V Arena Features"
+          subtitle="Unleash Your Potential"
+          description="Discover the unique features of V Arena that enhance your gaming experience."
+        />
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative"
           variants={staggerContainer}
@@ -203,7 +222,7 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
               whileHover={{
                 y: -5,
                 boxShadow: "0 10px 25px -5px rgba(139, 0, 0, 0.5)",
-                transition: { duration: 0.3 }
+                transition: { duration: 0.3 },
               }}
               onMouseEnter={() => handleCardMouseEnter(feature.image)}
               onMouseLeave={handleCardMouseLeave}
@@ -216,11 +235,19 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
                     className="mb-6 relative"
                     animate={{
                       y: [0, 5, 0],
-                      opacity: [0.8, 1, 0.8]
+                      opacity: [0.8, 1, 0.8],
                     }}
                     transition={{
-                      y: { duration: 2, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" },
-                      opacity: { duration: 2, repeat: Number.POSITIVE_INFINITY, repeatType: "reverse" }
+                      y: {
+                        duration: 2,
+                        repeat: Number.POSITIVE_INFINITY,
+                        repeatType: "reverse",
+                      },
+                      opacity: {
+                        duration: 2,
+                        repeat: Number.POSITIVE_INFINITY,
+                        repeatType: "reverse",
+                      },
                     }}
                   >
                     <div className="w-20 h-20 mx-auto mb-4 relative">
@@ -244,9 +271,7 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
                 </div>
 
                 {/* Description - Remove whileHover animation */}
-                <div
-                  className="w-full h-full absolute inset-0 flex items-center justify-center text-center px-6 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300"
-                >
+                <div className="w-full h-full absolute inset-0 flex items-center justify-center text-center px-6 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300">
                   <div className="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
                   <div className="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>
                   <div className="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-300"></div>

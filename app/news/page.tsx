@@ -1,13 +1,23 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { formatDistanceToNow } from 'date-fns';
-import { ChevronRight, Terminal, Castle, Moon, Users, Swords, ShieldCheck, CalendarClock } from 'lucide-react';
-import NavBar from '@/components/NavBar';
-import { NewsCardSkeletonGrid } from '@/components/NewsCardSkeleton';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { formatDistanceToNow } from "date-fns";
+import {
+  ChevronRight,
+  Terminal,
+  Castle,
+  Moon,
+  Users,
+  Swords,
+  ShieldCheck,
+  CalendarClock,
+} from "lucide-react";
+import NavBar from "@/components/NavBar";
+import { NewsCardSkeletonGrid } from "@/components/NewsCardSkeleton";
+import SectionHeader from "@/app/components/ui/SectionHeader";
 
 // Icon mapping
 const iconMap: { [key: string]: React.ElementType } = {
@@ -40,7 +50,7 @@ export default function NewsPage() {
     const fetchNews = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/news');
+        const response = await fetch("/api/news");
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -55,7 +65,9 @@ export default function NewsPage() {
         setNewsItems(data as NewsItem[]);
       } catch (error) {
         console.error("Failed to fetch news:", error);
-        setError(error instanceof Error ? error.message : 'Failed to fetch news');
+        setError(
+          error instanceof Error ? error.message : "Failed to fetch news"
+        );
       } finally {
         setLoading(false);
       }
@@ -110,26 +122,11 @@ export default function NewsPage() {
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            className="text-center mb-16"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-          >
-            <div className="mb-8">
-              <span className="text-red-500 text-sm font-medium tracking-widest uppercase relative inline-block pb-2 font-['Junge'] ">
-                NEWS & UPDATES
-                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
-              </span>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white uppercase tracking-wider">
-              Chronicles of V Rising
-            </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Stay informed about the latest updates, events, and community highlights
-            </p>
-          </motion.div>
+          <SectionHeader
+            title="News & Updates"
+            subtitle="📰 Chronicles of V Rising"
+            description="Stay informed about the latest updates, events, and community highlights from the V Arena"
+          />
         </div>
       </section>
 
@@ -175,7 +172,7 @@ export default function NewsPage() {
                     whileHover={{
                       y: -10,
                       scale: 1.02,
-                      transition: { duration: 0.2 }
+                      transition: { duration: 0.2 },
                     }}
                   >
                     <Link
@@ -197,8 +194,8 @@ export default function NewsPage() {
                           className="object-cover transition-transform duration-500 group-hover:scale-110 filter brightness-60"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            if (target.src !== '/news.png') {
-                              target.src = '/news.png';
+                            if (target.src !== "/news.png") {
+                              target.src = "/news.png";
                             }
                           }}
                         />
@@ -211,7 +208,9 @@ export default function NewsPage() {
                             whileHover={{ scale: 1.05 }}
                           >
                             <div className="flex items-center gap-2">
-                              {IconComponent && <IconComponent className="w-3 h-3" />}
+                              {IconComponent && (
+                                <IconComponent className="w-3 h-3" />
+                              )}
                               {news.category}
                             </div>
                           </motion.div>
@@ -225,7 +224,9 @@ export default function NewsPage() {
                         <h3 className="text-xl font-bold mb-3 group-hover:text-red-400 transition-colors">
                           {news.title}
                         </h3>
-                        <p className="text-gray-300 line-clamp-3">{news.excerpt}</p>
+                        <p className="text-gray-300 line-clamp-3">
+                          {news.excerpt}
+                        </p>
 
                         {/* Read More Button */}
                         <motion.div
@@ -257,12 +258,17 @@ export default function NewsPage() {
                   No News Yet
                 </h2>
                 <p className="text-gray-400 mb-6">
-                  Check back soon for new content, or make sure your Notion page ID is configured correctly.
+                  Check back soon for new content, or make sure your Notion page
+                  ID is configured correctly.
                 </p>
                 <div className="bg-yellow-900/20 border border-yellow-700/50 rounded-lg p-4 max-w-md mx-auto">
                   <p className="text-sm text-yellow-300">
-                    <strong>Setup tip:</strong> Add <code className="bg-black/50 px-1 rounded">NOTION_NEWS_PAGE_ID</code> to your .env file
-                    with the ID of your Notion page containing news posts.
+                    <strong>Setup tip:</strong> Add{" "}
+                    <code className="bg-black/50 px-1 rounded">
+                      NOTION_NEWS_PAGE_ID
+                    </code>{" "}
+                    to your .env file with the ID of your Notion page containing
+                    news posts.
                   </p>
                 </div>
               </div>

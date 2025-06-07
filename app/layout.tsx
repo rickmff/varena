@@ -3,9 +3,14 @@ import "@/app/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import type { Metadata, Viewport } from "next"
 import { Toaster } from 'sonner'
-import { Inter } from 'next/font/google'
+import { Inter, Junge } from 'next/font/google'
 
 const inter = Inter({ subsets: ['latin'] })
+const junge = Junge({ 
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-junge'
+})
 
 // Separate viewport configuration
 export const viewport: Viewport = {
@@ -116,7 +121,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Junge&display=swap" rel="stylesheet"></link>
         <link rel="manifest" href="/site.webmanifest" />
       </head>
-      <body className={inter.className}>
+      <body
+        className={`${inter.className} ${junge.variable} antialiased tracking-tight`}
+      >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>

@@ -22,6 +22,10 @@ const config = {
     extend: {
       fontFamily: {
         sans: ['"KoPub Batang"', ...defaultTheme.fontFamily.sans],
+        junge: ['var(--font-junge)', ...defaultTheme.fontFamily.serif],
+      },
+      letterSpacing: {
+        tight: "-0.06em",
       },
       colors: {
         border: "hsl(var(--border))",
