@@ -13,7 +13,6 @@ export function StatList({ stats }: { stats: Array<any> }) {
           : 100;
 
         const overCap = stat.cap && totalValue > stat.cap;
-        console.log(progressWidth);
 
         return (
           <li

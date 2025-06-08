@@ -291,9 +291,12 @@ export default function BuildsList({
             className="mb-4 ml-auto text-white group border-red-900/70  bg-red-900/50 hover:bg-red-800 transition-colors uppercase"
             variant={"outline"}
             size="lg"
+            asChild
           >
-            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
-            <Link href="/builds/create">Create A New Build</Link>
+            <Link href="/builds/create">
+              <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+              Create A New Build
+            </Link>
           </Button>
         </motion.div>
       )}
