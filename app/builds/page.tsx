@@ -34,7 +34,7 @@ export default function Builds() {
         <div className="container mx-auto px-4 relative z-10">
           <SectionHeader
             title="Build Collection"
-            subtitle="⚔️ Your Builds"
+            subtitle="Your Builds"
             // description="Manage your saved builds, create new combinations"
           />
         </div>

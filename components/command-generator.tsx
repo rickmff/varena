@@ -53,7 +53,7 @@ export default function CommandGenerator() {
       viewport={{ once: true }}
     >
 
-      <div className="relative flex justify-center gap-8">
+      <div className="relative flex justify-center mx-auto">
         {[
           { name: "Artifact", icon: <Sword className="w-5 h-5" /> },
           { name: "Legendary", icon: <Swords className="w-5 h-5" /> },
@@ -62,7 +62,7 @@ export default function CommandGenerator() {
         ].map((tab, index) => (
           <div
             key={tab.name}
-            className={`relative px-6 py-3 rounded-md text-lg font-medium tracking-wider transition-all duration-300 cursor-pointer ${activeTab === index
+            className={`uppercase relative flex-1 px-6 py-3 rounded-md text-lg font-medium tracking-wider transition-all duration-300 cursor-pointer ${activeTab === index
               ? `text-white`
               : "text-gray-400 hover:text-white"
               }`}
@@ -103,13 +103,13 @@ export default function CommandGenerator() {
                 />
               </>
             )}
-            <span className="relative z-10 flex items-center gap-2 font-light">
+            <span className="relative z-10 flex items-center justify-center gap-2 font-light font-junge">
               {tab.icon} {tab.name}
             </span>
           </div>
         ))}
       </div>
-      <div className={`max-w-4xl mx-auto rounded-lg border border-purple-900/30 p-6 min-h-[600px] backdrop-blur-sm shadow-lg transition-all duration-500 ${computedBG}`}>
+      <div className={`mx-auto rounded-lg border border-purple-900/30 p-6 min-h-[600px] backdrop-blur-sm shadow-lg transition-all duration-500 ${computedBG}`}>
 
         <motion.div
           className="space-y-6"

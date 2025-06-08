@@ -67,15 +67,24 @@ export default function Home() {
   const [isLoadingNews, setIsLoadingNews] = useState(true); // Add loading state
   const [newsError, setNewsError] = useState<string | null>(null); // Add error state
   const [hasBuilds, setHasBuilds] = useState(false); // State for whether user has builds
+  const [hasScrolledToSection, setHasScrolledToSection] = useState(false); // Track if we've already scrolled to section
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY);
+      const currentScrollY = window.scrollY;
+      setScrollY(currentScrollY);
+      
+      // Auto-scroll to features section on first scroll
+      if (currentScrollY > 10 && !hasScrolledToSection) {
+        setHasScrolledToSection(true);
+        const featuresSection = document.getElementById('features');
+        featuresSection?.scrollIntoView({ behavior: 'smooth' });
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [hasScrolledToSection]);
 
   const fetchNewsFromAPI = async (retryCount = 0) => {
     const maxRetries = 2;
@@ -255,92 +264,115 @@ export default function Home() {
     <div className="min-h-screen bg-black text-white overflow-hidden">
       <NavBar />
       {/* Hero Section */}
-      <section className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-black to-black">
         <div className="absolute inset-0 z-0">
           <BloodParticles />
         </div>
-        <div className="absolute inset-0 z-0 opacity-20">
-          <Image
-            src="/hero-bg.png"
-            alt="V Rising Background"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black"></div>
+        
+        {/* YouTube Video Background */}
+        <div className="absolute inset-0 z-1 opacity-20">
+          <iframe
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              width: '100vw',
+              height: '56.25vw', // 16:9 aspect ratio
+              minHeight: '100vh',
+              minWidth: '177.78vh', // 16:9 aspect ratio
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)'
+            }}
+            src="https://www.youtube.com/embed/pxQvrcn6Z6Y?autoplay=1&mute=1&loop=1&playlist=pxQvrcn6Z6Y&controls=0&showinfo=0&rel=0&modestbranding=1"
+            title="Arena Background"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          ></iframe>
         </div>
+        
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 z-2 bg-gradient-to-b from-black/80 via-black/30 to-black"></div>
+
+        {/* Animated background elements */}
+        <div className="absolute inset-0 z-3">
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/8 rounded-full blur-3xl animate-pulse delay-1000" />
+        </div>
+
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            className="max-w-3xl mx-auto text-center mb-12 flex flex-col items-center"
+            className="max-w-4xl mx-auto text-center space-y-8"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeInUp}
           >
-            <Image
-              src="/varena-logo.png"
-              alt="Varena Logo"
-              className="mr-10"
-              width={550}
-              height={379}
-            />
+            {/* Logo with enhanced styling */}
             <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center mt-12"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative"
             >
-              <motion.div
-                variants={fadeIn}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <DiscordButton size="lg" />
-              </motion.div>
-              <motion.div
-                variants={fadeIn}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="hidden md:flex text-xs font-bold  border-white/70 text-white hover:bg-zinc-900/70 bg-black transition-all duration-300"
-                >
-                  <Link
-                    href="/#commands"
-                    className="flex items-center justify-center gap-2 relative"
-                  >
-                    <span className="relative z-10">Get Started</span>
-                    <Play className="h-4 w-4 relative z-10" />
-                  </Link>
-                </Button>
-              </motion.div>
+              <div className="absolute inset-0 blur-2xl opacity-30">
+                <Image
+                  src="/varena-logo.png"
+                  alt="Varena Logo Glow"
+                  width={650}
+                  height={450}
+                  className="mx-auto"
+                />
+              </div>
+              <Image
+                src="/varena-logo.png"
+                alt="Varena Logo"
+                width={650}
+                height={450}
+                className="mx-auto relative z-10 hover:scale-105 transition-transform duration-300"
+              />
             </motion.div>
           </motion.div>
-          <motion.div
-            className="relative mx-auto max-w-5xl aspect-video rounded-lg overflow-hidden shadow-2xl shadow-purple-900/50"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            <div className="relative aspect-video">
-              <iframe
-                src="https://www.youtube.com/embed/pxQvrcn6Z6Y"
-                title="V Rising Gameplay"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full"
-              />
-            </div>
-          </motion.div>
         </div>
+
+        {/* Animated scroll indicator - positioned relative to hero section */}
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.0 }}
+          onClick={() => {
+            const featuresSection = document.getElementById('features');
+            featuresSection?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="absolute bottom-16 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center group transition-all duration-300 hover:scale-110 overflow-hidden z-20"
+        >
+          {/* Animated border */}
+          <motion.div
+            animate={{ 
+              scale: [1, 1.2, 1],
+              y: [3, 0, 3]
+            }}
+            transition={{ 
+              duration: 1.5, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+            className="absolute inset-0 border-2 border-white/30 group-hover:border-white/60 rounded-full transition-colors duration-300"
+          />
+          
+          {/* Animated caret */}
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="text-white/60 group-hover:text-white transition-colors relative z-10"
+          >
+            <ChevronRight className="h-6 w-6 rotate-90" />
+          </motion.div>
+        </motion.button>
       </section>
 
       {/* Features Section - Now uses the FeatureCarousel component */}
-      <FeatureCarousel features={featuresData} />
+      <section id="features">
+        <FeatureCarousel features={featuresData} />
+      </section>
 
       {/* Command Generator Section */}
       <section id="commands" className="py-20 bg-black relative">
@@ -359,8 +391,8 @@ export default function Home() {
         <div className="container mx-auto px-4 relative">
           <SectionHeader
             title="Build Collection"
-            subtitle="Your Builds"
-            description="Manage your saved builds and create new combinations"
+            subtitle="Build Library"
+            description="Access starter templates and manage your custom builds"
           />
           <motion.div
             initial="hidden"
@@ -634,7 +666,7 @@ export default function Home() {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="text-white bg-[#5865F2] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 relative overflow-hidden group px-8 w-full py-8 gap-4"
+                      className="text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 relative overflow-hidden group px-8 w-full py-8 gap-4"
                     >
                       <Link
                         href="https://discord.gg/varena"

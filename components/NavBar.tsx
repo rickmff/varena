@@ -8,6 +8,7 @@ import { Button, type ButtonProps } from "@/components/ui/button";
 import GameMenu from "./game-menu";
 
 export const menuItems = [
+  { name: "HOME", href: "/" },
   { name: "FEATURES", href: "/#features" },
   { name: "COMMANDS", href: "/#commands" },
   { name: "BUILDS", href: "/builds" },
@@ -16,29 +17,76 @@ export const menuItems = [
 
 export const DiscordButton = ({
   size = "sm",
+  className,
 }: {
   size?: ButtonProps["size"];
+  className?: string;
 }) => (
-  <Button
-    variant="outline"
-    size={size}
-    className="hidden md:flex text-xs font-bold text-white bg-[#5865F2] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300"
+  <motion.div
+    animate={{ 
+      scale: [1, 1.08, 1]
+    }}
+    transition={{
+      duration: 1.0,
+      repeat: Infinity,
+      repeatDelay: 2.5,
+      ease: [0.68, -0.55, 0.265, 1.55], // Bounce easing
+    }}
   >
-    <Link
-      href="https://discord.gg/varena"
-      target="_blank"
-      className="flex items-center justify-center gap-2"
+    <Button
+      variant="outline"
+      size={size}
+      className={`hidden md:flex text-xs font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 relative overflow-hidden ${className || ""}`}
     >
-      <Image
-        src="/discord.svg"
-        alt="Discord Logo"
-        width={20}
-        height={20}
-        className="h-5 w-5"
-      />
-      <span className="pt-1">JOIN US</span>
-    </Link>
-  </Button>
+      <div className="flex items-center justify-center gap-2 relative z-10">
+        <Link
+          href="https://discord.gg/varena"
+          target="_blank"
+          className="flex items-center justify-center gap-2"
+        >
+          <Image
+            src="/discord.svg"
+            alt="Discord Logo"
+            width={20}
+            height={20}
+            className="h-5 w-5"
+          />
+          <span className="pt-0">JOIN US</span>
+        </Link>
+      </div>
+      
+      {/* Diagonal flash effect */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        initial={{ x: "100%" }}
+        animate={{ x: "-100%" }}
+        transition={{
+          duration: 0.4,
+          repeat: Infinity,
+          repeatDelay: 2.5,
+          ease: [0.76, 0, 0.24, 1],
+        }}
+      >
+        <div className="absolute inset-0 w-8 h-full bg-gradient-to-r from-transparent via-white/25 to-transparent transform rotate-45 translate-x-4 -translate-y-2" />
+      </motion.div>
+      
+      {/* Second diagonal flash following behind */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        initial={{ x: "100%" }}
+        animate={{ x: "-100%" }}
+        transition={{
+          duration: 0.6,
+          repeat: Infinity,
+          repeatDelay: 2.2,
+          ease: [0.87, 0, 0.13, 1],
+          delay: 0.2,
+        }}
+      >
+        <div className="absolute inset-0 w-6 h-full bg-gradient-to-r from-transparent via-blue-200/15 to-transparent transform rotate-45 translate-x-2 -translate-y-1" />
+      </motion.div>
+    </Button>
+  </motion.div>
 );
 
 export default function NavBar() {
