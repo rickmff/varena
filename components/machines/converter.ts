@@ -136,6 +136,7 @@ const importWeapons = (chars: string) => {
                 position: slot as AvailableWeaponSlots,
                 infusion: hasInfusion && infusion ? infusion.id : undefined,
                 effects: effects,
+                uuid: crypto.randomUUID(),
             });
         }
     }

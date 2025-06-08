@@ -2,7 +2,7 @@ import bloodData from '@/data/vbuilds/bloodtypes.json';
 import hotkeys from 'hotkeys-js';
 import { toast } from 'sonner';
 import { assertEvent, assign, enqueueActions, fromCallback, log, raise, setup, spawnChild, stopChild } from 'xstate';
-import { Coating } from '../vbuilds/CoatingPicker';
+import { Coating, hasAdvancedCoatings } from '../vbuilds/CoatingPicker';
 import { AvailableWeaponSlots, Weapon } from '../vbuilds/WeaponForge';
 import { StatName } from './calculator';
 import { weaponBuilderMachine } from './weaponBuilder';
@@ -61,6 +61,7 @@ type BuildEvents =
     | { type: 'REMOVE_PASSIVE'; id: string }
     | { type: 'ADD_WEAPON'; weapon: Weapon }
     | { type: 'REMOVE_WEAPON'; position: AvailableWeaponSlots }
+    | { type: 'MOVE_WEAPON'; order: any[] }
     | { type: 'ADD_SPELL'; spell: any, slot: "dash" | "ultimate" | "spell1" | "spell2", jewel?: number[] }
     | { type: 'REMOVE_SPELL'; id: string }
     | { type: 'LEGENDARY_LIMIT_REACHED' }
@@ -298,6 +299,44 @@ export const builder = setup({
                 },
                 UNFOCUS_WEAPON: {
                     actions: assign({ focusedWeapon: () => null })
+                },
+
+                MOVE_WEAPON: {
+                    actions: assign({
+                        weapons: ({ context, event }) => {
+                            const updatedWeapons = new Map();
+
+                            event.order.forEach(({ id }, index) => {
+                                context.weapons.forEach((weapon) => {
+                                    if (weapon.uuid === id) {
+                                        updatedWeapons.set(index + 1 as AvailableWeaponSlots, { ...weapon, position: index + 1 as AvailableWeaponSlots });
+                                    }
+                                })
+                            })
+
+                            return updatedWeapons;
+                        },
+                        coatings: ({ context, event }) => {
+                            if (context.advancedCoatings == false) return context.coatings;
+                            const updatedCoatings = new Map();
+
+                            event.order.forEach(({ id }, index) => {
+                                context.weapons.forEach((weapon,) => {
+
+                                    if (weapon.uuid === id && context.coatings.has(weapon.position)) {
+                                        updatedCoatings.set(index + 1 as AvailableWeaponSlots, { ...context.coatings.get(weapon.position) });
+                                    }
+                                })
+                            })
+
+                            console.log("Updated coatings:", updatedCoatings);
+
+                            return updatedCoatings
+                        },
+                        focusedWeapon: ({ context, event }) => {
+                            return event.to + 1 as AvailableWeaponSlots;
+                        }
+                    })
                 }
 
             }
@@ -370,7 +409,7 @@ export const builder = setup({
                                 }
 
                                 const updatedWeapons = new Map(context.weapons);
-                                updatedWeapons.set(context.selectedWeaponSlot, event.weapon);
+                                updatedWeapons.set(context.selectedWeaponSlot, { ...event.weapon, uuid: crypto.randomUUID(), });
 
                                 return updatedWeapons;
                             },
