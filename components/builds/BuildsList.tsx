@@ -444,6 +444,7 @@ const premadeBuilds = [
     name: "CASTER",
     background: "/images/templates/caster.png",
     code: "722222222bcg9af3456g2456413656o6479n218700000000000000000000000000000033333961",
+    baseBorder: "border-purple-500/30",
     hoverBorder: "hover:border-purple-500",
     hoverGlow: "from-purple-900/20",
   },
@@ -451,6 +452,7 @@ const premadeBuilds = [
     name: "ASSASSIN",
     background: "/images/templates/assassin.png",
     code: "622222222bc4n12136734563223565103E8n218700000000000000000000000000000054444751",
+    baseBorder: "border-orange-500/30",
     hoverBorder: "hover:border-orange-500",
     hoverGlow: "from-orange-900/20",
   },
@@ -458,6 +460,7 @@ const premadeBuilds = [
     name: "BRAWLER",
     background: "/images/templates/brawler.png",
     code: "822222222bc1k42136734563223565103E8n218700000000000000000000000000000052222751",
+    baseBorder: "border-red-500/30",
     hoverBorder: "hover:border-red-500",
     hoverGlow: "from-red-900/20",
   },
@@ -465,6 +468,7 @@ const premadeBuilds = [
     name: "HYBRID",
     background: "/images/templates/hybrid.png",
     code: "600000000kcb4na1258345636234551038En217800000000000000000000000000000052222251",
+    baseBorder: "border-green-500/30",
     hoverBorder: "hover:border-green-500",
     hoverGlow: "from-green-900/20",
   },
@@ -703,7 +707,7 @@ export default function BuildsList({
                   )}`}
                 >
                   <div
-                    className={`relative aspect-video rounded-lg overflow-hidden border-2 border-red-900/30 ${build.hoverBorder} transition-all duration-300`}
+                    className={`relative aspect-video rounded-lg overflow-hidden border-2 ${build.baseBorder} ${build.hoverBorder} transition-all duration-300`}
                   >
                     {/* Background Image */}
                     <Image
