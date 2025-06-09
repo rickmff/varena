@@ -325,7 +325,7 @@ export default function Home() {
                 }}
               >
                 <Image
-                  src="/varena-logo.png"
+                  src="/varena-logo.svg"
                   alt="Varena Logo Glow"
                   width={650}
                   height={450}
@@ -333,7 +333,7 @@ export default function Home() {
                 />
               </motion.div>
               <Image
-                src="/varena-logo.png"
+                src="/varena-logo.svg"
                 alt="Varena Logo"
                 width={650}
                 height={450}
@@ -737,7 +737,7 @@ export default function Home() {
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
                   <Image
-                    src="/varena-logo.png"
+                    src="/varena-logo.svg"
                     alt="Varena Logo"
                     width={200}
                     height={200}
