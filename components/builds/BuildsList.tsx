@@ -160,7 +160,9 @@ const BuildContent = ({
   return (
     <Card
       className={`bg-black/80 backdrop-blur-sm rounded-lg border-2
-                         transition-all duration-300 overflow-hidden group cursor-pointer h-full relative build-spellSchool-${school}`}
+                         transition-all duration-300 overflow-hidden group cursor-pointer h-full relative build-spellSchool build-spellSchool-${
+                           school || "empty"
+                         }`}
     >
       {/* Glow effect on hover */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

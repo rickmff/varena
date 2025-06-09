@@ -1,38 +1,43 @@
+.build-spellSchool {
+    background-position: center;
+    background-size: cover;
+}
+
+.build-spellSchool-empty {
+    border-color: rgba(38, 31, 107, 0.3);
+    background-image: url('/images/background/Passives.png');    
+}
+
 .build-spellSchool-chaos {
     border-color: rgba(222, 91, 251, 0.3);
     background-image: url('/images/background/Chaos.png');
-    background-position: center;
+
     
 }
 
 .build-spellSchool-blood {
     border-color: rgba(196, 33, 66, 0.3);
     background-image: url('/images/background/Blood.png');
-    background-position: center;
 }
 
 .build-spellSchool-frost {
     border-color: rgba(0, 159, 249, 0.3);
     background-image: url('/images/background/Frost.png');
-    background-position: center;
 }
 
 .build-spellSchool-illusion {
     border-color: rgba(57, 223, 185, 0.3);
     background-image: url('/images/background/Illusion.png');
-    background-position: center;
 }
 
 .build-spellSchool-storm {
     border-color: rgba(253, 255, 93, 0.3);
     background-image: url('/images/background/Storm.png');
-    background-position: center;
 }
 
 .build-spellSchool-unholy {
     border-color: rgba(73, 179, 18, 0.3);
     background-image: url('/images/background/Unholy.png');
-    background-position: center;
 }
 
 .spellSchool-chaos {
