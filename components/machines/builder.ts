@@ -61,7 +61,7 @@ type BuildEvents =
     | { type: 'REMOVE_PASSIVE'; id: string }
     | { type: 'ADD_WEAPON'; weapon: Weapon }
     | { type: 'REMOVE_WEAPON'; position: AvailableWeaponSlots }
-    | { type: 'MOVE_WEAPON'; order: any[] }
+    | { type: 'MOVE_WEAPON'; order: any[], to: AvailableWeaponSlots }
     | { type: 'ADD_SPELL'; spell: any, slot: "dash" | "ultimate" | "spell1" | "spell2", jewel?: number[] }
     | { type: 'REMOVE_SPELL'; id: string }
     | { type: 'LEGENDARY_LIMIT_REACHED' }
@@ -334,7 +334,7 @@ export const builder = setup({
                             return updatedCoatings
                         },
                         focusedWeapon: ({ context, event }) => {
-                            return event.to + 1 as AvailableWeaponSlots;
+                            return event.to as AvailableWeaponSlots;
                         }
                     })
                 }

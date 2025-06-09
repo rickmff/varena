@@ -337,7 +337,7 @@ export const WeaponForge = () => {
       builder.send({
         type: "MOVE_WEAPON",
         order: newOrder,
-        to: newIndex,
+        to: (newIndex + 1) as AvailableWeaponSlots,
       });
     }
   }

@@ -73,12 +73,12 @@ export default function Home() {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setScrollY(currentScrollY);
-      
+
       // Auto-scroll to features section on first scroll
       if (currentScrollY > 10 && !hasScrolledToSection) {
         setHasScrolledToSection(true);
-        const featuresSection = document.getElementById('features');
-        featuresSection?.scrollIntoView({ behavior: 'smooth' });
+        const featuresSection = document.getElementById("features");
+        featuresSection?.scrollIntoView({ behavior: "smooth" });
       }
     };
 
@@ -268,19 +268,19 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           <BloodParticles />
         </div>
-        
+
         {/* YouTube Video Background */}
         <div className="absolute inset-0 z-1 opacity-20">
           <iframe
             className="absolute inset-0 w-full h-full object-cover"
             style={{
-              width: '100vw',
-              height: '56.25vw', // 16:9 aspect ratio
-              minHeight: '100vh',
-              minWidth: '177.78vh', // 16:9 aspect ratio
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)'
+              width: "100vw",
+              height: "56.25vw", // 16:9 aspect ratio
+              minHeight: "100vh",
+              minWidth: "177.78vh", // 16:9 aspect ratio
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
             }}
             src="https://www.youtube.com/embed/pxQvrcn6Z6Y?autoplay=1&mute=1&loop=1&playlist=pxQvrcn6Z6Y&controls=0&showinfo=0&rel=0&modestbranding=1"
             title="Arena Background"
@@ -289,7 +289,7 @@ export default function Home() {
             allowFullScreen
           ></iframe>
         </div>
-        
+
         {/* Gradient overlays */}
         <div className="absolute inset-0 z-2 bg-gradient-to-b from-black/80 via-black/30 to-black"></div>
 
@@ -313,15 +313,15 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative"
             >
-              <motion.div 
+              <motion.div
                 className="absolute inset-0 blur-2xl opacity-30"
-                animate={{ 
-                  opacity: [0.0, 0.4, 0.0]
+                animate={{
+                  opacity: [0.0, 0.4, 0.0],
                 }}
-                transition={{ 
-                  duration: 3, 
-                  repeat: Infinity, 
-                  ease: "easeOutBack" 
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  // ease: "easeOutBack"
                 }}
               >
                 <Image
@@ -349,25 +349,25 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
           onClick={() => {
-            const featuresSection = document.getElementById('features');
-            featuresSection?.scrollIntoView({ behavior: 'smooth' });
+            const featuresSection = document.getElementById("features");
+            featuresSection?.scrollIntoView({ behavior: "smooth" });
           }}
           className="absolute bottom-16 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center group transition-all duration-300 hover:scale-110 overflow-hidden z-20"
         >
           {/* Animated border */}
           <motion.div
-            animate={{ 
+            animate={{
               scale: [1, 1.2, 1],
-              y: [3, 0, 3]
+              y: [3, 0, 3],
             }}
-            transition={{ 
-              duration: 1.5, 
-              repeat: Infinity, 
-              ease: "easeInOut" 
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut",
             }}
             className="absolute inset-0 border-2 border-white/30 group-hover:border-white/60 rounded-full transition-colors duration-300"
           />
-          
+
           {/* Animated caret */}
           <motion.div
             animate={{ y: [0, 6, 0] }}
