@@ -298,7 +298,7 @@ export default function Home() {
           <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/8 rounded-full blur-3xl animate-pulse delay-1000" />
         </div>
 
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 relative z-10 -mt-20">
           <motion.div
             className="max-w-4xl mx-auto text-center space-y-8"
             initial="hidden"
@@ -313,7 +313,17 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative"
             >
-              <div className="absolute inset-0 blur-2xl opacity-30">
+              <motion.div 
+                className="absolute inset-0 blur-2xl opacity-30"
+                animate={{ 
+                  opacity: [0.0, 0.4, 0.0]
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity, 
+                  ease: "easeOutBack" 
+                }}
+              >
                 <Image
                   src="/varena-logo.png"
                   alt="Varena Logo Glow"
@@ -321,7 +331,7 @@ export default function Home() {
                   height={450}
                   className="mx-auto"
                 />
-              </div>
+              </motion.div>
               <Image
                 src="/varena-logo.png"
                 alt="Varena Logo"
