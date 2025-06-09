@@ -159,7 +159,7 @@ export default function NavBar() {
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
               <Image
-                src="/logo.png"
+                src="/logo.svg"
                 alt="V Rising Logo"
                 width={40}
                 height={40}
