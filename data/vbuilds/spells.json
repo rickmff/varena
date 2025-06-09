@@ -1520,7 +1520,7 @@
     ]
   },
   "ball_lightning": {
-    "name": "Ball Storm",
+    "name": "Ball Lightning",
     "id": "ball_lightning",
     "img": "/images/vbuilds/spells/spell-storm-ball_lightning.png",
     "spellSchool": "storm",
