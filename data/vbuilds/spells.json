@@ -1670,7 +1670,7 @@
     ]
   },
   "lightning_curtain": {
-    "name": "Storm Curtain",
+    "name": "Lightning Curtain",
     "id": "lightning_curtain",
     "img": "/images/vbuilds/spells/spell-storm-lightning_curtain.png",
     "spellSchool": "storm",
@@ -1750,7 +1750,7 @@
     ]
   },
   "lightning_tendrils": {
-    "name": "Storm Tendrils",
+    "name": "Lightning Tendrils",
     "id": "lightning_tendrils",
     "img": "/images/vbuilds/spells/spell-storm-lightning_tendrils.png",
     "spellSchool": "storm",
