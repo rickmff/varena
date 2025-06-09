@@ -938,12 +938,6 @@
         "min": 8.0,
         "max": 12.0,
         "key": 7
-      },
-      {
-        "description": "",
-        "min": null,
-        "max": null,
-        "key": 8
       }
     ]
   },
