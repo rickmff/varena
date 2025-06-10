@@ -57,7 +57,7 @@ export function StatList({ stats }: { stats: Array<any> }) {
                   className={`${
                     overCap
                       ? "bg-red-800"
-                      : "bg-gradient-to-l from-blue-400 to-blue-800"
+                      : "bg-gradient-to-b from-blue-400 to-blue-500"
                   } h-2 rounded`}
                   style={{ width: `${progressWidth}%` }}
                 ></div>
