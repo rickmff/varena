@@ -9,8 +9,8 @@ import GameMenu from "./game-menu";
 
 export const menuItems = [
   { name: "HOME", href: "/" },
-  { name: "BUILDS", href: "/builds" },
   { name: "FEATURES", href: "/#features" },
+  { name: "BUILDS", href: "/builds" },
   { name: "COMMANDS", href: "/#commands" },
   { name: "NEWS", href: "/news" },
 ];
