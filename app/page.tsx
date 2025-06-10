@@ -190,7 +190,7 @@ export default function Home() {
     {
       icon: "command",
       image: "/images/features/Horse.png",
-      title: "Easy Commands",
+      title: "Qol Commands",
       description:
         "Enjoy a consequence free environment with commands designed for smooth practice.",
     },
