@@ -108,9 +108,8 @@ export const JewelForge = ({
           }
 
           return (
-            <div>
+            <div key={effect.key}>
               <div
-                key={effect.key}
                 className={`flex items-center p-2 rounded-md transition-all cursor-pointer ${
                   selectedEffects.includes(effect.key)
                     ? "bg-red-900/50 border border-red-500/50"
