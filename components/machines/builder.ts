@@ -63,6 +63,7 @@ type BuildEvents =
     | { type: 'REMOVE_WEAPON'; position: AvailableWeaponSlots }
     | { type: 'MOVE_WEAPON'; order: any[], to: AvailableWeaponSlots }
     | { type: 'ADD_SPELL'; spell: any, slot: "dash" | "ultimate" | "spell1" | "spell2", jewel?: number[] }
+    | { type: 'SWAP_SPELLS'; }
     | { type: 'REMOVE_SPELL'; id: string }
     | { type: 'LEGENDARY_LIMIT_REACHED' }
     | { type: 'FOCUS_WEAPON', slot: AvailableWeaponSlots | null }
@@ -337,7 +338,17 @@ export const builder = setup({
                             return event.to as AvailableWeaponSlots;
                         }
                     })
-                }
+                },
+                SWAP_SPELLS: {
+                    actions: assign({
+                        spells: ({ context, event }) => {
+                            const updatedSpells = { ...context.spells, spell1: context.spells.spell2, spell2: context.spells.spell1 };
+
+
+                            return updatedSpells;
+                        }
+                    })
+                },
 
             }
         },

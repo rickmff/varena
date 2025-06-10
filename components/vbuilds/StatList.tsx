@@ -32,7 +32,7 @@ export function StatList({ stats }: { stats: Array<any> }) {
                           ? "text-red-800"
                           : progressWidth === 0
                           ? "text-zinc-500"
-                          : "text-red-400"
+                          : "text-blue-400"
                       }`}
                     >
                       {totalValue}
@@ -55,7 +55,9 @@ export function StatList({ stats }: { stats: Array<any> }) {
               <div className={`w-full bg-zinc-600 rounded h-2`}>
                 <div
                   className={`${
-                    overCap ? "bg-red-800" : "bg-red-400"
+                    overCap
+                      ? "bg-red-800"
+                      : "bg-gradient-to-l from-blue-400 to-blue-800"
                   } h-2 rounded`}
                   style={{ width: `${progressWidth}%` }}
                 ></div>

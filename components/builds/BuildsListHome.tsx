@@ -382,7 +382,7 @@ export default function BuildsListHome({
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {builds.length < maxBuilds && (
+          {builds.length < maxBuilds && builds.length !== 0 && (
             <Link href="/builds/create">
               <Card className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-dashed border-white/30 hover:border-white/60 transition-all duration-300 overflow-hidden group cursor-pointer h-full relative flex items-center justify-center min-h-[400px]">
                 {/* Glow effect on hover */}

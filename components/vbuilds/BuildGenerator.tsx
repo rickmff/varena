@@ -157,13 +157,19 @@ const BuilderPage = () => {
 
           {/* Spells & Passives Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-            <section className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
+            <section className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300 group">
               <div className="flex items-center gap-3 mb-4 sm:mb-6">
                 <div className="w-1 h-6 bg-gradient-to-b from-purple-400 to-purple-600 rounded-full" />
                 <h3 className="text-lg sm:text-xl font-bold text-grey-100 tracking-wide">
                   SPELLS
                 </h3>
                 <div className="flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
+                {(state.context.spells.spell1 ||
+                  state.context.spells.spell2) && (
+                  <div className="bg-green-500/10 border border-green-500/30 text-green-300 text-xs px-3 py-1.5 rounded-full font-medium  w-fit opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                    Drag spell to swap positions
+                  </div>
+                )}
               </div>
               <SpellForge />
             </section>
@@ -181,7 +187,7 @@ const BuilderPage = () => {
           </div>
 
           {/* Weapons Section */}
-          <div className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300">
+          <div className="bg-grey-900/40  border border-grey-700/50 rounded-xl p-4 sm:p-6 shadow-2xl hover:border-grey-600/50 transition-all duration-300 group">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4 sm:mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-1 h-6 bg-gradient-to-b from-orange-400 to-orange-600 rounded-full" />
@@ -190,10 +196,13 @@ const BuilderPage = () => {
                 </h3>
               </div>
               <FocusedWeapon side="top" />
-              {/* <div className="bg-green-500/10 border border-green-500/30 text-green-300 text-xs px-3 py-1.5 rounded-full font-medium  w-fit">
-                Press keys 1-8 to select a weapon
-              </div>
-              <div className="bg-red-500/10 border border-red-500/30 text-red-300 text-xs px-3 py-1.5 rounded-full font-medium  w-fit">
+              {state.context.weapons.size > 0 && (
+                <div className="bg-green-500/10 border border-green-500/30 text-green-300 text-xs px-3 py-1.5 rounded-full font-medium w-fit opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  Drag weapons to reorder
+                </div>
+              )}
+
+              {/* <div className="bg-red-500/10 border border-red-500/30 text-red-300 text-xs px-3 py-1.5 rounded-full font-medium  w-fit">
                 Press 0 to clear selected weapon
               </div> */}
               <div className="hidden sm:block flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />

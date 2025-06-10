@@ -347,6 +347,7 @@ export const WeaponForge = () => {
       onDragEnd={handleDragEnd}
       sensors={sensors}
       modifiers={[restrictToHorizontalAxis]}
+      id={"weapon-forge"}
     >
       <Dialog
         open={state.matches("weaponForge")}

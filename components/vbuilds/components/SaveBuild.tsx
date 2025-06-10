@@ -1,19 +1,34 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useBuilder } from "../BuildProvider";
 import { Input } from "@/components/ui/input";
 
+// Safe localStorage access helper
+const getLocalStorage = (key: string, defaultValue: any = "[]") => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem(key) || defaultValue;
+  }
+  return defaultValue;
+};
+
 const SaveBuild: React.FC = () => {
   const { builder } = useBuilder();
-  const savedCodes = JSON.parse(localStorage.getItem("vbuilds") || "[]");
-  const initialName = `Build ${savedCodes.length + 1}`;
-  const [name, setName] = React.useState(initialName);
+  const [savedCodes, setSavedCodes] = useState<any[]>([]);
+  const [name, setName] = useState("");
+
+  // Initialize state after component mounts on client
+  useEffect(() => {
+    const saved = JSON.parse(getLocalStorage("vbuilds"));
+    setSavedCodes(saved);
+    setName(`Build ${saved.length + 1}`);
+  }, []);
 
   const saveBuildCommand = async () => {
-    builder.send({ type: "SAVE_BUILD", name: name || initialName });
+    const buildName = name || `Build ${savedCodes.length + 1}`;
+    builder.send({ type: "SAVE_BUILD", name: buildName });
     try {
       toast("Build Saved", {
         className: "bg-black text-white",

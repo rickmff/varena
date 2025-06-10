@@ -578,27 +578,29 @@ export default function BuildsList({
           whileInView="visible"
           viewport={{ once: true }}
         >
-          <Link href="/builds/create">
-            <Card className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-dashed border-white/30 hover:border-white/60 transition-all duration-300 overflow-hidden group cursor-pointer h-full relative flex items-center justify-center min-h-[400px]">
-              {/* Glow effect on hover */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/10" />
-              </div>
-
-              <div className="flex flex-col items-center justify-center gap-4 p-8 relative z-10">
-                {/* Plus icon in circle */}
-                <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/40 flex items-center justify-center group-hover:border-white/60 transition-colors duration-300">
-                  <Plus className="w-8 h-8 text-white/60 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
+          {buildsToShow.length !== 0 && (
+            <Link href="/builds/create">
+              <Card className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-dashed border-white/30 hover:border-white/60 transition-all duration-300 overflow-hidden group cursor-pointer h-full relative flex items-center justify-center min-h-[400px]">
+                {/* Glow effect on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/10" />
                 </div>
 
-                {/* Text */}
-                <span className="text-white/60 group-hover:text-white font-bold text-lg tracking-wide transition-colors duration-300">
-                  CREATE A NEW BUILD
-                </span>
-              </div>
-            </Card>
-          </Link>
+                <div className="flex flex-col items-center justify-center gap-4 p-8 relative z-10">
+                  {/* Plus icon in circle */}
+                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/40 flex items-center justify-center group-hover:border-white/60 transition-colors duration-300">
+                    <Plus className="w-8 h-8 text-white/60 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
+                  </div>
+
+                  {/* Text */}
+                  <span className="text-white/60 group-hover:text-white font-bold text-lg tracking-wide transition-colors duration-300">
+                    CREATE A NEW BUILD
+                  </span>
+                </div>
+              </Card>
+            </Link>
+          )}
           {buildsToShow.map((build, index) => (
             <motion.div
               key={index}

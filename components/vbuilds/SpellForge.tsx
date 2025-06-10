@@ -20,14 +20,29 @@ import {
   HoverCardTitle,
 } from "../ui/hover-card";
 import { Button } from "../ui/button";
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  UniqueIdentifier,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+} from "@dnd-kit/sortable";
 const SlotTrigger = ({
   children,
   goto,
   hasSelection,
+  hoverIsDisabled = false,
 }: {
   children?: React.ReactNode;
   goto: "dash" | "spell1" | "spell2" | "ultimate";
   hasSelection: boolean;
+  hoverIsDisabled?: boolean;
 }) => {
   const { state, builder } = useBuilder();
 
@@ -44,6 +59,19 @@ const SlotTrigger = ({
 
   const spell = state.context.spells[goto] as SpellWithJewel;
 
+  if (hoverIsDisabled) {
+    return (
+      <>
+        <SheetTrigger
+          className="w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border hover:border-purple-500 transition-all duration-100"
+          onClick={() => builder.send({ type: `goto.spellForge.${goto}` })}
+        >
+          {children}
+        </SheetTrigger>
+      </>
+    );
+  }
+
   return (
     <HoverCard openDelay={0} closeDelay={0}>
       <HoverCardTrigger>
@@ -58,7 +86,7 @@ const SlotTrigger = ({
         <>
           <div className="flex items-center gap-4">
             <div className="relative w-10 h-10 rounded overflow-hidden">
-              <img src={spell.img} className="w-10 h-10" />
+              <img src={spell.img} className="w-10 h-10  select-none" />
               <img
                 src={`/images/vbuilds/jewels/jewel-${spell.spellSchool}_tier4.webp`}
                 className="absolute bottom-0 right-0 h-4 w-4"
@@ -120,10 +148,11 @@ const SlotImage = ({ slot }: { slot: "dash" | "spell1" | "spell2" }) => {
   const spells = useSelector(builder, (state) => state.context.spells);
   return (
     <>
-      <img src={spells[slot].img} className="w-20 h-20" />
+      <img src={spells[slot].img} className="w-20 h-20" draggable={false} />
       <img
         src={`/images/vbuilds/jewels/jewel-${spells[slot].spellSchool}_tier4.webp`}
         className="absolute bottom-0 right-0 h-8 w-8"
+        draggable={false}
       />
     </>
   );
@@ -135,6 +164,116 @@ const sectionTitle = {
   spell2: "Spell 2",
   ultimate: "Ultimate",
   idle: "Spells",
+};
+
+import React, { act, useState } from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
+
+function SortableItem(props) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isSorting,
+  } = useSortable({ id: props.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {props.trigger({ isSorting })}
+    </div>
+  );
+}
+
+const DndSlots = ({}) => {
+  const { state, builder } = useBuilder();
+  const spells = useSelector(builder, (state) => state.context.spells);
+  const [items, setItems] = useState<UniqueIdentifier[]>(["spell1", "spell2"]);
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      const oldIndex = items.indexOf(active.id);
+      if (over) {
+        const newIndex = items.indexOf(over.id);
+        const newOrder = arrayMove(items, oldIndex, newIndex);
+        setItems(newOrder);
+        builder.send({
+          type: "SWAP_SPELLS",
+        });
+      }
+    }
+  }
+
+  return (
+    <DndContext
+      sensors={sensors}
+      modifiers={[restrictToHorizontalAxis]}
+      onDragEnd={handleDragEnd}
+      id="spell-forge"
+    >
+      <SortableContext items={items} strategy={horizontalListSortingStrategy}>
+        <SortableItem
+          id={"spell1"}
+          trigger={({ isSorting }: { isSorting: boolean }) => {
+            return (
+              <SlotTrigger
+                goto={"spell1"}
+                hasSelection={spells.spell1}
+                hoverIsDisabled={isSorting}
+              >
+                {spells.spell1 ? (
+                  <SlotImage slot="spell1" />
+                ) : (
+                  <SlotPlaceholder
+                    placeholderImage="/images/vbuilds/spells/spell-blood-blood_rage.png"
+                    text="Spell 1"
+                  />
+                )}
+              </SlotTrigger>
+            );
+          }}
+        ></SortableItem>
+        <SortableItem
+          id={"spell2"}
+          trigger={({ isSorting }: { isSorting: boolean }) => {
+            return (
+              <SlotTrigger
+                goto={"spell2"}
+                hasSelection={spells.spell2}
+                hoverIsDisabled={isSorting}
+              >
+                {spells.spell2 ? (
+                  <SlotImage slot="spell2" />
+                ) : (
+                  <SlotPlaceholder
+                    placeholderImage="/images/vbuilds/spells/spell-blood-blood_rite.png"
+                    text="Spell 2"
+                  />
+                )}
+              </SlotTrigger>
+            );
+          }}
+        ></SortableItem>
+      </SortableContext>
+    </DndContext>
+  );
 };
 
 export const SpellForge = () => {
@@ -167,31 +306,16 @@ export const SpellForge = () => {
             />
           )}
         </SlotTrigger>
-        <SlotTrigger goto={"spell1"} hasSelection={spells.spell1}>
-          {spells.spell1 ? (
-            <SlotImage slot="spell1" />
-          ) : (
-            <SlotPlaceholder
-              placeholderImage="/images/vbuilds/spells/spell-blood-blood_rage.png"
-              text="Spell 1"
-            />
-          )}
-        </SlotTrigger>
-        <SlotTrigger goto={"spell2"} hasSelection={spells.spell2}>
-          {spells.spell2 ? (
-            <SlotImage slot="spell2" />
-          ) : (
-            <SlotPlaceholder
-              placeholderImage="/images/vbuilds/spells/spell-blood-blood_rite.png"
-              text="Spell 2"
-            />
-          )}
-        </SlotTrigger>
+        <DndSlots />
         <SlotTrigger goto={"ultimate"} hasSelection={spells.ultimate}>
           {spells.ultimate ? (
             <HoverCard openDelay={0} closeDelay={0}>
               <HoverCardTrigger>
-                <img src={spells["ultimate"].img} className="w-20 h-20" />
+                <img
+                  src={spells["ultimate"].img}
+                  className="w-20 h-20"
+                  draggable={false}
+                />
               </HoverCardTrigger>
               <HoverCardContent>
                 <HoverCardTitle>
