@@ -23,6 +23,7 @@ import CommandGenerator from "@/components/command-generator";
 import FeatureCarousel from "@/app/components/ui/FeatureCarousel";
 import BuildsList from "@/components/builds/BuildsList";
 import SectionHeader from "@/app/components/ui/SectionHeader";
+import BuildsListHome from "@/components/builds/BuildsListHome";
 
 // --- START: Icon mapping ---
 // Helper to map icon names from Notion to actual components
@@ -384,18 +385,6 @@ export default function Home() {
         <FeatureCarousel features={featuresData} />
       </section>
 
-      {/* Command Generator Section */}
-      <section id="commands" className="py-20 bg-black relative">
-        <div className="container mx-auto px-4 relative">
-          <SectionHeader
-            title="Command Generator"
-            subtitle="Server Commands"
-            description="Generate commands for our V Arena Server"
-          />
-          <CommandGenerator />
-        </div>
-      </section>
-
       {/* Builds Section */}
       <section id="builds" className="py-20 bg-black relative">
         <div className="container mx-auto px-4 relative">
@@ -410,12 +399,20 @@ export default function Home() {
             viewport={{ once: true }}
             variants={staggerContainer}
           >
-            <BuildsList
-              maxBuilds={3}
-              showViewAllButton={true}
-              onBuildsLoaded={setHasBuilds}
-            />
+            <BuildsListHome />
           </motion.div>
+        </div>
+      </section>
+
+      {/* Command Generator Section */}
+      <section id="commands" className="py-20 bg-black relative">
+        <div className="container mx-auto px-4 relative">
+          <SectionHeader
+            title="Command Generator"
+            subtitle="Server Commands"
+            description="Generate commands for our V Arena Server"
+          />
+          <CommandGenerator />
         </div>
       </section>
 

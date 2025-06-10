@@ -65,7 +65,7 @@ const config = {
           "950": "#450a0a",
         },
         spellSchool: {
-          undefined: "rgba(0, 0, 0, 1)",
+          undefined: "rgba(0 , 0 , 0 , 1)",
           chaos: "rgba(222, 91, 251, 1)",
           blood: "rgba(196, 33, 66, 1)",
           frost: "rgba(0, 159, 249, 1)",
