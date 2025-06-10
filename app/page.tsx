@@ -266,12 +266,14 @@ export default function Home() {
       <NavBar />
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-black to-black">
+        {/*
         <div className="absolute inset-0 z-0">
           <BloodParticles />
         </div>
+        */}
 
         {/* YouTube Video Background */}
-        <div className="absolute inset-0 z-1 opacity-20">
+        <div className="absolute inset-0 z-1 opacity-100">
           <iframe
             className="absolute inset-0 w-full h-full object-cover"
             style={{
@@ -283,7 +285,7 @@ export default function Home() {
               top: "50%",
               transform: "translate(-50%, -50%)",
             }}
-            src="https://www.youtube.com/embed/pxQvrcn6Z6Y?autoplay=1&mute=1&loop=1&playlist=pxQvrcn6Z6Y&controls=0&showinfo=0&rel=0&modestbranding=1"
+            src="https://www.youtube.com/embed/gjzwjlCSbes?autoplay=1&mute=1&loop=1&playlist=gjzwjlCSbes&controls=0&showinfo=0&rel=0&modestbranding=1"
             title="Arena Background"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -315,7 +317,7 @@ export default function Home() {
               className="relative"
             >
               <motion.div
-                className="absolute inset-0 blur-2xl opacity-30"
+                className="absolute inset-0 blur-2xl opacity-15"
                 animate={{
                   opacity: [0.0, 0.4, 0.0],
                 }}
@@ -328,7 +330,7 @@ export default function Home() {
                 <Image
                   src="/varena-logo.svg"
                   alt="Varena Logo Glow"
-                  width={650}
+                  width={500}//650
                   height={450}
                   className="mx-auto"
                 />
@@ -336,9 +338,9 @@ export default function Home() {
               <Image
                 src="/varena-logo.svg"
                 alt="Varena Logo"
-                width={650}
+                width={500}//650
                 height={450}
-                className="mx-auto relative z-10 hover:scale-105 transition-transform duration-300"
+                className="mx-auto relative z-10 hover:scale-102 transition-transform duration-300"
               />
             </motion.div>
           </motion.div>
