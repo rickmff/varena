@@ -112,7 +112,7 @@ const premadeBuilds = [
   {
     name: "ASSASSIN",
     background: "/images/templates/assassin.png",
-    code: "622222222bc4n12136734563223565103E8n218700000000000000000000000000000054444751",
+    code: "622222222bcn8721367j1245523642d03824083200000000000000000000000000000014444751",
     baseBorder: "border-orange-500/30",
     hoverBorder: "hover:border-orange-500",
     hoverGlow: "from-orange-900/20",
@@ -126,9 +126,9 @@ const premadeBuilds = [
     hoverGlow: "from-red-900/20",
   },
   {
-    name: "HYBRID",
-    background: "/images/templates/hybrid.png",
-    code: "600000000kcb4na1258345636234551038En217800000000000000000000000000000052222251",
+    name: "SUPPORT",
+    background: "/images/templates/support.png",
+    code: "222222222bcaoif3462l3452412461c07B9b0B7900000000000000000000000000000041111643",
     baseBorder: "border-green-500/30",
     hoverBorder: "hover:border-green-500",
     hoverGlow: "from-green-900/20",
