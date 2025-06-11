@@ -158,7 +158,7 @@ export async function getNewsPosts(parentId: string): Promise<NewsPost[]> {
     return [];
   }
 
-  console.log(`Fetching news posts from Notion page: ${parentId}`);
+  // console.log(`Fetching news posts from Notion page: ${parentId}`);
 
   try {
     const blocks = await notion.blocks.children.list({
@@ -166,13 +166,13 @@ export async function getNewsPosts(parentId: string): Promise<NewsPost[]> {
       page_size: 100,
     });
 
-    console.log(`Found ${blocks.results.length} blocks in parent page`);
+    // console.log(`Found ${blocks.results.length} blocks in parent page`);
 
     const childPages = blocks.results.filter(
       (block) => (block as BlockObjectResponse).type === "child_page",
     ) as BlockObjectResponse[];
 
-    console.log(`Found ${childPages.length} child pages`);
+    // console.log(`Found ${childPages.length} child pages`);
 
     if (childPages.length === 0) {
       console.warn("No child pages found. Make sure you have created child pages under your news parent page.");
@@ -220,7 +220,7 @@ export async function getNewsPosts(parentId: string): Promise<NewsPost[]> {
           // Get excerpt from first paragraph block
           const excerpt = await getPageExcerpt(pageId);
 
-          console.log(`Successfully processed news post: ${title}`);
+          // console.log(`Successfully processed news post: ${title}`);
 
           return {
             id: pageId,
@@ -241,7 +241,7 @@ export async function getNewsPosts(parentId: string): Promise<NewsPost[]> {
 
     // Filter out any null results from failed page processing
     const validNewsPosts = newsPosts.filter((post): post is NewsPost => post !== null);
-    console.log(`Successfully processed ${validNewsPosts.length} news posts`);
+    // console.log(`Successfully processed ${validNewsPosts.length} news posts`);
 
     return validNewsPosts;
   } catch (error) {

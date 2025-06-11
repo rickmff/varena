@@ -153,14 +153,6 @@ export const BuildContent = ({
     ultimateSpellSchool,
   ]);
 
-  console.log({
-    dashSpellSchool,
-    spell1SpellSchool,
-    spell2SpellSchool,
-    ultimateSpellSchool,
-    school,
-  });
-
   return (
     <Card
       className={`bg-black/80 backdrop-blur-sm rounded-lg border-2

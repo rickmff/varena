@@ -330,8 +330,6 @@ export const builder = setup({
                                 })
                             })
 
-                            console.log("Updated coatings:", updatedCoatings);
-
                             return updatedCoatings
                         },
                         focusedWeapon: ({ context, event }) => {

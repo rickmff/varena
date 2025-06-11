@@ -11,7 +11,7 @@ export const menuItems = [
   { name: "HOME", href: "/" },
   { name: "FEATURES", href: "/#features" },
   { name: "BUILDS", href: "/builds" },
-  { name: "COMMANDS", href: "/#commands" },
+  { name: "COMMANDS", href: "/commands" },
   { name: "NEWS", href: "/news" },
 ];
 
