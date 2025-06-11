@@ -60,7 +60,7 @@ export default function ArtifactTab({ schoolColors }: ArtifactTabProps) {
     try {
       const formattedWeaponName = selectedWeaponDetails.artifactName.toLowerCase();
       const infuseForCommand = selectedWeaponDetails.infuse.toLowerCase();
-      const command = `.lw ${formattedWeaponName} ${infuseForCommand} ${selectedEffects.join('')}`;
+      const command = `.art ${selectedWeaponKey} ${selectedEffects.join('')}`;
       await navigator.clipboard.writeText(command);
       toast.success('Artifact command copied!', {
         duration: 2000,
