@@ -125,8 +125,8 @@ export default function NewsPage() {
           <div className="container mx-auto px-4 relative z-10">
             <SectionHeader
               title="News & Updates"
-              subtitle="📰 Chronicles of V Rising"
-              description="Stay informed about the latest updates, events, and community highlights from the V Arena"
+              subtitle="Echoes of V Arena"
+              description="Stay informed about the latest updates, events, and community highlights"
             />
           </div>
         </section>
