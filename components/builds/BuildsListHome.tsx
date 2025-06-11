@@ -369,7 +369,7 @@ export default function BuildsListHome({
           <div className="flex items-center gap-3 mb-6">
             <div className="w-1 h-6 bg-gradient-to-b from-red-400 to-red-600 rounded-full" />
             <h3 className="text-xl font-bold text-grey-100 tracking-wide">
-              Make Your Own
+              MAKE YOUR OWN
             </h3>
             <div className="flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
           </div>

@@ -405,7 +405,7 @@ export default function Home() {
           <SectionHeader
             title="Command Generator"
             subtitle="Server Commands"
-            description="Generate commands for our V Arena Server"
+            description="Generate commands for V Arena"
           />
           <CommandGenerator />
         </div>
@@ -416,7 +416,7 @@ export default function Home() {
         <div className="container mx-auto px-4 relative">
           <SectionHeader
             title="News & Updates"
-            subtitle="Chronicles of V Rising"
+            subtitle="Echoes of V Arena"
             description="Stay informed about the latest updates, events, and community highlights"
           />
           <motion.div

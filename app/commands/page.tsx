@@ -19,7 +19,7 @@ export default function CommandsPage() {
           <SectionHeader
             title="Command Generator"
             subtitle="Server Commands"
-            description="Generate commands for our V Arena Server"
+            description="Generate commands for V Arena"
           />
           <CommandGenerator />
         </div>
