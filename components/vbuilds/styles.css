@@ -1,26 +1,67 @@
+.build-spellSchool {
+    background-position: center;
+    background-size: cover;
+}
+
+.build-spellSchool-empty {
+    border-color: rgba(38, 31, 107, 0.3);
+    background-image: url('/images/background/Passives.png');    
+}
+
+.build-spellSchool-chaos {
+    border-color: rgba(222, 91, 251, 0.3);
+    background-image: url('/images/background/Chaos.png');
+
+    
+}
+
+.build-spellSchool-blood {
+    border-color: rgba(196, 33, 66, 0.3);
+    background-image: url('/images/background/Blood.png');
+}
+
+.build-spellSchool-frost {
+    border-color: rgba(0, 159, 249, 0.3);
+    background-image: url('/images/background/Frost.png');
+}
+
+.build-spellSchool-illusion {
+    border-color: rgba(57, 223, 185, 0.3);
+    background-image: url('/images/background/Illusion.png');
+}
+
+.build-spellSchool-storm {
+    border-color: rgba(253, 255, 93, 0.3);
+    background-image: url('/images/background/Storm.png');
+}
+
+.build-spellSchool-unholy {
+    border-color: rgba(73, 179, 18, 0.3);
+    background-image: url('/images/background/Unholy.png');
+}
 
 .spellSchool-chaos {
-    color: #DE5BFB;
+    color: rgba(222, 91, 251, 1);
 }
 
 .spellSchool-blood {
-    color: #C42142;
+    color: rgba(196, 33, 66, 1);
 }
 
 .spellSchool-frost {
-    color: #009FF9;
+    color: rgba(0, 159, 249, 1);
 }
 
 .spellSchool-illusion {
-    color: #39DFB9;
+    color: rgba(57, 223, 185, 1);
 }
 
 .spellSchool-storm {
-    color: #FDFF5D;
+    color: rgba(253, 255, 93, 1);
 }
 
 .spellSchool-unholy {
-    color: #49B312;
+    color: rgba(73, 179, 18, 1);
 }
 
 
@@ -34,26 +75,26 @@ img.spellSchool {
 
 img.spellSchool-chaos {
     
-    filter: drop-shadow(0px 100px 0 #DE5BFB);
+    filter: drop-shadow(0px 100px 0 rgba(222, 91, 251, 1));
     
 }
 
 img.spellSchool-blood {
-    filter: drop-shadow(0px 100px 0 #C42142);
+    filter: drop-shadow(0px 100px 0 rgba(196, 33, 66, 1));
 }
 
 img.spellSchool-frost {
-    filter: drop-shadow(0px 100px 0 #009FF9);
+    filter: drop-shadow(0px 100px 0 rgba(0, 159, 249, 1));
 }
 
 img.spellSchool-illusion {
-    filter: drop-shadow(0px 100px 0 #39DFB9);
+    filter: drop-shadow(0px 100px 0 rgba(57, 223, 185, 1));
 }
 
 img.spellSchool-storm {
-    filter: drop-shadow(0px 100px 0 #FDFF5D);
+    filter: drop-shadow(0px 100px 0 rgba(253, 255, 93, 1));
 }
 
 img.spellSchool-unholy {
-    filter: drop-shadow(0px 100px 0 #49B312);
+    filter: drop-shadow(0px 100px 0 rgba(73, 179, 18, 1));
 }

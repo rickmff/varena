@@ -205,7 +205,7 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
         <SectionHeader
           title="V Arena Features"
           subtitle="Unleash Your Potential"
-          description="Discover the unique features of V Arena that enhance your gaming experience."
+          description="Discover the unique features of V Arena"
         />
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative"

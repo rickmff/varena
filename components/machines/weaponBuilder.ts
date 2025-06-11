@@ -66,7 +66,7 @@ export const weaponBuilderMachine = setup({
                     actions: assign({
                         weapon: null,
                         infusion: null,
-                        effects: [],
+                        // effects: [],
                     })
                 },
                 PICK_WEAPON: [

@@ -26,7 +26,7 @@
     "arenaCode": "2",
     "modifiers": [
       {
-        "stat": "Max Health",
+        "stat": "Bonus Maximum Health",
         "value": 8,
         "unit": "percent",
         "calculate": true

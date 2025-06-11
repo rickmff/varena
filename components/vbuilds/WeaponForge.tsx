@@ -337,7 +337,7 @@ export const WeaponForge = () => {
       builder.send({
         type: "MOVE_WEAPON",
         order: newOrder,
-        to: newIndex,
+        to: (newIndex + 1) as AvailableWeaponSlots,
       });
     }
   }
@@ -347,6 +347,7 @@ export const WeaponForge = () => {
       onDragEnd={handleDragEnd}
       sensors={sensors}
       modifiers={[restrictToHorizontalAxis]}
+      id={"weapon-forge"}
     >
       <Dialog
         open={state.matches("weaponForge")}

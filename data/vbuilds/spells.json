@@ -938,12 +938,6 @@
         "min": 8.0,
         "max": 12.0,
         "key": 7
-      },
-      {
-        "description": "",
-        "min": null,
-        "max": null,
-        "key": 8
       }
     ]
   },
@@ -1526,7 +1520,7 @@
     ]
   },
   "ball_lightning": {
-    "name": "Ball Storm",
+    "name": "Ball Lightning",
     "id": "ball_lightning",
     "img": "/images/vbuilds/spells/spell-storm-ball_lightning.png",
     "spellSchool": "storm",
@@ -1676,7 +1670,7 @@
     ]
   },
   "lightning_curtain": {
-    "name": "Storm Curtain",
+    "name": "Lightning Curtain",
     "id": "lightning_curtain",
     "img": "/images/vbuilds/spells/spell-storm-lightning_curtain.png",
     "spellSchool": "storm",
@@ -1756,7 +1750,7 @@
     ]
   },
   "lightning_tendrils": {
-    "name": "Storm Tendrils",
+    "name": "Lightning Tendrils",
     "id": "lightning_tendrils",
     "img": "/images/vbuilds/spells/spell-storm-lightning_tendrils.png",
     "spellSchool": "storm",

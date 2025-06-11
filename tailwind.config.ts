@@ -64,6 +64,15 @@ const config = {
         red: {
           "950": "#450a0a",
         },
+        spellSchool: {
+          undefined: "rgba(0 , 0 , 0 , 1)",
+          chaos: "rgba(222, 91, 251, 1)",
+          blood: "rgba(196, 33, 66, 1)",
+          frost: "rgba(0, 159, 249, 1)",
+          illusion: "rgba(57, 223, 185, 1)",
+          storm: "rgba(253, 255, 93, 1)",
+          unholy: "rgba(73, 179, 18, 1)",
+        }
       },
       borderRadius: {
         lg: "var(--radius)",

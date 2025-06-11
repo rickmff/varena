@@ -10,8 +10,8 @@ import GameMenu from "./game-menu";
 export const menuItems = [
   { name: "HOME", href: "/" },
   { name: "FEATURES", href: "/#features" },
-  { name: "COMMANDS", href: "/#commands" },
   { name: "BUILDS", href: "/builds" },
+  { name: "COMMANDS", href: "/#commands" },
   { name: "NEWS", href: "/news" },
 ];
 
@@ -23,8 +23,8 @@ export const DiscordButton = ({
   className?: string;
 }) => (
   <motion.div
-    animate={{ 
-      scale: [1, 1.08, 1]
+    animate={{
+      scale: [1, 1.08, 1],
     }}
     transition={{
       duration: 1.0,
@@ -36,7 +36,9 @@ export const DiscordButton = ({
     <Button
       variant="outline"
       size={size}
-      className={`hidden md:flex text-xs font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 relative overflow-hidden ${className || ""}`}
+      className={`hidden md:flex text-xs font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 relative overflow-hidden ${
+        className || ""
+      }`}
     >
       <div className="flex items-center justify-center gap-2 relative z-10">
         <Link
@@ -54,7 +56,7 @@ export const DiscordButton = ({
           <span className="pt-0">JOIN US</span>
         </Link>
       </div>
-      
+
       {/* Diagonal flash effect */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
@@ -69,7 +71,7 @@ export const DiscordButton = ({
       >
         <div className="absolute inset-0 w-8 h-full bg-gradient-to-r from-transparent via-white/25 to-transparent transform rotate-45 translate-x-4 -translate-y-2" />
       </motion.div>
-      
+
       {/* Second diagonal flash following behind */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
@@ -159,7 +161,7 @@ export default function NavBar() {
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
               <Image
-                src="/logo.png"
+                src="/logo.svg"
                 alt="V Rising Logo"
                 width={40}
                 height={40}

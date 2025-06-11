@@ -23,6 +23,7 @@ import CommandGenerator from "@/components/command-generator";
 import FeatureCarousel from "@/app/components/ui/FeatureCarousel";
 import BuildsList from "@/components/builds/BuildsList";
 import SectionHeader from "@/app/components/ui/SectionHeader";
+import BuildsListHome from "@/components/builds/BuildsListHome";
 
 // --- START: Icon mapping ---
 // Helper to map icon names from Notion to actual components
@@ -73,12 +74,12 @@ export default function Home() {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setScrollY(currentScrollY);
-      
+
       // Auto-scroll to features section on first scroll
       if (currentScrollY > 10 && !hasScrolledToSection) {
         setHasScrolledToSection(true);
-        const featuresSection = document.getElementById('features');
-        featuresSection?.scrollIntoView({ behavior: 'smooth' });
+        const featuresSection = document.getElementById("features");
+        featuresSection?.scrollIntoView({ behavior: "smooth" });
       }
     };
 
@@ -189,7 +190,7 @@ export default function Home() {
     {
       icon: "command",
       image: "/images/features/Horse.png",
-      title: "Easy Commands",
+      title: "Qol Commands",
       description:
         "Enjoy a consequence free environment with commands designed for smooth practice.",
     },
@@ -265,31 +266,33 @@ export default function Home() {
       <NavBar />
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-black to-black">
+        {/*
         <div className="absolute inset-0 z-0">
           <BloodParticles />
         </div>
-        
+        */}
+
         {/* YouTube Video Background */}
-        <div className="absolute inset-0 z-1 opacity-20">
+        <div className="absolute inset-0 z-1 opacity-100">
           <iframe
             className="absolute inset-0 w-full h-full object-cover"
             style={{
-              width: '100vw',
-              height: '56.25vw', // 16:9 aspect ratio
-              minHeight: '100vh',
-              minWidth: '177.78vh', // 16:9 aspect ratio
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)'
+              width: "100vw",
+              height: "56.25vw", // 16:9 aspect ratio
+              minHeight: "100vh",
+              minWidth: "177.78vh", // 16:9 aspect ratio
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
             }}
-            src="https://www.youtube.com/embed/pxQvrcn6Z6Y?autoplay=1&mute=1&loop=1&playlist=pxQvrcn6Z6Y&controls=0&showinfo=0&rel=0&modestbranding=1"
+            src="https://www.youtube.com/embed/gjzwjlCSbes?autoplay=1&mute=1&loop=1&playlist=gjzwjlCSbes&controls=0&showinfo=0&rel=0&modestbranding=1"
             title="Arena Background"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
           ></iframe>
         </div>
-        
+
         {/* Gradient overlays */}
         <div className="absolute inset-0 z-2 bg-gradient-to-b from-black/80 via-black/30 to-black"></div>
 
@@ -298,7 +301,7 @@ export default function Home() {
           <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/8 rounded-full blur-3xl animate-pulse delay-1000" />
         </div>
 
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 relative z-10 -mt-20">
           <motion.div
             className="max-w-4xl mx-auto text-center space-y-8"
             initial="hidden"
@@ -313,21 +316,31 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative"
             >
-              <div className="absolute inset-0 blur-2xl opacity-30">
+              <motion.div
+                className="absolute inset-0 blur-2xl opacity-15"
+                animate={{
+                  opacity: [0.0, 0.4, 0.0],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  // ease: "easeOutBack"
+                }}
+              >
                 <Image
-                  src="/varena-logo.png"
+                  src="/varena-logo.svg"
                   alt="Varena Logo Glow"
-                  width={650}
+                  width={500}//650
                   height={450}
                   className="mx-auto"
                 />
-              </div>
+              </motion.div>
               <Image
-                src="/varena-logo.png"
+                src="/varena-logo.svg"
                 alt="Varena Logo"
-                width={650}
+                width={500}//650
                 height={450}
-                className="mx-auto relative z-10 hover:scale-105 transition-transform duration-300"
+                className="mx-auto relative z-10 hover:scale-102 transition-transform duration-300"
               />
             </motion.div>
           </motion.div>
@@ -339,25 +352,25 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.0 }}
           onClick={() => {
-            const featuresSection = document.getElementById('features');
-            featuresSection?.scrollIntoView({ behavior: 'smooth' });
+            const featuresSection = document.getElementById("features");
+            featuresSection?.scrollIntoView({ behavior: "smooth" });
           }}
           className="absolute bottom-16 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center group transition-all duration-300 hover:scale-110 overflow-hidden z-20"
         >
           {/* Animated border */}
           <motion.div
-            animate={{ 
+            animate={{
               scale: [1, 1.2, 1],
-              y: [3, 0, 3]
+              y: [3, 0, 3],
             }}
-            transition={{ 
-              duration: 1.5, 
-              repeat: Infinity, 
-              ease: "easeInOut" 
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut",
             }}
             className="absolute inset-0 border-2 border-white/30 group-hover:border-white/60 rounded-full transition-colors duration-300"
           />
-          
+
           {/* Animated caret */}
           <motion.div
             animate={{ y: [0, 6, 0] }}
@@ -374,18 +387,6 @@ export default function Home() {
         <FeatureCarousel features={featuresData} />
       </section>
 
-      {/* Command Generator Section */}
-      <section id="commands" className="py-20 bg-black relative">
-        <div className="container mx-auto px-4 relative">
-          <SectionHeader
-            title="Command Generator"
-            subtitle="Server Commands"
-            description="Generate commands for our V Arena Server"
-          />
-          <CommandGenerator />
-        </div>
-      </section>
-
       {/* Builds Section */}
       <section id="builds" className="py-20 bg-black relative">
         <div className="container mx-auto px-4 relative">
@@ -400,12 +401,20 @@ export default function Home() {
             viewport={{ once: true }}
             variants={staggerContainer}
           >
-            <BuildsList
-              maxBuilds={3}
-              showViewAllButton={true}
-              onBuildsLoaded={setHasBuilds}
-            />
+            <BuildsListHome />
           </motion.div>
+        </div>
+      </section>
+
+      {/* Command Generator Section */}
+      <section id="commands" className="py-20 bg-black relative">
+        <div className="container mx-auto px-4 relative">
+          <SectionHeader
+            title="Command Generator"
+            subtitle="Server Commands"
+            description="Generate commands for our V Arena Server"
+          />
+          <CommandGenerator />
         </div>
       </section>
 
@@ -727,7 +736,7 @@ export default function Home() {
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
                   <Image
-                    src="/varena-logo.png"
+                    src="/varena-logo.svg"
                     alt="Varena Logo"
                     width={200}
                     height={200}
