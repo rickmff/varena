@@ -595,7 +595,7 @@ export default function Home() {
                   className="inline-block"
                 >
                   <Link
-                    href="/builds"
+                    href="/news"
                     className="flex items-center justify-center"
                   >
                     <div className="flex flex-col items-center justify-center gap-2 p-4 group cursor-pointer">
@@ -746,7 +746,7 @@ export default function Home() {
                       viewport={{ once: true }}
                     >
                       <Link
-                        href={`#${item.href}`}
+                        href={`${item.href}`}
                         className="hover:text-white transition-colors"
                       >
                         {item.name}
