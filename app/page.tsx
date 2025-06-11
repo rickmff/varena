@@ -498,27 +498,25 @@ export default function Home() {
                     return (
                       <motion.div
                         key={newsId}
-                        className="relative z-10"
-                        initial={{ opacity: 1, scale: 1 }}
-                        animate={{ opacity: 1, scale: 1 }}
                         whileHover={{
                           y: -10,
                           scale: 1.02,
                           transition: { duration: 0.2 },
                         }}
+                        className="h-full"
                       >
                         <Link
                           href={`/news/${newsSlug}`}
                           className="bg-black/90 backdrop-blur-sm rounded-lg border-2 border-red-900/50 hover:border-red-500
-                               transition-all duration-300 overflow-hidden group block h-full relative z-10"
+                               transition-all duration-300 overflow-hidden group block h-full relative"
                         >
                           {/* Glow effect on hover */}
-                          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0">
+                          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                             <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent" />
                             <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-red-900/20" />
                           </div>
 
-                          <div className="relative aspect-video z-10">
+                          <div className="relative aspect-video">
                             <img
                               src={newsCoverImage}
                               alt={newsTitle}
@@ -532,8 +530,8 @@ export default function Home() {
                             />
 
                             {/* Category Badge */}
-                            <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
-                              <div className="bg-red-900/90 text-white text-xs px-3 py-1.5 rounded-full font-bold border border-red-500/50 shadow-lg shadow-red-900/50 flex items-center gap-2">
+                            <div className="absolute top-4 right-4 flex items-center gap-2">
+                              <div className="bg-red-900/90 text-white text-xs px-3 py-1.5 rounded-full font-bold border border-red-500/50 shadow-lg shadow-red-900/50 flex items-center gap-2 pointer-events-none">
                                 {IconComponent && (
                                   <IconComponent className="w-3 h-3" />
                                 )}
@@ -542,7 +540,7 @@ export default function Home() {
                             </div>
                           </div>
 
-                          <div className="p-6 relative z-10">
+                          <div className="p-6 relative">
                             <div className="text-red-500 text-sm mb-2 font-bold tracking-wider">
                               {new Date(newsDate).toLocaleDateString()}
                             </div>

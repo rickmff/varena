@@ -4,9 +4,10 @@ import { ThemeProvider } from "@/components/theme-provider"
 import type { Metadata, Viewport } from "next"
 import { Toaster } from 'sonner'
 import { Inter, Junge } from 'next/font/google'
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ subsets: ['latin'] })
-const junge = Junge({ 
+const junge = Junge({
   weight: '400',
   subsets: ['latin'],
   variable: '--font-junge'
@@ -126,6 +127,7 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
+          <Analytics />
         </ThemeProvider>
         <Toaster richColors />
       </body>

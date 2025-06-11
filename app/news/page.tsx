@@ -206,7 +206,7 @@ export default function NewsPage() {
                           <div className="absolute top-4 right-4 flex items-center gap-2">
                             <motion.div
                               className="bg-red-900/80 text-white text-xs px-3 py-1.5 rounded-full font-bold
-                                   border border-red-500/50 shadow-lg shadow-red-900/50"
+                                   border border-red-500/50 shadow-lg shadow-red-900/50 pointer-events-none"
                               whileHover={{ scale: 1.05 }}
                             >
                               <div className="flex items-center gap-2">
