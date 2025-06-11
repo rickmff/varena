@@ -164,7 +164,8 @@ export default function NewsPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                {newsItems.slice(0, 3).map((news, index) => {
+                {/* Is right now showing 9 news cards */}
+                {newsItems.slice(0, 9).map((news, index) => {
                   const IconComponent = iconMap[news.iconName] || Terminal;
                   return (
                     <motion.div
