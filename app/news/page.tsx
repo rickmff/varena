@@ -110,7 +110,7 @@ export default function NewsPage() {
         <NavBar />
 
         {/* Hero Section */}
-        <section className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
+        <section className="relative pt-24 pb-4 md:pt-32 overflow-hidden bg-gradient-to-b from-black to-black">
           <div className="absolute inset-0 z-0 opacity-20">
             <Image
               src="/hero-bg.png"
@@ -132,7 +132,7 @@ export default function NewsPage() {
         </section>
 
         {/* News Grid */}
-        <section className="py-20 bg-black relative">
+        <section className="pb-20 pt-4 bg-black relative">
           <div className="container mx-auto px-4 relative">
             {loading ? (
               <motion.div
@@ -280,7 +280,7 @@ export default function NewsPage() {
         </section>
 
         {/* Back to Home */}
-        <section className="py-12 bg-black border-t border-red-900/30">
+        {/* <section className="py-12 bg-black border-t border-red-900/30">
           <div className="container mx-auto px-4 text-center">
             <Link
               href="/"
@@ -289,7 +289,7 @@ export default function NewsPage() {
               ← Back to Home
             </Link>
           </div>
-        </section>
+        </section> */}
       </div>
     </>
   );

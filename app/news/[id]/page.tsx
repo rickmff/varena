@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useEffect, use } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { notFound } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { formatDistanceToNow } from 'date-fns';
-import NotionRenderer from '@/components/NotionRenderer';
-import NavBar from '@/components/NavBar';
-import { Skeleton } from '@/components/ui/skeleton';
+import React, { useState, useEffect, use } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import { motion } from "framer-motion";
+import { formatDistanceToNow } from "date-fns";
+import NotionRenderer from "@/components/NotionRenderer";
+import NavBar from "@/components/NavBar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface NewsPostPageProps {
   params: Promise<{
@@ -21,7 +21,7 @@ function NewsPostSkeleton() {
     <div className="min-h-screen bg-black text-white">
       <NavBar />
 
-      <div className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
+      <div className="relative pt-24 pb-4 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
         <div className="absolute inset-0 z-0 opacity-20">
           <Image
             src="/hero-bg.png"
@@ -83,9 +83,9 @@ export default function NewsPostPage({ params }: NewsPostPageProps) {
 
         if (!response.ok) {
           if (response.status === 404) {
-            setError('Post not found');
+            setError("Post not found");
           } else {
-            setError('Failed to load post');
+            setError("Failed to load post");
           }
           return;
         }
@@ -99,8 +99,8 @@ export default function NewsPostPage({ params }: NewsPostPageProps) {
 
         setPost(postData);
       } catch (error) {
-        console.error('Error fetching post:', error);
-        setError('Failed to load post');
+        console.error("Error fetching post:", error);
+        setError("Failed to load post");
       } finally {
         setLoading(false);
       }
@@ -120,9 +120,12 @@ export default function NewsPostPage({ params }: NewsPostPageProps) {
         <div className="container mx-auto px-4 py-24">
           <div className="text-center">
             <div className="text-6xl mb-4">❌</div>
-            <h1 className="text-3xl font-bold text-red-400 mb-4">News Post Not Found</h1>
+            <h1 className="text-3xl font-bold text-red-400 mb-4">
+              News Post Not Found
+            </h1>
             <p className="text-gray-400 mb-8">
-              {error || 'The news post you\'re looking for doesn\'t exist or has been removed.'}
+              {error ||
+                "The news post you're looking for doesn't exist or has been removed."}
             </p>
             <Link
               href="/news"
@@ -199,7 +202,7 @@ export default function NewsPostPage({ params }: NewsPostPageProps) {
                     className="object-cover"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
+                      target.style.display = "none";
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/30" />
@@ -238,11 +241,27 @@ export default function NewsPostPage({ params }: NewsPostPageProps) {
               {/* Meta Information */}
               <div className="flex items-center justify-center space-x-6 text-gray-400">
                 {post.publishedDate && (
-                  <time dateTime={post.publishedDate} className="flex items-center">
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <time
+                    dateTime={post.publishedDate}
+                    className="flex items-center"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
                     </svg>
-                    Published {formatDistanceToNow(new Date(post.publishedDate), { addSuffix: true })}
+                    Published{" "}
+                    {formatDistanceToNow(new Date(post.publishedDate), {
+                      addSuffix: true,
+                    })}
                   </time>
                 )}
 
@@ -253,8 +272,18 @@ export default function NewsPostPage({ params }: NewsPostPageProps) {
                     rel="noopener noreferrer"
                     className="flex items-center text-red-400 hover:text-red-300 transition-colors"
                   >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
                     </svg>
                     View in Notion
                   </a>
@@ -306,8 +335,18 @@ export default function NewsPostPage({ params }: NewsPostPageProps) {
                       rel="noopener noreferrer"
                       className="inline-flex items-center px-4 py-2 border border-red-900/50 text-gray-300 font-medium rounded-lg hover:bg-red-900/20 hover:border-red-500 transition-all duration-200"
                     >
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      <svg
+                        className="w-4 h-4 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
                       </svg>
                       Edit in Notion
                     </a>
