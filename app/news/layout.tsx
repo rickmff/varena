@@ -4,4 +4,10 @@ export const metadata = {
   title: "V Arena - News",
 };
 
-export default Page;
+export default function NewsLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <>{children}</>;
+}

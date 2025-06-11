@@ -14,6 +14,7 @@ import {
   CalendarClock,
   Terminal,
   Plus,
+  Newspaper,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
@@ -273,24 +274,16 @@ export default function Home() {
         */}
 
         {/* YouTube Video Background */}
-        <div className="absolute inset-0 z-1 opacity-100">
-          <iframe
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{
-              width: "100vw",
-              height: "56.25vw", // 16:9 aspect ratio
-              minHeight: "100vh",
-              minWidth: "177.78vh", // 16:9 aspect ratio
-              left: "50%",
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-            }}
-            src="https://www.youtube.com/embed/gjzwjlCSbes?autoplay=1&mute=1&loop=1&playlist=gjzwjlCSbes&controls=0&showinfo=0&rel=0&modestbranding=1"
-            title="Arena Background"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          ></iframe>
+        <div className="absolute inset-0 z-1 opacity-60">
+          <div className="yt-embed-holder">
+            <iframe
+              src="https://www.youtube.com/embed/gjzwjlCSbes?autoplay=1&mute=1&loop=1&playlist=gjzwjlCSbes&controls=0&showinfo=0&rel=0&modestbranding=1"
+              title="Arena Background"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            ></iframe>
+          </div>
         </div>
 
         {/* Gradient overlays */}
@@ -330,7 +323,7 @@ export default function Home() {
                 <Image
                   src="/varena-logo.svg"
                   alt="Varena Logo Glow"
-                  width={500}//650
+                  width={500} //650
                   height={450}
                   className="mx-auto"
                 />
@@ -338,7 +331,7 @@ export default function Home() {
               <Image
                 src="/varena-logo.svg"
                 alt="Varena Logo"
-                width={500}//650
+                width={500} //650
                 height={450}
                 className="mx-auto relative z-10 hover:scale-102 transition-transform duration-300"
               />
@@ -601,25 +594,22 @@ export default function Home() {
                   whileTap={{ scale: 0.95 }}
                   className="inline-block"
                 >
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="border-2 border-red-900 text-white hover:bg-red-900/20 hover:border-red-500
-                           relative overflow-hidden group px-8 shadow-lg shadow-red-900/20"
+                  <Link
+                    href="/builds"
+                    className="flex items-center justify-center"
                   >
-                    <Link href="/news" className="flex items-center">
-                      <span className="relative z-10 font-bold tracking-wider">
-                        VIEW ALL NEWS
+                    <div className="flex flex-col items-center justify-center gap-2 p-4 group cursor-pointer">
+                      {/* Library icon */}
+                      <div className="w-10 h-10 rounded-full border-2 border-red-900/50 flex items-center justify-center group-hover:border-red-500 transition-colors duration-300">
+                        <Newspaper className="w-5 h-5 text-red-400 group-hover:text-red-300 transition-colors duration-300" />
+                      </div>
+
+                      {/* Text */}
+                      <span className="text-white group-hover:text-red-300 font-bold text-sm tracking-wide transition-colors duration-300">
+                        VIEW ALL THE NEWS
                       </span>
-                      <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-2 transition-transform" />
-                    </Link>
-                    <motion.span
-                      className="absolute inset-0 bg-gradient-to-r from-red-900/40 to-transparent"
-                      initial={{ x: "-100%" }}
-                      whileHover={{ x: 0 }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  </Button>
+                    </div>
+                  </Link>
                 </motion.div>
               </motion.div>
             )}
@@ -725,7 +715,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black border-t border-red-900/30 py-12 relative">
+      <footer className="bg-black border-t border-slate-800 py-12 relative">
         <div className="container mx-auto px-4 relative">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
@@ -816,7 +806,7 @@ export default function Home() {
             </div> */}
           </div>
           <motion.div
-            className="border-t border-white/20 mt-8 pt-8 text-center text-sm text-gray-300"
+            className="border-t border-slate-800 mt-8 pt-8 text-center text-sm text-slate-700"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ delay: 0.5 }}

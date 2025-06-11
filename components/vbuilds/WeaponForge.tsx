@@ -508,7 +508,6 @@ import { CSS } from "@dnd-kit/utilities";
 import React from "react";
 
 export function SortableItem(props) {
-  console.log(props);
   const {
     isSorting,
     attributes,
