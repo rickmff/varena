@@ -18,7 +18,6 @@ import {
 import NavBar from "@/components/NavBar";
 import { NewsCardSkeletonGrid } from "@/components/NewsCardSkeleton";
 import SectionHeader from "@/app/components/ui/SectionHeader";
-import Head from "next/head";
 
 // Icon mapping
 const iconMap: { [key: string]: React.ElementType } = {
@@ -253,7 +252,7 @@ export default function NewsPage() {
                 animate="visible"
                 variants={staggerContainer}
               >
-                <NewsCardSkeletonGrid count={3} />
+                <NewsCardSkeletonGrid count={9} />
                 <div className="text-center py-12 mt-8">
                   <div className="text-6xl mb-4">📰</div>
                   <h2 className="text-2xl font-semibold text-gray-300 mb-2">
