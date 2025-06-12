@@ -90,21 +90,21 @@
         "key": 6
       },
       {
-        "description": "Increase explosion healing (30 - 50%)",
-        "min": 30.0,
-        "max": 50.0,
-        "key": 7
-      },
-      {
         "description": "Explosion pushes enemies back (1.6 - 3.2m)",
         "min": 1.6,
         "max": 3.2,
-        "key": 8
+        "key": 7
       },
       {
         "description": "Explosion increases ally MS (10% - 18%) for 3s",
-        "min": null,
-        "max": null,
+        "min": 10.0,
+        "max": 18.0,
+        "key": 8
+      },
+      {
+        "description": "Increase explosion healing (30 - 50%)",
+        "min": 30.0,
+        "max": 50.0,
         "key": 9
       }
     ]
@@ -2158,7 +2158,7 @@
     "arenaCode": "A",
     "effects": [
       {
-        "description": "Conjure a bone spirit arround the target dealing (8 - 16%)",
+        "description": "Conjure a bone spirit around the target dealing (8 - 16%)",
         "min": 8.0,
         "max": 16.0,
         "key": 1
