@@ -33,9 +33,9 @@ const spellData: Record<string, Jewel> = {
       { id: 4, name: "Increase hit healing (16 - 36%)" },
       { id: 5, name: "Recast to conjure an AoE that deals damage to enemies and heals allies (20 - 36%) on hit and then explodes (20 - 36%)" },
       { id: 6, name: "Increase explosion damage (12 - 24%)" },
-      { id: 7, name: "Increase explosion healing (30 - 50%)" },
-      { id: 8, name: "Explosion pushes enemies back (1.6 - 3.2m)" },
-      { id: 9, name: "Explosion increases ally MS (10% - 18%) for 3s" }
+      { id: 7, name: "Explosion pushes enemies back (1.6 - 3.2m)" },
+      { id: 8, name: "Explosion increases ally MS (10% - 18%) for 3s" },
+      { id: 9, name: "Increase explosion healing (30 - 50%)" }
     ]
   },
   "bloodrage": {
@@ -628,7 +628,7 @@ const spellData: Record<string, Jewel> = {
     wiki: "https://vrising.fandom.com/wiki/Unholy_Chains",
     school: "unholy",
     effects: [
-      { id: 1, name: "Conjure a bone spirit arround the target dealing (8 - 16%) " },
+      { id: 1, name: "Conjure a bone spirit around the target dealing (8 - 16%) " },
       { id: 2, name: "Deals (35 - 55%) damage every 0.7s but reduce the damage by (50 - 90%)" },
       { id: 3, name: "Increase duration by (0.2 - 0.4s) and the damage done by (40 - 60%)" },
       { id: 4, name: "Inflict a fading snare (0.6 - 1.4s)" },
