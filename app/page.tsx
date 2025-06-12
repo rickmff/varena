@@ -196,36 +196,112 @@ export default function Home() {
   const [newsError, setNewsError] = useState<string | null>(null);
   const [hasBuilds, setHasBuilds] = useState(false);
   const [hasScrolledToSection, setHasScrolledToSection] = useState(false);
-  const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({});
+  const [isVideoVisible, setIsVideoVisible] = useState(false);
+  const videoRef = useRef<HTMLIFrameElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
+  const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY);
+      const currentScrollY = window.scrollY;
+      setScrollY(currentScrollY);
+
+      // Auto-scroll to features section on first scroll
+      if (currentScrollY > 10 && !hasScrolledToSection) {
+        setHasScrolledToSection(true);
+        const featuresSection = document.getElementById("features");
+        featuresSection?.scrollIntoView({ behavior: "smooth" });
+      }
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, [hasScrolledToSection]);
+
+  // Video visibility observer
+  useEffect(() => {
+    if (!videoContainerRef.current) return;
+
+    const options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.3, // Video will load when 30% visible
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        setIsVideoVisible(entry.isIntersecting);
+      });
+    }, options);
+
+    observer.observe(videoContainerRef.current);
+
+    return () => {
+      if (videoContainerRef.current) {
+        observer.unobserve(videoContainerRef.current);
+      }
+    };
   }, []);
 
+  // Handle video src based on visibility
+  const videoSrc = useMemo(() => {
+    if (!isVideoVisible) return '';
+    return "https://www.youtube.com/embed/gjzwjlCSbes?autoplay=1&mute=1&loop=1&playlist=gjzwjlCSbes&controls=0&showinfo=0&rel=0&modestbranding=1";
+  }, [isVideoVisible]);
+
   const fetchNewsFromAPI = async (retryCount = 0) => {
+    const maxRetries = 2;
+
     try {
-      const response = await fetch("/api/news");
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (retryCount === 0) {
+        setIsLoadingNews(true);
       }
+      setNewsError(null); // Clear any previous errors
+
+      const response = await fetch("/api/news?homepage=true", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // Add cache control to prevent stale data
+        next: { revalidate: 3600 }, // Cache for 1 hour
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          `HTTP error! status: ${response.status} - ${response.statusText}`
+        );
+      }
+
       const data = await response.json();
+
       if (data.error) {
         throw new Error(data.error);
-      }
-      setNewsItems(data);
-      setIsLoadingNews(false);
-    } catch (error) {
-      console.error("Failed to fetch news:", error);
-      if (retryCount < 3) {
-        setTimeout(() => fetchNewsFromAPI(retryCount + 1), 1000 * Math.pow(2, retryCount));
       } else {
-        setNewsError(error instanceof Error ? error.message : "Failed to fetch news");
+        // Ensure data is an array and has items
+        const newsData = Array.isArray(data) ? data : [];
+
+        // Set the news items immediately
+        setNewsItems(newsData);
+        setNewsError(null);
+
+        // Success - set loading to false immediately
+        setIsLoadingNews(false);
+      }
+    } catch (error) {
+      // Retry logic
+      if (retryCount < maxRetries) {
+        setTimeout(() => {
+          fetchNewsFromAPI(retryCount + 1);
+        }, (retryCount + 1) * 1000); // Exponential backoff
+      } else {
+        // Max retries reached
+        setNewsError(
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch news after multiple attempts"
+        );
+        setNewsItems([]);
         setIsLoadingNews(false);
       }
     }
@@ -235,131 +311,699 @@ export default function Home() {
     fetchNewsFromAPI();
   }, []);
 
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6 },
+    },
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { duration: 0.6 },
+    },
+  };
+
+  const scaleIn = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.5 },
+    },
+  };
+
+  // Define features data here, or fetch from an API
+  const featuresData = [
+    {
+      icon: "command",
+      image: "/images/features/Horse.webp",
+      title: "Qol Commands",
+      description:
+        "Enjoy a consequence free environment with commands designed for smooth practice.",
+    },
+    {
+      icon: "crossed-swords",
+      image: "/images/features/Pancake.webp",
+      title: "Game Modes",
+      description:
+        "Experience unique game modes, including the fan-favorite, Capture the Pancake.",
+    },
+    {
+      icon: "calendar-clock",
+      image: "/images/features/Events.webp",
+      title: "Events",
+      description:
+        "Participate in regular events and tournaments with the PvP community.",
+    },
+    {
+      icon: "moderation",
+      image: "/images/features/Moderation.webp",
+      title: "Moderation",
+      description:
+        "Enjoy a protected, safe space with active moderation and support.",
+    },
+  ];
+
+  // News Card Skeleton Component
+  const NewsCardSkeleton = () => (
+    <motion.div
+      variants={scaleIn}
+      className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-red-900/30 overflow-hidden h-full relative"
+    >
+      {/* Image Skeleton */}
+      <div className="relative aspect-video bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 animate-pulse">
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-zinc-700/50 to-transparent animate-shimmer"></div>
+
+        {/* Category Badge Skeleton */}
+        <div className="absolute top-4 right-4">
+          <div className="bg-zinc-800 rounded-full px-3 py-1.5 animate-pulse">
+            <div className="w-16 h-3 bg-zinc-700 rounded"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Skeleton */}
+      <div className="p-6 space-y-3">
+        {/* Date Skeleton */}
+        <div className="w-24 h-3 bg-zinc-800 rounded animate-pulse"></div>
+
+        {/* Title Skeleton */}
+        <div className="space-y-2">
+          <div className="w-full h-5 bg-zinc-800 rounded animate-pulse"></div>
+          <div className="w-3/4 h-5 bg-zinc-800 rounded animate-pulse"></div>
+        </div>
+
+        {/* Excerpt Skeleton */}
+        <div className="space-y-2 pt-2">
+          <div className="w-full h-3 bg-zinc-800 rounded animate-pulse"></div>
+          <div className="w-full h-3 bg-zinc-800 rounded animate-pulse"></div>
+          <div className="w-2/3 h-3 bg-zinc-800 rounded animate-pulse"></div>
+        </div>
+
+        {/* Read More Button Skeleton */}
+        <div className="pt-4">
+          <div className="w-20 h-3 bg-zinc-800 rounded animate-pulse"></div>
+        </div>
+      </div>
+    </motion.div>
+  );
+
+  // Process news items to ensure they have valid image URLs and prepare for optimization
+  const processedNewsItems = useMemo(() => {
+    if (!Array.isArray(newsItems)) {
+      console.warn('newsItems is not an array:', newsItems);
+      return [];
+    }
+
+    const seenImages = new Set<string>();
+    const processedItems = newsItems.map(news => {
+      if (!news) {
+        console.warn('Found null/undefined news item');
+        return null;
+      }
+
+      try {
+        // Use fallbacks for missing properties
+        const newsId = news.id || news._id || `news-${Math.random().toString(36).substring(7)}`;
+        const newsTitle = news.title || news.name || "News Item";
+        const newsSlug = news.slug || newsId;
+        const newsDate = news.date || news.createdAt || news.created_time || new Date().toISOString();
+        const newsExcerpt = news.excerpt || news.description || news.content?.substring(0, 150) || "Read more to discover the latest updates...";
+        const newsCategory = news.category || news.type || "News";
+        const newsIconName = news.iconName || "Terminal";
+
+        // Process image URL and ensure uniqueness
+        let newsCoverImage = news.coverImageUrl || news.image || news.cover || "/news.png";
+
+        // Clean up the URL to ensure consistent format
+        if (newsCoverImage && newsCoverImage !== "/news.png") {
+          try {
+            // Check if it's a relative URL (starts with /)
+            if (newsCoverImage.startsWith('/')) {
+              // Keep relative URLs as is
+              newsCoverImage = newsCoverImage;
+            } else {
+              // For absolute URLs, validate them
+              const url = new URL(newsCoverImage);
+              newsCoverImage = url.toString();
+            }
+          } catch (e) {
+            console.warn('Invalid image URL:', newsCoverImage);
+            newsCoverImage = "/news.png";
+          }
+        }
+
+        // If image URL is already seen, invalid, or had errors, use fallback
+        if (!newsCoverImage || seenImages.has(newsCoverImage) || imageLoadErrors[newsCoverImage]) {
+          newsCoverImage = "/news.png";
+        } else {
+          seenImages.add(newsCoverImage);
+        }
+
+        return {
+          id: newsId,
+          title: newsTitle,
+          slug: newsSlug,
+          date: newsDate,
+          excerpt: newsExcerpt,
+          category: newsCategory,
+          iconName: newsIconName,
+          coverImageUrl: newsCoverImage,
+        };
+      } catch (error) {
+        console.error('Error processing news item:', error);
+        return null;
+      }
+    }).filter(Boolean);
+
+    // Only return first 3 items to prevent unnecessary image loading
+    return processedItems.slice(0, 3);
+  }, [newsItems, imageLoadErrors]);
+
+  // Handle image error with retry logic
   const handleImageError = (imageUrl: string) => {
-    setImageLoadErrors((prev) => ({ ...prev, [imageUrl]: true }));
+    setImageLoadErrors(prev => ({
+      ...prev,
+      [imageUrl]: true
+    }));
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white overflow-hidden">
       <NavBar />
-
       {/* Hero Section */}
-      <section className="relative pt-24 pb-4 md:pt-32 overflow-hidden bg-gradient-to-b from-black to-black">
-        <div className="absolute inset-0 z-0 opacity-20">
-          <Image
-            src="/hero-bg.png"
-            alt="V Rising Background"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black"></div>
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-black to-black">
+        {/*
+        <div className="absolute inset-0 z-0">
+          <BloodParticles />
+        </div>
+        */}
+
+        {/* YouTube Video Background */}
+        <div
+          ref={videoContainerRef}
+          className="absolute inset-0 z-1 opacity-60"
+        >
+          <div className="yt-embed-holder">
+            {isVideoVisible ? (
+              <iframe
+                ref={videoRef}
+                src={videoSrc}
+                title="Arena Background"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full bg-black">
+                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 to-black"></div>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="container mx-auto px-4 relative z-10">
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 z-2 bg-gradient-to-b from-black/80 via-black/30 to-black"></div>
+
+        {/* Animated background elements */}
+        <div className="absolute inset-0 z-3">
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-purple-500/8 rounded-full blur-3xl animate-pulse delay-1000" />
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10 -mt-20">
+          <motion.div
+            className="max-w-4xl mx-auto text-center space-y-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+          >
+            {/* Logo with enhanced styling */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative"
+            >
+              <motion.div
+                className="absolute inset-0 blur-2xl opacity-15"
+                animate={{
+                  opacity: [0.0, 0.4, 0.0],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  // ease: "easeOutBack"
+                }}
+              >
+                <Image
+                  src="/varena-logo.svg"
+                  alt="Varena Logo Glow"
+                  width={500} //650
+                  height={450}
+                  className="mx-auto"
+                />
+              </motion.div>
+              <Image
+                src="/varena-logo.svg"
+                alt="Varena Logo"
+                width={500} //650
+                height={450}
+                className="mx-auto relative z-10 hover:scale-102 transition-transform duration-300"
+              />
+            </motion.div>
+          </motion.div>
+        </div>
+
+        {/* Animated scroll indicator - positioned relative to hero section */}
+        <motion.button
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.0 }}
+          onClick={() => {
+            const featuresSection = document.getElementById("features");
+            featuresSection?.scrollIntoView({ behavior: "smooth" });
+          }}
+          className="absolute bottom-16 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center group transition-all duration-300 hover:scale-110 overflow-hidden z-20"
+        >
+          {/* Animated border */}
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              y: [3, 0, 3],
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute inset-0 border-2 border-white/30 group-hover:border-white/60 rounded-full transition-colors duration-300"
+          />
+
+          {/* Animated caret */}
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="text-white/60 group-hover:text-white transition-colors relative z-10"
+          >
+            <ChevronRight className="h-6 w-6 rotate-90" />
+          </motion.div>
+        </motion.button>
+      </section>
+
+      {/* Features Section - Now uses the FeatureCarousel component */}
+      <section id="features">
+        <FeatureCarousel features={featuresData} />
+      </section>
+
+      {/* Builds Section */}
+      <section id="builds" className="py-20 bg-black relative">
+        <div className="container mx-auto px-4 relative">
+          <SectionHeader
+            title="Build Collection"
+            subtitle="Build Library"
+            description="Access starter templates and manage your custom builds"
+          />
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+          >
+            <BuildsListHome />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Command Generator Section */}
+      <section id="commands" className="py-20 bg-black relative">
+        <div className="container mx-auto px-4 relative">
+          <SectionHeader
+            title="Command Generator"
+            subtitle="Server Commands"
+            description="Generate commands for V Arena"
+          />
+          <CommandGenerator />
+        </div>
+      </section>
+
+      {/* News Section */}
+      <section id="news" className="py-20 bg-black relative">
+        <div className="container mx-auto px-4 relative">
           <SectionHeader
             title="News & Updates"
             subtitle="Echoes of V Arena"
             description="Stay informed about the latest updates, events, and community highlights"
           />
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+          >
+            {(() => {
+              // Loading state
+              if (isLoadingNews) {
+                return [...Array(3)].map((_, index) => (
+                  <NewsCardSkeleton key={`skeleton-${index}`} />
+                ));
+              }
+
+              // Error state
+              if (newsError) {
+                return (
+                  <motion.div
+                    className="col-span-full text-center py-12"
+                    variants={fadeInUp}
+                  >
+                    <div className="text-6xl mb-4">⚠️</div>
+                    <h3 className="text-2xl font-semibold text-red-400 mb-2">
+                      Failed to Load News
+                    </h3>
+                    <p className="text-gray-400 mb-4">{newsError}</p>
+                    <button
+                      onClick={() => fetchNewsFromAPI()}
+                      className="px-4 py-2 bg-red-900/50 border border-red-900/50 text-white rounded-lg hover:bg-red-900/70 transition-colors"
+                    >
+                      Try Again
+                    </button>
+                  </motion.div>
+                );
+              }
+
+              // Check if we have valid news items
+              if (!Array.isArray(processedNewsItems)) {
+                console.warn('processedNewsItems is not an array:', processedNewsItems);
+                return null;
+              }
+
+              if (processedNewsItems.length === 0) {
+                return (
+                  <motion.div
+                    className="col-span-full text-center py-12"
+                    variants={fadeInUp}
+                  >
+                    <div className="text-6xl mb-4">📰</div>
+                    <h3 className="text-2xl font-semibold text-gray-300 mb-2">
+                      No News Available
+                    </h3>
+                    <p className="text-gray-400 mb-4">
+                      Check back later for the latest updates and announcements.
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      If this persists, please ensure your Notion integration is
+                      correctly configured.
+                    </p>
+                  </motion.div>
+                );
+              }
+
+              return processedNewsItems.map((news, index) => {
+                if (!news) {
+                  console.warn('Found null news item in processedNewsItems');
+                  return null;
+                }
+
+                return (
+                  <NewsCard
+                    key={news.id}
+                    news={news}
+                    index={index}
+                    onImageError={handleImageError}
+                  />
+                );
+              }).filter(Boolean);
+            })()}
+          </motion.div>
+
+          {/* View All Button - Only show when not loading and has news */}
+          {!isLoadingNews &&
+            !newsError &&
+            processedNewsItems &&
+            processedNewsItems.length > 0 && (
+              <motion.div
+                className="text-center mt-12"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                viewport={{ once: true }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-block"
+                >
+                  <Link
+                    href="/news"
+                    className="flex items-center justify-center"
+                  >
+                    <div className="flex flex-col items-center justify-center gap-2 p-4 group cursor-pointer">
+                      {/* Library icon */}
+                      <div className="w-10 h-10 rounded-full border-2 border-red-900/50 flex items-center justify-center group-hover:border-red-500 transition-colors duration-300">
+                        <Newspaper className="w-5 h-5 text-red-400 group-hover:text-red-300 transition-colors duration-300" />
+                      </div>
+
+                      {/* Text */}
+                      <span className="text-white group-hover:text-red-300 font-bold text-sm tracking-wide transition-colors duration-300">
+                        VIEW ALL THE NEWS
+                      </span>
+                    </div>
+                  </Link>
+                </motion.div>
+              </motion.div>
+            )}
         </div>
       </section>
 
-      {/* News Grid */}
-      <section className="pb-20 pt-4 bg-black relative">
-        <div className="container mx-auto px-4 relative">
-          {isLoadingNews ? (
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={{
-                hidden: { opacity: 0 },
-                visible: {
-                  opacity: 1,
-                  transition: {
-                    staggerChildren: 0.1,
-                  },
-                },
-              }}
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[1, 2, 3].map((i) => (
+      {/* Call to Action */}
+      <section className="py-20 relative overflow-hidden">
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black to-transparent"></div>
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black"></div>
+        {/*         <div className="absolute inset-0 z-0">
+          <Image
+            src="/flower.webp"
+            alt="Background Pattern"
+            fill
+            className="object-cover opacity-30"
+            loading="lazy"
+            sizes="100vw"
+            quality={60}
+          />
+        </div> */}
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div
+            className="max-w-6xl mx-auto "
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <div className="grid md:grid-cols-2 items-center">
+              {/* Left side - Discord preview */}
+
+              <Image
+                src="/logo.png"
+                alt="Logo"
+                width={400}
+                height={400}
+                className="w-full h-auto object-contain relative z-10"
+              />
+
+              {/* Right side - Call to action */}
+              <div className="p-12 md:p-12">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent uppercase">
+                    United by our thirst for blood
+                  </h2>
+                  <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                    Join a community of both new and experienced players.
+                    Sharpen your skills, test new playstyles, and join your kin
+                    for the hunt!
+                  </p>
                   <motion.div
-                    key={i}
-                    variants={{
-                      hidden: { opacity: 0, scale: 0.9 },
-                      visible: {
-                        opacity: 1,
-                        scale: 1,
-                        transition: { duration: 0.5 },
-                      },
-                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="mb-8"
                   >
-                    <div className="bg-black/90 backdrop-blur-sm rounded-lg border-2 border-red-900/50 overflow-hidden">
-                      <div className="aspect-video bg-gray-900 animate-pulse" />
-                      <div className="p-6">
-                        <div className="h-4 w-24 bg-gray-800 rounded animate-pulse mb-2" />
-                        <div className="h-6 w-3/4 bg-gray-800 rounded animate-pulse mb-3" />
-                        <div className="h-4 w-full bg-gray-800 rounded animate-pulse mb-2" />
-                        <div className="h-4 w-2/3 bg-gray-800 rounded animate-pulse" />
-                      </div>
-                    </div>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 relative overflow-hidden group px-8 w-full py-8 gap-4"
+                    >
+                      <Link
+                        href="https://discord.gg/varena"
+                        target="_blank"
+                        className="flex items-center justify-center gap-4"
+                      >
+                        <Image
+                          src="/discord.svg"
+                          alt="Discord"
+                          width={32}
+                          height={32}
+                          className="h-8 w-8 group-hover:scale-110 transition-transform"
+                        />
+                        <span className="text-2xl font-bold tracking-wider">
+                          JOIN THE ARENA
+                        </span>
+                        <motion.span
+                          className="absolute inset-0 bg-white/10"
+                          initial={{ x: "-100%" }}
+                          whileHover={{ x: 0 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      </Link>
+                    </Button>
                   </motion.div>
-                ))}
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-400 truncate">
+                    <motion.div
+                      className="flex items-center gap-2"
+                      whileHover={{ scale: 1.05, color: "#fff" }}
+                    >
+                      <Users className="h-5 w-5" />
+                      <span className="font-semibold">7,000+ Members</span>
+                    </motion.div>
+                    <motion.div
+                      className="flex items-center gap-2"
+                      whileHover={{ scale: 1.05, color: "#fff" }}
+                    >
+                      <Moon className="h-5 w-5" />
+                      <span className="font-semibold">
+                        Active 24/7 as long as Rendy doesn't sleep
+                      </span>
+                    </motion.div>
+                  </div>
+                </motion.div>
               </div>
-            </motion.div>
-          ) : newsError ? (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">⚠️</div>
-              <h2 className="text-2xl font-semibold text-red-400 mb-2">
-                Failed to Load News
-              </h2>
-              <p className="text-gray-400 mb-6">{newsError}</p>
-              <button
-                onClick={() => fetchNewsFromAPI()}
-                className="px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 transition-colors duration-200"
-              >
-                Try Again
-              </button>
             </div>
-          ) : newsItems.length > 0 ? (
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-              variants={{
-                hidden: { opacity: 0 },
-                visible: {
-                  opacity: 1,
-                  transition: {
-                    staggerChildren: 0.1,
-                  },
-                },
-              }}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              {newsItems.map((news, index) => (
-                <NewsCard
-                  key={news.id}
-                  news={news}
-                  index={index}
-                  onImageError={handleImageError}
-                />
-              ))}
-            </motion.div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">📰</div>
-              <h2 className="text-2xl font-semibold text-gray-400 mb-2">
-                No News Available
-              </h2>
-              <p className="text-gray-500">
-                Check back later for updates and announcements.
-              </p>
-            </div>
-          )}
+          </motion.div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-black border-t border-slate-800 py-12 relative">
+        <div className="container mx-auto px-4 relative">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <Link href="/" className="flex items-center gap-2 mb-4">
+                <motion.div
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <Image
+                    src="/varena-logo.svg"
+                    alt="Varena Logo"
+                    width={200}
+                    height={200}
+                    className="hover:scale-110 transition-transform duration-300"
+                  />
+                </motion.div>
+              </Link>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-4">Links</h3>
+              <ul className="space-y-2 text-sm text-gray-100">
+                {menuItems.map(
+                  (item: { name: string; href: string }, i: number) => (
+                    <motion.li
+                      key={item.name}
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      viewport={{ once: true }}
+                    >
+                      <Link
+                        href={`${item.href}`}
+                        className="hover:text-white transition-colors"
+                      >
+                        {item.name}
+                      </Link>
+                    </motion.li>
+                  )
+                )}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-4">Community</h3>
+              <ul className="space-y-2 text-sm text-gray-100">
+                {[
+                  { name: "Discord", href: "https://www.discord.gg/varena" },
+                  { name: "Twitter", href: "https://www.x.com/VRisingVArena" },
+                  {
+                    name: "YouTube",
+                    href: "https://www.youtube.com/@VRisingArena",
+                  },
+                  { name: "Twitch", href: "https://www.twitch.tv/varenatv" },
+                ].map((item, i) => (
+                  <motion.li
+                    key={item.name}
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    <Link
+                      href={item.href}
+                      className="hover:text-white transition-colors"
+                      target="_blank"
+                    >
+                      {item.name}
+                    </Link>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+            {/*             <div>
+              <h3 className="text-lg font-bold mb-4">Legal</h3>
+              <ul className="space-y-2 text-sm text-gray-100">
+                {["Privacy Policy", "Terms of Service", "Cookie Policy", "EULA"].map((item, i) => (
+                  <motion.li
+                    key={item}
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    <Link href="#" className="hover:text-white transition-colors">
+                      {item}
+                    </Link>
+                  </motion.li>
+                ))}
+              </ul>
+            </div> */}
+          </div>
+          <motion.div
+            className="border-t border-slate-800 mt-8 pt-8 text-center text-sm text-slate-700"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <p>© {new Date().getFullYear()} V Arena. All rights reserved.</p>
+            <p className="mt-2">
+              This is a fan-made website and is not affiliated with Stunlock
+              Studios.
+            </p>
+          </motion.div>
+        </div>
+      </footer>
     </div>
   );
 }
