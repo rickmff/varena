@@ -151,34 +151,89 @@ export async function getNotionPages(id: string): Promise<PageDetails[]> {
   }
 }
 
-// New function to get news posts from a Notion page or database
-export async function getNewsPosts(parentId: string): Promise<NewsPost[]> {
+// Cache for Notion responses
+let newsCache: {
+  items: NewsPost[];
+  timestamp: number;
+} | null = null;
+
+const CACHE_DURATION = 3600000; // 1 hour in milliseconds
+const MAX_ITEMS = 3; // Maximum number of items to fetch for homepage
+
+// Helper function to optimize Notion image URLs
+function optimizeNotionImageUrl(url: string | null): string | null {
+  if (!url) return null;
+
+  try {
+    const urlObj = new URL(url);
+
+    // Check if it's a Notion URL
+    if (urlObj.hostname === 'prod-files-secure.s3.us-west-2.amazonaws.com') {
+      // Use our proxy endpoint
+      return `/api/image?url=${encodeURIComponent(url)}`;
+    }
+
+    return url;
+  } catch (e) {
+    console.error('Invalid URL:', url);
+    return null;
+  }
+}
+
+// New function to check if cache is valid
+function isCacheValid(): boolean {
+  return (
+    newsCache !== null &&
+    newsCache.items.length > 0 &&
+    Date.now() - newsCache.timestamp < CACHE_DURATION
+  );
+}
+
+// New function to get news posts with caching
+export async function getNewsPosts(parentId: string, forHomepage: boolean = false): Promise<NewsPost[]> {
+  // Check cache first
+  if (isCacheValid()) {
+    return forHomepage ? newsCache!.items.slice(0, MAX_ITEMS) : newsCache!.items;
+  }
+
   if (!parentId) {
     console.error("No parent ID provided for getNewsPosts");
     return [];
   }
 
-  // console.log(`Fetching news posts from Notion page: ${parentId}`);
-
   try {
+    // Only fetch what we need
+    const pageSize = forHomepage ? MAX_ITEMS : 100;
+
     const blocks = await notion.blocks.children.list({
       block_id: parentId,
-      page_size: 100,
+      page_size: pageSize,
     });
-
-    // console.log(`Found ${blocks.results.length} blocks in parent page`);
 
     const childPages = blocks.results.filter(
       (block) => (block as BlockObjectResponse).type === "child_page",
     ) as BlockObjectResponse[];
-
-    // console.log(`Found ${childPages.length} child pages`);
 
     if (childPages.length === 0) {
       console.warn("No child pages found. Make sure you have created child pages under your news parent page.");
       return [];
     }
 
+    // Get the parent page's cover image to use as fallback
+    const parentPage = await notion.pages.retrieve({
+      page_id: parentId,
+    }) as unknown as NotionPageResponse;
+
+    let defaultCoverImage: string | null = null;
+    if (parentPage.cover) {
+      if (parentPage.cover.type === "file" && parentPage.cover.file) {
+        defaultCoverImage = optimizeNotionImageUrl(parentPage.cover.file.url);
+      } else if (parentPage.cover.type === "external" && parentPage.cover.external) {
+        defaultCoverImage = optimizeNotionImageUrl(parentPage.cover.external.url);
+      }
+    }
+
+    // Batch fetch page details to reduce API calls
     const newsPosts = await Promise.all(
       childPages.map(async (page): Promise<NewsPost | null> => {
         const pageId = page.id;
@@ -204,23 +259,26 @@ export async function getNewsPosts(parentId: string): Promise<NewsPost[]> {
             if (pageDetails.icon.type === "emoji" && pageDetails.icon.emoji) {
               icon = pageDetails.icon.emoji;
             } else if (pageDetails.icon.type === "file" && pageDetails.icon.file) {
-              iconUrl = pageDetails.icon.file.url;
+              iconUrl = optimizeNotionImageUrl(pageDetails.icon.file.url);
             }
           }
 
           // Get cover image from the page details
           if (pageDetails.cover) {
             if (pageDetails.cover.type === "file" && pageDetails.cover.file) {
-              coverImageUrl = pageDetails.cover.file.url;
+              coverImageUrl = optimizeNotionImageUrl(pageDetails.cover.file.url);
             } else if (pageDetails.cover.type === "external" && pageDetails.cover.external) {
-              coverImageUrl = pageDetails.cover.external.url;
+              coverImageUrl = optimizeNotionImageUrl(pageDetails.cover.external.url);
             }
           }
 
-          // Get excerpt from first paragraph block
-          const excerpt = await getPageExcerpt(pageId);
+          // Use default cover image if no cover image is set
+          if (!coverImageUrl && defaultCoverImage) {
+            coverImageUrl = defaultCoverImage;
+          }
 
-          // console.log(`Successfully processed news post: ${title}`);
+          // Get excerpt from first paragraph block - only if needed
+          const excerpt = forHomepage ? await getPageExcerpt(pageId) : undefined;
 
           return {
             id: pageId,
@@ -241,9 +299,14 @@ export async function getNewsPosts(parentId: string): Promise<NewsPost[]> {
 
     // Filter out any null results from failed page processing
     const validNewsPosts = newsPosts.filter((post): post is NewsPost => post !== null);
-    // console.log(`Successfully processed ${validNewsPosts.length} news posts`);
 
-    return validNewsPosts;
+    // Update cache
+    newsCache = {
+      items: validNewsPosts,
+      timestamp: Date.now(),
+    };
+
+    return forHomepage ? validNewsPosts.slice(0, MAX_ITEMS) : validNewsPosts;
   } catch (error) {
     if (isNotionClientError(error)) {
       console.error("Notion API error in getNewsPosts:", {

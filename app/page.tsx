@@ -17,7 +17,7 @@ import {
   Newspaper,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef, memo } from "react";
 import BloodParticles from "@/components/blood-particles";
 import NavBar, { DiscordButton, menuItems } from "@/components/NavBar";
 import CommandGenerator from "@/components/command-generator";
@@ -48,8 +48,8 @@ interface NewsItem {
   excerpt: string;
   category: string;
   iconName: string; // e.g., "Castle", "Moon"
-  slug?: string; // Optional slug for news posts
-  coverImageUrl?: string; // Cover image from Notion
+  slug: string; // Make slug required
+  coverImageUrl: string; // Make coverImageUrl required
   // Additional optional properties that might come from different APIs
   _id?: string; // Alternative ID field
   name?: string; // Alternative title field
@@ -60,16 +60,146 @@ interface NewsItem {
   type?: string; // Alternative category field
   image?: string; // Alternative cover image field
   cover?: string; // Another alternative cover image field
-  // Add other fields if necessary
 }
+
+// News Card Component - Memoized
+const NewsCard = memo(({ news, index, onImageError }: {
+  news: NewsItem;
+  index: number;
+  onImageError: (url: string) => void;
+}) => {
+  // Add null check for news
+  if (!news) {
+    console.warn('NewsCard received null/undefined news prop');
+    return null;
+  }
+
+  // Validate required properties
+  if (!news.id || !news.title || !news.slug || !news.date || !news.excerpt || !news.category || !news.iconName || !news.coverImageUrl) {
+    console.warn('NewsCard received news item with missing required properties:', news);
+    return null;
+  }
+
+  const IconComponent = iconMap[news.iconName] || Terminal;
+  const [isVisible, setIsVisible] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      {
+        rootMargin: '50px',
+        threshold: 0.1
+      }
+    );
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => {
+      if (cardRef.current) {
+        observer.unobserve(cardRef.current);
+      }
+    };
+  }, []);
+
+  const handleImageError = (url: string) => {
+    setImageError(true);
+    onImageError(url);
+  };
+
+  // Use fallback image if no cover image URL is provided or if there was an error
+  const imageUrl = (!news.coverImageUrl || imageError) ? '/news.png' : news.coverImageUrl;
+
+  return (
+    <motion.div
+      ref={cardRef}
+      key={news.id}
+      whileHover={{
+        y: -10,
+        scale: 1.02,
+        transition: { duration: 0.2 },
+      }}
+      className="h-full"
+    >
+      <Link
+        href={`/news/${news.slug}`}
+        className="bg-black/90 backdrop-blur-sm rounded-lg border-2 border-red-900/50 hover:border-red-500
+                 transition-all duration-300 overflow-hidden group block h-full relative"
+      >
+        {/* Glow effect on hover */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-red-900/20" />
+        </div>
+
+        <div className="relative aspect-video">
+          {isVisible && (
+            <Image
+              src={imageUrl}
+              alt={news.title}
+              width={640}
+              height={360}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              loading={index === 0 ? "eager" : "lazy"}
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMDAwMDAwIiAvPjwvc3ZnPg=="
+              onError={() => handleImageError(imageUrl)}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              quality={75}
+              priority={index === 0}
+              unoptimized={imageUrl.startsWith('data:') || imageUrl === '/news.png'}
+            />
+          )}
+
+          {/* Category Badge */}
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            <div className="bg-red-900/90 text-white text-xs px-3 py-1.5 rounded-full font-bold border border-red-500/50 shadow-lg shadow-red-900/50 flex items-center gap-2 pointer-events-none">
+              {IconComponent && (
+                <IconComponent className="w-3 h-3" />
+              )}
+              {news.category}
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 relative">
+          <div className="text-red-500 text-sm mb-2 font-bold tracking-wider">
+            {new Date(news.date).toLocaleDateString()}
+          </div>
+          <h3 className="text-xl font-bold mb-3 text-white group-hover:text-red-400 transition-colors">
+            {news.title}
+          </h3>
+          <p className="text-gray-300 mb-4">{news.excerpt}</p>
+
+          {/* Read More Button */}
+          <div className="flex items-center gap-2 text-red-500 text-sm font-bold group-hover:text-red-400 transition-colors">
+            READ MORE
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+});
+
+NewsCard.displayName = 'NewsCard';
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
-  const [newsItems, setNewsItems] = useState<NewsItem[]>([]); // State for news items
-  const [isLoadingNews, setIsLoadingNews] = useState(true); // Add loading state
-  const [newsError, setNewsError] = useState<string | null>(null); // Add error state
-  const [hasBuilds, setHasBuilds] = useState(false); // State for whether user has builds
-  const [hasScrolledToSection, setHasScrolledToSection] = useState(false); // Track if we've already scrolled to section
+  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const [isLoadingNews, setIsLoadingNews] = useState(true);
+  const [newsError, setNewsError] = useState<string | null>(null);
+  const [hasBuilds, setHasBuilds] = useState(false);
+  const [hasScrolledToSection, setHasScrolledToSection] = useState(false);
+  const [isVideoVisible, setIsVideoVisible] = useState(false);
+  const videoRef = useRef<HTMLIFrameElement>(null);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
+  const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const handleScroll = () => {
@@ -88,6 +218,37 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [hasScrolledToSection]);
 
+  // Video visibility observer
+  useEffect(() => {
+    if (!videoContainerRef.current) return;
+
+    const options = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.3, // Video will load when 30% visible
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        setIsVideoVisible(entry.isIntersecting);
+      });
+    }, options);
+
+    observer.observe(videoContainerRef.current);
+
+    return () => {
+      if (videoContainerRef.current) {
+        observer.unobserve(videoContainerRef.current);
+      }
+    };
+  }, []);
+
+  // Handle video src based on visibility
+  const videoSrc = useMemo(() => {
+    if (!isVideoVisible) return '';
+    return "https://www.youtube.com/embed/gjzwjlCSbes?autoplay=1&mute=1&loop=1&playlist=gjzwjlCSbes&controls=0&showinfo=0&rel=0&modestbranding=1";
+  }, [isVideoVisible]);
+
   const fetchNewsFromAPI = async (retryCount = 0) => {
     const maxRetries = 2;
 
@@ -97,13 +258,13 @@ export default function Home() {
       }
       setNewsError(null); // Clear any previous errors
 
-      const response = await fetch("/api/news", {
+      const response = await fetch("/api/news?homepage=true", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
         // Add cache control to prevent stale data
-        cache: "no-cache",
+        next: { revalidate: 3600 }, // Cache for 1 hour
       });
 
       if (!response.ok) {
@@ -190,28 +351,28 @@ export default function Home() {
   const featuresData = [
     {
       icon: "command",
-      image: "/images/features/Horse.png",
+      image: "/images/features/Horse.webp",
       title: "Qol Commands",
       description:
         "Enjoy a consequence free environment with commands designed for smooth practice.",
     },
     {
       icon: "crossed-swords",
-      image: "/images/features/Pancake.png",
+      image: "/images/features/Pancake.webp",
       title: "Game Modes",
       description:
         "Experience unique game modes, including the fan-favorite, Capture the Pancake.",
     },
     {
       icon: "calendar-clock",
-      image: "/images/features/Events.png",
+      image: "/images/features/Events.webp",
       title: "Events",
       description:
         "Participate in regular events and tournaments with the PvP community.",
     },
     {
       icon: "moderation",
-      image: "/images/features/Moderation.png",
+      image: "/images/features/Moderation.webp",
       title: "Moderation",
       description:
         "Enjoy a protected, safe space with active moderation and support.",
@@ -262,6 +423,86 @@ export default function Home() {
     </motion.div>
   );
 
+  // Process news items to ensure they have valid image URLs and prepare for optimization
+  const processedNewsItems = useMemo(() => {
+    if (!Array.isArray(newsItems)) {
+      console.warn('newsItems is not an array:', newsItems);
+      return [];
+    }
+
+    const seenImages = new Set<string>();
+    const processedItems = newsItems.map(news => {
+      if (!news) {
+        console.warn('Found null/undefined news item');
+        return null;
+      }
+
+      try {
+        // Use fallbacks for missing properties
+        const newsId = news.id || news._id || `news-${Math.random().toString(36).substring(7)}`;
+        const newsTitle = news.title || news.name || "News Item";
+        const newsSlug = news.slug || newsId;
+        const newsDate = news.date || news.createdAt || news.created_time || new Date().toISOString();
+        const newsExcerpt = news.excerpt || news.description || news.content?.substring(0, 150) || "Read more to discover the latest updates...";
+        const newsCategory = news.category || news.type || "News";
+        const newsIconName = news.iconName || "Terminal";
+
+        // Process image URL and ensure uniqueness
+        let newsCoverImage = news.coverImageUrl || news.image || news.cover || "/news.png";
+
+        // Clean up the URL to ensure consistent format
+        if (newsCoverImage && newsCoverImage !== "/news.png") {
+          try {
+            // Check if it's a relative URL (starts with /)
+            if (newsCoverImage.startsWith('/')) {
+              // Keep relative URLs as is
+              newsCoverImage = newsCoverImage;
+            } else {
+              // For absolute URLs, validate them
+              const url = new URL(newsCoverImage);
+              newsCoverImage = url.toString();
+            }
+          } catch (e) {
+            console.warn('Invalid image URL:', newsCoverImage);
+            newsCoverImage = "/news.png";
+          }
+        }
+
+        // If image URL is already seen, invalid, or had errors, use fallback
+        if (!newsCoverImage || seenImages.has(newsCoverImage) || imageLoadErrors[newsCoverImage]) {
+          newsCoverImage = "/news.png";
+        } else {
+          seenImages.add(newsCoverImage);
+        }
+
+        return {
+          id: newsId,
+          title: newsTitle,
+          slug: newsSlug,
+          date: newsDate,
+          excerpt: newsExcerpt,
+          category: newsCategory,
+          iconName: newsIconName,
+          coverImageUrl: newsCoverImage,
+        };
+      } catch (error) {
+        console.error('Error processing news item:', error);
+        return null;
+      }
+    }).filter(Boolean);
+
+    // Only return first 3 items to prevent unnecessary image loading
+    return processedItems.slice(0, 3);
+  }, [newsItems, imageLoadErrors]);
+
+  // Handle image error with retry logic
+  const handleImageError = (imageUrl: string) => {
+    setImageLoadErrors(prev => ({
+      ...prev,
+      [imageUrl]: true
+    }));
+  };
+
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
       <NavBar />
@@ -274,15 +515,26 @@ export default function Home() {
         */}
 
         {/* YouTube Video Background */}
-        <div className="absolute inset-0 z-1 opacity-60">
+        <div
+          ref={videoContainerRef}
+          className="absolute inset-0 z-1 opacity-60"
+        >
           <div className="yt-embed-holder">
-            <iframe
-              src="https://www.youtube.com/embed/gjzwjlCSbes?autoplay=1&mute=1&loop=1&playlist=gjzwjlCSbes&controls=0&showinfo=0&rel=0&modestbranding=1"
-              title="Arena Background"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            ></iframe>
+            {isVideoVisible ? (
+              <iframe
+                ref={videoRef}
+                src={videoSrc}
+                title="Arena Background"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full bg-black">
+                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 to-black"></div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -455,133 +707,55 @@ export default function Home() {
               }
 
               // Check if we have valid news items
-              if (Array.isArray(newsItems) && newsItems.length > 0) {
-                return newsItems
-                  .slice(0, 3)
-                  .map((news, index) => {
-                    // More flexible validation - check if we have at least some content
-                    if (!news) {
-                      return null;
-                    }
-
-                    // Use fallbacks for missing properties
-                    const newsId = news.id || news._id || `news-${index}`;
-                    const newsTitle =
-                      news.title || news.name || `News Item ${index + 1}`;
-                    const newsSlug = news.slug || newsId;
-                    const newsDate =
-                      news.date ||
-                      news.createdAt ||
-                      news.created_time ||
-                      new Date().toISOString();
-                    const newsExcerpt =
-                      news.excerpt ||
-                      news.description ||
-                      news.content?.substring(0, 150) ||
-                      "Read more to discover the latest updates...";
-                    const newsCategory = news.category || news.type || "News";
-                    const newsCoverImage =
-                      news.coverImageUrl ||
-                      news.image ||
-                      news.cover ||
-                      "/news.png";
-
-                    const IconComponent = iconMap[news.iconName] || Terminal;
-
-                    return (
-                      <motion.div
-                        key={newsId}
-                        whileHover={{
-                          y: -10,
-                          scale: 1.02,
-                          transition: { duration: 0.2 },
-                        }}
-                        className="h-full"
-                      >
-                        <Link
-                          href={`/news/${newsSlug}`}
-                          className="bg-black/90 backdrop-blur-sm rounded-lg border-2 border-red-900/50 hover:border-red-500
-                               transition-all duration-300 overflow-hidden group block h-full relative"
-                        >
-                          {/* Glow effect on hover */}
-                          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <div className="absolute inset-0 bg-gradient-to-r from-red-900/20 to-transparent" />
-                            <div className="absolute inset-0 bg-gradient-to-b from-red-900/20 via-transparent to-red-900/20" />
-                          </div>
-
-                          <div className="relative aspect-video">
-                            <img
-                              src={newsCoverImage}
-                              alt={newsTitle}
-                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                if (target.src !== "/news.png") {
-                                  target.src = "/news.png";
-                                }
-                              }}
-                            />
-
-                            {/* Category Badge */}
-                            <div className="absolute top-4 right-4 flex items-center gap-2">
-                              <div className="bg-red-900/90 text-white text-xs px-3 py-1.5 rounded-full font-bold border border-red-500/50 shadow-lg shadow-red-900/50 flex items-center gap-2 pointer-events-none">
-                                {IconComponent && (
-                                  <IconComponent className="w-3 h-3" />
-                                )}
-                                {newsCategory}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="p-6 relative">
-                            <div className="text-red-500 text-sm mb-2 font-bold tracking-wider">
-                              {new Date(newsDate).toLocaleDateString()}
-                            </div>
-                            <h3 className="text-xl font-bold mb-3 text-white group-hover:text-red-400 transition-colors">
-                              {newsTitle}
-                            </h3>
-                            <p className="text-gray-300 mb-4">{newsExcerpt}</p>
-
-                            {/* Read More Button */}
-                            <div className="flex items-center gap-2 text-red-500 text-sm font-bold group-hover:text-red-400 transition-colors">
-                              READ MORE
-                              <ChevronRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
-                            </div>
-                          </div>
-                        </Link>
-                      </motion.div>
-                    );
-                  })
-                  .filter(Boolean); // Remove any null items
+              if (!Array.isArray(processedNewsItems)) {
+                console.warn('processedNewsItems is not an array:', processedNewsItems);
+                return null;
               }
 
-              // Empty state
-              return (
-                <motion.div
-                  className="col-span-full text-center py-12"
-                  variants={fadeInUp}
-                >
-                  <div className="text-6xl mb-4">📰</div>
-                  <h3 className="text-2xl font-semibold text-gray-300 mb-2">
-                    No News Available
-                  </h3>
-                  <p className="text-gray-400 mb-4">
-                    Check back later for the latest updates and announcements.
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    If this persists, please ensure your Notion integration is
-                    correctly configured.
-                  </p>
-                </motion.div>
-              );
+              if (processedNewsItems.length === 0) {
+                return (
+                  <motion.div
+                    className="col-span-full text-center py-12"
+                    variants={fadeInUp}
+                  >
+                    <div className="text-6xl mb-4">📰</div>
+                    <h3 className="text-2xl font-semibold text-gray-300 mb-2">
+                      No News Available
+                    </h3>
+                    <p className="text-gray-400 mb-4">
+                      Check back later for the latest updates and announcements.
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      If this persists, please ensure your Notion integration is
+                      correctly configured.
+                    </p>
+                  </motion.div>
+                );
+              }
+
+              return processedNewsItems.map((news, index) => {
+                if (!news) {
+                  console.warn('Found null news item in processedNewsItems');
+                  return null;
+                }
+
+                return (
+                  <NewsCard
+                    key={news.id}
+                    news={news}
+                    index={index}
+                    onImageError={handleImageError}
+                  />
+                );
+              }).filter(Boolean);
             })()}
           </motion.div>
 
           {/* View All Button - Only show when not loading and has news */}
           {!isLoadingNews &&
             !newsError &&
-            newsItems &&
-            newsItems.length > 0 && (
+            processedNewsItems &&
+            processedNewsItems.length > 0 && (
               <motion.div
                 className="text-center mt-12"
                 initial={{ opacity: 0 }}
@@ -620,7 +794,17 @@ export default function Home() {
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-black to-transparent"></div>
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black"></div>
-        <div className="absolute inset-0 z-0 bg-[url('/flower.png')] bg-center bg-cover opacity-30"></div>
+        {/*         <div className="absolute inset-0 z-0">
+          <Image
+            src="/flower.webp"
+            alt="Background Pattern"
+            fill
+            className="object-cover opacity-30"
+            loading="lazy"
+            sizes="100vw"
+            quality={60}
+          />
+        </div> */}
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             className="max-w-6xl mx-auto "

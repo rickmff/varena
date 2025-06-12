@@ -2,8 +2,9 @@
 
 import { motion } from "framer-motion";
 import { Terminal, Swords, CalendarClock, ShieldCheck } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import SectionHeader from "./SectionHeader";
+import Image from 'next/image';
 
 // Define the props for the FeatureCarousel component
 interface Feature {
@@ -39,6 +40,9 @@ const scaleIn = {
   visible: { scale: 1, opacity: 1, transition: { duration: 0.4 } },
 };
 
+// Create a cache to store preloaded images
+const imageCache = new Map();
+
 const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
   const carouselRef = useRef<HTMLDivElement>(null);
   const bg1Ref = useRef<HTMLDivElement | null>(null);
@@ -50,6 +54,12 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
   const [activeBgLayer, setActiveBgLayer] = useState<
     "bg-image-1" | "bg-image-2"
   >("bg-image-1");
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+
+  // Memoize the image URLs to prevent unnecessary reloads
+  const imageUrls = useMemo(() => {
+    return features.map(feature => feature.image);
+  }, [features]);
 
   useEffect(() => {
     // Get DOM elements once after mount
@@ -63,33 +73,90 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
       !features ||
       features.length === 0 ||
       !bg1Ref.current ||
-      !bg2Ref.current
+      !bg2Ref.current ||
+      imagesLoaded
     )
       return;
 
-    // Preload all images
-    features.forEach((feature) => {
-      const img = new globalThis.Image();
-      img.src = feature.image;
-    });
+    // Check if images are already in cache
+    const allImagesInCache = features.every(feature =>
+      imageCache.has(feature.image)
+    );
 
-    const bg1 = bg1Ref.current;
-    const bg2 = bg2Ref.current;
+    if (allImagesInCache) {
+      setImagesLoaded(true);
+      const bg1 = bg1Ref.current;
+      const bg2 = bg2Ref.current;
 
-    bg1.style.backgroundImage = `url(${features[0].image})`;
-    bg1.style.opacity = "1";
-    bg2.style.opacity = "0";
+      bg1.style.backgroundImage = `url(${features[0].image})`;
+      bg1.style.opacity = "1";
+      bg2.style.opacity = "0";
 
-    if (features.length > 1) {
-      bg2.style.backgroundImage = `url(${features[1].image})`;
-    } else {
-      // If only one image, ensure bg2 is cleared or has same image and stays hidden
-      bg2.style.backgroundImage = `url(${features[0].image})`;
+      if (features.length > 1) {
+        bg2.style.backgroundImage = `url(${features[1].image})`;
+      }
+
+      setActiveBgLayer("bg-image-1");
+      setCurrentBgIndex(0);
+      return;
     }
 
-    setActiveBgLayer("bg-image-1");
-    setCurrentBgIndex(0); // features[0] is now active
-  }, [features]); // Rerun only if features array changes
+    // Only preload the first two images initially
+    Promise.all(features.slice(0, 2).map(feature => {
+      return new Promise((resolve) => {
+        if (imageCache.has(feature.image)) {
+          resolve(feature.image);
+          return;
+        }
+
+        const img = new window.Image();
+        img.onload = () => {
+          imageCache.set(feature.image, true);
+          resolve(feature.image);
+        };
+        img.onerror = () => resolve(null);
+        img.src = feature.image;
+      });
+    })).then(() => {
+      if (!bg1Ref.current || !bg2Ref.current) return;
+
+      const bg1 = bg1Ref.current;
+      const bg2 = bg2Ref.current;
+
+      bg1.style.backgroundImage = `url(${features[0].image})`;
+      bg1.style.opacity = "1";
+      bg2.style.opacity = "0";
+
+      if (features.length > 1) {
+        bg2.style.backgroundImage = `url(${features[1].image})`;
+      }
+
+      setActiveBgLayer("bg-image-1");
+      setCurrentBgIndex(0);
+      setImagesLoaded(true);
+    });
+  }, [features, imagesLoaded, imageUrls]);
+
+  // Lazy load remaining images when user starts interacting
+  useEffect(() => {
+    if (features.length <= 2 || !imagesLoaded) return;
+
+    const lazyLoadImages = () => {
+      features.slice(2).forEach((feature) => {
+        if (imageCache.has(feature.image)) return;
+
+        const img = new window.Image();
+        img.onload = () => {
+          imageCache.set(feature.image, true);
+        };
+        img.src = feature.image;
+      });
+      window.removeEventListener('mousemove', lazyLoadImages);
+    };
+
+    window.addEventListener('mousemove', lazyLoadImages);
+    return () => window.removeEventListener('mousemove', lazyLoadImages);
+  }, [features, imagesLoaded]);
 
   // Effect for Intersection Observer and Interval Logic for carousel
   useEffect(() => {
@@ -98,7 +165,8 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
       features.length <= 1 ||
       !carouselRef.current ||
       !bg1Ref.current ||
-      !bg2Ref.current
+      !bg2Ref.current ||
+      !imagesLoaded
     ) {
       return; // No carousel for 0 or 1 image, or if refs aren't set
     }
@@ -148,7 +216,7 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
         observer.unobserve(carouselRef.current);
       }
     };
-  }, [features, isHoveringCard, currentBgIndex, activeBgLayer, carouselRef]);
+  }, [features, isHoveringCard, currentBgIndex, activeBgLayer, carouselRef, imagesLoaded]);
 
   const handleCardMouseEnter = (featureImage: string) => {
     if (!bg1Ref.current || !bg2Ref.current || features.length === 0) return;
@@ -199,6 +267,23 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
           id="bg-image-2"
           className="absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ease-in-out opacity-0"
         ></div>
+
+        {/* Preload all images invisibly to improve cache */}
+        <div className="hidden">
+          {features.map((feature, index) => (
+            <Image
+              key={`preload-${index}`}
+              src={feature.image}
+              alt=""
+              width={1}
+              height={1}
+              priority={index < 2}
+              onLoad={() => {
+                imageCache.set(feature.image, true);
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="container mx-auto px-4 relative z-20">
