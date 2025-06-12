@@ -1,8 +1,8 @@
 import elixirData from "@/data/vbuilds/elixirs.json";
 import coatingData from "@/data/vbuilds/coatings.json";
 import passiveData from "@/data/vbuilds/passives.json";
-import { Coating } from "@/components/vbuilds/CoatingPicker";
-import { Passive } from "../vbuilds/PassiveList";
+import { Coating } from "@/types/coating";
+import { Passive } from "@/types/passive";
 import legendaryWeaponData from "@/data/vbuilds/legendary-weapons.json";
 import epicWeaponData from "@/data/vbuilds/epic-weapons.json";
 import infusionData from "@/data/vbuilds/infusions.json";
@@ -14,6 +14,7 @@ import { armourOptions } from "../vbuilds/ArmourPicker";
 import bloodData from "@/data/vbuilds/bloodtypes.json";
 import spellData from "@/data/vbuilds/spells.json";
 import { hasAdvancedCoatings } from "@/components/vbuilds/CoatingPicker";
+import { Weapon as WeaponType, WeaponData } from "@/types/weapon";
 
 
 const importElixir = (char: string) => {
@@ -95,7 +96,7 @@ const importWeapons = (chars: string) => {
         ...Object.values(epicWeaponData).map(weapon => ({ ...weapon, type: "epic" as const }))
     ];
 
-    const weapons = new Map<number, Weapon>();
+    const weapons = new Map<number, WeaponType>();
     let legendaryCount = 0; // Track the number of legendary weapons
 
     for (let i = 0; i < chars.length; i += 5) {
@@ -198,7 +199,19 @@ const exportCoating = (coatings: Map<number, Coating>) => {
     return result;
 }
 
-const exportSpells = (selectedSpells) => {
+interface SelectedSpell {
+    arenaCode?: string;
+    jewel?: number[];
+}
+
+interface SelectedSpells {
+    dash?: SelectedSpell;
+    spell1?: SelectedSpell;
+    spell2?: SelectedSpell;
+    ultimate?: SelectedSpell;
+}
+
+const exportSpells = (selectedSpells: SelectedSpells | undefined) => {
 
     const spellDataArray = Object.values(spellData);
 
@@ -225,7 +238,7 @@ const exportSpells = (selectedSpells) => {
     return spell1Code + spell1Jewels + spell2Code + spell2Jewels + veilCode + veilJewels + ultimateCode;
 }
 
-const exportWeapons = (weapons: Map<number, Weapon>) => {
+const exportWeapons = (weapons: Map<number, WeaponType>) => {
     let result = "";
 
     for (let i = 1; i <= 8; i++) {
@@ -234,7 +247,7 @@ const exportWeapons = (weapons: Map<number, Weapon>) => {
         if (weapon) {
             result += weapon.arenaCode || "0"; // Add weapon arena code
             result += weapon.infusion ? Object.values(infusionData).find(value => value.id === weapon.infusion)?.arenaCode || "0" : "0"; // Add infusion code
-            result += weapon.effects.map(effectId => {
+            result += weapon.effects.map((effectId: string) => {
                 const effect = Object.values(weaponEffectData).find(e => e.id === effectId);
                 return effect ? effect.key : "0";
             }).join(""); // Add effects
@@ -264,6 +277,17 @@ const exportBlood = (blood: { primary?: string; secondary?: string; infusion?: s
     return primary + secondary + infusion;
 };
 
+interface BuildExport {
+    elixir?: { arenaCode: string };
+    coatings: Map<number, Coating>;
+    passives: Passive[];
+    spells: SelectedSpells;
+    weapons: Map<number, WeaponType>;
+    amulet?: { arenaCode: string };
+    armour?: { arenaCode: string };
+    blood: { primary?: string; secondary?: string; infusion?: string } | null;
+}
+
 export const arenaCode = (context: BuildContext) => exportVArenaCode({
     elixir: context.elixir,
     coatings: context.coatings,
@@ -276,7 +300,7 @@ export const arenaCode = (context: BuildContext) => exportVArenaCode({
 })
 
 
-export const exportVArenaCode = (build) => {
+export const exportVArenaCode = (build: BuildExport) => {
 
     const elixir = build.elixir?.arenaCode || "0";
     const coatings = exportCoating(build.coatings);

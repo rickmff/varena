@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, MouseEvent } from "react";
 import { useBuilder } from "../BuildProvider";
 import { arenaCode } from "@/components/machines/converter";
 import { Button } from "@/components/ui/button";
@@ -29,12 +29,6 @@ const ArenaCode: React.FC = () => {
   const copyBuildCommand = async () => {
     try {
       await navigator.clipboard.writeText(exportCommand);
-      // toast.success(
-      //   <>
-      //     Build command copied! <br /> Paste in-game chat to import.
-      //   </>
-      // );
-
       toast("Build Command Copied", {
         className: "bg-black text-white",
         description: "Paste in-game chat to import.",
@@ -66,7 +60,7 @@ export const ArenaCodeOutsideBuilder: React.FC<{
 }> = ({ code }) => {
   const exportCommand = `.import-build ${code}`;
 
-  const copyBuildCommand = async (e) => {
+  const copyBuildCommand = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     try {
@@ -83,7 +77,7 @@ export const ArenaCodeOutsideBuilder: React.FC<{
   return (
     <div className="flex gap-4">
       <input
-        onClick={(e) => {
+        onClick={(e: MouseEvent<HTMLInputElement>) => {
           e.preventDefault();
           e.stopPropagation();
         }}

@@ -6,6 +6,7 @@ import {
 import { useBuilder } from "./BuildProvider";
 import { Modifier } from "../machines/calculator";
 import { HoverCardDescription, HoverCardTitle } from "../ui/hover-card";
+import { Armour } from "@/types/armour";
 
 export const armourOptions = [
   {
@@ -149,9 +150,8 @@ const ArmourDescription = ({ armour }: { armour: Armour }) => {
       <div className="space-y-2 text-sm">
         {armour.modifiers.map((mod) => (
           <HoverCardDescription key={mod.stat}>
-            {`- ${mod.stat} by +${mod.value}${
-              mod.unit === "percent" ? "%" : ""
-            }`}
+            {`- ${mod.stat} by +${mod.value}${mod.unit === "percent" ? "%" : ""
+              }`}
           </HoverCardDescription>
         ))}
       </div>

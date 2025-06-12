@@ -50,7 +50,7 @@ export default function NewsPage() {
     const fetchNews = async () => {
       try {
         setLoading(true);
-        const response = await fetch("/api/news");
+        const response = await fetch("/api/news/all");
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

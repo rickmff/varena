@@ -3,7 +3,6 @@ import { getNewsPosts } from '@/lib/notion';
 
 export const revalidate = 3600; // Revalidate every hour
 
-// Create two separate endpoints for homepage and full news list
 export async function GET() {
   try {
     const newsPageId = process.env.NOTION_NEWS_PAGE_ID;
@@ -29,7 +28,7 @@ export async function GET() {
     }));
 
     // Cache the response for 1 hour
-    return new NextResponse(JSON.stringify(newsItems.slice(0, 3)), {
+    return new NextResponse(JSON.stringify(newsItems), {
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',

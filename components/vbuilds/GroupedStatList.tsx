@@ -11,10 +11,24 @@ import {
 } from "../ui/accordion";
 
 import { spellSchoolMasteryModifiers } from "../machines/calculator";
+import type { StatName } from "../machines/calculator";
+
+interface StatEntry {
+  name: string;
+  category: string;
+  cap?: number | null;
+  defaultValue: number;
+  value?: number;
+  unit?: string;
+}
+
+interface FinalValues {
+  [key: string]: number | { [key: string]: number };
+}
 
 export function groupStatsByCategoryWithValues(
-  flatStats: Record<string, any>,
-  finalValues: Record<string, number>
+  flatStats: Record<string, StatEntry>,
+  finalValues: FinalValues
 ) {
   const groupedStats: Record<string, any[]> = {};
 
@@ -25,16 +39,16 @@ export function groupStatsByCategoryWithValues(
     groupedStats[stat.category].push({
       ...stat,
       cap:
-        stat.cap && finalValues["INCREASE_CAP"]?.[stat.name]
+        stat.cap && typeof finalValues["INCREASE_CAP"] === "object" && finalValues["INCREASE_CAP"]?.[stat.name]
           ? customRound(
-              stat.cap + Number(finalValues["INCREASE_CAP"][stat.name])
-            )
+            stat.cap + Number(finalValues["INCREASE_CAP"][stat.name])
+          )
           : stat.cap,
       finalValue: ["Physical Power", "Spell Power", "Movement Speed"].includes(
         stat.name
       )
         ? finalValues[stat.name] ?? stat.defaultValue
-        : customRound(finalValues[stat.name]),
+        : customRound(Number(finalValues[stat.name])),
     });
   });
 
@@ -52,7 +66,7 @@ function customRound(value: number): number {
   return firstDecimal >= 5 ? Math.ceil(value) : Math.floor(value);
 }
 
-export function GroupedStatList({ stats }: { stats: Record<string, any>[] }) {
+export function GroupedStatList({ stats }: { stats: StatEntry[] }) {
   const { state } = useBuilder();
 
   const baseStatsWithMasteries = stats.map((originalStat) => {
@@ -67,9 +81,15 @@ export function GroupedStatList({ stats }: { stats: Record<string, any>[] }) {
     return stat;
   });
 
+  // Convert array to Record for groupStatsByCategoryWithValues
+  const statsRecord = baseStatsWithMasteries.reduce((acc, stat) => {
+    acc[stat.name] = stat;
+    return acc;
+  }, {} as Record<string, StatEntry>);
+
   const finalStats = computeFinalStats(state.context);
   const groupedStats = groupStatsByCategoryWithValues(
-    baseStatsWithMasteries,
+    statsRecord,
     finalStats
   );
 

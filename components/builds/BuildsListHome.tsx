@@ -31,6 +31,7 @@ type Build = {
 
 interface BuildsListProps {
   maxBuilds?: number; // Maximum number of builds to show
+  onBuildsLoaded?: (hasBuilds: boolean) => void; // Callback when builds are loaded
 }
 
 const Img = ({
@@ -179,10 +180,14 @@ export default function BuildsListHome({
           const parsedBuilds = JSON.parse(storedBuilds);
           const buildsArray = Array.isArray(parsedBuilds) ? parsedBuilds : [];
           setBuilds(buildsArray);
+          onBuildsLoaded?.(buildsArray.length > 0);
+        } else {
+          onBuildsLoaded?.(false);
         }
       } catch (error) {
         console.error("Failed to load builds from localStorage:", error);
         setBuilds([]);
+        onBuildsLoaded?.(false);
       }
     };
 
@@ -252,8 +257,8 @@ export default function BuildsListHome({
       buildCount % 3 === 0
         ? "lg:col-span-3"
         : buildCount % 3 === 1
-        ? "lg:col-span-2"
-        : "lg:col-span-1";
+          ? "lg:col-span-2"
+          : "lg:col-span-1";
 
     return `col-span-1 ${mdSpan} ${lgSpan}`;
   };

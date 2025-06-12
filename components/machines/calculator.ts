@@ -3,6 +3,7 @@ import weaponEffectData from '@/data/vbuilds/weaponEffects.json'
 import { BuildContext, BloodContext } from './builder'
 import { AvailableWeaponSlots, Weapon } from '../vbuilds/WeaponForge';
 import { stateIn } from 'xstate';
+import { Passive } from "@/components/vbuilds/PassiveList";
 
 
 export type StatName =
@@ -86,14 +87,17 @@ export const getBloodModifiers = (blood: BloodContext | null) => {
     return bloodModifiers
 };
 
-export const getPassiveModifiers = (passives: string[] | null) => {
+export const getPassiveModifiers = (passives: Passive[] | null) => {
     if (!passives) return [];
-    const passiveModifiers: Modifier[] = passives.flatMap((passive) => passive.modifiers)
-
-
-
-    return passiveModifiers
-}
+    const passiveModifiers: Modifier[] = passives.flatMap((passive) =>
+        (passive.modifiers || []).map(mod => ({
+            ...mod,
+            stat: mod.stat as StatName,
+            unit: mod.unit as "flat" | "percent"
+        }))
+    );
+    return passiveModifiers;
+};
 
 const getWeaponSlotModifiers = (weapons: Map<AvailableWeaponSlots, Weapon>, slot: AvailableWeaponSlots | null) => {
     if (!slot) return [];

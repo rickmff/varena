@@ -45,10 +45,16 @@ const DropdownItem = ({
 );
 
 type ClearOption = { label: string; image?: string; name?: string };
-type Option = { id: string; name: string; image: string; [key: string]: any };
+type Option = { id: string; name: string; image: string;[key: string]: any };
 type OptionId = Option["id"];
 
-const HoverInfoCard = ({ children, isVisible = false, description }) => {
+interface HoverInfoCardProps {
+  children: React.ReactNode;
+  isVisible?: boolean;
+  description: React.ReactNode;
+}
+
+const HoverInfoCard = ({ children, isVisible = false, description }: HoverInfoCardProps) => {
   if (!isVisible) {
     return <>{children}</>;
   }
@@ -100,60 +106,60 @@ export const DropdownSelect: React.FC<{
   hoverDescription,
   hoverOptionDescription,
 }) => {
-  // const [selected, setSelected] = useState<OptionId | null>(defaultValue);
+    // const [selected, setSelected] = useState<OptionId | null>(defaultValue);
 
-  return (
-    <DropdownMenu>
-      <HoverInfoCard isVisible={hoverIsVisible} description={hoverDescription}>
-        <DropdownMenuTrigger
-          onFocus={() => null}
-          className={`w-20 h-20 text-gray-200 rounded-md flex items-center justify-center ${string3}`}
-        >
-          {selected ? (
-            <img
-              src={options.find((option) => option.id === selected)?.image}
-              alt={options.find((option) => option.id === selected)?.name}
-              className="pointer-events-none"
-            />
-          ) : (
-            <span>{placeholder || "Select an option"}</span>
-          )}
-        </DropdownMenuTrigger>
-      </HoverInfoCard>
-      <DropdownMenuContent className="p-0 min-w-0 space-y-1 overflow-auto">
-        <div className="flex flex-wrap gap-2 p-2">
-          {options
-            .filter((option) => option.id !== selected)
-            .map((option) => (
-              <HoverInfoCard
-                key={option.id}
-                isVisible={hoverOptionDescription}
-                description={
-                  hoverOptionDescription && hoverOptionDescription(option)
-                }
-              >
-                <DropdownItem
+    return (
+      <DropdownMenu>
+        <HoverInfoCard isVisible={hoverIsVisible} description={hoverDescription}>
+          <DropdownMenuTrigger
+            onFocus={() => null}
+            className={`w-20 h-20 text-gray-200 rounded-md flex items-center justify-center ${string3}`}
+          >
+            {selected ? (
+              <img
+                src={options.find((option) => option.id === selected)?.image}
+                alt={options.find((option) => option.id === selected)?.name}
+                className="pointer-events-none"
+              />
+            ) : (
+              <span>{placeholder || "Select an option"}</span>
+            )}
+          </DropdownMenuTrigger>
+        </HoverInfoCard>
+        <DropdownMenuContent className="p-0 min-w-0 space-y-1 overflow-auto">
+          <div className="flex flex-wrap gap-2 p-2">
+            {options
+              .filter((option) => option.id !== selected)
+              .map((option) => (
+                <HoverInfoCard
                   key={option.id}
-                  option={option}
-                  onClick={() => {
-                    // setSelected(option.id);
-                    onSelect && onSelect(option.id);
-                  }}
-                />
-              </HoverInfoCard>
-            ))}
-          {selected && clear && (
-            <DropdownItem
-              option={{
-                label: "Clear",
-              }}
-              onClick={() => {
-                clear();
-              }}
-            />
-          )}
-        </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
+                  isVisible={hoverOptionDescription}
+                  description={
+                    hoverOptionDescription && hoverOptionDescription(option)
+                  }
+                >
+                  <DropdownItem
+                    key={option.id}
+                    option={option}
+                    onClick={() => {
+                      // setSelected(option.id);
+                      onSelect && onSelect(option.id);
+                    }}
+                  />
+                </HoverInfoCard>
+              ))}
+            {selected && clear && (
+              <DropdownItem
+                option={{
+                  label: "Clear",
+                }}
+                onClick={() => {
+                  clear();
+                }}
+              />
+            )}
+          </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };

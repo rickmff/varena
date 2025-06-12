@@ -39,24 +39,20 @@ import { InfusionSelect } from "./components/weaponForge/InfusionSelect";
 
 export type AvailableWeaponSlots = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
-export interface Weapon {
-  uuid: string; // Unique identifier for the weapon
-  name: string; // Name of the weapon
-  id: string; // Unique identifier for the weapon
-  position: AvailableWeaponSlots; // Slot position (1 to 8)
-  type: "legendary" | "epic"; // Weapon type
-  effects: string[]; // List of effects for the weapon
+export interface WeaponData {
+  id: string;
+  name: string;
   img: string;
-  infusion?: string; // Infusion type (optional)
-  arenaCode: string; // Arena code for the weapon
+  arenaCode: string;
 }
 
-export type WeaponData = {
-  id: string; // Unique identifier for the weapon
-  name: string; // Name of the weapon
-  img: string; // Image path for the weapon
-  arenaCode: string; // Arena code for the weapon
-};
+export interface Weapon extends WeaponData {
+  uuid: string;
+  position: AvailableWeaponSlots;
+  type: "legendary" | "epic";
+  effects: string[];
+  infusion?: string;
+}
 
 export const FocusedWeapon = ({
   side = "bottom",
@@ -79,19 +75,17 @@ export const FocusedWeapon = ({
         {weapon ? (
           <div className="text-xs flex gap-1 items-center">
             <div
-              className={`text-white ${
-                weapon?.type === "legendary" && "text-orange-500"
-              } ${weapon?.type === "epic" && "text-purple-500"}`}
+              className={`text-white ${weapon?.type === "legendary" && "text-orange-500"
+                } ${weapon?.type === "epic" && "text-purple-500"}`}
             >
               Current Weapon
             </div>
             <img
               src={weapon?.img}
-              className={`h-6 w-6 border rounded ${
-                weapon?.type === "legendary"
-                  ? "border-orange-500"
-                  : "border-purple-500"
-              }`}
+              className={`h-6 w-6 border rounded ${weapon?.type === "legendary"
+                ? "border-orange-500"
+                : "border-purple-500"
+                }`}
             />
           </div>
         ) : (
@@ -157,11 +151,10 @@ const HoverInfoCard = ({
       >
         <div className="flex gap-4 items-center">
           <div
-            className={`relative rounded-md overflow-hidden w-10 h-10 border ${
-              weapon?.type === "legendary"
-                ? "border-orange-500"
-                : "border-purple-500"
-            }`}
+            className={`relative rounded-md overflow-hidden w-10 h-10 border ${weapon?.type === "legendary"
+              ? "border-orange-500"
+              : "border-purple-500"
+              }`}
           >
             <img src={weapon?.img} className="w-10 h-10" />
             {weapon.infusion && (
@@ -175,11 +168,10 @@ const HoverInfoCard = ({
           </div>
           <div>
             <div
-              className={`capitalize font-bold ${
-                weapon?.type === "legendary"
-                  ? "text-orange-500"
-                  : "text-purple-500"
-              }`}
+              className={`capitalize font-bold ${weapon?.type === "legendary"
+                ? "text-orange-500"
+                : "text-purple-500"
+                }`}
             >
               {weapon?.name}
             </div>
@@ -230,15 +222,13 @@ const SlotTrigger = ({
     <HoverInfoCard weapon={weaponInSlot} isDisabled={disableHoverCard}>
       <DialogTrigger
         id={`weapon-slot-${slot}`}
-        className={`w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 hover:border-purple-500 transition-all duration-100 ${
-          !weaponInSlot
-            ? "border"
-            : weaponInSlot.type === "legendary"
+        className={`w-20 h-20 bg-zinc-900 text-gray-200 rounded-md flex items-center justify-center relative overflow-hidden border-2 hover:border-purple-500 transition-all duration-100 ${!weaponInSlot
+          ? "border"
+          : weaponInSlot.type === "legendary"
             ? "border-orange-500/60"
             : "border-purple-500/60"
-        } ${
-          state.context.focusedWeapon == slot ? "ring-2 ring-emerald-500" : ""
-        }`}
+          } ${state.context.focusedWeapon == slot ? "ring-2 ring-emerald-500" : ""
+          }`}
         onClick={() => {
           builder.send({ type: `goto.weaponForge`, slot });
         }}
@@ -262,9 +252,8 @@ export const WeaponSlotPlaceholder: React.FC<{
         <img
           src={placeholderImage}
           alt="Select Weapon"
-          className={`${
-            !weaponInSlot && "grayscale brightness-50 opacity-60"
-          } pointer-events-none`}
+          className={`${!weaponInSlot && "grayscale brightness-50 opacity-60"
+            } pointer-events-none`}
         />
         <span className="absolute inset-0 flex items-center justify-center text-white">
           {weaponInSlot ? null : `Slot ${slot}`}
@@ -423,11 +412,10 @@ export const WeaponForge = () => {
             <div className="space-y-8">
               <div className="flex items-center gap-4">
                 <div
-                  className={`relative border-2 ${
-                    weaponState.context.weapon?.type === "legendary"
-                      ? "border-orange-500"
-                      : "border-purple-500"
-                  } rounded-md overflow-hidden`}
+                  className={`relative border-2 ${weaponState.context.weapon?.type === "legendary"
+                    ? "border-orange-500"
+                    : "border-purple-500"
+                    } rounded-md overflow-hidden`}
                 >
                   <img
                     src={weaponState.context.weapon?.img}
@@ -464,31 +452,30 @@ export const WeaponForge = () => {
                   {state.context.weapons.has(
                     state.context.selectedWeaponSlot as AvailableWeaponSlots
                   ) && (
-                    <Button
-                      variant={"outline"}
-                      className="border-red-500 text-red-500 hover:bg-red-500/10"
-                      onClick={() => {
-                        builder.send({
-                          type: "REMOVE_WEAPON",
-                          position: state.context
-                            .selectedWeaponSlot as AvailableWeaponSlots,
-                        });
-                      }}
-                    >
-                      Clear Weapon Slot
-                    </Button>
-                  )}
+                      <Button
+                        variant={"outline"}
+                        className="border-red-500 text-red-500 hover:bg-red-500/10"
+                        onClick={() => {
+                          builder.send({
+                            type: "REMOVE_WEAPON",
+                            position: state.context
+                              .selectedWeaponSlot as AvailableWeaponSlots,
+                          });
+                        }}
+                      >
+                        Clear Weapon Slot
+                      </Button>
+                    )}
                 </div>
               </div>
               <div className="flex flex-col gap-4">
                 <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
                   <span className="mr-2">Select Effects</span>
                   <div
-                    className={`${
-                      selectedEffects.length === 3
-                        ? "bg-green-500/20 text-green-400"
-                        : "bg-yellow-500/20 text-yellow-400"
-                    } text-xs px-2 py-1 rounded-full`}
+                    className={`${selectedEffects.length === 3
+                      ? "bg-green-500/20 text-green-400"
+                      : "bg-yellow-500/20 text-yellow-400"
+                      } text-xs px-2 py-1 rounded-full`}
                   >
                     Choose 3 Effects
                   </div>
@@ -507,7 +494,13 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import React from "react";
 
-export function SortableItem(props) {
+interface SortableItemProps {
+  id: string;
+  index: number;
+  weapon: { id: string };
+}
+
+const SortableItem = ({ id, index, weapon }: SortableItemProps) => {
   const {
     isSorting,
     attributes,
@@ -516,26 +509,26 @@ export function SortableItem(props) {
     transform,
     transition,
     activeIndex,
-  } = useSortable({ id: props.id, disabled: props.id.includes("slot") });
+  } = useSortable({ id: id, disabled: id.includes("slot") });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: props.index == activeIndex ? 1000 : 1,
+    zIndex: index == activeIndex ? 1000 : 1,
   };
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <SlotTrigger
         disableHoverCard={isSorting}
-        key={props.index}
-        slot={(props.index + 1) as AvailableWeaponSlots}
+        key={index}
+        slot={(index + 1) as AvailableWeaponSlots}
       >
         <WeaponSlotPlaceholder
-          placeholderImage={Object.values(epicWeaponData)[props.index].img}
-          slot={(props.index + 1) as AvailableWeaponSlots}
+          placeholderImage={Object.values(epicWeaponData)[index].img}
+          slot={(index + 1) as AvailableWeaponSlots}
         />
       </SlotTrigger>
     </div>
   );
-}
+};

@@ -1,4 +1,4 @@
-import { Dispatch, useEffect, useState } from "react";
+import React, { Dispatch, useEffect, useState, SetStateAction } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,12 +9,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { useBuilder } from "./BuildProvider";
 import bloodData from "@/data/vbuilds/bloodtypes.json";
-import { Label } from "../ui/label";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Button } from "../ui/button";
-import { set } from "date-fns";
 import { Check } from "lucide-react";
 import { useSelector } from "@xstate/react";
+import { Blood } from "@/types/blood";
 
 const SlotTrigger = ({ children }: { children?: React.ReactNode }) => {
   const { builder } = useBuilder();
@@ -31,7 +29,7 @@ const SlotTrigger = ({ children }: { children?: React.ReactNode }) => {
   );
 };
 
-const PrimaryBloodDisplay = ({ blood }) => {
+const PrimaryBloodDisplay = ({ blood }: { blood: Blood }) => {
   return (
     <div>
       <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
@@ -61,7 +59,7 @@ const PrimaryBloodDisplay = ({ blood }) => {
   );
 };
 
-const SecondaryBloodDisplay = ({ blood, setInfusion, infusion }) => {
+const SecondaryBloodDisplay = ({ blood, setInfusion, infusion }: { blood: Blood; setInfusion?: (value: string) => void; infusion?: string }) => {
   return (
     <div>
       <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center">
@@ -77,19 +75,17 @@ const SecondaryBloodDisplay = ({ blood, setInfusion, infusion }) => {
           .map(([key, effect], index) => (
             <div
               key={key}
-              className={`flex items-center p-3 rounded-md transition-all cursor-pointer ${
-                key === infusion
-                  ? "bg-red-900/50 border border-red-500/50"
-                  : "bg-black/30 border border-red-900/30 hover:bg-black/40"
-              }`}
-              onClick={() => setInfusion(key)}
+              className={`flex items-center p-3 rounded-md transition-all cursor-pointer ${key === infusion
+                ? "bg-red-900/50 border border-red-500/50"
+                : "bg-black/30 border border-red-900/30 hover:bg-black/40"
+                }`}
+              onClick={() => setInfusion && setInfusion(key)}
             >
               <div
-                className={`flex-shrink-0 w-6 h-6 rounded-full mr-3 flex items-center justify-center border ${
-                  infusion === key
-                    ? "bg-red-500/50 border-red-400"
-                    : "bg-black/50 border-gray-600"
-                }`}
+                className={`flex-shrink-0 w-6 h-6 rounded-full mr-3 flex items-center justify-center border ${infusion === key
+                  ? "bg-red-500/50 border-red-400"
+                  : "bg-black/50 border-gray-600"
+                  }`}
               >
                 {infusion === key && (
                   <svg
@@ -179,7 +175,9 @@ export const BloodSlotPlaceholder: React.FC<{
 
 const bloodList = Object.values(bloodData);
 
-const BloodTabs = ({
+type BloodValue = keyof typeof bloodData | "";
+
+const BloodTabs = <T extends BloodValue>({
   setValue,
   setInfusion,
   primarySelectedValue,
@@ -187,11 +185,11 @@ const BloodTabs = ({
   value,
   type,
 }: {
-  value: string;
-  setValue: Dispatch<React.SetStateAction<any>>;
-  setInfusion?: Dispatch<React.SetStateAction<any>>;
+  value: T;
+  setValue: Dispatch<SetStateAction<T>>;
+  setInfusion?: Dispatch<SetStateAction<string | undefined>>;
   infusion?: string;
-  primarySelectedValue?: string | null;
+  primarySelectedValue?: keyof typeof bloodData | null;
   type: "primary" | "secondary";
 }) => {
   return (
@@ -199,10 +197,10 @@ const BloodTabs = ({
       value={value}
       onValueChange={(value) => {
         if (type === "secondary") {
-          setInfusion && setInfusion(undefined);
+          setInfusion?.(undefined);
         }
 
-        setValue(value);
+        setValue(value as T);
       }}
     >
       <TabsList className="flex mb-8">
@@ -241,10 +239,10 @@ export const BloodForge = () => {
   const { state, builder } = useBuilder();
 
   const blood = useSelector(builder, (state) => state.context.blood);
-  const [primaryBlood, setPrimaryBlood] = useState(blood?.primary || "rogue");
-  const [secondaryBlood, setSecondaryBlood] = useState(blood?.secondary || "");
-  const [secondaryBloodInfusion, setSecondaryBloodInfusion] = useState<any>(
-    blood?.infusion || ""
+  const [primaryBlood, setPrimaryBlood] = useState<keyof typeof bloodData>(blood?.primary || "rogue");
+  const [secondaryBlood, setSecondaryBlood] = useState<keyof typeof bloodData | "">(blood?.secondary || "");
+  const [secondaryBloodInfusion, setSecondaryBloodInfusion] = useState<string | undefined>(
+    blood?.infusion || undefined
   );
 
   useEffect(() => {
@@ -252,6 +250,7 @@ export const BloodForge = () => {
       setSecondaryBloodInfusion("");
     }
   }, [primaryBlood, secondaryBlood, setSecondaryBloodInfusion]);
+
   return (
     <Dialog
       open={state.matches("bloodForge")}
@@ -275,7 +274,7 @@ export const BloodForge = () => {
             <h2 className="text-lg font-bold text-gray-200 mb-4">
               Primary Blood
             </h2>
-            <BloodTabs
+            <BloodTabs<keyof typeof bloodData>
               setValue={setPrimaryBlood}
               value={primaryBlood}
               type="primary"
@@ -285,7 +284,7 @@ export const BloodForge = () => {
             <h2 className="text-lg font-bold text-gray-200 mb-4">
               Secondary Blood
             </h2>
-            <BloodTabs
+            <BloodTabs<keyof typeof bloodData | "">
               type="secondary"
               value={primaryBlood === secondaryBlood ? "" : secondaryBlood}
               setValue={setSecondaryBlood}
@@ -302,7 +301,6 @@ export const BloodForge = () => {
             onClick={() => {
               builder.send({
                 type: "ADD_BLOOD",
-
                 primary: primaryBlood,
                 secondary: secondaryBlood,
                 infusion: secondaryBloodInfusion,

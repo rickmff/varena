@@ -4,6 +4,7 @@ import { useBuilder } from "../../BuildProvider";
 import { useSelector } from "@xstate/react";
 import { MAX_LEGENDARY_WEAPONS_COUNT } from "@/components/machines/builder";
 import { ActorRef, ActorRefFromLogic } from "xstate";
+
 export const WeaponSelect = () => {
   const { state, builder } = useBuilder();
 
@@ -24,7 +25,6 @@ export const WeaponSelect = () => {
       {Object.values(legoWeaponData).map((weapon) => (
         <button
           onClick={() => {
-            // onWeaponSelect(weapon);
             weaponBuilder?.send({
               type: "PICK_WEAPON",
               weapon: {
@@ -35,14 +35,14 @@ export const WeaponSelect = () => {
                 effects: [],
                 img: weapon.img,
                 arenaCode: weapon.arenaCode,
+                uuid: crypto.randomUUID(),
               },
             });
           }}
           key={weapon.id}
-          className={`h-20 w-20 rounded bg-zinc-900 flex items-center justify-center ${
-            legendaryWeaponCount === MAX_LEGENDARY_WEAPONS_COUNT &&
+          className={`h-20 w-20 rounded bg-zinc-900 flex items-center justify-center ${legendaryWeaponCount === MAX_LEGENDARY_WEAPONS_COUNT &&
             "opacity-50 cursor-not-allowed"
-          }`}
+            }`}
         >
           <img
             src={weapon.img}
@@ -56,7 +56,6 @@ export const WeaponSelect = () => {
         <button
           key={weapon.id}
           onClick={() => {
-            // onWeaponSelect(weapon);
             weaponBuilder?.send({
               type: "PICK_WEAPON",
               weapon: {
@@ -67,6 +66,7 @@ export const WeaponSelect = () => {
                 effects: [],
                 img: weapon.img,
                 arenaCode: weapon.arenaCode,
+                uuid: crypto.randomUUID(),
               },
             });
           }}

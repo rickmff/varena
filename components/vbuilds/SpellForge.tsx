@@ -1,4 +1,5 @@
 "use client";
+import React, { useState } from "react";
 import { useBuilder } from "./BuildProvider";
 import { useSelector } from "@xstate/react";
 import {
@@ -33,6 +34,10 @@ import {
   horizontalListSortingStrategy,
   SortableContext,
 } from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
+
 const SlotTrigger = ({
   children,
   goto,
@@ -166,12 +171,12 @@ const sectionTitle = {
   idle: "Spells",
 };
 
-import React, { act, useState } from "react";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
+interface SortableItemProps {
+  id: string;
+  trigger: (props: { isSorting: boolean }) => React.ReactNode;
+}
 
-function SortableItem(props) {
+function SortableItem({ id, trigger }: SortableItemProps) {
   const {
     attributes,
     listeners,
@@ -179,7 +184,7 @@ function SortableItem(props) {
     transform,
     transition,
     isSorting,
-  } = useSortable({ id: props.id });
+  } = useSortable({ id: id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -188,12 +193,12 @@ function SortableItem(props) {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {props.trigger({ isSorting })}
+      {trigger({ isSorting })}
     </div>
   );
 }
 
-const DndSlots = ({}) => {
+const DndSlots = ({ }) => {
   const { state, builder } = useBuilder();
   const spells = useSelector(builder, (state) => state.context.spells);
   const [items, setItems] = useState<UniqueIdentifier[]>(["spell1", "spell2"]);
