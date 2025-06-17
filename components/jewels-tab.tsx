@@ -11,12 +11,12 @@ import Image from "next/image"
 export type SchoolKey = keyof typeof schoolsData;
 
 export const schoolsData = {
-  blood: { name: "Blood", image: "/images/schools/Blood.png" },
-  chaos: { name: "Chaos", image: "/images/schools/Chaos.png" },
-  unholy: { name: "Unholy", image: "/images/schools/Unholy.png" },
-  illusion: { name: "Illusion", image: "/images/schools/Illusion.png" },
-  frost: { name: "Frost", image: "/images/schools/Frost.png" },
-  lightning: { name: "Storm", image: "/images/schools/Storm.png" }
+  blood: { name: "Blood", image: "/images/schools/Blood.webp" },
+  chaos: { name: "Chaos", image: "/images/schools/Chaos.webp" },
+  unholy: { name: "Unholy", image: "/images/schools/Unholy.webp" },
+  illusion: { name: "Illusion", image: "/images/schools/Illusion.webp" },
+  frost: { name: "Frost", image: "/images/schools/Frost.webp" },
+  lightning: { name: "Storm", image: "/images/schools/Storm.webp" }
 } as const;
 
 export type SchoolColors = typeof schoolColors;
@@ -24,42 +24,42 @@ export type SchoolColors = typeof schoolColors;
 export const schoolColors = {
   blood: {
     primary: 'red',
-    bg: 'bg-[url("/images/background/Blood.png")]',
+    bg: 'bg-[url("/images/background/Blood.webp")]',
     border: 'border-red-900/30',
     focus: 'focus:ring-red-500/50 focus:border-red-500/50',
     button: 'bg-red-900/50 hover:bg-red-800',
   },
   chaos: {
     primary: 'purple',
-    bg: 'bg-[url("/images/background/Chaos.png")]',
+    bg: 'bg-[url("/images/background/Chaos.webp")]',
     border: 'border-purple-900/30',
     focus: 'focus:ring-purple-500/50 focus:border-purple-500/50',
     button: 'bg-purple-900/50 hover:bg-purple-800',
   },
   unholy: {
     primary: 'green',
-    bg: 'bg-[url("/images/background/Unholy.png")]',
+    bg: 'bg-[url("/images/background/Unholy.webp")]',
     border: 'border-green-900/30',
     focus: 'focus:ring-green-500/50 focus:border-green-500/50',
     button: 'bg-green-900/50 hover:bg-green-800',
   },
   illusion: {
     primary: 'blue',
-    bg: 'bg-[url("/images/background/Illusion.png")]',
+    bg: 'bg-[url("/images/background/Illusion.webp")]',
     border: 'border-cyan-900/30',
     focus: 'focus:ring-cyan-500/50 focus:border-cyan-500/50',
     button: 'bg-cyan-900/50 hover:bg-cyan-800',
   },
   frost: {
     primary: 'cyan',
-    bg: 'bg-[url("/images/background/Frost.png")]',
+    bg: 'bg-[url("/images/background/Frost.webp")]',
     border: 'border-blue-900/30',
     focus: 'focus:ring-blue-500/50 focus:border-blue-500/50',
     button: 'bg-blue-900/50 hover:bg-blue-800',
   },
   lightning: {
     primary: 'yellow',
-    bg: 'bg-[url("/images/background/Storm.png")]',
+    bg: 'bg-[url("/images/background/Storm.webp")]',
     border: 'border-yellow-900/30',
     focus: 'focus:ring-yellow-500/50 focus:border-yellow-500/50',
     button: 'bg-yellow-900/50 hover:bg-yellow-800',
