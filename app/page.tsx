@@ -113,7 +113,7 @@ const NewsCard = memo(({ news, index, onImageError }: {
   };
 
   // Use fallback image if no cover image URL is provided or if there was an error
-  const imageUrl = (!news.coverImageUrl || imageError) ? '/news.png' : news.coverImageUrl;
+  const imageUrl = (!news.coverImageUrl || imageError) ? '/news.webp' : news.coverImageUrl;
 
   return (
     <motion.div
@@ -152,7 +152,7 @@ const NewsCard = memo(({ news, index, onImageError }: {
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               quality={75}
               priority={index === 0}
-              unoptimized={imageUrl.startsWith('data:') || imageUrl === '/news.png'}
+              unoptimized={imageUrl.startsWith('data:') || imageUrl === '/news.webp'}
             />
           )}
 
@@ -448,10 +448,10 @@ export default function Home() {
         const newsIconName = news.iconName || "Terminal";
 
         // Process image URL and ensure uniqueness
-        let newsCoverImage = news.coverImageUrl || news.image || news.cover || "/news.png";
+        let newsCoverImage = news.coverImageUrl || news.image || news.cover || "/news.webp";
 
         // Clean up the URL to ensure consistent format
-        if (newsCoverImage && newsCoverImage !== "/news.png") {
+        if (newsCoverImage && newsCoverImage !== "/news.webp") {
           try {
             // Check if it's a relative URL (starts with /)
             if (newsCoverImage.startsWith('/')) {
@@ -464,13 +464,13 @@ export default function Home() {
             }
           } catch (e) {
             console.warn('Invalid image URL:', newsCoverImage);
-            newsCoverImage = "/news.png";
+            newsCoverImage = "/news.webp";
           }
         }
 
         // If image URL is already seen, invalid, or had errors, use fallback
         if (!newsCoverImage || seenImages.has(newsCoverImage) || imageLoadErrors[newsCoverImage]) {
-          newsCoverImage = "/news.png";
+          newsCoverImage = "/news.webp";
         } else {
           seenImages.add(newsCoverImage);
         }

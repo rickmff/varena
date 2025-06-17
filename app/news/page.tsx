@@ -113,7 +113,7 @@ export default function NewsPage() {
         <section className="relative pt-24 pb-4 md:pt-32 overflow-hidden bg-gradient-to-b from-black to-black">
           <div className="absolute inset-0 z-0 opacity-20">
             <Image
-              src="/hero-bg.png"
+              src="/hero-bg.webp"
               alt="V Rising Background"
               fill
               className="object-cover"
@@ -190,14 +190,14 @@ export default function NewsPage() {
 
                         <div className="relative aspect-video">
                           <Image
-                            src={news.coverImageUrl || `/news.png`}
+                            src={news.coverImageUrl || `/news.webp`}
                             alt={news.title}
                             fill
                             className="object-cover transition-transform duration-500 group-hover:scale-110 filter brightness-60"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
-                              if (target.src !== "/news.png") {
-                                target.src = "/news.png";
+                              if (target.src !== "/news.webp") {
+                                target.src = "/news.webp";
                               }
                             }}
                           />
