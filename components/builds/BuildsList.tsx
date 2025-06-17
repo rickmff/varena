@@ -307,7 +307,7 @@ export const BuildContent = ({
                   <Img
                     src={build.spells.dash?.img}
                     alt="Veil"
-                    emptySrc="/images/vbuilds/spells/spell-blood-veil_of_blood.png"
+                    emptySrc="/images/vbuilds/spells/spell-blood-veil_of_blood.webp"
                   />
                 </Item>
 
@@ -315,7 +315,7 @@ export const BuildContent = ({
                   <Img
                     src={build.spells.spell1?.img}
                     alt="Spell 1"
-                    emptySrc="/images/vbuilds/spells/spell-blood-blood_rage.png"
+                    emptySrc="/images/vbuilds/spells/spell-blood-blood_rage.webp"
                   />
                 </Item>
 
@@ -323,7 +323,7 @@ export const BuildContent = ({
                   <Img
                     src={build.spells.spell2?.img}
                     alt="Spell 2"
-                    emptySrc="/images/vbuilds/spells/spell-blood-blood_rite.png"
+                    emptySrc="/images/vbuilds/spells/spell-blood-blood_rite.webp"
                   />
                 </Item>
 
@@ -331,7 +331,7 @@ export const BuildContent = ({
                   <Img
                     src={build.spells.ultimate?.img}
                     alt="Ultimate"
-                    emptySrc="/images/vbuilds/spells/spell-chaos-merciless_charge.png"
+                    emptySrc="/images/vbuilds/spells/spell-chaos-merciless_charge.webp"
                   />
                 </Item>
               </div>
