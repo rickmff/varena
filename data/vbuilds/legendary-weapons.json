@@ -2,85 +2,85 @@
   "axe": {
     "id": "axe",
     "name": "The Red Twins",
-    "img": "/images/vbuilds/weapons/legendary/Axe.png",
+    "img": "/images/vbuilds/weapons/legendary/Axe.webp",
     "arenaCode": "1"
   },
   "claws": {
     "id": "claws",
     "name": "Talons of the Lich Beast",
-    "img": "/images/vbuilds/weapons/legendary/Claws.png",
+    "img": "/images/vbuilds/weapons/legendary/Claws.webp",
     "arenaCode": "2"
   },
   "crossbow": {
     "id": "crossbow",
     "name": "The Siren's Wail",
-    "img": "/images/vbuilds/weapons/legendary/Crossbow.png",
+    "img": "/images/vbuilds/weapons/legendary/Crossbow.webp",
     "arenaCode": "3"
   },
   "daggers": {
     "id": "daggers",
     "name": "The Wraithblades",
-    "img": "/images/vbuilds/weapons/legendary/Daggers.png",
+    "img": "/images/vbuilds/weapons/legendary/Daggers.webp",
     "arenaCode": "4"
   },
   "greatsword": {
     "id": "greatsword",
     "name": "Apocalypse",
-    "img": "/images/vbuilds/weapons/legendary/GreatSword.png",
+    "img": "/images/vbuilds/weapons/legendary/GreatSword.webp",
     "arenaCode": "5"
   },
   "longbow": {
     "id": "longbow",
     "name": "Oaksong",
-    "img": "/images/vbuilds/weapons/legendary/LongBow.png",
+    "img": "/images/vbuilds/weapons/legendary/LongBow.webp",
     "arenaCode": "6"
   },
   "mace": {
     "id": "mace",
     "name": "Hand of Winter",
-    "img": "/images/vbuilds/weapons/legendary/Mace.png",
+    "img": "/images/vbuilds/weapons/legendary/Mace.webp",
     "arenaCode": "7"
   },
   "pistols": {
     "id": "pistols",
     "name": "The Endbringers",
-    "img": "/images/vbuilds/weapons/legendary/Pistols.png",
+    "img": "/images/vbuilds/weapons/legendary/Pistols.webp",
     "arenaCode": "8"
   },
   "reaper": {
     "id": "reaper",
     "name": "Mortira's Lament",
-    "img": "/images/vbuilds/weapons/legendary/Reaper.png",
+    "img": "/images/vbuilds/weapons/legendary/Reaper.webp",
     "arenaCode": "9"
   },
   "slashers_01": {
     "id": "slashers_01",
     "name": "Cloud Dancers",
-    "img": "/images/vbuilds/weapons/legendary/Slashers_01.png",
+    "img": "/images/vbuilds/weapons/legendary/Slashers_01.webp",
     "arenaCode": "a"
   },
   "slashers_02": {
     "id": "slashers_02",
     "name": "Wings of the Fallen",
-    "img": "/images/vbuilds/weapons/legendary/Slashers_02.png",
+    "img": "/images/vbuilds/weapons/legendary/Slashers_02.webp",
     "arenaCode": "b"
   },
   "spear": {
     "id": "spear",
     "name": "The Thousand Storms",
-    "img": "/images/vbuilds/weapons/legendary/Spear.png",
+    "img": "/images/vbuilds/weapons/legendary/Spear.webp",
     "arenaCode": "c"
   },
   "sword": {
     "id": "sword",
     "name": "The Gravecaller",
-    "img": "/images/vbuilds/weapons/legendary/Sword.png",
+    "img": "/images/vbuilds/weapons/legendary/Sword.webp",
     "arenaCode": "d"
   },
   "twinblades": {
     "id": "twinblades",
     "name": "The Fate Dancers",
-    "img": "/images/vbuilds/weapons/legendary/Twinblades.png",
+    "img": "/images/vbuilds/weapons/legendary/Twinblades.webp",
     "arenaCode": "e"
   },
   "whip": {
