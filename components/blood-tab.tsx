@@ -44,13 +44,13 @@ export default function BloodTab() {
             {primaryBlood ? (
               <div className="flex items-center gap-2">
                 <Image
-                  src={`/images/vbuilds/blood/${primaryBlood.toLowerCase()}-blood.png`}
+                  src={`/images/vbuilds/blood/${primaryBlood.toLowerCase()}-blood.webp`}
                   alt={primaryBlood}
                   className="w-10 h-10 object-cover rounded"
-                  width={40}
-                  height={40}
+                  width={48}
+                  height={48}
                   onError={(e) => {
-                    e.currentTarget.src = "/images/vbuilds/blood/brute-blood.png"
+                    e.currentTarget.src = "/images/vbuilds/blood/brute-blood.webp"
                   }}
                 />
                 <span>{primaryBlood}</span>
@@ -84,13 +84,13 @@ export default function BloodTab() {
                     className="w-full px-5 py-4 text-left text-white hover:bg-red-900/50 flex items-center gap-2"
                   >
                     <Image
-                      src={`/images/vbuilds/blood/${blood.toLowerCase()}-blood.png`}
+                      src={`/images/vbuilds/blood/${blood.toLowerCase()}-blood.webp`}
                       alt={blood}
                       className="w-10 h-10 object-cover rounded"
-                      width={40}
-                      height={40}
+                      width={48}
+                      height={48}
                       onError={(e) => {
-                        e.currentTarget.src = "/images/vbuilds/blood/brute-blood.png"
+                        e.currentTarget.src = "/images/vbuilds/blood/brute-blood.webp"
                       }}
                     />
                     <span>{blood}</span>
@@ -110,13 +110,13 @@ export default function BloodTab() {
             {secondaryBlood ? (
               <div className="flex items-center gap-2">
                 <Image
-                  src={`/images/vbuilds/blood/${secondaryBlood.toLowerCase()}-blood.png`}
+                  src={`/images/vbuilds/blood/${secondaryBlood.toLowerCase()}-blood.webp`}
                   alt={secondaryBlood}
                   className="w-10 h-10 object-cover rounded"
-                  width={40}
-                  height={40}
+                  width={48}
+                  height={48}
                   onError={(e) => {
-                    e.currentTarget.src = "/images/vbuilds/blood/brute-blood.png"
+                    e.currentTarget.src = "/images/vbuilds/blood/brute-blood.webp"
                   }}
                 />
                 <span>{secondaryBlood}</span>
@@ -150,13 +150,13 @@ export default function BloodTab() {
                     className="w-full px-5 py-4 text-left text-white hover:bg-red-900/50 flex items-center gap-2"
                   >
                     <Image
-                      src={`/images/vbuilds/blood/${blood.toLowerCase()}-blood.png`}
+                      src={`/images/vbuilds/blood/${blood.toLowerCase()}-blood.webp`}
                       alt={blood}
                       className="w-10 h-10 object-cover rounded"
-                      width={40}
-                      height={40}
+                      width={48}
+                      height={48}
                       onError={(e) => {
-                        e.currentTarget.src = "/images/vbuilds/blood/brute-blood.png"
+                        e.currentTarget.src = "/images/vbuilds/blood/brute-blood.webp"
                       }}
                     />
                     <span>{blood}</span>
