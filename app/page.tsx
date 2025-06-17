@@ -794,7 +794,7 @@ export default function Home() {
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-black to-transparent"></div>
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black"></div>
-        {/*         <div className="absolute inset-0 z-0">
+        {         <div className="absolute inset-0 z-0">
           <Image
             src="/flower.webp"
             alt="Background Pattern"
@@ -804,7 +804,7 @@ export default function Home() {
             sizes="100vw"
             quality={60}
           />
-        </div> */}
+        </div> }
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             className="max-w-6xl mx-auto "
