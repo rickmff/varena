@@ -9,7 +9,7 @@ interface Jewel {
 const spellData: Record<string, Jewel> = {
   "veilofblood": {
     name: "Veil of Blood",
-    image: "/images/spells/blooddash.png",
+    image: "/images/spells/blooddash.webp",
     wiki: "https://vrising.fandom.com/wiki/Veil_Of_Blood",
     school: "blood",
     effects: [
@@ -23,7 +23,7 @@ const spellData: Record<string, Jewel> = {
   },
   "bloodfountain": {
     name: "Blood Fountain",
-    image: "/images/spells/bloodfountain.png",
+    image: "/images/spells/bloodfountain.webp",
     wiki: "https://vrising.fandom.com/wiki/Blood_Fountain",
     school: "blood",
     effects: [
@@ -40,7 +40,7 @@ const spellData: Record<string, Jewel> = {
   },
   "bloodrage": {
     name: "Blood Rage",
-    image: "/images/spells/bloodrage.png",
+    image: "/images/spells/bloodrage.webp",
     wiki: "https://vrising.fandom.com/wiki/Blood_Rage",
     school: "blood",
     effects: [
@@ -55,7 +55,7 @@ const spellData: Record<string, Jewel> = {
   },
   "bloodrite": {
     name: "Blood Rite",
-    image: "/images/spells/bloodrite.png",
+    image: "/images/spells/bloodrite.webp",
     wiki: "https://vrising.fandom.com/wiki/Blood_Rite",
     school: "blood",
     effects: [
@@ -71,7 +71,7 @@ const spellData: Record<string, Jewel> = {
   },
   "sanguinecoil": {
     name: "Sanguine Coil",
-    image: "/images/spells/sanguinecoil.png",
+    image: "/images/spells/sanguinecoil.webp",
     wiki: "https://vrising.fandom.com/wiki/Blood_Fountain",
     school: "blood",
     effects: [
@@ -87,7 +87,7 @@ const spellData: Record<string, Jewel> = {
   },
   "shadowbolt": {
     name: "Shadowbolt",
-    image: "/images/spells/shadowbolt.png",
+    image: "/images/spells/shadowbolt.webp",
     wiki: "https://vrising.fandom.com/wiki/Shadowbolt",
     school: "blood",
     effects: [
@@ -103,7 +103,7 @@ const spellData: Record<string, Jewel> = {
   },
   "carrionswarm": {
     name: "Carrion Swarm",
-    image: "/images/spells/swarm.png",
+    image: "/images/spells/swarm.webp",
     wiki: "/",
     school: "blood",
     effects: [
@@ -117,7 +117,7 @@ const spellData: Record<string, Jewel> = {
   },
   "veilofchaos": {
     name: "Veil of Chaos",
-    image: "/images/spells/chaosdash.png",
+    image: "/images/spells/chaosdash.webp",
     wiki: "https://vrising.fandom.com/wiki/Veil_Of_Chaos",
     school: "chaos",
     effects: [
@@ -131,7 +131,7 @@ const spellData: Record<string, Jewel> = {
   },
   "aftershock": {
     name: "Aftershock",
-    image: "/images/spells/aftershock.png",
+    image: "/images/spells/aftershock.webp",
     wiki: "https://vrising.fandom.com/wiki/Aftershock",
     school: "chaos",
     effects: [
@@ -145,7 +145,7 @@ const spellData: Record<string, Jewel> = {
   },
   "chaosbarrier": {
     name: "Chaos Barrier",
-    image: "/images/spells/chaosbar.png",
+    image: "/images/spells/chaosbar.webp",
     wiki: "https://vrising.fandom.com/wiki/Chaos_Barrier",
     school: "chaos",
     effects: [
@@ -159,7 +159,7 @@ const spellData: Record<string, Jewel> = {
   },
   "chaosvolley": {
     name: "Chaos Volley",
-    image: "/images/spells/chaosvolley.png",
+    image: "/images/spells/chaosvolley.webp",
     wiki: "https://vrising.fandom.com/wiki/Chaos_Volley",
     school: "chaos",
     effects: [
@@ -173,7 +173,7 @@ const spellData: Record<string, Jewel> = {
   },
   "powersurge": {
     name: "Power Surge",
-    image: "/images/spells/powersurge.png",
+    image: "/images/spells/powersurge.webp",
     wiki: "https://vrising.fandom.com/wiki/Power_Surge",
     school: "chaos",
     effects: [
@@ -189,7 +189,7 @@ const spellData: Record<string, Jewel> = {
   },
   "void": {
     name: "Void",
-    image: "/images/spells/chaosvoid.png",
+    image: "/images/spells/chaosvoid.webp",
     wiki: "https://vrising.fandom.com/wiki/Void",
     school: "chaos",
     effects: [
@@ -203,7 +203,7 @@ const spellData: Record<string, Jewel> = {
   },
   "rainofchaos": {
     name: "Rain of Chaos",
-    image: "/images/spells/rainofchaos.png",
+    image: "/images/spells/rainofchaos.webp",
     wiki: "/",
     school: "chaos",
     effects: [
@@ -217,7 +217,7 @@ const spellData: Record<string, Jewel> = {
   },
   "veiloffrost": {
     name: "Veil of Frost",
-    image: "/images/spells/frostdash.png",
+    image: "/images/spells/frostdash.webp",
     wiki: "https://vrising.fandom.com/wiki/Veil_of_Frost",
     school: "frost",
     effects: [
@@ -232,7 +232,7 @@ const spellData: Record<string, Jewel> = {
 
   "coldsnap": {
     name: "Cold Snap",
-    image: "/images/spells/coldsnap.png",
+    image: "/images/spells/coldsnap.webp",
     wiki: "https://vrising.fandom.com/wiki/Cold_Snap",
     school: "frost",
     effects: [
@@ -247,7 +247,7 @@ const spellData: Record<string, Jewel> = {
 
   "crystallance": {
     name: "Crystal Lance",
-    image: "/images/spells/crystallance.png",
+    image: "/images/spells/crystallance.webp",
     wiki: "https://vrising.fandom.com/wiki/Crystal_Lance",
     school: "frost",
     effects: [
@@ -262,7 +262,7 @@ const spellData: Record<string, Jewel> = {
 
   "frostbarrier": {
     name: "Frost Barrier",
-    image: "/images/spells/frostbarr.png",
+    image: "/images/spells/frostbarr.webp",
     wiki: "https://vrising.fandom.com/wiki/Frost_Barrier",
     school: "frost",
     effects: [
@@ -278,7 +278,7 @@ const spellData: Record<string, Jewel> = {
 
   "frostbat": {
     name: "Frost Bat",
-    image: "/images/spells/frostbat.png",
+    image: "/images/spells/frostbat.webp",
     wiki: "https://vrising.fandom.com/wiki/Frost_Bat",
     school: "frost",
     effects: [
@@ -293,7 +293,7 @@ const spellData: Record<string, Jewel> = {
 
   "icenova": {
     name: "Ice Nova",
-    image: "/images/spells/icenova.png",
+    image: "/images/spells/icenova.webp",
     wiki: "https://vrising.fandom.com/wiki/Ice_Nova",
     school: "frost",
     effects: [
@@ -307,7 +307,7 @@ const spellData: Record<string, Jewel> = {
 
   "arcticstorm": {
     name: "Arctic Storm",
-    image: "/images/spells/arcticstorm.png",
+    image: "/images/spells/arcticstorm.webp",
     wiki: "/",
     school: "frost",
     effects: [
@@ -321,7 +321,7 @@ const spellData: Record<string, Jewel> = {
   },
   "veilofillusion": {
     name: "Veil of Illusion",
-    image: "/images/spells/illudash.png",
+    image: "/images/spells/illudash.webp",
     wiki: "https://vrising.fandom.com/wiki/Veil_of_Illusion",
     school: "illusion",
     effects: [
@@ -337,7 +337,7 @@ const spellData: Record<string, Jewel> = {
 
   "misttrance": {
     name: "Mist Trance",
-    image: "/images/spells/misttrance.png",
+    image: "/images/spells/misttrance.webp",
     wiki: "https://vrising.fandom.com/wiki/Mist_Trance",
     school: "illusion",
     effects: [
@@ -354,7 +354,7 @@ const spellData: Record<string, Jewel> = {
 
   "mosquito": {
     name: "Mosquito",
-    image: "/images/spells/mosquito.png",
+    image: "/images/spells/mosquito.webp",
     wiki: "https://vrising.fandom.com/wiki/Mosquito_(Spell)",
     school: "illusion",
     effects: [
@@ -368,7 +368,7 @@ const spellData: Record<string, Jewel> = {
 
   "phantomaegis": {
     name: "Phantom Aegis",
-    image: "/images/spells/phantomaegis.png",
+    image: "/images/spells/phantomaegis.webp",
     wiki: "https://vrising.fandom.com/wiki/Phantom_Aegis",
     school: "illusion",
     effects: [
@@ -384,7 +384,7 @@ const spellData: Record<string, Jewel> = {
 
   "spectralwolf": {
     name: "Spectral Wolf",
-    image: "/images/spells/specwolf.png",
+    image: "/images/spells/specwolf.webp",
     wiki: "https://vrising.fandom.com/wiki/Spectral_Wolf",
     school: "illusion",
     effects: [
@@ -401,7 +401,7 @@ const spellData: Record<string, Jewel> = {
 
   "wraithspear": {
     name: "Wraith Spear",
-    image: "/images/spells/wraithspear.png",
+    image: "/images/spells/wraithspear.webp",
     wiki: "https://vrising.fandom.com/wiki/Wraith_Spear",
     school: "illusion",
     effects: [
@@ -417,7 +417,7 @@ const spellData: Record<string, Jewel> = {
 
   "curse": {
     name: "Curse",
-    image: "/images/spells/curse.png",
+    image: "/images/spells/curse.webp",
     wiki: "/",
     school: "illusion",
     effects: [
@@ -432,7 +432,7 @@ const spellData: Record<string, Jewel> = {
   },
   "veilofstorm": {
     name: "Veil of Storm",
-    image: "/images/spells/lightningdash.png",
+    image: "/images/spells/lightningdash.webp",
     wiki: "https://vrising.fandom.com/wiki/Veil_of_Storm",
     school: "lightning",
     effects: [
@@ -446,7 +446,7 @@ const spellData: Record<string, Jewel> = {
   },
   "balllightning": {
     name: "Ball Lightning",
-    image: "/images/spells/balllightning.png",
+    image: "/images/spells/balllightning.webp",
     wiki: "https://vrising.fandom.com/wiki/Ball_Storm",
     school: "lightning",
     effects: [
@@ -460,7 +460,7 @@ const spellData: Record<string, Jewel> = {
   },
   "cyclone": {
     name: "Cyclone",
-    image: "/images/spells/cyclone.png",
+    image: "/images/spells/cyclone.webp",
     wiki: "https://vrising.fandom.com/wiki/Thunder_Strike",
     school: "lightning",
     effects: [
@@ -476,7 +476,7 @@ const spellData: Record<string, Jewel> = {
   },
   "discharge": {
     name: "Discharge",
-    image: "/images/spells/discharge.png",
+    image: "/images/spells/discharge.webp",
     wiki: "https://vrising.fandom.com/wiki/Discharge",
     school: "lightning",
     effects: [
@@ -490,7 +490,7 @@ const spellData: Record<string, Jewel> = {
   },
   "lightningcurtain": {
     name: "Lightning Curtain",
-    image: "/images/spells/lcurtain.png",
+    image: "/images/spells/lcurtain.webp",
     wiki: "https://vrising.fandom.com/wiki/Storm_Curtain",
     school: "lightning",
     effects: [
@@ -503,7 +503,7 @@ const spellData: Record<string, Jewel> = {
   },
   "polarityshift": {
     name: "Polarity Shift",
-    image: "/images/spells/polshift.png",
+    image: "/images/spells/polshift.webp",
     wiki: "https://vrising.fandom.com/wiki/Polarity_Shift",
     school: "lightning",
     effects: [
@@ -516,7 +516,7 @@ const spellData: Record<string, Jewel> = {
   },
   "lightningtendrils": {
     name: "Lightning Tendrils",
-    image: "/images/spells/tendrils.png",
+    image: "/images/spells/tendrils.webp",
     wiki: "https://vrising.fandom.com/wiki/Storm_Tendrils",
     school: "lightning",
     effects: [
@@ -531,7 +531,7 @@ const spellData: Record<string, Jewel> = {
   },
   "veilofbones": {
     name: "Veil of Bones",
-    image: "/images/spells/bonedash.png",
+    image: "/images/spells/bonedash.webp",
     wiki: "https://vrising.fandom.com/wiki/Veil_of_Bones",
     school: "unholy",
     effects: [
@@ -546,7 +546,7 @@ const spellData: Record<string, Jewel> = {
   },
   "boneexplosion": {
     name: "Bone Explosion",
-    image: "/images/spells/boneex.png",
+    image: "/images/spells/boneex.webp",
     wiki: "https://vrising.fandom.com/wiki/Bone_Explosion",
     school: "unholy",
     effects: [
@@ -563,7 +563,7 @@ const spellData: Record<string, Jewel> = {
   },
   "corruptedskull": {
     name: "Corrupted Skull",
-    image: "/images/spells/corruptedskull.png",
+    image: "/images/spells/corruptedskull.webp",
     wiki: "https://vrising.fandom.com/wiki/Corrupted_Skull",
     school: "unholy",
     effects: [
@@ -577,7 +577,7 @@ const spellData: Record<string, Jewel> = {
   },
   "deathknight": {
     name: "Death Knight",
-    image: "/images/spells/deathknight.png",
+    image: "/images/spells/deathknight.webp",
     wiki: "https://vrising.fandom.com/wiki/Death_Knight",
     school: "unholy",
     effects: [
@@ -591,7 +591,7 @@ const spellData: Record<string, Jewel> = {
   },
   "soulburn": {
     name: "Soulburn",
-    image: "/images/spells/soulburn.png",
+    image: "/images/spells/soulburn.webp",
     wiki: "https://vrising.fandom.com/wiki/Soulburn",
     school: "unholy",
     effects: [
@@ -607,7 +607,7 @@ const spellData: Record<string, Jewel> = {
   },
   "wardofthedamned": {
     name: "Ward of the Damned",
-    image: "/images/spells/skellybar.png",
+    image: "/images/spells/skellybar.webp",
     wiki: "https://vrising.fandom.com/wiki/Ward_of_the_Damned",
     school: "unholy",
     effects: [
@@ -624,7 +624,7 @@ const spellData: Record<string, Jewel> = {
   },
   "unholychains": {
     name: "Unholy Chains",
-    image: "/images/spells/chains.png",
+    image: "/images/spells/chains.webp",
     wiki: "https://vrising.fandom.com/wiki/Unholy_Chains",
     school: "unholy",
     effects: [
