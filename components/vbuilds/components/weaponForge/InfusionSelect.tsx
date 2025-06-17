@@ -25,7 +25,7 @@ export const InfusionSelect = ({}) => {
           }}
         >
           <img
-            src={`/images/vbuilds/spellschools/${infusion.id}.png`}
+            src={`/images/vbuilds/spellschools/${infusion.id}.webp`}
             className={`spellSchool spellSchool-${infusion.id} w-12 h-12`}
           />
         </button>
