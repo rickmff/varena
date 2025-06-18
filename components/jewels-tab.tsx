@@ -99,7 +99,7 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
 
   const copyCommand = async () => {
     try {
-      const command = `.j ${spellName} ${selectedEffects.join(' ')}`
+      const command = `.j ${spellName} ${selectedSchool} ${selectedEffects.join('')}`
       await navigator.clipboard.writeText(command)
       toast.success('Command copied to clipboard!', {
         duration: 2000,
@@ -271,7 +271,7 @@ export default function JewelTab({ schoolColors, onSchoolSelect }: JewelTabProps
 
           <div className={`bg-black px-4 py-2 rounded-md border w-full text-center ${currentColors.border}`}>
             <code className="text-gray-300  text-xl break-all bg-black/50 px-12 rounded-md">
-              .j {spellName} {selectedEffects.join('')}
+              .j {spellName} {selectedSchool} {selectedEffects.join('')}
             </code>
           </div>
           <motion.div
