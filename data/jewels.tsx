@@ -434,7 +434,7 @@ const spellData: Record<string, Jewel> = {
     name: "Veil of Storm",
     image: "/images/spells/lightningdash.png",
     wiki: "https://vrising.fandom.com/wiki/Veil_of_Storm",
-    school: "lightning",
+    school: "storm",
     effects: [
       { id: 1, name: "Next primary attack within 3s consumes Static to apply Stun (0.3 - 0.5s)" },
       { id: 2, name: "Next primary attack within 3s deals damage (12 - 24%)" },
@@ -448,7 +448,7 @@ const spellData: Record<string, Jewel> = {
     name: "Ball Lightning",
     image: "/images/spells/balllightning.png",
     wiki: "https://vrising.fandom.com/wiki/Ball_Storm",
-    school: "lightning",
+    school: "storm",
     effects: [
       { id: 1, name: "Increase tick damage (3 - 7%)" },
       { id: 2, name: "Recast detonates the ball to deal damage (50 - 90%)" },
@@ -462,7 +462,7 @@ const spellData: Record<string, Jewel> = {
     name: "Cyclone",
     image: "/images/spells/cyclone.png",
     wiki: "https://vrising.fandom.com/wiki/Thunder_Strike",
-    school: "lightning",
+    school: "storm",
     effects: [
       { id: 1, name: "Increase damage (20 - 40%)" },
       { id: 2, name: "Increase damage done by storm shields (8 - 20%)" },
@@ -478,7 +478,7 @@ const spellData: Record<string, Jewel> = {
     name: "Discharge",
     image: "/images/spells/discharge.png",
     wiki: "https://vrising.fandom.com/wiki/Discharge",
-    school: "lightning",
+    school: "storm",
     effects: [
       { id: 1, name: "Increase Storm Shield damage (8 - 20%)" },
       { id: 2, name: "Increase Stun duration (0.1 - 0.3s)" },
@@ -492,7 +492,7 @@ const spellData: Record<string, Jewel> = {
     name: "Lightning Curtain",
     image: "/images/spells/lcurtain.png",
     wiki: "https://vrising.fandom.com/wiki/Storm_Curtain",
-    school: "lightning",
+    school: "storm",
     effects: [
       { id: 1, name: "Hit on caster or ally grants a shield (30 - 50%)" },
       { id: 2, name: "Increase tick damage (4 - 12%)" },
@@ -505,7 +505,7 @@ const spellData: Record<string, Jewel> = {
     name: "Polarity Shift",
     image: "/images/spells/polshift.png",
     wiki: "https://vrising.fandom.com/wiki/Polarity_Shift",
-    school: "lightning",
+    school: "storm",
     effects: [
       { id: 1, name: "Hit applies a fading Snare (0.8 - 1.6s)" },
       { id: 2, name: "Increase projectile range and speed (12 - 24%)" },
@@ -518,7 +518,7 @@ const spellData: Record<string, Jewel> = {
     name: "Lightning Tendrils",
     image: "/images/spells/tendrils.png",
     wiki: "https://vrising.fandom.com/wiki/Storm_Tendrils",
-    school: "lightning",
+    school: "storm",
     effects: [
       { id: 1, name: "Lightning bolts deal (4 - 12%) increased damage" },
       { id: 2, name: "Launch 1 additional lightning bolt" },

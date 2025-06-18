@@ -16,7 +16,7 @@ export const schoolsData = {
   unholy: { name: "Unholy", image: "/images/schools/Unholy.png" },
   illusion: { name: "Illusion", image: "/images/schools/Illusion.png" },
   frost: { name: "Frost", image: "/images/schools/Frost.png" },
-  lightning: { name: "Storm", image: "/images/schools/Storm.png" }
+  storm: { name: "Storm", image: "/images/schools/Storm.png" }
 } as const;
 
 export type SchoolColors = typeof schoolColors;
@@ -57,7 +57,7 @@ export const schoolColors = {
     focus: 'focus:ring-blue-500/50 focus:border-blue-500/50',
     button: 'bg-blue-900/50 hover:bg-blue-800',
   },
-  lightning: {
+  storm: {
     primary: 'yellow',
     bg: 'bg-[url("/images/background/Storm.png")]',
     border: 'border-yellow-900/30',
