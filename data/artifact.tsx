@@ -2,21 +2,21 @@ import { StaticImageData } from "next/image"
 
 // Define the image paths as strings
 const weaponImagePaths = {
-  Spear_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Spear_Unique_T08_Variation01.png",
-  Axe_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Axe_Unique_T08_Variation01.png",
-  Greatsword_Artifact: "/images/weapons/Stunlock_Icon_Weapon_GreatSword_Unique_T08_Variation01.png",
-  Crossbow_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Crossbow_Unique_T08_Variation01.png",
-  Pistols_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Pistols_Unique_T08_Variation01.png",
-  Reaper_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Reaper_Unique_T08_Variation01.png",
-  Sword_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Sword_Unique_T08_Variation01.png",
-  Mace_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Mace_Unique_T08_Variation01.png",
+  Spear_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Spear_Unique_T08_Variation01.webp",
+  Axe_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Axe_Unique_T08_Variation01.webp",
+  Greatsword_Artifact: "/images/weapons/Stunlock_Icon_Weapon_GreatSword_Unique_T08_Variation01.webp",
+  Crossbow_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Crossbow_Unique_T08_Variation01.webp",
+  Pistols_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Pistols_Unique_T08_Variation01.webp",
+  Reaper_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Reaper_Unique_T08_Variation01.webp",
+  Sword_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Sword_Unique_T08_Variation01.webp",
+  Mace_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Mace_Unique_T08_Variation01.webp",
   Whip_Artifact: "/images/vbuilds/legos/morning-star.jpg",
-  Longbow_Artifact: "/images/weapons/Stunlock_Icon_Weapon_LongBow_Unique_T08_Variation01.png",
-  Slashers_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Slashers_Unique_T08_Variation01.png",
-  Slashers2_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Slashers_Unique_T08_Variation02.png",
-  Claws_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Claws_Unique_T08_Variation01.png",
-  Daggers_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Daggers_Unique_T08_Variation01.png",
-  Twinblades_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Twinblades_Unique_T08_Variation01.png",
+  Longbow_Artifact: "/images/weapons/Stunlock_Icon_Weapon_LongBow_Unique_T08_Variation01.webp",
+  Slashers_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Slashers_Unique_T08_Variation01.webp",
+  Slashers2_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Slashers_Unique_T08_Variation02.webp",
+  Claws_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Claws_Unique_T08_Variation01.webp",
+  Daggers_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Daggers_Unique_T08_Variation01.webp",
+  Twinblades_Artifact: "/images/weapons/Stunlock_Icon_Weapon_Twinblades_Unique_T08_Variation01.webp",
 }
 
 // Export the paths

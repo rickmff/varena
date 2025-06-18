@@ -113,7 +113,7 @@ const NewsCard = memo(({ news, index, onImageError }: {
   };
 
   // Use fallback image if no cover image URL is provided or if there was an error
-  const imageUrl = (!news.coverImageUrl || imageError) ? '/news.png' : news.coverImageUrl;
+  const imageUrl = (!news.coverImageUrl || imageError) ? '/news.webp' : news.coverImageUrl;
 
   return (
     <motion.div
@@ -152,7 +152,7 @@ const NewsCard = memo(({ news, index, onImageError }: {
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               quality={75}
               priority={index === 0}
-              unoptimized={imageUrl.startsWith('data:') || imageUrl === '/news.png'}
+              unoptimized={imageUrl.startsWith('data:') || imageUrl === '/news.webp'}
             />
           )}
 
@@ -247,7 +247,7 @@ export default function Home() {
       <section className="relative pt-24 pb-4 md:pt-32 overflow-hidden bg-gradient-to-b from-black to-black">
         <div className="absolute inset-0 z-0 opacity-20">
           <Image
-            src="/hero-bg.png"
+            src="/hero-bg.webp"
             alt="V Rising Background"
             fill
             className="object-cover"

@@ -111,8 +111,8 @@ const SlotTrigger = ({
                   <img
                     src={
                       !effect || effect.max === null
-                        ? "/images/vbuilds/attributes/Attribute_TierIndicator_Fixed.png"
-                        : "/images/vbuilds/attributes/Attribute_TierIndicator_5.png"
+                        ? "/images/vbuilds/attributes/Attribute_TierIndicator_Fixed.webp"
+                        : "/images/vbuilds/attributes/Attribute_TierIndicator_5.webp"
                     }
                     className="flex-grow-0 w-6 h-6"
                   />
@@ -247,7 +247,7 @@ const DndSlots = ({ }) => {
                   <SlotImage slot="spell1" />
                 ) : (
                   <SlotPlaceholder
-                    placeholderImage="/images/vbuilds/spells/spell-blood-blood_rage.png"
+                    placeholderImage="/images/vbuilds/spells/spell-blood-blood_rage.webp"
                     text="Spell 1"
                   />
                 )}
@@ -268,7 +268,7 @@ const DndSlots = ({ }) => {
                   <SlotImage slot="spell2" />
                 ) : (
                   <SlotPlaceholder
-                    placeholderImage="/images/vbuilds/spells/spell-blood-blood_rite.png"
+                    placeholderImage="/images/vbuilds/spells/spell-blood-blood_rite.webp"
                     text="Spell 2"
                   />
                 )}
@@ -306,7 +306,7 @@ export const SpellForge = () => {
             <SlotImage slot="dash" />
           ) : (
             <SlotPlaceholder
-              placeholderImage="/images/vbuilds/spells/spell-blood-veil_of_blood.png"
+              placeholderImage="/images/vbuilds/spells/spell-blood-veil_of_blood.webp"
               text="Veil"
             />
           )}
@@ -334,7 +334,7 @@ export const SpellForge = () => {
             </HoverCard>
           ) : (
             <SlotPlaceholder
-              placeholderImage="/images/vbuilds/spells/spell-chaos-merciless_charge.png"
+              placeholderImage="/images/vbuilds/spells/spell-chaos-merciless_charge.webp"
               text="Ultimate"
             />
           )}

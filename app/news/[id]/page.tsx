@@ -24,7 +24,7 @@ function NewsPostSkeleton() {
       <div className="relative pt-24 pb-4 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
         <div className="absolute inset-0 z-0 opacity-20">
           <Image
-            src="/hero-bg.png"
+            src="/hero-bg.webp"
             alt="V Rising Background"
             fill
             className="object-cover"
@@ -155,7 +155,7 @@ export default function NewsPostPage({ params }: NewsPostPageProps) {
       <div className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
         <div className="absolute inset-0 z-0 opacity-20">
           <Image
-            src="/hero-bg.png"
+            src="/hero-bg.webp"
             alt="V Rising Background"
             fill
             className="object-cover"

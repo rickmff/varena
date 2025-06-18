@@ -46,7 +46,7 @@ const SpellTabs = ({
               className="overflow-hidden"
             >
               <img
-                src={`/images/vbuilds/spellschools/${school}.png`}
+                src={`/images/vbuilds/spellschools/${school}.webp`}
                 className={`spellSchool spellSchool-${school} w-8 h-8`}
               />
             </TabsTrigger>

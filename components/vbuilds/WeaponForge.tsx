@@ -160,7 +160,7 @@ const HoverInfoCard = ({
             {weapon.infusion && (
               <div className="overflow-hidden w-5 h-5 rounded-md bg-black/80 flex items-center justify-center absolute right-0 bottom-0 border-l-2 border-t-2 border-purple-500 rounded-bl-none rounded-tr-none">
                 <img
-                  src={`/images/vbuilds/spellschools/${weapon.infusion}.png`}
+                  src={`/images/vbuilds/spellschools/${weapon.infusion}.webp`}
                   className={`spellSchool spellSchool-${weapon.infusion} w-4 h-4`}
                 />
               </div>
@@ -191,7 +191,7 @@ const HoverInfoCard = ({
                 key={effect?.id}
               >
                 <img
-                  src="/images/vbuilds/attributes/Attribute_TierIndicator_5.png"
+                  src="/images/vbuilds/attributes/Attribute_TierIndicator_5.webp"
                   className="flex-grow-0 w-6 h-6"
                 />
                 <div>
@@ -268,7 +268,7 @@ export const WeaponSlotPlaceholder: React.FC<{
       {weaponInSlot.infusion && (
         <div className="overflow-hidden w-10 h-10 rounded-md bg-black/80 flex items-center justify-center absolute right-0 bottom-0 border-l-2 border-t-2 border-purple-500 rounded-bl-none rounded-tr-none">
           <img
-            src={`/images/vbuilds/spellschools/${weaponInSlot.infusion}.png`}
+            src={`/images/vbuilds/spellschools/${weaponInSlot.infusion}.webp`}
             className={`spellSchool spellSchool-${weaponInSlot.infusion} w-8 h-8`}
           />
         </div>
@@ -391,7 +391,7 @@ export const WeaponForge = () => {
                     {weaponState.context.infusion && (
                       <div className="overflow-hidden w-10 h-10 rounded-md bg-zinc-900 flex items-center justify-center">
                         <img
-                          src={`/images/vbuilds/spellschools/${weaponState.context.infusion}.png`}
+                          src={`/images/vbuilds/spellschools/${weaponState.context.infusion}.webp`}
                           className={`spellSchool spellSchool-${weaponState.context.infusion} w-10 h-10`}
                         />
                       </div>
@@ -424,7 +424,7 @@ export const WeaponForge = () => {
                   {weaponState.context.infusion && (
                     <div className="overflow-hidden w-10 h-10 rounded-md bg-black/40 flex items-center justify-center absolute right-0 bottom-0 border-l-2 border-t-2 border-purple-500 rounded-bl-none rounded-tr-none">
                       <img
-                        src={`/images/vbuilds/spellschools/${weaponState.context.infusion}.png`}
+                        src={`/images/vbuilds/spellschools/${weaponState.context.infusion}.webp`}
                         className={`spellSchool spellSchool-${weaponState.context.infusion} w-8 h-8`}
                       />
                     </div>

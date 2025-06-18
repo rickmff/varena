@@ -22,8 +22,8 @@ export default function CommandGenerator() {
   const [selectedJewelSchool, setSelectedJewelSchool] = useState<SchoolKey | ''>('')
   const [legendaryInfuse, setLegendaryInfuse] = useState<SchoolKey | ''>('')
 
-  const jewelDefaultBg = 'bg-[url("/images/background/Shadow.png")]'
-  const legendaryDefaultBg = 'bg-[url("/images/background/Passives.png")]'
+  const jewelDefaultBg = 'bg-[url("/images/background/Shadow.webp")]'
+  const legendaryDefaultBg = 'bg-[url("/images/background/Passives.webp")]'
 
   const changeTab = (tab: number) => {
     setActiveTab(tab)
@@ -33,13 +33,13 @@ export default function CommandGenerator() {
 
   const computedBG = useMemo(() => {
     if (activeTab === 0) {
-      return 'bg-[url("/images/background/Passives.png")]'
+      return 'bg-[url("/images/background/Passives.webp")]'
     } else if (activeTab === 1) {
       return legendaryInfuse ? schoolColors[legendaryInfuse as SchoolKey].bg : legendaryDefaultBg + ' bg-cover bg-left'
     } else if (activeTab === 2) {
       return selectedJewelSchool ? schoolColors[selectedJewelSchool as SchoolKey].bg : jewelDefaultBg + ' bg-cover bg-center'
     } else if (activeTab === 3) {
-      return 'bg-[url("/images/background/Shadow.png")]'
+      return 'bg-[url("/images/background/Shadow.webp")]'
     }
     return ''
   }, [activeTab, legendaryInfuse, selectedJewelSchool])
