@@ -798,7 +798,7 @@ export default function Home() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 relative overflow-hidden">
+      <section className="py-12 sm:py-20 relative overflow-hidden">
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-black to-transparent"></div>
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black"></div>
         {<div className="absolute inset-0 z-0">
@@ -814,34 +814,36 @@ export default function Home() {
         </div>}
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
-            className="max-w-6xl mx-auto "
+            className="max-w-6xl mx-auto"
             variants={fadeInUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <div className="grid md:grid-cols-2 items-center">
-              {/* Left side - Discord preview */}
-
-              <Image
-                src="/logo.png"
-                alt="Logo"
-                width={400}
-                height={400}
-                className="w-full h-auto object-contain relative z-10"
-              />
+            <div className="grid md:grid-cols-2 items-center gap-8 md:gap-12">
+              {/* Left side - Logo */}
+              <div className="flex justify-center md:justify-start">
+                <Image
+                  src="/logo.png"
+                  alt="Logo"
+                  width={400}
+                  height={400}
+                  className="w-full max-w-[300px] md:max-w-[400px] h-auto object-contain relative z-10"
+                  priority
+                />
+              </div>
 
               {/* Right side - Call to action */}
-              <div className="p-12 md:p-12">
+              <div className="p-4 sm:p-8 md:p-12 text-center md:text-left">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent uppercase">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 text-white bg-gradient-to-r from-white to-red-200 bg-clip-text text-transparent uppercase">
                     United by our thirst for blood
                   </h2>
-                  <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                  <p className="text-lg sm:text-xl text-gray-300 mb-6 sm:mb-8 leading-relaxed">
                     Join a community of both new and experienced players.
                     Sharpen your skills, test new playstyles, and join your kin
                     for the hunt!
@@ -849,26 +851,26 @@ export default function Home() {
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="mb-8"
+                    className="mb-6 sm:mb-8"
                   >
                     <Button
                       variant="outline"
                       size="lg"
-                      className="text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 relative overflow-hidden group px-8 w-full py-8 gap-4"
+                      className="text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 relative overflow-hidden group px-4 sm:px-8 w-full py-6 sm:py-8 gap-4"
                     >
                       <Link
                         href="https://discord.gg/varena"
                         target="_blank"
-                        className="flex items-center justify-center gap-4"
+                        className="flex items-center justify-center gap-2 sm:gap-4"
                       >
                         <Image
                           src="/discord.svg"
                           alt="Discord"
                           width={32}
                           height={32}
-                          className="h-8 w-8 group-hover:scale-110 transition-transform"
+                          className="h-6 w-6 sm:h-8 sm:w-8 group-hover:scale-110 transition-transform"
                         />
-                        <span className="text-2xl font-bold tracking-wider">
+                        <span className="text-xl sm:text-2xl font-bold tracking-wider">
                           JOIN THE ARENA
                         </span>
                         <motion.span
@@ -880,19 +882,19 @@ export default function Home() {
                       </Link>
                     </Button>
                   </motion.div>
-                  <div className="flex items-center justify-center gap-2 text-sm text-gray-400 truncate">
+                  <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 sm:gap-6 text-sm text-gray-400">
                     <motion.div
                       className="flex items-center gap-2"
                       whileHover={{ scale: 1.05, color: "#fff" }}
                     >
-                      <Users className="h-5 w-5" />
+                      <Users className="h-4 w-4 sm:h-5 sm:w-5" />
                       <span className="font-semibold">7,000+ Members</span>
                     </motion.div>
                     <motion.div
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 text-center sm:text-left"
                       whileHover={{ scale: 1.05, color: "#fff" }}
                     >
-                      <Moon className="h-5 w-5" />
+                      <Moon className="h-4 w-4 sm:h-5 sm:w-5" />
                       <span className="font-semibold">
                         Active 24/7 as long as Rendy doesn't sleep
                       </span>

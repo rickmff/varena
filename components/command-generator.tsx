@@ -53,16 +53,16 @@ export default function CommandGenerator() {
       viewport={{ once: true }}
     >
 
-      <div className="relative flex justify-center mx-auto">
+      <div className="relative flex flex-col sm:flex-row justify-center mx-auto gap-2 sm:gap-0">
         {[
-          { name: "Artifact", icon: <Sword className="w-5 h-5" /> },
-          { name: "Legendary", icon: <Swords className="w-5 h-5" /> },
-          { name: "Jewel", icon: <Gem className="w-5 h-5" /> },
-          { name: "Blood", icon: <FlaskRound className="w-5 h-5" /> }
+          { name: "Artifact", icon: <Sword className="w-4 h-4 sm:w-5 sm:h-5" /> },
+          { name: "Legendary", icon: <Swords className="w-4 h-4 sm:w-5 sm:h-5" /> },
+          { name: "Jewel", icon: <Gem className="w-4 h-4 sm:w-5 sm:h-5" /> },
+          { name: "Blood", icon: <FlaskRound className="w-4 h-4 sm:w-5 sm:h-5" /> }
         ].map((tab, index) => (
           <div
             key={tab.name}
-            className={`uppercase relative flex-1 px-6 py-3 rounded-md text-lg font-medium tracking-wider transition-all duration-300 cursor-pointer ${activeTab === index
+            className={`uppercase relative flex-1 px-3 sm:px-6 py-2 sm:py-3 rounded-md text-base sm:text-lg font-medium tracking-wider transition-all duration-300 cursor-pointer ${activeTab === index
               ? `text-white`
               : "text-gray-400 hover:text-white"
               }`}
@@ -103,13 +103,13 @@ export default function CommandGenerator() {
                 />
               </>
             )}
-            <span className="relative z-10 flex items-center justify-center gap-2 font-light font-junge">
+            <span className="relative z-10 flex items-center justify-center gap-1 sm:gap-2 font-light font-junge text-sm sm:text-base">
               {tab.icon} {tab.name}
             </span>
           </div>
         ))}
       </div>
-      <div className={`mx-auto rounded-lg border border-purple-900/30 p-6 min-h-[600px] backdrop-blur-sm shadow-lg transition-all duration-500 ${computedBG}`}>
+      <div className={`mx-auto mt-4 rounded-lg border border-purple-900/30 p-4 sm:p-6 min-h-[600px] backdrop-blur-sm shadow-lg transition-all duration-500 ${computedBG}`}>
 
         <motion.div
           className="space-y-6"
