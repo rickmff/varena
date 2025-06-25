@@ -109,7 +109,7 @@ export default function CommandGenerator() {
           </div>
         ))}
       </div>
-      <div className={`mx-auto mt-4 rounded-lg border border-purple-900/30 p-4 sm:p-6 min-h-[600px] backdrop-blur-sm shadow-lg transition-all duration-500 ${computedBG}`}>
+      <div className={`mx-auto rounded-lg border border-purple-900/30 p-4 sm:p-6 min-h-[600px] backdrop-blur-sm shadow-lg transition-all duration-500 ${computedBG}`}>
 
         <motion.div
           className="space-y-6"
