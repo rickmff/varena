@@ -5,7 +5,6 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   ChevronRight,
-  Play,
   Users,
   Castle,
   Moon,
@@ -13,16 +12,13 @@ import {
   ShieldCheck,
   CalendarClock,
   Terminal,
-  Plus,
   Newspaper,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect, useMemo, useRef, memo } from "react";
-import BloodParticles from "@/components/blood-particles";
-import NavBar, { DiscordButton, menuItems } from "@/components/NavBar";
+import NavBar, { menuItems } from "@/components/NavBar";
 import CommandGenerator from "@/components/command-generator";
 import FeatureCarousel from "@/app/components/ui/FeatureCarousel";
-import BuildsList from "@/components/builds/BuildsList";
 import SectionHeader from "@/app/components/ui/SectionHeader";
 import BuildsListHome from "@/components/builds/BuildsListHome";
 
@@ -194,9 +190,9 @@ export default function Home() {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState(true);
   const [newsError, setNewsError] = useState<string | null>(null);
-  const [hasBuilds, setHasBuilds] = useState(false);
   const [hasScrolledToSection, setHasScrolledToSection] = useState(false);
   const [isVideoVisible, setIsVideoVisible] = useState(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const videoRef = useRef<HTMLIFrameElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({});
@@ -244,10 +240,16 @@ export default function Home() {
   }, []);
 
   // Handle video src based on visibility
-  const videoSrc = useMemo(() => {
-    if (!isVideoVisible) return '';
-    return "https://www.youtube.com/embed/gjzwjlCSbes?autoplay=1&mute=1&loop=1&playlist=gjzwjlCSbes&controls=0&showinfo=0&rel=0&modestbranding=1";
+  useEffect(() => {
+    if (isVideoVisible && !isVideoLoaded) {
+      setIsVideoLoaded(true);
+    }
   }, [isVideoVisible]);
+
+  const videoSrc = useMemo(() => {
+    if (!isVideoLoaded) return '';
+    return "https://www.youtube.com/embed/gjzwjlCSbes?autoplay=1&mute=1&loop=1&playlist=gjzwjlCSbes&controls=0&showinfo=0&rel=0&modestbranding=1";
+  }, [isVideoLoaded]);
 
   const fetchNewsFromAPI = async (retryCount = 0) => {
     const maxRetries = 2;
@@ -517,10 +519,10 @@ export default function Home() {
         {/* YouTube Video Background */}
         <div
           ref={videoContainerRef}
-          className="absolute inset-0 z-1 opacity-60"
+          className="absolute inset-0 z-1 opacity-60 overflow-hidden"
         >
-          <div className="yt-embed-holder">
-            {isVideoVisible ? (
+          <div className="relative w-full h-full">
+            {isVideoLoaded ? (
               <iframe
                 ref={videoRef}
                 src={videoSrc}
@@ -529,9 +531,14 @@ export default function Home() {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
                 loading="lazy"
+                className="absolute top-1/2 left-1/2 w-[100vw] h-[100vh] min-w-[177.77vh] min-h-[56.25vw] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                style={{
+                  width: 'calc(100% + 2px)',
+                  height: 'calc(100% + 2px)'
+                }}
               />
             ) : (
-              <div className="w-full h-full bg-black">
+              <div className="absolute inset-0 bg-black">
                 <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 to-black"></div>
               </div>
             )}
@@ -794,7 +801,7 @@ export default function Home() {
       <section className="py-20 relative overflow-hidden">
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-black to-transparent"></div>
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-transparent to-black"></div>
-        {         <div className="absolute inset-0 z-0">
+        {<div className="absolute inset-0 z-0">
           <Image
             src="/flower.webp"
             alt="Background Pattern"
@@ -804,7 +811,7 @@ export default function Home() {
             sizes="100vw"
             quality={60}
           />
-        </div> }
+        </div>}
         <div className="container mx-auto px-4 relative z-10">
           <motion.div
             className="max-w-6xl mx-auto "
