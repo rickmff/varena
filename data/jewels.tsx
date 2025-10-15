@@ -32,7 +32,7 @@ const spellData: Record<string, Jewel> = {
       { id: 3, name: "Hit applies fading Snare (0.8 - 1.2s)" },
       { id: 4, name: "Increase hit healing (16 - 36%)" },
       { id: 5, name: "Recast to conjure an AoE that deals damage to enemies and heals allies (20 - 36%) on hit and then explodes (20 - 36%)" },
-      { id: 6, name: "Increase explosion damage (12 - 24%)" },
+      { id: 6, name: "Increase explosion damage (16 - 32%)" },
       { id: 7, name: "Explosion pushes enemies back (1.6 - 3.2m)" },
       { id: 8, name: "Explosion increases ally MS (10% - 18%) for 3s" },
       { id: 9, name: "Increase explosion healing (30 - 50%)" }
@@ -61,9 +61,9 @@ const spellData: Record<string, Jewel> = {
     effects: [
       { id: 1, name: "Trigger applies a fading Snare (1.2 - 2.4s)" },
       { id: 2, name: "Increase damage (12 - 20%)" },
-      { id: 3, name: "Trigger for first primary attack within 5s to deal bonus damage (30 - 50%)" },
+      { id: 3, name: "Trigger for first primary attack within 5s to deal bonus damage (20 - 40%)" },
       { id: 4, name: "Trigger heals (30 - 50%)" },
-      { id: 5, name: "Increase Immaterial duration (16 - 24%)" },
+      { id: 5, name: "Increase Immaterial duration (12 - 20%)" },
       { id: 6, name: "Turn invisible while Immaterial" },
       { id: 7, name: "Trigger conjurs a projectile towards each nearby enemy (1 - 5 max) that deals damage (16 - 24%) and applies Leech" },
       { id: 8, name: "Increase MS (20 - 36%) during channel" }
@@ -92,7 +92,7 @@ const spellData: Record<string, Jewel> = {
     school: "blood",
     effects: [
       { id: 1, name: "Hit conjures an AoE that deals damage (14 - 30%) and applies Leech" },
-      { id: 2, name: "Hit on an enemy affected by Leech deals damage (30 - 50%)" },
+      { id: 2, name: "Hit on an enemy affected by Leech deals damage (40 - 60%)" },
       { id: 3, name: "Hit applies Vampiric Curse dealing (140 - 180%) leeching (14 - 30%) health after 3s. Decrease hit damage (140%)" },
       { id: 4, name: "Hit on an enemy affected by Leech heals (1.4 - 3% max HP)" },
       { id: 5, name: "Decrease cast time (12 - 24%)" },
@@ -107,11 +107,11 @@ const spellData: Record<string, Jewel> = {
     wiki: "/",
     school: "blood",
     effects: [
-      { id: 1, name: "Increase damage done by each bat by (8 - 16%)" },
-      { id: 2, name: "Explode when reaching maximum distance dealing (24 - 48%) and inflicting Leech" },
+      { id: 1, name: "Increase damage done by each bat by (5 - 10%)" },
+      { id: 2, name: "Explode when reaching maximum distance dealing (16 - 32%) and inflicting Leech" },
       { id: 3, name: "Hits leeches (4 - 8%) health" },
       { id: 4, name: "Hitting the same target with all bats inflicts a (0.6 - 1s) stun" },
-      { id: 5, name: "The first hit inflicts Lesser Vampiric Curse dealing (40 - 60%) damage and leeching (12 - 24%) health" },
+      { id: 5, name: "The first hit inflicts Lesser Vampiric Curse dealing (30 - 50%) damage and leeching (12 - 24%) health" },
       { id: 6, name: "Inflict a fading snare on enemies hit lasting (0.8 - 1.6s)" }
     ]
   },
@@ -193,10 +193,10 @@ const spellData: Record<string, Jewel> = {
     wiki: "https://vrising.fandom.com/wiki/Void",
     school: "chaos",
     effects: [
-      { id: 1, name: "Increase damage (8 - 20%)" },
+      { id: 1, name: "Increase damage (8 - 16%)" },
       { id: 2, name: "Explosion leaves behind an AoE that deals damage (8 - 16%) (3 max)" },
       { id: 3, name: "Explosion conjures 3 AoEs that explode to deal damage (12 - 24%) and apply Ignite" },
-      { id: 4, name: "Increase recharge rate (8 - 20%)" },
+      { id: 4, name: "Increase recharge rate (8 - 12%)" },
       { id: 5, name: "Explosion on an enemy affected by Ignite applies Agonising Flames" },
       { id: 6, name: "Increase range (8 - 20%)" }
     ]
@@ -285,7 +285,7 @@ const spellData: Record<string, Jewel> = {
       { id: 1, name: "Hit on an enemy affected by Chill or Freeze launches 8 projectiles that deal damage (16 - 32%) and apply Chill" },
       { id: 2, name: "Hit on an enemy affected by Chill or Freeze shields caster (40 - 80%)" },
       { id: 3, name: "Hit conjures an AoE that deals damage (40 - 60%)" },
-      { id: 4, name: "Increase damage (20 - 40%) to enemies affected by Chill or Freeze" },
+      { id: 4, name: "Increase damage (20 - 32%) to enemies affected by Chill or Freeze" },
       { id: 5, name: "Increase projectile range and speed (12 - 24%)" },
       { id: 6, name: "Decrease cast time (12 - 24%)" }
     ]
@@ -342,7 +342,7 @@ const spellData: Record<string, Jewel> = {
     school: "illusion",
     effects: [
       { id: 1, name: "Trigger increases first primary attack damage (30 - 50%) for 5s" },
-      { id: 2, name: "Trigger applies Fear to enemies (0.8 - 1.6s) in a caster-centred AoE" },
+      { id: 2, name: "Trigger applies Fear to enemies (0.8 - 1.2s) in a caster-centred AoE" },
       { id: 3, name: "Trigger increases MS (8 - 16%) for 3s" },
       { id: 4, name: "Trigger grants Phantasm (1 - 5)" },
       { id: 5, name: "Trigger reduces secondary weapon skill CD (40 - 80%)" },

@@ -67,7 +67,7 @@
     "name": "Weapon Skill Power",
     "value": 0,
     "unit": "%",
-    "cap": 140,
+    "cap": 145,
     "defaultValue": 100,
     "category": "Physical"
   },
@@ -83,7 +83,7 @@
     "name": "Bonus Spell Power",
     "value": 0,
     "unit": "%",
-    "cap": 35,
+    "cap": 30,
     "defaultValue": 0,
     "category": "Spell"
   },
@@ -211,7 +211,7 @@
     "name": "Spell Leech",
     "value": 0,
     "unit": "%",
-    "cap": 25,
+    "cap": 20,
     "defaultValue": 0,
     "category": "Health & Healing"
   },
@@ -251,7 +251,7 @@
     "name": "Spell Cooldown Rate",
     "value": 0,
     "unit": "%",
-    "cap": 40,
+    "cap": 30,
     "defaultValue": 0,
     "category": "Cooldown"
   },
