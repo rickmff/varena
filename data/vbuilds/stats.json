@@ -251,7 +251,7 @@
     "name": "Spell Cooldown Rate",
     "value": 0,
     "unit": "%",
-    "cap": 30,
+    "cap": 35,
     "defaultValue": 0,
     "category": "Cooldown"
   },
