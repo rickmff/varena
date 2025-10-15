@@ -178,7 +178,7 @@
           },
           {
             "stat": "Spell Leech",
-            "value": 5,
+            "value": 4,
             "unit": "percent",
             "calculate": true
           },
@@ -404,11 +404,11 @@
     "arenaCode": "4",
     "effects": {
       "I": {
-        "description": "14% Increased Spell Power and 10% increased Shapeshift Speed.",
+        "description": "12% Increased Spell Power and 10% increased Shapeshift Speed.",
         "modifiers": [
           {
             "stat": "Bonus Spell Power",
-            "value": 14,
+            "value": 12,
             "unit": "percent",
             "calculate": true
           },

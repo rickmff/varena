@@ -18,13 +18,13 @@
     "name": "Chaos Kindling",
     "id": "chaos_kindling",
     "img": "/images/vbuilds/passives/passive-chaos_kindling.jpg",
-    "description": "Increases Spell Cooldown Rate by 7%. Ignite deals 25% increased damage and Chaos Explosions ignite enemies hit.",
+    "description": "Increases Spell Cooldown Rate by 6%. Ignite deals 25% increased damage and Chaos Explosions ignite enemies hit.",
     "type": "Elemental",
     "arenaCode": "5",
     "modifiers": [
       {
         "stat": "Spell Cooldown Rate",
-        "value": 7,
+        "value": 6,
         "unit": "percent"
       }
     ]
@@ -182,13 +182,13 @@
     "name": "Flowing Sorcery",
     "id": "flowing_sorcery",
     "img": "/images/vbuilds/passives/passive-flowing_sorcery.jpg",
-    "description": "Increases Spell Cooldown Rate by 7% and there is a 35% chance to not consume Phantasm when triggering a cooldown reset.",
+    "description": "Increases Spell Cooldown Rate by 6% and there is a 35% chance to not consume Phantasm when triggering a cooldown reset.",
     "type": "Elemental",
     "arenaCode": "e",
     "modifiers": [
       {
         "stat": "Spell Cooldown Rate",
-        "value": 7,
+        "value": 6,
         "unit": "percent"
       },
       {
@@ -224,13 +224,13 @@
     "name": "Enhanced Conductivity",
     "id": "enhanced_conductivity",
     "img": "/images/vbuilds/passives/passive-enhanced_conductivity.jpg",
-    "description": "Increases Bonus Spell Power by 7% and spell damage now also triggers bonus damage to enemies affected by Static.",
+    "description": "Increases Bonus Spell Power by 6% and spell damage now also triggers bonus damage to enemies affected by Static.",
     "type": "Elemental",
     "arenaCode": "i",
     "modifiers": [
       {
         "stat": "Bonus Spell Power",
-        "value": 7,
+        "value": 6,
         "unit": "percent"
       }
     ]
@@ -396,13 +396,13 @@
     "name": "Ravenous Strikes",
     "id": "ravenous_strikes",
     "img": "/images/vbuilds/passives/passive-ravenous_strikes.jpg",
-    "description": "Increases Weapon Skill Power by 8% and Weapon Skill Leech by 5%.",
+    "description": "Increases Weapon Skill Power by 9% and Weapon Skill Leech by 5%.",
     "type": "Vampire",
     "arenaCode": "8",
     "modifiers": [
       {
         "stat": "Weapon Skill Power",
-        "value": 8,
+        "value": 9,
         "unit": "percent"
       },
       {
