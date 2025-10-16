@@ -73,6 +73,7 @@ export default function BloodParticles() {
     }
 
     // Animation loop
+    let animationId: number;
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
@@ -81,13 +82,17 @@ export default function BloodParticles() {
         particles[i].draw()
       }
 
-      requestAnimationFrame(animate)
+      animationId = requestAnimationFrame(animate)
     }
 
     animate()
 
     return () => {
       window.removeEventListener("resize", setCanvasSize)
+      // Cancel animation frame to prevent memory leaks
+      if (animationId) {
+        cancelAnimationFrame(animationId)
+      }
     }
   }, [])
 

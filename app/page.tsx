@@ -15,7 +15,7 @@ import {
   Newspaper,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState, useEffect, useMemo, useRef, memo } from "react";
+import { useState, useEffect, useMemo, useRef, memo, useCallback } from "react";
 import NavBar, { menuItems } from "@/components/NavBar";
 import CommandGenerator from "@/components/command-generator";
 import FeatureCarousel from "@/app/components/ui/FeatureCarousel";
@@ -35,6 +35,19 @@ const iconMap: { [key: string]: React.ElementType } = {
   // Add more mappings as needed based on the text you store in Notion for 'iconName'
 };
 // --- END: Icon mapping ---
+
+// Global cache for loaded images to prevent reloading
+const loadedImagesCache = new Set<string>();
+const MAX_CACHE_SIZE = 50; // Limit cache size to prevent memory leaks
+
+// Cleanup function for cache
+const cleanupCache = () => {
+  if (loadedImagesCache.size > MAX_CACHE_SIZE) {
+    const cacheArray = Array.from(loadedImagesCache);
+    const toRemove = cacheArray.slice(0, cacheArray.length - MAX_CACHE_SIZE);
+    toRemove.forEach(url => loadedImagesCache.delete(url));
+  }
+};
 
 // Define a type for your news items fetched from Notion
 interface NewsItem {
@@ -78,13 +91,35 @@ const NewsCard = memo(({ news, index, onImageError }: {
 
   const IconComponent = iconMap[news.iconName] || Terminal;
   const [isVisible, setIsVisible] = useState(false);
+  const [hasBeenVisible, setHasBeenVisible] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
+  // Use fallback image if no cover image URL is provided or if there was an error
+  const imageUrl = (!news.coverImageUrl || imageError) ? '/news.webp' : news.coverImageUrl;
+
   useEffect(() => {
+    // If image is already in cache, make it visible immediately
+    if (loadedImagesCache.has(imageUrl)) {
+      setIsVisible(true);
+      setHasBeenVisible(true);
+      return;
+    }
+
+    // If already visible, don't create observer
+    if (hasBeenVisible) {
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsVisible(entry.isIntersecting);
+        if (entry.isIntersecting && !hasBeenVisible) {
+          setIsVisible(true);
+          setHasBeenVisible(true);
+          // Disconnect observer after first intersection to prevent memory leaks
+          observer.disconnect();
+        }
       },
       {
         rootMargin: '50px',
@@ -92,24 +127,62 @@ const NewsCard = memo(({ news, index, onImageError }: {
       }
     );
 
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
+    const currentRef = cardRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
     }
 
     return () => {
-      if (cardRef.current) {
-        observer.unobserve(cardRef.current);
-      }
+      // Properly disconnect the observer to prevent memory leaks
+      observer.disconnect();
+    };
+  }, [imageUrl]); // Remove hasBeenVisible from dependencies to prevent infinite loops
+
+  // Cleanup effect for component unmount
+  useEffect(() => {
+    return () => {
+      // Optional: Clean up cache when component unmounts if needed
+      // This is commented out as we want to keep cache across component mounts
+      // cleanupCache();
     };
   }, []);
 
-  const handleImageError = (url: string) => {
+  const handleImageError = useCallback((url: string) => {
     setImageError(true);
     onImageError(url);
-  };
+  }, [onImageError]);
 
-  // Use fallback image if no cover image URL is provided or if there was an error
-  const imageUrl = (!news.coverImageUrl || imageError) ? '/news.webp' : news.coverImageUrl;
+  const handleImageLoad = useCallback(() => {
+    setImageLoaded(true);
+    // Add to global cache to prevent future reloads
+    loadedImagesCache.add(imageUrl);
+    // Cleanup cache if it gets too large
+    cleanupCache();
+  }, [imageUrl]);
+
+  // Memoize the image component to prevent unnecessary re-renders
+  const imageComponent = useMemo(() => {
+    if (!isVisible) return null;
+
+    return (
+      <Image
+        src={imageUrl}
+        alt={news.title}
+        width={640}
+        height={360}
+        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        loading={index === 0 ? "eager" : "lazy"}
+        placeholder="blur"
+        blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMDAwMDAwIiAvPjwvc3ZnPg=="
+        onError={() => handleImageError(imageUrl)}
+        onLoad={handleImageLoad}
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        quality={75}
+        priority={index === 0}
+        unoptimized={imageUrl.startsWith('data:') || imageUrl === '/news.webp'}
+      />
+    );
+  }, [isVisible, imageUrl, news.title, index]); // Remove function dependencies to prevent recreations
 
   return (
     <motion.div
@@ -134,23 +207,7 @@ const NewsCard = memo(({ news, index, onImageError }: {
         </div>
 
         <div className="relative aspect-video">
-          {isVisible && (
-            <Image
-              src={imageUrl}
-              alt={news.title}
-              width={640}
-              height={360}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              loading={index === 0 ? "eager" : "lazy"}
-              placeholder="blur"
-              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMDAwMDAwIiAvPjwvc3ZnPg=="
-              onError={() => handleImageError(imageUrl)}
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              quality={75}
-              priority={index === 0}
-              unoptimized={imageUrl.startsWith('data:') || imageUrl === '/news.webp'}
-            />
-          )}
+          {imageComponent}
 
           {/* Category Badge */}
           <div className="absolute top-4 right-4 flex items-center gap-2">
@@ -191,11 +248,8 @@ export default function Home() {
   const [isLoadingNews, setIsLoadingNews] = useState(true);
   const [newsError, setNewsError] = useState<string | null>(null);
   const [hasScrolledToSection, setHasScrolledToSection] = useState(false);
-  const [isVideoVisible, setIsVideoVisible] = useState(false);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const videoRef = useRef<HTMLIFrameElement>(null);
-  const videoContainerRef = useRef<HTMLDivElement>(null);
   const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({});
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -214,42 +268,6 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [hasScrolledToSection]);
 
-  // Video visibility observer
-  useEffect(() => {
-    if (!videoContainerRef.current) return;
-
-    const options = {
-      root: null,
-      rootMargin: '0px',
-      threshold: 0.3, // Video will load when 30% visible
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        setIsVideoVisible(entry.isIntersecting);
-      });
-    }, options);
-
-    observer.observe(videoContainerRef.current);
-
-    return () => {
-      if (videoContainerRef.current) {
-        observer.unobserve(videoContainerRef.current);
-      }
-    };
-  }, []);
-
-  // Handle video src based on visibility
-  useEffect(() => {
-    if (isVideoVisible && !isVideoLoaded) {
-      setIsVideoLoaded(true);
-    }
-  }, [isVideoVisible]);
-
-  const videoSrc = useMemo(() => {
-    if (!isVideoLoaded) return '';
-    return "https://www.youtube.com/embed/gjzwjlCSbes?autoplay=1&mute=1&loop=1&playlist=gjzwjlCSbes&controls=0&showinfo=0&rel=0&modestbranding=1";
-  }, [isVideoLoaded]);
 
   const fetchNewsFromAPI = async (retryCount = 0) => {
     const maxRetries = 2;
@@ -516,32 +534,19 @@ export default function Home() {
         </div>
         */}
 
-        {/* YouTube Video Background */}
-        <div
-          ref={videoContainerRef}
-          className="absolute inset-0 z-1 opacity-60 overflow-hidden"
-        >
+        {/* Static Background Image */}
+        <div className="absolute inset-0 z-1 opacity-60 overflow-hidden">
           <div className="relative w-full h-full">
-            {isVideoLoaded ? (
-              <iframe
-                ref={videoRef}
-                src={videoSrc}
-                title="Arena Background"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                loading="lazy"
-                className="absolute top-1/2 left-1/2 w-[100vw] h-[100vh] min-w-[177.77vh] min-h-[56.25vw] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-                style={{
-                  width: 'calc(100% + 2px)',
-                  height: 'calc(100% + 2px)'
-                }}
-              />
-            ) : (
-              <div className="absolute inset-0 bg-black">
-                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 to-black"></div>
-              </div>
-            )}
+            <Image
+              src="/hero-bg.webp"
+              alt="Arena Background"
+              fill
+              className="object-cover"
+              priority
+              quality={80}
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/30 to-black"></div>
           </div>
         </div>
 
@@ -593,6 +598,7 @@ export default function Home() {
                 width={500} //650
                 height={450}
                 className="mx-auto relative z-10 hover:scale-102 transition-transform duration-300"
+                priority
               />
             </motion.div>
           </motion.div>

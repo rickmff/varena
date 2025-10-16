@@ -36,9 +36,8 @@ export const DiscordButton = ({
     <Button
       variant="outline"
       size={size}
-      className={`hidden md:flex text-xs font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 relative overflow-hidden ${
-        className || ""
-      }`}
+      className={`hidden md:flex text-xs font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 relative overflow-hidden ${className || ""
+        }`}
     >
       <div className="flex items-center justify-center gap-2 relative z-10">
         <Link
@@ -211,11 +210,15 @@ export default function NavBar() {
             className="relative z-50"
           >
             <motion.div
+              initial={{
+                borderColor: "rgba(255, 255, 255, 0.3)",
+                backgroundColor: "rgba(127, 29, 29, 0)",
+              }}
               animate={{
                 borderColor:
                   scrollY > 50 ? "rgb(127 29 29)" : "rgba(255, 255, 255, 0.3)",
                 backgroundColor:
-                  scrollY > 50 ? "rgba(127, 29, 29, 0.1)" : "transparent",
+                  scrollY > 50 ? "rgba(127, 29, 29, 0.1)" : "rgba(127, 29, 29, 0)",
               }}
               transition={{
                 type: "spring",

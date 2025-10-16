@@ -212,9 +212,8 @@ const FeatureCarousel: React.FC<FeatureCarouselProps> = ({ features }) => {
 
     return () => {
       clearInterval(intervalId);
-      if (carouselRef.current) {
-        observer.unobserve(carouselRef.current);
-      }
+      // Properly disconnect the observer to prevent memory leaks
+      observer.disconnect();
     };
   }, [features, isHoveringCard, currentBgIndex, activeBgLayer, carouselRef, imagesLoaded]);
 

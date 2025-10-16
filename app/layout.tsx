@@ -61,22 +61,9 @@ export const metadata: Metadata = {
     creator: '@varena',
   },
   icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-    ],
-    shortcut: ['/favicon.ico'],
-    apple: ['/apple-touch-icon.png'],
-    other: [
-      {
-        rel: 'mask-icon',
-        url: '/safari-pinned-tab.svg',
-        color: '#5bbad5',
-      },
-    ],
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
   manifest: '/site.webmanifest',
   robots: {
@@ -100,27 +87,7 @@ export default function RootLayout({
       <head>
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="msapplication-TileImage" content="/mstile-144x144.png" />
-        <meta name="description" content="Join a community of both new and experienced players. Sharpen your skills, test new playstyles, and join your kin for the hunt!" />
-        <meta property="og:url" content="https://v-arena.com" />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="V Arena - V Rising Community Server" />
-        <meta property="og:description" content="Join a community of both new and experienced players. Sharpen your skills, test new playstyles, and join your kin for the hunt!" />
-        <meta property="og:image" content="https://v-arena.com/og-image.png" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta property="twitter:domain" content="v-arena.com" />
-        <meta property="twitter:url" content="https://v-arena.com" />
-        <meta name="twitter:title" content="V Arena - V Rising Community Server" />
-        <meta name="twitter:description" content="Join a community of both new and experienced players. Sharpen your skills, test new playstyles, and join your kin for the hunt!" />
-        <meta name="twitter:image" content="https://v-arena.com/og-image.png" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <link href="https://fonts.googleapis.com/css2?family=Junge&display=swap" rel="stylesheet"></link>
-        <link rel="manifest" href="/site.webmanifest" />
       </head>
       <body
         className={`${inter.className} ${junge.variable} antialiased tracking-tight`}
