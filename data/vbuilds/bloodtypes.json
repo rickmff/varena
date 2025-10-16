@@ -81,7 +81,7 @@
     "arenaCode": "7",
     "effects": {
       "I": {
-        "description": "10% Increased Physical Power and Veil attacks deal 30% bonus damage.",
+        "description": "10% Increased Physical Power and Veil attacks deal 40% bonus damage.",
         "modifiers": [
           {
             "stat": "Bonus Physical Power",
@@ -91,7 +91,7 @@
           },
           {
             "stat": "Veil Attack Damage",
-            "value": 30,
+            "value": 40,
             "unit": "percent",
             "calculate": true
           }
@@ -115,11 +115,11 @@
         ]
       },
       "III": {
-        "description": "16% Increased Weapon Skill Power and 24% increased damage when striking enemies at full health.",
+        "description": "18% Increased Weapon Skill Power and 24% increased damage when striking enemies at full health.",
         "modifiers": [
           {
             "stat": "Weapon Skill Power",
-            "value": 16,
+            "value": 18,
             "unit": "percent",
             "calculate": true
           },
@@ -178,7 +178,7 @@
           },
           {
             "stat": "Spell Leech",
-            "value": 5,
+            "value": 4,
             "unit": "percent",
             "calculate": true
           },
@@ -201,7 +201,7 @@
         "modifiers": []
       },
       "III": {
-        "description": "12% Increased Movement Speed and 18% increased Attack Speed but there is a 25% chance when taking damage to trigger an eruption inflicting a 2s snare.",
+        "description": "12% Increased Movement Speed and 14% increased Attack Speed but there is a 25% chance when taking damage to trigger an eruption inflicting a 2s snare.",
         "modifiers": [
           {
             "stat": "Bonus Movement Speed",
@@ -211,24 +211,24 @@
           },
           {
             "stat": "Attack Speed",
-            "value": 18,
+            "value": 14,
             "unit": "percent",
             "calculate": true
           }
         ]
       },
       "IV": {
-        "description": "Spell and Weapon Charge Gain increased by 15 but there is a 30% chance to spawn a shadow that attacks you when using an ability.",
+        "description": "Spell and Weapon Charge Gain increased by 10 but there is a 30% chance to spawn a shadow that attacks you when using an ability.",
         "modifiers": [
           {
             "stat": "Spell Charge Gain",
-            "value": 15,
+            "value": 10,
             "unit": "flat",
             "calculate": true
           },
           {
             "stat": "Weapon Charge Gain",
-            "value": 15,
+            "value": 10,
             "unit": "flat",
             "calculate": true
           }
@@ -299,7 +299,7 @@
         ]
       },
       "IV": {
-        "description": "15% Chance to parry an attack reducing damage taken by 25%. Parrying an attack increases your own physical power by 20% for 3.5s.",
+        "description": "15% Chance to parry an attack reducing damage taken by 25%. Parrying an attack increases your own physical power by 15% for 3.5s.",
         "modifiers": [
           {
             "stat": "Parry Damage Reduction",
@@ -309,7 +309,7 @@
           },
           {
             "stat": "Physical Power (Parry Buff)",
-            "value": 20,
+            "value": 15,
             "unit": "percent",
             "calculate": false
           }
@@ -335,11 +335,11 @@
     "arenaCode": "6",
     "effects": {
       "I": {
-        "description": "14% Increased Spell Power and 10% Shield Efficiency.",
+        "description": "12% Increased Spell Power and 10% Shield Efficiency.",
         "modifiers": [
           {
             "stat": "Bonus Spell Power",
-            "value": 14,
+            "value": 12,
             "unit": "percent",
             "calculate": true
           },
@@ -352,11 +352,11 @@
         ]
       },
       "II": {
-        "description": "14% Increased Spell Cooldown Rate and shield self for 25% of your spell power when casting a spell.",
+        "description": "12% Increased Spell Cooldown Rate and shield self for 25% of your spell power when casting a spell.",
         "modifiers": [
           {
             "stat": "Spell Cooldown Rate",
-            "value": 14,
+            "value": 12,
             "unit": "percent",
             "calculate": true
           }
@@ -404,11 +404,11 @@
     "arenaCode": "4",
     "effects": {
       "I": {
-        "description": "14% Increased Spell Power and 10% increased Shapeshift Speed.",
+        "description": "12% Increased Spell Power and 10% increased Shapeshift Speed.",
         "modifiers": [
           {
             "stat": "Bonus Spell Power",
-            "value": 14,
+            "value": 12,
             "unit": "percent",
             "calculate": true
           },
@@ -479,11 +479,11 @@
     "arenaCode": "9",
     "effects": {
       "I": {
-        "description": "14% Increased Spell Power and 8% increased Spell Critical Power.",
+        "description": "12% Increased Spell Power and 8% increased Spell Critical Power.",
         "modifiers": [
           {
             "stat": "Bonus Spell Power",
-            "value": 14,
+            "value": 12,
             "unit": "percent",
             "calculate": true
           },
@@ -496,7 +496,7 @@
         ]
       },
       "II": {
-        "description": "16% Increased Spell Critical Chance and Spell hits grants 8% Movement Speed for 3s.",
+        "description": "16% Increased Spell Critical Chance and Spell hits grants 6% Movement Speed for 3s.",
         "modifiers": [
           {
             "stat": "Spell Critical Chance",
@@ -506,18 +506,18 @@
           },
           {
             "stat": "Bonus Movement Speed",
-            "value": 8,
+            "value": 6,
             "unit": "percent",
             "calculate": false
           }
         ]
       },
       "III": {
-        "description": "10% Increased Spell Leech and 3% increased Spell Charge Gain.",
+        "description": "8% Increased Spell Leech and 3% increased Spell Charge Gain.",
         "modifiers": [
           {
             "stat": "Spell Leech",
-            "value": 10,
+            "value": 8,
             "unit": "percent",
             "calculate": true
           },
@@ -530,11 +530,11 @@
         ]
       },
       "IV": {
-        "description": "Spell Critical Strike Hits increases Spell Cooldown Rate by 40% for 3s.",
+        "description": "Spell Critical Strike Hits increases Spell Cooldown Rate by 30% for 3s.",
         "modifiers": [
           {
             "stat": "Spell Cooldown Rate",
-            "value": 40,
+            "value": 30,
             "unit": "percent",
             "calculate": false
           }

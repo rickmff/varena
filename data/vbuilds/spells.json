@@ -84,9 +84,9 @@
         "key": 5
       },
       {
-        "description": "Increase explosion damage (12 - 24%)",
-        "min": 12.0,
-        "max": 24.0,
+        "description": "Increase explosion damage (16 - 32%)",
+        "min": 16.0,
+        "max": 32.0,
         "key": 6
       },
       {
@@ -182,9 +182,9 @@
         "key": 2
       },
       {
-        "description": "Trigger for first primary attack within 5s to deal bonus damage (30 - 50%)",
-        "min": 30.0,
-        "max": 50.0,
+        "description": "Trigger for first primary attack within 5s to deal bonus damage (20 - 40%)",
+        "min": 20.0,
+        "max": 40.0,
         "key": 3
       },
       {
@@ -194,9 +194,9 @@
         "key": 4
       },
       {
-        "description": "Increase Immaterial duration (16 - 24%)",
-        "min": 16.0,
-        "max": 24.0,
+        "description": "Increase Immaterial duration (12 - 20%)",
+        "min": 12.0,
+        "max": 20.0,
         "key": 5
       },
       {
@@ -292,7 +292,7 @@
         "key": 1
       },
       {
-        "description": "Hit on an enemy affected by Leech deals damage (30 - 50%)",
+        "description": "Hit on an enemy affected by Leech deals damage (40 - 60%)",
         "min": 30.0,
         "max": 50.0,
         "key": 2
@@ -344,15 +344,15 @@
     "arenaCode": "6",
     "effects": [
       {
-        "description": "Increase damage done by each bat by (8 - 16%)",
-        "min": 8.0,
-        "max": 16.0,
+        "description": "Increase damage done by each bat by (5 - 10%)",
+        "min": 5.0,
+        "max": 10.0,
         "key": 1
       },
       {
-        "description": "Explode when reaching maximum distance dealing (24 - 48%) and inflicting Leech",
-        "min": 24.0,
-        "max": 48.0,
+        "description": "Explode when reaching maximum distance dealing (16 - 32%) and inflicting Leech",
+        "min": 16.0,
+        "max": 32.0,
         "key": 2
       },
       {
@@ -368,9 +368,9 @@
         "key": 4
       },
       {
-        "description": "The first hit inflicts Lesser Vampiric Curse dealing (40 - 60%) damage and leeching (12 - 24%) health",
-        "min": 40.0,
-        "max": 60.0,
+        "description": "The first hit inflicts Lesser Vampiric Curse dealing (30 - 50%) damage and leeching (12 - 24%) health",
+        "min": 30.0,
+        "max": 50.0,
         "key": 5
       },
       {
@@ -650,9 +650,9 @@
     "arenaCode": "b",
     "effects": [
       {
-        "description": "Increase damage (8 - 20%)",
+        "description": "Increase damage (8 - 16%)",
         "min": 8.0,
-        "max": 20.0,
+        "max": 16.0,
         "key": 1
       },
       {
@@ -668,9 +668,9 @@
         "key": 3
       },
       {
-        "description": "Increase recharge rate (8 - 20%)",
+        "description": "Increase recharge rate (8 - 12%)",
         "min": 8.0,
-        "max": 20.0,
+        "max": 12.0,
         "key": 4
       },
       {
@@ -968,9 +968,9 @@
         "key": 3
       },
       {
-        "description": "Increase damage (20 - 40%) to enemies affected by Chill or Freeze",
+        "description": "Increase damage (20 - 32%) to enemies affected by Chill or Freeze",
         "min": 20.0,
-        "max": 40.0,
+        "max": 32.0,
         "key": 4
       },
       {
@@ -1158,9 +1158,9 @@
         "key": 1
       },
       {
-        "description": "Trigger applies Fear to enemies (0.8 - 1.6s) in a caster-centred AoE",
+        "description": "Trigger applies Fear to enemies (0.8 - 1.2s) in a caster-centred AoE",
         "min": 0.8,
-        "max": 1.6,
+        "max": 1.2,
         "key": 2
       },
       {

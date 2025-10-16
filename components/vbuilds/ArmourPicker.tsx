@@ -93,7 +93,7 @@ export const armourOptions = [
       },
       {
         stat: "Weapon Skill Power",
-        value: 8,
+        value: 9,
         unit: "percent",
         calculate: true,
       },
@@ -119,19 +119,19 @@ export const armourOptions = [
       },
       {
         stat: "Bonus Spell Power",
-        value: 7.2,
+        value: 6,
         unit: "percent",
         calculate: true,
       },
       {
         stat: "Spell Cooldown Rate",
-        value: 7,
+        value: 6,
         unit: "percent",
         calculate: true,
       },
       {
         stat: "Spell Leech",
-        value: 5,
+        value: 4,
         unit: "percent",
         calculate: true,
       },

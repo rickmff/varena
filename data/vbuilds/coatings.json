@@ -3,14 +3,14 @@
     "id": "blood",
     "name": "Blood Coating",
     "image": "/images/vbuilds/consumables/BloodCoating.webp",
-    "description": "Imbue your equipped weapon with the essence of blood. Your next primary attack inflicts Leech and Vampiric Curse, dealing 40% magic damage after 2s and spawning a Blood Orb. The on hit effect recharges every 12s and the imbuement lasts for 60 minutes. Effect persists through death.",
+    "description": "Imbue your equipped weapon with the essence of blood. Your next primary attack inflicts Leech and Vampiric Curse, dealing 50% magic damage after 2s and spawning a Blood Orb. The on hit effect recharges every 12s and the imbuement lasts for 60 minutes. Effect persists through death.",
     "arenaCode": "1"
   },
   "chaos": {
     "id": "chaos",
     "name": "Chaos Coating",
     "image": "/images/vbuilds/consumables/ChaosCoating.webp",
-    "description": "Imbue your equipped weapon with blazing chaos. Your next primary attack triggers a Chaos Explosion dealing 50% magic damage in an area and inflicting Ignite. The on hit effect recharges every 12s and the imbuement lasts for 60 minutes. Effect persists through death.",
+    "description": "Imbue your equipped weapon with blazing chaos. Your next primary attack triggers a Chaos Explosion dealing 40% magic damage in an area and inflicting Ignite. The on hit effect recharges every 12s and the imbuement lasts for 60 minutes. Effect persists through death.",
     "arenaCode": "2"
   },
   "frost": {
