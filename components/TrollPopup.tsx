@@ -10,23 +10,15 @@ interface TrollPopupProps {
 }
 
 export default function TrollPopup({ isOpen, onClose }: TrollPopupProps) {
-  const [closeAttempts, setCloseAttempts] = useState(0);
   const [buttonPosition, setButtonPosition] = useState({ x: 0, y: 0 });
+  const [canEscape, setCanEscape] = useState(true);
+  const totalDistanceRef = useRef(0);
   const previousPositionRef = useRef({ x: 0, y: 0 });
   const popupRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const MAX_ATTEMPTS = 5;
-  const MIN_DISTANCE_FROM_PREVIOUS = 150; // Minimum distance from previous position in pixels
-
-  // Initialize button position when popup opens
-  useEffect(() => {
-    if (isOpen) {
-      // Start with button in top-right corner (will be set after first render)
-      // We'll set it to top-right after getting dimensions
-      setCloseAttempts(0);
-    }
-  }, [isOpen]);
+  const ESCAPE_DISTANCE = 100; // Distance at which button starts to "run away"
+  const MAX_TOTAL_DISTANCE = 2500; // Total distance button can travel before stopping
 
   // Set initial position after popup dimensions are available
   useEffect(() => {
@@ -41,88 +33,82 @@ export default function TrollPopup({ isOpen, onClose }: TrollPopupProps) {
 
       setButtonPosition({ x: initialX, y: initialY });
       previousPositionRef.current = { x: initialX, y: initialY };
+      totalDistanceRef.current = 0;
+      setCanEscape(true);
     }
   }, [isOpen]);
 
-  const handleCloseClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  // Make button "run away" from cursor
+  useEffect(() => {
+    if (!isOpen || !canEscape) return;
 
-    if (closeAttempts < MAX_ATTEMPTS - 1) {
-      // Get popup and button dimensions
-      if (popupRef.current && buttonRef.current) {
-        const popupRect = popupRef.current.getBoundingClientRect();
-        const buttonRect = buttonRef.current.getBoundingClientRect();
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!popupRef.current || !buttonRef.current) return;
 
-        // Button is positioned using absolute left and top
-        // Calculate bounds to keep button fully visible within popup
+      const popupRect = popupRef.current.getBoundingClientRect();
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+
+      // Get mouse position relative to popup
+      const mouseX = e.clientX - popupRect.left;
+      const mouseY = e.clientY - popupRect.top;
+
+      // Get button center position
+      const buttonCenterX = buttonPosition.x + buttonRect.width / 2;
+      const buttonCenterY = buttonPosition.y + buttonRect.height / 2;
+
+      // Calculate distance from mouse to button
+      const distance = Math.sqrt(
+        Math.pow(mouseX - buttonCenterX, 2) +
+        Math.pow(mouseY - buttonCenterY, 2)
+      );
+
+      // If mouse is close and button can still escape, make button "run away"
+      if (distance < ESCAPE_DISTANCE && totalDistanceRef.current < MAX_TOTAL_DISTANCE) {
+        const angle = Math.atan2(mouseY - buttonCenterY, mouseX - buttonCenterX);
+        const escapeDistance = 80;
+
+        const newX = buttonPosition.x - Math.cos(angle) * escapeDistance;
+        const newY = buttonPosition.y - Math.sin(angle) * escapeDistance;
+
+        // Clamp to bounds
         const padding = 16;
-        const buttonWidth = buttonRect.width;
-        const buttonHeight = buttonRect.height;
+        const minX = padding;
+        const maxX = popupRect.width - buttonRect.width - padding;
+        const minY = padding;
+        const maxY = popupRect.height - buttonRect.height - padding;
 
-        // X axis bounds: button can be anywhere horizontally within popup
-        // left: 0 to (popup width - button width)
-        const minX = padding; // Minimum left position (from left edge)
-        const maxX = popupRect.width - buttonWidth - padding; // Maximum left position (from left edge)
+        const clampedX = Math.max(minX, Math.min(maxX, newX));
+        const clampedY = Math.max(minY, Math.min(maxY, newY));
 
-        // Y axis bounds: button can be anywhere vertically within popup
-        // top: 0 to (popup height - button height)
-        const minY = padding; // Minimum top position (from top edge)
-        const maxY = popupRect.height - buttonHeight - padding; // Maximum top position (from top edge)
-
-        // Calculate center position
-        const centerX = popupRect.width / 2 - buttonWidth / 2;
-        const centerY = popupRect.height / 2 - buttonHeight / 2;
-
-        // Generate random position biased toward center
-        let newX: number, newY: number;
-        let attempts = 0;
-        const maxAttempts = 50; // Prevent infinite loop
-
-        do {
-          // Use normal distribution biased toward center
-          // This creates positions closer to center more often
-          const randomFactorX = (Math.random() + Math.random() + Math.random()) / 3; // Bias toward 0.5
-          const randomFactorY = (Math.random() + Math.random() + Math.random()) / 3;
-
-          // Calculate position with center bias
-          // More weight to center, less to edges
-          const rangeX = maxX - minX;
-          const rangeY = maxY - minY;
-
-          // Position closer to center (weighted random)
-          // Calculate range from center to nearest edge
-          const rangeFromCenterX = Math.min(centerX - minX, maxX - centerX);
-          const rangeFromCenterY = Math.min(centerY - minY, maxY - centerY);
-
-          // Offset from center (0.6 factor keeps it closer to center)
-          const offsetFromCenterX = (randomFactorX - 0.5) * rangeFromCenterX * 0.6;
-          const offsetFromCenterY = (randomFactorY - 0.5) * rangeFromCenterY * 0.6;
-
-          newX = centerX + offsetFromCenterX;
-          newY = centerY + offsetFromCenterY;
-
-          // Clamp to bounds to ensure button stays within popup
-          newX = Math.max(minX, Math.min(maxX, newX));
-          newY = Math.max(minY, Math.min(maxY, newY));
-
-          attempts++;
-        } while (
-          attempts < maxAttempts &&
-          Math.sqrt(
-            Math.pow(newX - previousPositionRef.current.x, 2) +
-            Math.pow(newY - previousPositionRef.current.y, 2)
-          ) < MIN_DISTANCE_FROM_PREVIOUS
+        // Calculate distance moved
+        const distanceMoved = Math.sqrt(
+          Math.pow(clampedX - buttonPosition.x, 2) +
+          Math.pow(clampedY - buttonPosition.y, 2)
         );
 
-        // Update position
-        previousPositionRef.current = { x: newX, y: newY };
-        setButtonPosition({ x: newX, y: newY });
-        setCloseAttempts((prev) => prev + 1);
+        // Update total distance traveled
+        totalDistanceRef.current += distanceMoved;
+
+        if (clampedX !== buttonPosition.x || clampedY !== buttonPosition.y) {
+          setButtonPosition({ x: clampedX, y: clampedY });
+          previousPositionRef.current = { x: clampedX, y: clampedY };
+        }
+
+        // Stop escaping if max distance reached
+        if (totalDistanceRef.current >= MAX_TOTAL_DISTANCE) {
+          setCanEscape(false);
+        }
       }
-    } else {
-      // Final attempt - actually close
-      onClose();
-    }
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [isOpen, buttonPosition, canEscape]);
+
+  const handleCloseClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Close immediately when clicked
+    onClose();
   };
 
   if (!isOpen) return null;
