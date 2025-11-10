@@ -2,6 +2,7 @@ import "./page.css";
 import BuildProvider from "@/components/vbuilds/BuildProvider";
 import BuildGenerator from "@/components/vbuilds/BuildGenerator";
 import TrollPopupWrapper from "@/components/TrollPopupWrapper";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "V Arena - Build Editor",
@@ -11,7 +12,9 @@ export const metadata = {
 export default function BuildEditor() {
   return (
     <>
-      <TrollPopupWrapper />
+      <Suspense fallback={null}>
+        <TrollPopupWrapper />
+      </Suspense>
       <div className="pt-20 h-screen bg-zinc-950 bg-blend-lighten overflow-hidden space-y-8 flex">
         <BuildProvider>
           <BuildGenerator />
