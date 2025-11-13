@@ -4,7 +4,7 @@ import { getNewsPosts } from '@/lib/notion';
 export const revalidate = 3600; // Revalidate every hour
 
 // Create two separate endpoints for homepage and full news list
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const newsPageId = process.env.NOTION_NEWS_PAGE_ID;
 
@@ -14,7 +14,11 @@ export async function GET() {
       }, { status: 500 });
     }
 
-    const newsPosts = await getNewsPosts(newsPageId, false);
+    // Check if this is a homepage request
+    const { searchParams } = new URL(request.url);
+    const isHomepage = searchParams.get('homepage') === 'true';
+
+    const newsPosts = await getNewsPosts(newsPageId, isHomepage);
 
     // Transform news posts to match the NewsItem interface expected by the frontend
     const newsItems = newsPosts.map((post) => ({
@@ -28,11 +32,17 @@ export async function GET() {
       coverImageUrl: post.coverImageUrl, // Already optimized by the Notion helper
     }));
 
-    // Cache the response for 1 hour
-    return new NextResponse(JSON.stringify(newsItems.slice(0, 3)), {
+    // Cache the response for 1 hour (3600 seconds)
+    // For homepage requests, cache more aggressively with both s-maxage and max-age
+    const cacheControl = isHomepage
+      ? 'public, s-maxage=3600, max-age=3600, stale-while-revalidate=86400'
+      : 'public, s-maxage=3600, stale-while-revalidate=86400';
+
+    // getNewsPosts already limits to MAX_ITEMS (3) when isHomepage is true
+    return new NextResponse(JSON.stringify(newsItems), {
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+        'Cache-Control': cacheControl,
       },
     });
   } catch (error) {

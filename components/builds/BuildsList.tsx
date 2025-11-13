@@ -22,8 +22,10 @@ import React from "react";
 import Image from "next/image";
 import "@/components/vbuilds/styles.css";
 import { StarterBuilds } from "./StarterBuilds";
+import { useAuth } from "@/hooks/use-auth";
 
 type Build = {
+  id?: string;
   name: string;
   code: string;
 };
@@ -436,32 +438,58 @@ export default function BuildsList({
   onBuildsLoaded,
 }: BuildsListProps = {}) {
   const [builds, setBuilds] = useState<Build[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
-    // Fetch builds from localStorage
-    const fetchBuilds = () => {
+    const fetchBuilds = async () => {
+      if (authLoading) return;
+
+      if (!isAuthenticated) {
+        setBuilds([]);
+        setLoading(false);
+        onBuildsLoaded?.(false);
+        return;
+      }
+
+      setLoading(true);
       try {
-        const storedBuilds = localStorage.getItem("vbuilds");
-        if (storedBuilds) {
-          const parsedBuilds = JSON.parse(storedBuilds);
-          const buildsArray = Array.isArray(parsedBuilds) ? parsedBuilds : [];
-          setBuilds(buildsArray);
-          onBuildsLoaded?.(buildsArray.length > 0);
-        } else {
+        const response = await fetch("/api/builds");
+
+        if (response.status === 401) {
+          setBuilds([]);
+          setLoading(false);
           onBuildsLoaded?.(false);
+          return;
         }
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch builds");
+        }
+
+        const data = await response.json();
+        const buildsArray = Array.isArray(data) ? data.map((build: any) => ({
+          id: build.id,
+          name: build.name,
+          code: build.code,
+        })) : [];
+
+        setBuilds(buildsArray);
+        onBuildsLoaded?.(buildsArray.length > 0);
       } catch (error) {
-        console.error("Failed to load builds from localStorage:", error);
+        console.error("Failed to load builds:", error);
         setBuilds([]);
         onBuildsLoaded?.(false);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchBuilds();
-  }, [onBuildsLoaded]);
+  }, [isAuthenticated, authLoading, onBuildsLoaded]);
 
-  const handleDelete = (event: React.MouseEvent, index: number) => {
+  const handleDelete = async (event: React.MouseEvent, buildId: string, index: number) => {
     // Prevent the card click event from triggering
     event.preventDefault();
     event.stopPropagation();
@@ -471,15 +499,28 @@ export default function BuildsList({
       actionButtonStyle: { backgroundColor: "#f87171" },
       action: {
         label: "Delete",
-        onClick: () => {
-          const updatedBuilds = [...builds];
-          updatedBuilds.splice(index, 1);
-          // Update state and localStorage
-          setBuilds(updatedBuilds);
+        onClick: async () => {
+          if (!buildId) {
+            toast.error("Build ID not found");
+            return;
+          }
+
           try {
-            localStorage.setItem("vbuilds", JSON.stringify(updatedBuilds));
+            const response = await fetch(`/api/builds/${buildId}`, {
+              method: "DELETE",
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to delete build");
+            }
+
+            const updatedBuilds = builds.filter((_, i) => i !== index);
+            setBuilds(updatedBuilds);
+            onBuildsLoaded?.(updatedBuilds.length > 0);
+            toast.success("Build deleted successfully");
           } catch (error) {
-            console.error("Failed to update localStorage:", error);
+            console.error("Failed to delete build:", error);
+            toast.error("Failed to delete build");
           }
         },
       },
@@ -547,10 +588,133 @@ export default function BuildsList({
 
   // Custom container for premade builds without stagger delay
 
+  // Check for local builds to import
+  const [hasLocalBuilds, setHasLocalBuilds] = useState(false);
+  const [importing, setImporting] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && isAuthenticated) {
+      try {
+        const localBuilds = localStorage.getItem("vbuilds");
+        if (localBuilds) {
+          const parsed = JSON.parse(localBuilds);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setHasLocalBuilds(true);
+          }
+        }
+      } catch (error) {
+        // Ignore errors
+      }
+    }
+  }, [isAuthenticated]);
+
+  const handleImportLocalBuilds = async () => {
+    if (!isAuthenticated) {
+      toast.error("Please sign in to import builds");
+      return;
+    }
+
+    try {
+      const localBuilds = localStorage.getItem("vbuilds");
+      if (!localBuilds) {
+        toast.error("No local builds found");
+        return;
+      }
+
+      const parsed = JSON.parse(localBuilds);
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        toast.error("No local builds to import");
+        return;
+      }
+
+      setImporting(true);
+      let imported = 0;
+      let failed = 0;
+
+      for (const localBuild of parsed) {
+        try {
+          const response = await fetch("/api/builds", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: localBuild.name || `Imported Build ${imported + 1}`,
+              code: localBuild.code,
+            }),
+          });
+
+          if (response.ok) {
+            imported++;
+          } else {
+            failed++;
+          }
+        } catch (error) {
+          failed++;
+        }
+      }
+
+      // Clear localStorage after successful import
+      if (imported > 0) {
+        localStorage.removeItem("vbuilds");
+        setHasLocalBuilds(false);
+
+        // Refresh builds list
+        const response = await fetch("/api/builds");
+        if (response.ok) {
+          const data = await response.json();
+          const buildsArray = Array.isArray(data) ? data.map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+          })) : [];
+          setBuilds(buildsArray);
+          onBuildsLoaded?.(buildsArray.length > 0);
+        }
+
+        toast.success(
+          `Imported ${imported} build${imported !== 1 ? "s" : ""}${failed > 0 ? `, ${failed} failed` : ""}`
+        );
+      } else {
+        toast.error("Failed to import builds");
+      }
+    } catch (error) {
+      console.error("Error importing builds:", error);
+      toast.error("Error importing builds");
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
     <TooltipProvider>
       <div className="pb-16">
         <StarterBuilds />
+
+        {/* Import Local Builds Banner */}
+        {hasLocalBuilds && isAuthenticated && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-4 bg-yellow-900/20 border border-yellow-800/50 rounded-lg flex items-center justify-between gap-4"
+          >
+            <div>
+              <p className="text-yellow-200 font-medium">
+                You have local builds that can be imported
+              </p>
+              <p className="text-yellow-300/70 text-sm">
+                Import your saved builds to access them from any device
+              </p>
+            </div>
+            <Button
+              onClick={handleImportLocalBuilds}
+              disabled={importing}
+              className="bg-yellow-900/50 hover:bg-yellow-900/70 border-yellow-800 text-yellow-200"
+            >
+              {importing ? "Importing..." : "Import Local Builds"}
+            </Button>
+          </motion.div>
+        )}
 
         {/* User's Personal Builds Section */}
         {builds.length > 0 && (
@@ -595,7 +759,7 @@ export default function BuildsList({
           )}
           {buildsToShow.map((build, index) => (
             <motion.div
-              key={index}
+              key={build.id || index}
               variants={scaleIn}
               // whileHover={{
               //   y: -10,
@@ -610,7 +774,7 @@ export default function BuildsList({
                   code={build.code}
                   name={build.name}
                   handleDeleteBuild={(event: React.MouseEvent) =>
-                    handleDelete(event, index)
+                    handleDelete(event, build.id || "", index)
                   }
                 />
               </Link>
@@ -618,7 +782,7 @@ export default function BuildsList({
           ))}
         </motion.div>
 
-        {builds.length === 0 && (
+        {!loading && builds.length === 0 && (
           <motion.div
             className="flex justify-center gap-4 mb-8"
             initial="hidden"
@@ -627,13 +791,22 @@ export default function BuildsList({
             variants={staggerContainer}
           >
             <motion.div>
-              <Link
-                href="/builds/create"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
-              >
-                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
-                CREATE YOUR FIRST BUILD
-              </Link>
+              {isAuthenticated ? (
+                <Link
+                  href="/builds/create"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
+                >
+                  <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+                  CREATE YOUR FIRST BUILD
+                </Link>
+              ) : (
+                <Link
+                  href="/auth/signin"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
+                >
+                  SIGN IN TO VIEW YOUR BUILDS
+                </Link>
+              )}
             </motion.div>
           </motion.div>
         )}

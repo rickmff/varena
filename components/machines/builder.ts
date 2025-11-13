@@ -123,32 +123,15 @@ export const builder = setup({
         input: {} as { stats: Record<StatName, StatEntry>, build: Record<string, any> },
         context: {} as BuildContext,
         events: {} as BuildEvents
-        // actions: 
+        // actions:
     },
     actions: {
+        // Note: saveBuild action is deprecated - saving is now handled via API in SaveBuild component
+        // Keeping this as a no-op for backward compatibility
         saveBuild: ({ context, event }) => {
-            // Implement the logic to save the build, e.g., send it to a server or local storage
-            // Convert build to arena code
-
             assertEvent(event, 'SAVE_BUILD');
-
-
-            const buildCode = arenaCode(context);
-
-            // Get existing arena codes from localStorage or initialize empty array
-            const savedCodes = JSON.parse(localStorage.getItem('vbuilds') || '[]');
-
-            // Add the new code with timestamp
-            savedCodes.push({
-                code: buildCode,
-                timestamp: new Date().toISOString(),
-                name: event.name || `Build ${savedCodes.length + 1}` // Default name
-            });
-
-            // Save back to localStorage
-            localStorage.setItem('vbuilds', JSON.stringify(savedCodes));
-            //redirect to /builds push state
-            window.location.href = '/builds';
+            // Build saving is now handled by SaveBuild component via API
+            // This action is kept for backward compatibility but does nothing
         }
     },
     actors: {

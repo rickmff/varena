@@ -1,28 +1,38 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getAuth } from 'firebase-admin/auth';
-import { initializeApp, applicationDefault } from 'firebase-admin/app';
-
-// Initialize Firebase Admin SDK
-initializeApp({
-  credential: applicationDefault(),
-});
+import { auth } from '@/lib/better-auth/auth';
 
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get('token')?.value;
+  // Verify session using Better Auth
+  const cookieHeader = request.headers.get('cookie') || '';
+  const session = await auth.api.getSession({
+    headers: {
+      cookie: cookieHeader,
+    },
+  });
 
-  if (!token) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // List of protected routes that require authentication
+  // Note: /builds/create is accessible anonymously, but saving requires auth
+  const protectedRoutes = [
+    '/admin',
+    '/profile',
+  ];
+
+  // Check if current route requires authentication
+  const isProtectedRoute = protectedRoutes.some(route =>
+    request.nextUrl.pathname.startsWith(route)
+  );
+
+  if (isProtectedRoute && !session?.user) {
+    // Create redirect URL with callbackUrl
+    const signInUrl = new URL('/auth/signin', request.url);
+    signInUrl.searchParams.set('callbackUrl', request.nextUrl.pathname + request.nextUrl.search);
+    return NextResponse.redirect(signInUrl);
   }
 
-  try {
-    await getAuth().verifyIdToken(token);
-    return NextResponse.next();
-  } catch (error) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: '/admin/:path*',
+  matcher: ['/admin/:path*', '/profile/:path*'],
 };

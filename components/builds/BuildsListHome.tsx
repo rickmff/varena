@@ -23,8 +23,10 @@ import Image from "next/image";
 import "@/components/vbuilds/styles.css";
 import { StarterBuilds } from "./StarterBuilds";
 import { BuildContent } from "./BuildsList";
+import { useAuth } from "@/hooks/use-auth";
 
 type Build = {
+  id?: string;
   name: string;
   code: string;
 };
@@ -169,36 +171,62 @@ export default function BuildsListHome({
   onBuildsLoaded,
 }: BuildsListProps = {}) {
   const [builds, setBuilds] = useState<Build[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
-    // Fetch builds from localStorage
-    const fetchBuilds = () => {
+    const fetchBuilds = async () => {
+      if (authLoading) return;
+
+      if (!isAuthenticated) {
+        setBuilds([]);
+        setLoading(false);
+        onBuildsLoaded?.(false);
+        return;
+      }
+
+      setLoading(true);
       try {
-        const storedBuilds = localStorage.getItem("vbuilds");
-        if (storedBuilds) {
-          const parsedBuilds = JSON.parse(storedBuilds);
-          const buildsArray = Array.isArray(parsedBuilds) ? parsedBuilds : [];
-          setBuilds(buildsArray);
-          onBuildsLoaded?.(buildsArray.length > 0);
-        } else {
+        const response = await fetch("/api/builds");
+
+        if (response.status === 401) {
+          setBuilds([]);
+          setLoading(false);
           onBuildsLoaded?.(false);
+          return;
         }
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch builds");
+        }
+
+        const data = await response.json();
+        const buildsArray = Array.isArray(data) ? data.map((build: any) => ({
+          id: build.id,
+          name: build.name,
+          code: build.code,
+        })) : [];
+
+        setBuilds(buildsArray);
+        onBuildsLoaded?.(buildsArray.length > 0);
       } catch (error) {
-        console.error("Failed to load builds from localStorage:", error);
+        console.error("Failed to load builds:", error);
         setBuilds([]);
         onBuildsLoaded?.(false);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchBuilds();
-  }, [onBuildsLoaded]);
+  }, [isAuthenticated, authLoading, onBuildsLoaded]);
 
   const handleBuildClick = (code: string) => {
     router.push(`/builds/create?build=${encodeURIComponent(code)}`);
   };
 
-  const handleDelete = (event: React.MouseEvent, index: number) => {
+  const handleDelete = async (event: React.MouseEvent, buildId: string, index: number) => {
     // Prevent the card click event from triggering
     event.preventDefault();
     event.stopPropagation();
@@ -208,15 +236,28 @@ export default function BuildsListHome({
       actionButtonStyle: { backgroundColor: "#f87171" },
       action: {
         label: "Delete",
-        onClick: () => {
-          const updatedBuilds = [...builds];
-          updatedBuilds.splice(index, 1);
-          // Update state and localStorage
-          setBuilds(updatedBuilds);
+        onClick: async () => {
+          if (!buildId) {
+            toast.error("Build ID not found");
+            return;
+          }
+
           try {
-            localStorage.setItem("vbuilds", JSON.stringify(updatedBuilds));
+            const response = await fetch(`/api/builds/${buildId}`, {
+              method: "DELETE",
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to delete build");
+            }
+
+            const updatedBuilds = builds.filter((_, i) => i !== index);
+            setBuilds(updatedBuilds);
+            onBuildsLoaded?.(updatedBuilds.length > 0);
+            toast.success("Build deleted successfully");
           } catch (error) {
-            console.error("Failed to update localStorage:", error);
+            console.error("Failed to delete build:", error);
+            toast.error("Failed to delete build");
           }
         },
       },
@@ -411,7 +452,7 @@ export default function BuildsListHome({
             </Link>
           )}
           {buildsToShow.map((build, index) => (
-            <motion.div key={index} variants={scaleIn}>
+            <motion.div key={build.id || index} variants={scaleIn}>
               <Link
                 href={`/builds/create?build=${encodeURIComponent(build.code)}`}
               >
@@ -419,7 +460,7 @@ export default function BuildsListHome({
                   code={build.code}
                   name={build.name}
                   handleDeleteBuild={(event: React.MouseEvent) =>
-                    handleDelete(event, index)
+                    handleDelete(event, build.id || "", index)
                   }
                 />
               </Link>
@@ -457,7 +498,7 @@ export default function BuildsListHome({
           )}
         </motion.div>
 
-        {builds.length === 0 && (
+        {!loading && builds.length === 0 && (
           <motion.div
             className="flex justify-center gap-4 mb-8"
             initial="hidden"
@@ -466,13 +507,22 @@ export default function BuildsListHome({
             variants={staggerContainer}
           >
             <motion.div>
-              <Link
-                href="/builds/create"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
-              >
-                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
-                CREATE YOUR FIRST BUILD
-              </Link>
+              {isAuthenticated ? (
+                <Link
+                  href="/builds/create"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
+                >
+                  <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+                  CREATE YOUR FIRST BUILD
+                </Link>
+              ) : (
+                <Link
+                  href="/auth/signin"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
+                >
+                  SIGN IN TO SAVE BUILDS
+                </Link>
+              )}
             </motion.div>
           </motion.div>
         )}

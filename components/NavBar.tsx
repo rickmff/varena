@@ -4,8 +4,23 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button, type ButtonProps } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import GameMenu from "./game-menu";
+import { useAuth } from "@/hooks/use-auth";
+import { authClient } from "@/lib/better-auth/client";
+import { LogIn, User, LogOut, Hammer } from "lucide-react";
+import { toast } from "sonner";
 
 export const menuItems = [
   { name: "HOME", href: "/" },
@@ -93,6 +108,34 @@ export const DiscordButton = ({
 export default function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const router = useRouter();
+  const { isAuthenticated, isLoading, user, refetch } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await authClient.signOut();
+      toast.success("Signed out successfully!");
+      refetch(); // Update session state
+      router.push("/");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast.error("Error signing out");
+    }
+  };
+
+  const getUserInitials = (name?: string | null, email?: string | null) => {
+    if (name) {
+      const parts = name.trim().split(" ");
+      if (parts.length >= 2) {
+        return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+      }
+      return name[0].toUpperCase();
+    }
+    if (email) {
+      return email[0].toUpperCase();
+    }
+    return "U";
+  };
 
   useEffect(() => {
     let scrollContainer;
@@ -204,31 +247,98 @@ export default function NavBar() {
               )
             )}
           </nav>
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="relative z-50"
-          >
+          <div className="flex items-center gap-3 relative z-50">
+            {isLoading ? (
+              <Skeleton className="h-10 w-10 rounded-full hidden md:block" />
+            ) : isAuthenticated && user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="hidden md:flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-[#5865F2] focus:ring-offset-2 focus:ring-offset-black"
+                  >
+                    <Avatar className="h-10 w-10 border-2 border-[#5865F2]/50 hover:border-[#4752C4] transition-colors">
+                      <AvatarImage src={user.image || undefined} alt={user.name || user.email || "User"} />
+                      <AvatarFallback className="bg-[#0f0a47] text-white font-semibold">
+                        {getUserInitials(user.name, user.email)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </motion.button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-black border-[#5865F2]/30">
+                  <DropdownMenuLabel className="text-white">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium">{user.name || "User"}</p>
+                      <p className="text-xs text-gray-400">{user.email}</p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-[#5865F2]/30" />
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile" className="cursor-pointer text-white hover:bg-[#0f0a47]">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>My Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/builds" className="cursor-pointer text-white hover:bg-[#0f0a47]">
+                      <Hammer className="mr-2 h-4 w-4" />
+                      <span>My Builds</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-[#5865F2]/30" />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="cursor-pointer text-red-400 hover:bg-red-950/20 hover:text-red-300"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Button
+                  asChild
+                  variant="outline"
+                  className="hidden md:flex text-xs font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300"
+                >
+                  <Link href="/auth/signin" className="flex items-center gap-2">
+                    <LogIn className="h-4 w-4" />
+                    <span>Sign In</span>
+                  </Link>
+                </Button>
+              </motion.div>
+            )}
             <motion.div
-              initial={{
-                borderColor: "rgba(255, 255, 255, 0.3)",
-                backgroundColor: "rgba(127, 29, 29, 0)",
-              }}
-              animate={{
-                borderColor:
-                  scrollY > 50 ? "rgb(127 29 29)" : "rgba(255, 255, 255, 0.3)",
-                backgroundColor:
-                  scrollY > 50 ? "rgba(127, 29, 29, 0.1)" : "rgba(127, 29, 29, 0)",
-              }}
-              transition={{
-                type: "spring",
-                stiffness: 100,
-                damping: 20,
-              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              <DiscordButton />
+              <motion.div
+                initial={{
+                  borderColor: "rgba(255, 255, 255, 0.3)",
+                  backgroundColor: "rgba(127, 29, 29, 0)",
+                }}
+                animate={{
+                  borderColor:
+                    scrollY > 50 ? "rgb(127 29 29)" : "rgba(255, 255, 255, 0.3)",
+                  backgroundColor:
+                    scrollY > 50 ? "rgba(127, 29, 29, 0.1)" : "rgba(127, 29, 29, 0)",
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 20,
+                }}
+              >
+                <DiscordButton />
+              </motion.div>
             </motion.div>
-          </motion.div>
+          </div>
           <Button
             variant="ghost"
             size="icon"

@@ -249,6 +249,7 @@ export default function Home() {
   const [newsError, setNewsError] = useState<string | null>(null);
   const [hasScrolledToSection, setHasScrolledToSection] = useState(false);
   const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({});
+  const hasFetchedNews = useRef(false); // Prevent duplicate API calls in React Strict Mode
 
 
   useEffect(() => {
@@ -271,6 +272,8 @@ export default function Home() {
 
   const fetchNewsFromAPI = async (retryCount = 0) => {
     const maxRetries = 2;
+    const CACHE_KEY = 'homepage-news-cache';
+    const CACHE_DURATION = 3600 * 1000; // 1 hour in milliseconds
 
     try {
       if (retryCount === 0) {
@@ -278,13 +281,35 @@ export default function Home() {
       }
       setNewsError(null); // Clear any previous errors
 
+      // Check cache first
+      if (typeof window !== 'undefined') {
+        const cachedData = localStorage.getItem(CACHE_KEY);
+        if (cachedData) {
+          try {
+            const { data, timestamp } = JSON.parse(cachedData);
+            const now = Date.now();
+
+            // If cache is still valid (less than 1 hour old), use it
+            if (now - timestamp < CACHE_DURATION) {
+              const newsData = Array.isArray(data) ? data : [];
+              setNewsItems(newsData);
+              setNewsError(null);
+              setIsLoadingNews(false);
+              return; // Exit early, using cached data
+            }
+          } catch (e) {
+            // Invalid cache, continue to fetch
+            console.warn('Invalid cache data, fetching fresh data');
+          }
+        }
+      }
+
       const response = await fetch("/api/news?homepage=true", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        // Add cache control to prevent stale data
-        next: { revalidate: 3600 }, // Cache for 1 hour
+        cache: 'default', // Let browser use its cache based on Cache-Control headers
       });
 
       if (!response.ok) {
@@ -301,6 +326,19 @@ export default function Home() {
         // Ensure data is an array and has items
         const newsData = Array.isArray(data) ? data : [];
 
+        // Save to cache
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify({
+              data: newsData,
+              timestamp: Date.now(),
+            }));
+          } catch (e) {
+            // localStorage might be full or disabled, ignore
+            console.warn('Failed to save to cache:', e);
+          }
+        }
+
         // Set the news items immediately
         setNewsItems(newsData);
         setNewsError(null);
@@ -315,6 +353,23 @@ export default function Home() {
           fetchNewsFromAPI(retryCount + 1);
         }, (retryCount + 1) * 1000); // Exponential backoff
       } else {
+        // Max retries reached - try to use stale cache if available
+        if (typeof window !== 'undefined') {
+          const cachedData = localStorage.getItem(CACHE_KEY);
+          if (cachedData) {
+            try {
+              const { data } = JSON.parse(cachedData);
+              const newsData = Array.isArray(data) ? data : [];
+              setNewsItems(newsData);
+              setIsLoadingNews(false);
+              console.warn('Using stale cache due to fetch failure');
+              return;
+            } catch (e) {
+              // Invalid cache, show error
+            }
+          }
+        }
+
         // Max retries reached
         setNewsError(
           error instanceof Error
@@ -328,7 +383,11 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchNewsFromAPI();
+    // Prevent duplicate calls in React Strict Mode (development)
+    if (!hasFetchedNews.current) {
+      hasFetchedNews.current = true;
+      fetchNewsFromAPI();
+    }
   }, []);
 
   const fadeInUp = {

@@ -50,6 +50,15 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/api/news',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=3600, max-age=3600, stale-while-revalidate=86400',
+          },
+        ],
+      },
     ];
   },
 }
