@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getNewsPosts } from '@/lib/notion';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // Revalidate every hour
 
 // Create two separate endpoints for homepage and full news list

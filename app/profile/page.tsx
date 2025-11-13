@@ -7,6 +7,7 @@ import { User, Mail, Calendar, LogOut } from "lucide-react";
 import Link from "next/link";
 import { authClient } from "@/lib/better-auth/client";
 import LogoutButton from "./logout-button";
+import prisma from "@/lib/prisma";
 
 export default async function ProfilePage() {
   const session = await getServerSession();
@@ -16,6 +17,12 @@ export default async function ProfilePage() {
   }
 
   const user = session.user;
+
+  // Fetch user from database to get createdAt
+  const dbUser = await prisma.user.findUnique({
+    where: { email: user.email },
+    select: { createdAt: true },
+  });
 
   const getUserInitials = (name?: string | null, email?: string | null) => {
     if (name) {
@@ -83,13 +90,13 @@ export default async function ProfilePage() {
                 <p className="text-white mt-1">{user.email}</p>
               </div>
 
-              {user.emailVerified && (
+              {dbUser?.createdAt && (
                 <div>
                   <label className="text-sm font-medium text-gray-400 flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
                     Account created on
                   </label>
-                  <p className="text-white mt-1">{formatDate(user.emailVerified)}</p>
+                  <p className="text-white mt-1">{formatDate(dbUser.createdAt)}</p>
                 </div>
               )}
             </div>
