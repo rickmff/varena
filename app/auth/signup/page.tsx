@@ -236,11 +236,10 @@ function SignUpForm() {
                     {[1, 2, 3, 4].map((level) => (
                       <div
                         key={level}
-                        className={`h-1 flex-1 rounded ${
-                          level <= passwordStrength.strength
+                        className={`h-1 flex-1 rounded ${level <= passwordStrength.strength
                             ? passwordStrength.color
                             : "bg-gray-700"
-                        }`}
+                          }`}
                       />
                     ))}
                   </div>
