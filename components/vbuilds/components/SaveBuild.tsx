@@ -69,11 +69,11 @@ const SaveBuild: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-            body: JSON.stringify({
-              name: buildName,
-              code: buildCode,
-              isPublic: isPublic,
-            }),
+        body: JSON.stringify({
+          name: buildName,
+          code: buildCode,
+          isPublic: isPublic,
+        }),
       });
 
       if (response.status === 401) {
@@ -123,6 +123,7 @@ const SaveBuild: React.FC = () => {
             onChange={(e) => setName(e.target.value)}
             placeholder="Build name"
             disabled={loading}
+            maxLength={42}
           />
           <Button
             onClick={saveBuildCommand}
@@ -131,19 +132,6 @@ const SaveBuild: React.FC = () => {
           >
             {loading ? "SAVING..." : "SAVE"}
           </Button>
-        </div>
-        <div className="flex items-center gap-3">
-          <label className="text-sm text-gray-400 flex items-center gap-2 cursor-pointer">
-            <Switch
-              checked={isPublic}
-              onCheckedChange={setIsPublic}
-              disabled={loading || authLoading}
-            />
-            <span>Make this build public</span>
-          </label>
-          <span className="text-xs text-gray-500">
-            (Public builds appear in the community tab)
-          </span>
         </div>
       </div>
 

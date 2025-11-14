@@ -39,6 +39,24 @@ export async function PUT(request: Request, { params }: RouteParams) {
       );
     }
 
+    // Check public build limit when changing from private to public
+    const willBePublic = isPublic !== undefined ? isPublic : existingBuild.isPublic;
+    if (willBePublic && !existingBuild.isPublic) {
+      const publicBuildCount = await prisma.build.count({
+        where: {
+          userId: session.user.id,
+          isPublic: true,
+        },
+      });
+
+      if (publicBuildCount >= 5) {
+        return NextResponse.json(
+          { error: "You can only have 5 public builds. Please make another build private or delete a public build first." },
+          { status: 400 }
+        );
+      }
+    }
+
     const build = await prisma.build.update({
       where: { id },
       data: {

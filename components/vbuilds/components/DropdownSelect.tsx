@@ -17,7 +17,7 @@ const string1 =
 const string2 =
   "border-red-900/50 bg-gradient-to-b to-red-900/20 from-transparent";
 const string3 =
-  "bg-zinc-900 border-2 border hover:border-purple-500 transition-all duration-100";
+  "bg-zinc-900/100 border-2 border-zinc-700 hover:border-purple-500 transition-all duration-100";
 
 const DropdownItem = ({
   option,
@@ -113,7 +113,8 @@ export const DropdownSelect: React.FC<{
         <HoverInfoCard isVisible={hoverIsVisible} description={hoverDescription}>
           <DropdownMenuTrigger
             onFocus={() => null}
-            className={`w-20 h-20 text-gray-200 rounded-md flex items-center justify-center ${string3}`}
+            className="w-20 h-20 text-gray-200 rounded-md flex items-center justify-center !bg-zinc-900 border-2 border-zinc-700 hover:border-purple-500 transition-all duration-100"
+            style={{ backgroundColor: 'rgb(24 24 27)' }}
           >
             {selected ? (
               <img

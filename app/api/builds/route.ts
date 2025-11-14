@@ -118,6 +118,23 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check public build limit (5 per user)
+    if (isPublic === true) {
+      const publicBuildCount = await prisma.build.count({
+        where: {
+          userId: userIdToUse,
+          isPublic: true,
+        },
+      });
+
+      if (publicBuildCount >= 5) {
+        return NextResponse.json(
+          { error: "You can only have 5 public builds. Please make another build private or delete a public build first." },
+          { status: 400 }
+        );
+      }
+    }
+
     const build = await prisma.build.create({
       data: {
         name,

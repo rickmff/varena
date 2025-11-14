@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { convertStringToBuild } from "../machines/converter";
@@ -209,6 +209,7 @@ export default function PublicBuildsList() {
   const [builds, setBuilds] = useState<DecodedBuild[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const fetchingRef = useRef(false);
 
   // Filter states
   const [armourFilter, setArmourFilter] = useState<string | null>(null);
@@ -223,7 +224,11 @@ export default function PublicBuildsList() {
   const [showAuthorDropdown, setShowAuthorDropdown] = useState(false);
 
   useEffect(() => {
+    // Prevent duplicate fetches
+    if (fetchingRef.current) return;
+
     const fetchBuilds = async () => {
+      fetchingRef.current = true;
       setLoading(true);
       try {
         const response = await fetch("/api/public-builds");
@@ -263,6 +268,7 @@ export default function PublicBuildsList() {
         setBuilds([]);
       } finally {
         setLoading(false);
+        fetchingRef.current = false;
       }
     };
 

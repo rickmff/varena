@@ -188,8 +188,10 @@ export const BuildContent = ({
 
   return (
     <Card
-      className={`bg-black/80 backdrop-blur-sm rounded-lg border-2
-                         transition-all duration-300 overflow-hidden group cursor-pointer h-full relative build-spellSchool build-spellSchool-${school || "empty"
+      className={`bg-black/80 backdrop-blur-sm rounded-lg border-2 ${showPublicToggle && isPublic
+        ? "border-green-500/50"
+        : "border-zinc-800/50"
+        } transition-all duration-300 overflow-hidden group cursor-pointer h-full relative build-spellSchool build-spellSchool-${school || "empty"
         }`}
     >
       {/* Glow effect on hover */}
@@ -205,16 +207,26 @@ export const BuildContent = ({
       </div>
 
       <div
-        className="absolute top-4 right-4 flex gap-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        className="absolute top-4 right-4 flex gap-2 z-10"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
       >
+        {handleDeleteBuild && (
+          <button
+            type="button"
+            className="bg-red-600/80 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-red-500/50 opacity-0 group-hover:opacity-100"
+            onClick={handleDeleteBuild}
+            aria-label="Delete build"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
         {showPublicToggle && onTogglePublic !== undefined && (
           <button
             type="button"
-            className="w-8 h-8 rounded-full border border-white/30 bg-black/80 flex items-center justify-center hover:border-white/60 hover:bg-black transition-colors"
+            className="w-8 h-8 rounded-full border border-white/30 bg-black/80 flex items-center justify-center hover:border-white/60 hover:bg-black transition-colors opacity-100"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -229,29 +241,13 @@ export const BuildContent = ({
             )}
           </button>
         )}
-        {handleDeleteBuild && (
-          <button
-            type="button"
-            className="bg-red-600/80 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-red-500/50"
-            onClick={handleDeleteBuild}
-            aria-label="Delete build"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        )}
       </div>
 
       <CardHeader className="relative">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-xl font-bold transition-colors">
+          <CardTitle className="text-xl font-bold text-white">
             {name || "Unnamed Build"}
           </CardTitle>
-          {showPublicToggle && isPublic && (
-            <div className="flex items-center gap-1 px-2 py-0.5 bg-green-900/30 border border-green-500/30 rounded-full">
-              <Globe2 className="w-3 h-3 text-green-400" />
-              <span className="text-[10px] uppercase tracking-wide text-green-400">Public</span>
-            </div>
-          )}
         </div>
         {author && (
           <p className="text-sm text-gray-400 mt-1 flex items-center gap-1">
@@ -538,9 +534,16 @@ export default function BuildsList({
           isPublic: build.isPublic || false,
         })) : [];
 
-        console.log("Builds loaded:", buildsArray.length, buildsArray);
-        setBuilds(buildsArray);
-        onBuildsLoaded?.(buildsArray.length > 0);
+        // Sort builds: public builds first, then private builds
+        const sortedBuilds = buildsArray.sort((a, b) => {
+          if (a.isPublic && !b.isPublic) return -1;
+          if (!a.isPublic && b.isPublic) return 1;
+          return 0;
+        });
+
+        console.log("Builds loaded:", sortedBuilds.length, sortedBuilds);
+        setBuilds(sortedBuilds);
+        onBuildsLoaded?.(sortedBuilds.length > 0);
       } catch (error) {
         console.error("Failed to load builds:", error);
         setBuilds([]);
@@ -604,6 +607,20 @@ export default function BuildsList({
     buildId: string,
     currentIsPublic: boolean
   ) => {
+    // If trying to make build public, check if user already has 5 public builds
+    if (!currentIsPublic) {
+      const publicBuildCount = builds.filter(b => b.isPublic).length;
+      if (publicBuildCount >= 5) {
+        toast.error(
+          "You can only have 5 public builds. Please make another build private or delete a public build first.",
+          {
+            duration: 5000,
+          }
+        );
+        return;
+      }
+    }
+
     try {
       const response = await fetch(`/api/builds/${buildId}`, {
         method: "PUT",
@@ -616,17 +633,34 @@ export default function BuildsList({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update build visibility");
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || "Failed to update build visibility";
+
+        // Show specific error message if it's about the limit
+        if (response.status === 400 && errorMessage.includes("5 public builds")) {
+          toast.error(errorMessage, {
+            duration: 5000,
+          });
+        } else {
+          toast.error(errorMessage);
+        }
+        return;
       }
 
-      // Update local state
-      setBuilds((prevBuilds) =>
-        prevBuilds.map((build) =>
+      // Update local state and maintain sort order (public first)
+      setBuilds((prevBuilds) => {
+        const updated = prevBuilds.map((build) =>
           build.id === buildId
             ? { ...build, isPublic: !currentIsPublic }
             : build
-        )
-      );
+        );
+        // Sort: public builds first, then private builds
+        return updated.sort((a, b) => {
+          if (a.isPublic && !b.isPublic) return -1;
+          if (!a.isPublic && b.isPublic) return 1;
+          return 0;
+        });
+      });
 
       toast.success(
         `Build ${!currentIsPublic ? "made public" : "made private"}`
@@ -765,9 +799,16 @@ export default function BuildsList({
             id: build.id,
             name: build.name,
             code: build.code,
+            isPublic: build.isPublic || false,
           })) : [];
-          setBuilds(buildsArray);
-          onBuildsLoaded?.(buildsArray.length > 0);
+          // Sort builds: public builds first, then private builds
+          const sortedBuilds = buildsArray.sort((a, b) => {
+            if (a.isPublic && !b.isPublic) return -1;
+            if (!a.isPublic && b.isPublic) return 1;
+            return 0;
+          });
+          setBuilds(sortedBuilds);
+          onBuildsLoaded?.(sortedBuilds.length > 0);
         }
 
         toast.success(
