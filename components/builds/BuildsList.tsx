@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { ClipboardCopyIcon, Plus, Swords, ChevronRight } from "lucide-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -19,9 +19,7 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 import React from "react";
-import Image from "next/image";
 import "@/components/vbuilds/styles.css";
-import { StarterBuilds } from "./StarterBuilds";
 import { useAuth } from "@/hooks/use-auth";
 
 type Build = {
@@ -140,7 +138,30 @@ export const BuildContent = ({
   name: string;
   handleDeleteBuild: (event: React.MouseEvent) => void;
 }) => {
-  const build = convertStringToBuild(code);
+  // Safely convert the arena code into a build structure.
+  // If anything goes wrong we render a minimal, non-animated card instead
+  // so that a bad code never breaks the whole builds grid.
+  let build;
+  try {
+    build = convertStringToBuild(code);
+  } catch (error) {
+    console.error("Failed to parse build code", { code, error });
+    return (
+      <Card className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-red-900/50 h-full flex flex-col justify-between">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold">
+            {name || "Invalid Build"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-red-300">
+            There was an error loading this build. Please recreate or edit it in
+            the builder.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const spells = build.spells;
   const dashSpellSchool = spells.dash?.spellSchool;
@@ -158,21 +179,18 @@ export const BuildContent = ({
   return (
     <Card
       className={`bg-black/80 backdrop-blur-sm rounded-lg border-2
-                         transition-all duration-300 overflow-hidden group cursor-pointer h-full relative build-spellSchool build-spellSchool-${
-                           school || "empty"
-                         }`}
+                         transition-all duration-300 overflow-hidden group cursor-pointer h-full relative build-spellSchool build-spellSchool-${school || "empty"
+        }`}
     >
       {/* Glow effect on hover */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div
-          className={`absolute inset-0 bg-gradient-to-r ${
-            fromVariants[school || "empty"]
-          } to-transparent`}
+          className={`absolute inset-0 bg-gradient-to-r ${fromVariants[school || "empty"]
+            } to-transparent`}
         />
         <div
-          className={`absolute inset-0 bg-gradient-to-b ${
-            fromVariants[school || "empty"]
-          } via-transparent ${toVariants[school || "empty"]}`}
+          className={`absolute inset-0 bg-gradient-to-b ${fromVariants[school || "empty"]
+            } via-transparent ${toVariants[school || "empty"]}`}
         />
       </div>
 
@@ -274,7 +292,7 @@ export const BuildContent = ({
                     src={
                       bloodData[
                         (build.blood?.primary as keyof typeof bloodData) ||
-                          "Empty"
+                        "Empty"
                       ]?.image
                     }
                     alt={`Blood: ${build.blood?.primary || "Empty"}`}
@@ -400,25 +418,25 @@ export const BuildContent = ({
             <div className="flex gap-1 flex-wrap">
               {build.weapons.size === 0
                 ? Object.values(epicWeaponData)
-                    .slice(0, 8)
-                    .map((weapon, index) => (
-                      <Item key={index} school={school}>
-                        <Img
-                          src={undefined}
-                          alt={`Weapon ${index}`}
-                          emptySrc={weapon.img}
-                        />
-                      </Item>
-                    ))
-                : Array.from(build.weapons.values()).map((weapon, index) => (
-                    <Item school={school} key={index}>
+                  .slice(0, 8)
+                  .map((weapon, index) => (
+                    <Item key={index} school={school}>
                       <Img
-                        src={weapon.img}
+                        src={undefined}
                         alt={`Weapon ${index}`}
-                        emptySrc=""
+                        emptySrc={weapon.img}
                       />
                     </Item>
-                  ))}
+                  ))
+                : Array.from(build.weapons.values()).map((weapon, index) => (
+                  <Item school={school} key={index}>
+                    <Img
+                      src={weapon.img}
+                      alt={`Weapon ${index}`}
+                      emptySrc=""
+                    />
+                  </Item>
+                ))}
             </div>
           </div>
         </div>
@@ -434,7 +452,6 @@ export const BuildContent = ({
 
 export default function BuildsList({
   maxBuilds,
-  showViewAllButton = false,
   onBuildsLoaded,
 }: BuildsListProps = {}) {
   const [builds, setBuilds] = useState<Build[]>([]);
@@ -475,6 +492,7 @@ export default function BuildsList({
           code: build.code,
         })) : [];
 
+        console.log("Builds loaded:", buildsArray.length, buildsArray);
         setBuilds(buildsArray);
         onBuildsLoaded?.(buildsArray.length > 0);
       } catch (error) {
@@ -545,6 +563,9 @@ export default function BuildsList({
   // // Get the builds to display (limited by maxBuilds if specified)
   const buildsToShow = maxBuilds ? builds.slice(0, maxBuilds) : builds;
 
+  // Debug: Log builds to show
+  console.log("buildsToShow:", buildsToShow.length, buildsToShow);
+
   // // Calculate button span based on grid layout and number of builds
   const getButtonSpanClass = () => {
     const buildCount = buildsToShow.length;
@@ -561,8 +582,8 @@ export default function BuildsList({
       buildCount % 3 === 0
         ? "lg:col-span-3"
         : buildCount % 3 === 1
-        ? "lg:col-span-2"
-        : "lg:col-span-1";
+          ? "lg:col-span-2"
+          : "lg:col-span-1";
 
     return `col-span-1 ${mdSpan} ${lgSpan}`;
   };
@@ -689,8 +710,6 @@ export default function BuildsList({
   return (
     <TooltipProvider>
       <div className="pb-16">
-        <StarterBuilds />
-
         {/* Import Local Builds Banner */}
         {hasLocalBuilds && isAuthenticated && (
           <motion.div
@@ -731,41 +750,38 @@ export default function BuildsList({
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           variants={staggerContainer}
           initial="hidden"
-          whileInView="visible"
+          animate="visible"
           viewport={{ once: true }}
         >
           {buildsToShow.length !== 0 && (
-            <Link href="/builds/create">
-              <Card className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-dashed border-white/30 hover:border-white/60 transition-all duration-300 overflow-hidden group cursor-pointer h-full relative flex items-center justify-center min-h-[400px]">
-                {/* Glow effect on hover */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/10" />
-                </div>
-
-                <div className="flex flex-col items-center justify-center gap-4 p-8 relative z-10">
-                  {/* Plus icon in circle */}
-                  <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/40 flex items-center justify-center group-hover:border-white/60 transition-colors duration-300">
-                    <Plus className="w-8 h-8 text-white/60 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
+            <motion.div variants={scaleIn}>
+              <Link href="/builds/create">
+                <Card className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-dashed border-white/30 hover:border-white/60 transition-all duration-300 overflow-hidden group cursor-pointer h-full relative flex items-center justify-center min-h-[400px]">
+                  {/* Glow effect on hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/10" />
                   </div>
 
-                  {/* Text */}
-                  <span className="text-white/60 group-hover:text-white font-bold text-lg tracking-wide transition-colors duration-300">
-                    CREATE A NEW BUILD
-                  </span>
-                </div>
-              </Card>
-            </Link>
+                  <div className="flex flex-col items-center justify-center gap-4 p-8 relative z-10">
+                    {/* Plus icon in circle */}
+                    <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/40 flex items-center justify-center group-hover:border-white/60 transition-colors duration-300">
+                      <Plus className="w-8 h-8 text-white/60 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
+                    </div>
+
+                    {/* Text */}
+                    <span className="text-white/60 group-hover:text-white font-bold text-lg tracking-wide transition-colors duration-300">
+                      CREATE A NEW BUILD
+                    </span>
+                  </div>
+                </Card>
+              </Link>
+            </motion.div>
           )}
           {buildsToShow.map((build, index) => (
             <motion.div
               key={build.id || index}
               variants={scaleIn}
-              // whileHover={{
-              //   y: -10,
-              //   scale: 1.02,
-              //   transition: { duration: 0.2 },
-              // }}
             >
               <Link
                 href={`/builds/create?build=${encodeURIComponent(build.code)}`}

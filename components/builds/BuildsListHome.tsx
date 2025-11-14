@@ -1,27 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { ClipboardCopyIcon, Plus, Swords, ChevronRight } from "lucide-react";
+import { Plus, Swords } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { convertStringToBuild } from "../machines/converter";
-import bloodData from "@/data/vbuilds/bloodtypes.json";
-import { Button } from "@/components/ui/button";
-import { ArenaCodeOutsideBuilder } from "../vbuilds/components/ArenaCode";
-import epicWeaponData from "@/data/vbuilds/epic-weapons.json";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
   TooltipProvider,
 } from "@/components/ui/tooltip";
 import React from "react";
-import Image from "next/image";
 import "@/components/vbuilds/styles.css";
-import { StarterBuilds } from "./StarterBuilds";
 import { BuildContent } from "./BuildsList";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -84,26 +74,6 @@ function findMostFrequentSpellSchool(words: any[]): string {
 
   return mostFrequentWord;
 }
-
-const fromVariants: Record<string, string> = {
-  empty: "from-spellSchool-empty/30",
-  storm: "from-spellSchool-storm/5",
-  blood: "from-spellSchool-blood/5",
-  chaos: "from-spellSchool-chaos/5",
-  arcane: "from-spellSchool-unholy/5",
-  frost: "from-spellSchool-frost/5",
-  illusion: "from-spellSchool-illusion/5",
-};
-
-const toVariants: Record<string, string> = {
-  empty: "to-spellSchool-empty/5",
-  storm: "to-spellSchool-storm/5",
-  blood: "to-spellSchool-blood/5",
-  chaos: "to-spellSchool-chaos/5",
-  arcane: "to-spellSchool-unholy/5",
-  frost: "to-spellSchool-frost/5",
-  illusion: "to-spellSchool-illusion/5",
-};
 
 const borderVariants: Record<string, string> = {
   empty: "border-spellSchool-empty/30",
@@ -313,77 +283,6 @@ export default function BuildsListHome({
     },
   };
 
-  // Custom animation variants for premade builds
-  const slideInFromLeft = {
-    hidden: { opacity: 0, x: -400, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      scale: 1,
-      transition: {
-        duration: 0.8,
-        ease: [0.25, 0.46, 0.45, 0.94], // Custom ease with deceleration
-      },
-    },
-  };
-
-  const slideInFromRight = {
-    hidden: { opacity: 0, x: 400, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      scale: 1,
-      transition: {
-        duration: 0.8,
-        ease: [0.25, 0.46, 0.45, 0.94], // Custom ease with deceleration
-      },
-    },
-  };
-
-  const slideInFromLeftDelayed = {
-    hidden: { opacity: 0, x: -500, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      scale: 1,
-      transition: {
-        duration: 0.8,
-        delay: 0.2, // Edge delay for closing in effect
-        ease: [0.25, 0.46, 0.45, 0.94],
-      },
-    },
-  };
-
-  const slideInFromRightDelayed = {
-    hidden: { opacity: 0, x: 500, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      scale: 1,
-      transition: {
-        duration: 0.8,
-        delay: 0.2, // Edge delay for closing in effect
-        ease: [0.25, 0.46, 0.45, 0.94],
-      },
-    },
-  };
-
-  // Function to get the appropriate animation variant for each premade build
-  const getPremadeBuildVariant = (index: number) => {
-    switch (index) {
-      case 0:
-        return slideInFromLeftDelayed; // CASTER - leftmost edge, delayed
-      case 1:
-        return slideInFromLeft; // ASSASSIN - from left
-      case 2:
-        return slideInFromRight; // BRAWLER - from right
-      case 3:
-        return slideInFromRightDelayed; // HYBRID - rightmost edge, delayed
-      default:
-        return scaleIn;
-    }
-  };
-
   const staggerContainer = {
     hidden: { opacity: 0 },
     visible: {
@@ -394,22 +293,10 @@ export default function BuildsListHome({
     },
   };
 
-  // Custom container for premade builds without stagger delay
-  const premadeBuildsContainer = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0, // No stagger, let individual animations handle timing
-      },
-    },
-  };
 
   return (
     <TooltipProvider>
       <div className="pb-16">
-        {/* Premade Starter Builds Section */}
-        <StarterBuilds />
         {/* User's Personal Builds Section */}
         {builds.length > 0 && (
           <div className="flex items-center gap-3 mb-6">

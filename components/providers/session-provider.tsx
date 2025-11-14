@@ -13,21 +13,28 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Constants for session refresh strategy
+const POLLING_INTERVAL = 5 * 60 * 1000; // 5 minutes instead of 60 seconds
+const MIN_FETCH_INTERVAL = 30 * 1000; // Minimum 30 seconds between any fetches
+const FOCUS_THROTTLE = 2 * 60 * 1000; // Only check on focus if last check was > 2 minutes ago
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const fetchingRef = useRef(false);
   const lastFetchRef = useRef<number>(0);
+  const lastFocusCheckRef = useRef<number>(0);
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchSession = useCallback(async () => {
+  const fetchSession = useCallback(async (force = false) => {
     // Prevent multiple simultaneous calls
     if (fetchingRef.current) {
       return;
     }
 
-    // Throttle: don't fetch if last fetch was less than 500ms ago
+    // Throttle: don't fetch if last fetch was less than MIN_FETCH_INTERVAL ago (unless forced)
     const now = Date.now();
-    if (now - lastFetchRef.current < 500) {
+    if (!force && now - lastFetchRef.current < MIN_FETCH_INTERVAL) {
       return;
     }
 
@@ -50,30 +57,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Setup polling based on session state
+  useEffect(() => {
+    // Clear existing polling interval
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+
+    // Only poll if user is authenticated (no need to check every 5 min if not logged in)
+    // This reduces unnecessary API calls when user is not logged in
+    if (session?.user && !isLoading) {
+      pollingIntervalRef.current = setInterval(() => {
+        fetchSession();
+      }, POLLING_INTERVAL);
+    }
+
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+    };
+  }, [session?.user, isLoading, fetchSession]);
+
+  // Setup event listeners and initial fetch
   useEffect(() => {
     // Fetch initial session
-    fetchSession();
+    fetchSession(true);
 
     // Revalidate when window receives focus (user returns to tab)
+    // But only if enough time has passed since last check
     const handleFocus = () => {
-      fetchSession();
-    };
-
-    // Revalidate when page becomes visible
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
+      const now = Date.now();
+      // Only check if last focus check was more than FOCUS_THROTTLE ago
+      if (now - lastFocusCheckRef.current > FOCUS_THROTTLE) {
+        lastFocusCheckRef.current = now;
         fetchSession();
       }
     };
 
-    // Check periodically, but with longer interval (60s)
-    const interval = setInterval(fetchSession, 60000);
+    // Revalidate when page becomes visible
+    // But only if enough time has passed since last check
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        const now = Date.now();
+        // Only check if last focus check was more than FOCUS_THROTTLE ago
+        if (now - lastFocusCheckRef.current > FOCUS_THROTTLE) {
+          lastFocusCheckRef.current = now;
+          fetchSession();
+        }
+      }
+    };
 
     window.addEventListener("focus", handleFocus);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      clearInterval(interval);
       window.removeEventListener("focus", handleFocus);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
@@ -84,7 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     session: session,
     isAuthenticated: !!session?.user,
     isLoading,
-    refetch: fetchSession,
+    refetch: () => fetchSession(true), // Force refresh when explicitly called
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
