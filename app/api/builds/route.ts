@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/better-auth/server";
 import prisma from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
+import { revalidateTag } from "next/cache";
 
 // Create a new build
 export async function POST(request: Request) {
@@ -129,6 +131,9 @@ export async function POST(request: Request) {
       },
     });
 
+    // Invalidate cache for this user's builds
+    revalidateTag(`builds-${userIdToUse}`);
+
     return NextResponse.json(build, { status: 201 });
   } catch (error: any) {
     console.error("Error creating build:", error);
@@ -156,14 +161,26 @@ export async function GET(request: Request) {
       );
     }
 
-    const builds = await prisma.build.findMany({
-      where: {
-        userId: session.user.id,
+    // Cache builds for 1 week (604800 seconds), keyed by user ID
+    const getCachedBuilds = unstable_cache(
+      async (userId: string) => {
+        return await prisma.build.findMany({
+          where: {
+            userId,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
       },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+      [`builds-${session.user.id}`],
+      {
+        tags: [`builds-${session.user.id}`],
+        revalidate: 604800, // 1 week in seconds
+      }
+    );
+
+    const builds = await getCachedBuilds(session.user.id);
 
     return NextResponse.json(builds);
   } catch (error: any) {

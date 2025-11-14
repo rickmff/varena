@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { Plus, Lock, Globe2, Trash2 } from "lucide-react";
+import { Plus, Lock, Globe2, Trash2, User } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -134,6 +134,7 @@ const Item = ({
 export const BuildContent = ({
   code,
   name,
+  author,
   handleDeleteBuild,
   isPublic,
   onTogglePublic,
@@ -141,6 +142,7 @@ export const BuildContent = ({
 }: {
   code: string;
   name: string;
+  author?: string;
   handleDeleteBuild?: (event: React.MouseEvent) => void;
   isPublic?: boolean;
   onTogglePublic?: (checked: boolean) => void;
@@ -240,9 +242,23 @@ export const BuildContent = ({
       </div>
 
       <CardHeader className="relative">
-        <CardTitle className="text-xl font-bold transition-colors">
-          {name || "Unnamed Build"}
-        </CardTitle>
+        <div className="flex items-center gap-2">
+          <CardTitle className="text-xl font-bold transition-colors">
+            {name || "Unnamed Build"}
+          </CardTitle>
+          {showPublicToggle && isPublic && (
+            <div className="flex items-center gap-1 px-2 py-0.5 bg-green-900/30 border border-green-500/30 rounded-full">
+              <Globe2 className="w-3 h-3 text-green-400" />
+              <span className="text-[10px] uppercase tracking-wide text-green-400">Public</span>
+            </div>
+          )}
+        </div>
+        {author && (
+          <p className="text-sm text-gray-400 mt-1 flex items-center gap-1">
+            <User className="w-3 h-3" />
+            {author}
+          </p>
+        )}
       </CardHeader>
       <CardContent className="relative">
         <div className="space-y-6">
@@ -794,17 +810,6 @@ export default function BuildsList({
               {importing ? "Importing..." : "Import Local Builds"}
             </Button>
           </motion.div>
-        )}
-
-        {/* User's Personal Builds Section */}
-        {builds.length > 0 && (
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 bg-gradient-to-b from-red-400 to-red-600 rounded-full" />
-            <h3 className="text-xl font-bold text-grey-100 tracking-wide">
-              MAKE YOUR OWN
-            </h3>
-            <div className="flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
-          </div>
         )}
 
         <motion.div

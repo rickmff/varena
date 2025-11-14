@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/better-auth/server";
 import prisma from "@/lib/prisma";
+import { revalidateTag } from "next/cache";
 
 interface RouteParams {
   params: Promise<{
@@ -51,6 +52,10 @@ export async function PUT(request: Request, { params }: RouteParams) {
       },
     });
 
+    // Invalidate cache when public/private status changes (or any update)
+    // This ensures the cache is refreshed when builds are modified
+    revalidateTag(`builds-${session.user.id}`);
+
     return NextResponse.json(build);
   } catch (error: any) {
     console.error("Error updating build:", error);
@@ -93,6 +98,9 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     await prisma.build.delete({
       where: { id },
     });
+
+    // Invalidate cache for this user's builds
+    revalidateTag(`builds-${session.user.id}`);
 
     return NextResponse.json({ message: "Build deletada com sucesso" });
   } catch (error: any) {
