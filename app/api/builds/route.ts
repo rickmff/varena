@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, description, code, author, authorTwitchUrl, authorYoutubeUrl } = await request.json();
+    const { name, description, code, author, authorTwitchUrl, authorYoutubeUrl, isPublic } = await request.json();
 
     // Only name and code are required
     if (!name || !code) {
@@ -124,6 +124,7 @@ export async function POST(request: Request) {
         author: buildAuthor,
         authorTwitchUrl: authorTwitchUrl || null,
         authorYoutubeUrl: authorYoutubeUrl || null,
+        isPublic: isPublic === true,
         userId: userIdToUse,
       },
     });

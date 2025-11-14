@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
+import { Plus, Lock, Globe2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -18,6 +18,7 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "@/components/ui/tooltip";
+import { Switch } from "@/components/ui/switch";
 import React from "react";
 import "@/components/vbuilds/styles.css";
 import { useAuth } from "@/hooks/use-auth";
@@ -26,6 +27,7 @@ type Build = {
   id?: string;
   name: string;
   code: string;
+  isPublic?: boolean;
 };
 
 interface BuildsListProps {
@@ -133,10 +135,16 @@ export const BuildContent = ({
   code,
   name,
   handleDeleteBuild,
+  isPublic,
+  onTogglePublic,
+  showPublicToggle = true,
 }: {
   code: string;
   name: string;
-  handleDeleteBuild: (event: React.MouseEvent) => void;
+  handleDeleteBuild?: (event: React.MouseEvent) => void;
+  isPublic?: boolean;
+  onTogglePublic?: (checked: boolean) => void;
+  showPublicToggle?: boolean;
 }) => {
   // Safely convert the arena code into a build structure.
   // If anything goes wrong we render a minimal, non-animated card instead
@@ -194,20 +202,41 @@ export const BuildContent = ({
         />
       </div>
 
-      <div className="absolute top-4 right-4 flex gap-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger>
-            <div
-              role="button"
-              className="bg-red-600/80 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-red-500/50"
-              onClick={handleDeleteBuild}
-              aria-label="Delete build"
-            >
-              ×
-            </div>
-          </TooltipTrigger>
-          <TooltipContent side="left">Delete Build</TooltipContent>
-        </Tooltip>
+      <div
+        className="absolute top-4 right-4 flex gap-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        {showPublicToggle && onTogglePublic !== undefined && (
+          <button
+            type="button"
+            className="w-8 h-8 rounded-full border border-white/30 bg-black/80 flex items-center justify-center hover:border-white/60 hover:bg-black transition-colors"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onTogglePublic(!isPublic);
+            }}
+            aria-label={isPublic ? "Make build private" : "Make build public"}
+          >
+            {isPublic ? (
+              <Globe2 className="w-4 h-4 text-green-400" />
+            ) : (
+              <Lock className="w-4 h-4 text-zinc-300" />
+            )}
+          </button>
+        )}
+        {handleDeleteBuild && (
+          <button
+            type="button"
+            className="bg-red-600/80 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-red-500/50"
+            onClick={handleDeleteBuild}
+            aria-label="Delete build"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       <CardHeader className="relative">
@@ -446,7 +475,7 @@ export const BuildContent = ({
           </div>
         </div>
       </CardContent>
-    </Card>
+    </Card >
   );
 };
 
@@ -490,6 +519,7 @@ export default function BuildsList({
           id: build.id,
           name: build.name,
           code: build.code,
+          isPublic: build.isPublic || false,
         })) : [];
 
         console.log("Builds loaded:", buildsArray.length, buildsArray);
@@ -512,37 +542,31 @@ export default function BuildsList({
     event.preventDefault();
     event.stopPropagation();
 
-    toast("Are you sure you want to delete this build?", {
-      closeButton: true,
-      actionButtonStyle: { backgroundColor: "#f87171" },
-      action: {
-        label: "Delete",
-        onClick: async () => {
-          if (!buildId) {
-            toast.error("Build ID not found");
-            return;
-          }
+    if (!buildId) {
+      toast.error("Build ID not found");
+      return;
+    }
 
-          try {
-            const response = await fetch(`/api/builds/${buildId}`, {
-              method: "DELETE",
-            });
+    const confirmed = window.confirm("Are you sure you want to delete this build?");
+    if (!confirmed) return;
 
-            if (!response.ok) {
-              throw new Error("Failed to delete build");
-            }
+    try {
+      const response = await fetch(`/api/builds/${buildId}`, {
+        method: "DELETE",
+      });
 
-            const updatedBuilds = builds.filter((_, i) => i !== index);
-            setBuilds(updatedBuilds);
-            onBuildsLoaded?.(updatedBuilds.length > 0);
-            toast.success("Build deleted successfully");
-          } catch (error) {
-            console.error("Failed to delete build:", error);
-            toast.error("Failed to delete build");
-          }
-        },
-      },
-    });
+      if (!response.ok) {
+        throw new Error("Failed to delete build");
+      }
+
+      const updatedBuilds = builds.filter((_, i) => i !== index);
+      setBuilds(updatedBuilds);
+      onBuildsLoaded?.(updatedBuilds.length > 0);
+      toast.success("Build deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete build:", error);
+      toast.error("Failed to delete build");
+    }
   };
 
   const handleCopyCommand = async (event: React.MouseEvent, code: string) => {
@@ -557,6 +581,43 @@ export default function BuildsList({
       });
     } catch (error) {
       toast.error("Failed to copy command");
+    }
+  };
+
+  const handleTogglePublic = async (
+    buildId: string,
+    currentIsPublic: boolean
+  ) => {
+    try {
+      const response = await fetch(`/api/builds/${buildId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          isPublic: !currentIsPublic,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update build visibility");
+      }
+
+      // Update local state
+      setBuilds((prevBuilds) =>
+        prevBuilds.map((build) =>
+          build.id === buildId
+            ? { ...build, isPublic: !currentIsPublic }
+            : build
+        )
+      );
+
+      toast.success(
+        `Build ${!currentIsPublic ? "made public" : "made private"}`
+      );
+    } catch (error) {
+      console.error("Failed to toggle build visibility:", error);
+      toast.error("Failed to update build visibility");
     }
   };
 
@@ -792,6 +853,13 @@ export default function BuildsList({
                   handleDeleteBuild={(event: React.MouseEvent) =>
                     handleDelete(event, build.id || "", index)
                   }
+                  isPublic={build.isPublic}
+                  onTogglePublic={(checked) => {
+                    if (build.id) {
+                      handleTogglePublic(build.id, build.isPublic || false);
+                    }
+                  }}
+                  showPublicToggle={true}
                 />
               </Link>
             </motion.div>

@@ -1,14 +1,16 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import BuildsList from "@/components/builds/BuildsList";
+import PublicBuildsList from "@/components/builds/PublicBuildsList";
 import SectionHeader from "@/app/components/ui/SectionHeader";
-
-export const metadata = {
-  title: "V Arena - Builds",
-};
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export default function Builds() {
+  const [activeTab, setActiveTab] = useState("mine");
+
   return (
     <div
       className="min-h-screen bg-black text-white overflow-auto"
@@ -32,8 +34,7 @@ export default function Builds() {
         <div className="container mx-auto px-4 relative z-10">
           <SectionHeader
             title="Build Collection"
-            subtitle="Your Builds"
-          // description="Manage your saved builds, create new combinations"
+            subtitle={activeTab === "mine" ? "Your Builds" : "Community Builds"}
           />
         </div>
       </section>
@@ -41,7 +42,28 @@ export default function Builds() {
       {/* Builds Section */}
       <section className="bg-black relative -mt-20 pb-20">
         <div className="container mx-auto px-4 relative z-10">
-          <BuildsList />
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full max-w-md grid-cols-2 mb-8 bg-black/50 border border-white/10">
+              <TabsTrigger
+                value="mine"
+                className="data-[state=active]:bg-red-900/50 data-[state=active]:text-white"
+              >
+                MAKE YOUR OWN
+              </TabsTrigger>
+              <TabsTrigger
+                value="community"
+                className="data-[state=active]:bg-red-900/50 data-[state=active]:text-white"
+              >
+                COMMUNITY
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="mine">
+              <BuildsList />
+            </TabsContent>
+            <TabsContent value="community">
+              <PublicBuildsList />
+            </TabsContent>
+          </Tabs>
         </div>
       </section>
     </div>

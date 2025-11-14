@@ -69,6 +69,7 @@ model Build {
   author           String
   authorTwitchUrl  String?
   authorYoutubeUrl String?
+  isPublic         Boolean  @default(false)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -78,4 +79,5 @@ model Build {
 
   @@unique([name, userId]) // Permite mesmo nome para usuários diferentes
   @@index([userId])
+  @@index([isPublic])
 }

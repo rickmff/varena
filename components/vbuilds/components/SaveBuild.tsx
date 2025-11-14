@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { arenaCode } from "@/components/machines/converter";
+import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -23,6 +24,7 @@ const SaveBuild: React.FC = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const [name, setName] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
@@ -67,10 +69,11 @@ const SaveBuild: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          name: buildName,
-          code: buildCode,
-        }),
+            body: JSON.stringify({
+              name: buildName,
+              code: buildCode,
+              isPublic: isPublic,
+            }),
       });
 
       if (response.status === 401) {
@@ -112,21 +115,36 @@ const SaveBuild: React.FC = () => {
 
   return (
     <>
-      <div className="flex gap-4">
-        <Input
-          className="text-base bg-black/50 px-4 py-2 rounded-md border text-gray-400 flex-1"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Build name"
-          disabled={loading}
-        />
-        <Button
-          onClick={saveBuildCommand}
-          disabled={loading || authLoading}
-          className="px-3 py-2 text-white group border-red-900/70  bg-red-900/50 hover:bg-red-800 transition-colors"
-        >
-          {loading ? "SAVING..." : "SAVE"}
-        </Button>
+      <div className="space-y-4">
+        <div className="flex gap-4">
+          <Input
+            className="text-base bg-black/50 px-4 py-2 rounded-md border text-gray-400 flex-1"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Build name"
+            disabled={loading}
+          />
+          <Button
+            onClick={saveBuildCommand}
+            disabled={loading || authLoading}
+            className="px-3 py-2 text-white group border-red-900/70  bg-red-900/50 hover:bg-red-800 transition-colors"
+          >
+            {loading ? "SAVING..." : "SAVE"}
+          </Button>
+        </div>
+        <div className="flex items-center gap-3">
+          <label className="text-sm text-gray-400 flex items-center gap-2 cursor-pointer">
+            <Switch
+              checked={isPublic}
+              onCheckedChange={setIsPublic}
+              disabled={loading || authLoading}
+            />
+            <span>Make this build public</span>
+          </label>
+          <span className="text-xs text-gray-500">
+            (Public builds appear in the community tab)
+          </span>
+        </div>
       </div>
 
       <AlertDialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>

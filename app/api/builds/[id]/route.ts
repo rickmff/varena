@@ -21,7 +21,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
     }
 
     const { id } = await params;
-    const { name, description, code, author, authorTwitchUrl, authorYoutubeUrl } = await request.json();
+    const { name, description, code, author, authorTwitchUrl, authorYoutubeUrl, isPublic } = await request.json();
 
     // Verificar se a build pertence ao usuário
     const existingBuild = await prisma.build.findFirst({
@@ -47,6 +47,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
         author: author || existingBuild.author,
         authorTwitchUrl: authorTwitchUrl !== undefined ? authorTwitchUrl : existingBuild.authorTwitchUrl,
         authorYoutubeUrl: authorYoutubeUrl !== undefined ? authorYoutubeUrl : existingBuild.authorYoutubeUrl,
+        isPublic: isPublic !== undefined ? isPublic : existingBuild.isPublic,
       },
     });
 

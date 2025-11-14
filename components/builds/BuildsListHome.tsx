@@ -19,6 +19,7 @@ type Build = {
   id?: string;
   name: string;
   code: string;
+  isPublic?: boolean;
 };
 
 interface BuildsListProps {
@@ -176,6 +177,7 @@ export default function BuildsListHome({
           id: build.id,
           name: build.name,
           code: build.code,
+          isPublic: build.isPublic || false,
         })) : [];
 
         setBuilds(buildsArray);
