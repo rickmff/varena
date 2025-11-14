@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { authClient } from "@/lib/better-auth/client";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import NavBar from "@/components/NavBar";
 
 function SignUpForm() {
   const router = useRouter();
@@ -139,182 +140,187 @@ function SignUpForm() {
 
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Sign Up</CardTitle>
-          <CardDescription>
-            Create an account to get started
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="name" className="text-sm font-medium">
-                Name
-              </label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Your name"
-                value={formData.name}
-                onChange={(e) => {
-                  setFormData({ ...formData, name: e.target.value });
-                  if (errors.name) setErrors({ ...errors, name: undefined });
-                }}
-                disabled={loading}
-                aria-invalid={!!errors.name}
-                aria-describedby={errors.name ? "name-error" : undefined}
-                className={errors.name ? "border-red-500" : ""}
-              />
-              {errors.name && (
-                <p id="name-error" className="text-sm text-red-500" role="alert">
-                  {errors.name}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
-                Email
-              </label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="seu@email.com"
-                value={formData.email}
-                onChange={(e) => {
-                  setFormData({ ...formData, email: e.target.value });
-                  if (errors.email) setErrors({ ...errors, email: undefined });
-                }}
-                disabled={loading}
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? "email-error" : undefined}
-                className={errors.email ? "border-red-500" : ""}
-              />
-              {errors.email && (
-                <p id="email-error" className="text-sm text-red-500" role="alert">
-                  {errors.email}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
-                Password
-              </label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={(e) => {
-                    setFormData({ ...formData, password: e.target.value });
-                    if (errors.password) setErrors({ ...errors, password: undefined });
-                  }}
-                  disabled={loading}
-                  aria-invalid={!!errors.password}
-                  aria-describedby={errors.password ? "password-error" : undefined}
-                  className={errors.password ? "border-red-500 pr-10" : "pr-10"}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
-                  tabIndex={-1}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
-              {formData.password && (
-                <div className="space-y-1">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4].map((level) => (
-                      <div
-                        key={level}
-                        className={`h-1 flex-1 rounded ${level <= passwordStrength.strength
-                            ? passwordStrength.color
-                            : "bg-gray-700"
-                          }`}
-                      />
-                    ))}
-                  </div>
-                  {passwordStrength.label && (
-                    <p className="text-xs text-gray-400">
-                      Strength: <span className={passwordStrength.strength >= 3 ? "text-green-500" : "text-yellow-500"}>{passwordStrength.label}</span>
+    <div className="min-h-screen bg-black text-white">
+      <NavBar />
+      <section className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black flex items-center justify-center">
+        <div className="container mx-auto px-4 relative z-10 flex items-center justify-center">
+          <Card className="w-full max-w-md">
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-2xl font-bold">Sign Up</CardTitle>
+              <CardDescription>
+                Create an account to get started
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="text-sm font-medium">
+                    Name
+                  </label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Your name"
+                    value={formData.name}
+                    onChange={(e) => {
+                      setFormData({ ...formData, name: e.target.value });
+                      if (errors.name) setErrors({ ...errors, name: undefined });
+                    }}
+                    disabled={loading}
+                    aria-invalid={!!errors.name}
+                    aria-describedby={errors.name ? "name-error" : undefined}
+                    className={errors.name ? "border-red-500" : ""}
+                  />
+                  {errors.name && (
+                    <p id="name-error" className="text-sm text-red-500" role="alert">
+                      {errors.name}
                     </p>
                   )}
                 </div>
-              )}
-              {errors.password && (
-                <p id="password-error" className="text-sm text-red-500" role="alert">
-                  {errors.password}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="confirmPassword" className="text-sm font-medium">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={formData.confirmPassword}
-                  onChange={(e) => {
-                    setFormData({ ...formData, confirmPassword: e.target.value });
-                    if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
-                  }}
-                  disabled={loading}
-                  aria-invalid={!!errors.confirmPassword}
-                  aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
-                  className={errors.confirmPassword ? "border-red-500 pr-10" : "pr-10"}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
-                  tabIndex={-1}
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
+                <div className="space-y-2">
+                  <label htmlFor="email" className="text-sm font-medium">
+                    Email
+                  </label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={formData.email}
+                    onChange={(e) => {
+                      setFormData({ ...formData, email: e.target.value });
+                      if (errors.email) setErrors({ ...errors, email: undefined });
+                    }}
+                    disabled={loading}
+                    aria-invalid={!!errors.email}
+                    aria-describedby={errors.email ? "email-error" : undefined}
+                    className={errors.email ? "border-red-500" : ""}
+                  />
+                  {errors.email && (
+                    <p id="email-error" className="text-sm text-red-500" role="alert">
+                      {errors.email}
+                    </p>
                   )}
-                </button>
-              </div>
-              {errors.confirmPassword && (
-                <p id="confirmPassword-error" className="text-sm text-red-500" role="alert">
-                  {errors.confirmPassword}
-                </p>
-              )}
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating account...
-                </>
-              ) : (
-                "Sign Up"
-              )}
-            </Button>
-          </form>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="password" className="text-sm font-medium">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={(e) => {
+                        setFormData({ ...formData, password: e.target.value });
+                        if (errors.password) setErrors({ ...errors, password: undefined });
+                      }}
+                      disabled={loading}
+                      aria-invalid={!!errors.password}
+                      aria-describedby={errors.password ? "password-error" : undefined}
+                      className={errors.password ? "border-red-500 pr-10" : "pr-10"}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                      tabIndex={-1}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  {formData.password && (
+                    <div className="space-y-1">
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4].map((level) => (
+                          <div
+                            key={level}
+                            className={`h-1 flex-1 rounded ${level <= passwordStrength.strength
+                              ? passwordStrength.color
+                              : "bg-gray-700"
+                              }`}
+                          />
+                        ))}
+                      </div>
+                      {passwordStrength.label && (
+                        <p className="text-xs text-gray-400">
+                          Strength: <span className={passwordStrength.strength >= 3 ? "text-green-500" : "text-yellow-500"}>{passwordStrength.label}</span>
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  {errors.password && (
+                    <p id="password-error" className="text-sm text-red-500" role="alert">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="confirmPassword" className="text-sm font-medium">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={formData.confirmPassword}
+                      onChange={(e) => {
+                        setFormData({ ...formData, confirmPassword: e.target.value });
+                        if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
+                      }}
+                      disabled={loading}
+                      aria-invalid={!!errors.confirmPassword}
+                      aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
+                      className={errors.confirmPassword ? "border-red-500 pr-10" : "pr-10"}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                      tabIndex={-1}
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && (
+                    <p id="confirmPassword-error" className="text-sm text-red-500" role="alert">
+                      {errors.confirmPassword}
+                    </p>
+                  )}
+                </div>
+                <Button type="submit" className="items-center justify-center gap-2 whitespace-nowrap rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border hover:text-accent-foreground h-10 px-4 py-2 hidden md:flex font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 w-full" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating account...
+                    </>
+                  ) : (
+                    "Sign Up"
+                  )}
+                </Button>
+              </form>
 
-          <div className="text-center text-sm">
-            <span className="text-muted-foreground">Already have an account? </span>
-            <Link href="/auth/signin" className="text-primary hover:underline">
-              Sign in
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+              <div className="text-center text-sm">
+                <span className="text-muted-foreground">Already have an account? </span>
+                <Link href="/auth/signin" className="text-primary hover:underline">
+                  Sign in
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
     </div>
   );
 }

@@ -1,15 +1,5 @@
 {
-  "redirects": [
-    {
-      "source": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "staging.teusite.com"
-        }
-      ],
-      "destination": "https://staging-yourproject.vercel.app",
-      "permanent": false
-    }
-  ]
+  "buildCommand": "next build",
+  "installCommand": "yarn install",
+  "framework": "nextjs"
 }

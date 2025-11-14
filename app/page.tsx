@@ -709,8 +709,8 @@ export default function Home() {
         <div className="container mx-auto px-4 relative">
           <SectionHeader
             title="Build Collection"
-            subtitle="Build Library"
-            description="Access starter templates and manage your custom builds"
+            subtitle="Builds Creator"
+            description="Manage your custom builds or search for builds created by the community"
           />
           <motion.div
             initial="hidden"

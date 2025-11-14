@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { authClient } from "@/lib/better-auth/client";
+import { migrateLocalBuilds } from "@/lib/migrate-local-builds";
 
 interface AuthContextType {
   user: any;
@@ -25,6 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const lastFetchRef = useRef<number>(0);
   const lastFocusCheckRef = useRef<number>(0);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const migrationAttemptedRef = useRef(false);
 
   const fetchSession = useCallback(async (force = false) => {
     // Prevent multiple simultaneous calls
@@ -118,6 +120,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [fetchSession]);
+
+  // Migrate builds from localStorage when user session is established
+  // This handles cases where user is already logged in (e.g., from previous tab)
+  useEffect(() => {
+    // Only run migration once per session establishment
+    if (!session?.user || migrationAttemptedRef.current || isLoading) {
+      return;
+    }
+
+    // Mark migration as attempted to prevent multiple runs
+    migrationAttemptedRef.current = true;
+
+    // Run migration asynchronously without blocking
+    migrateLocalBuilds()
+      .then((result) => {
+        if (result.migrated > 0) {
+          console.log(`[Session Provider] Migrated ${result.migrated} build(s) from localStorage`);
+        }
+      })
+      .catch((error) => {
+        console.error("[Session Provider] Error during build migration:", error);
+        // Reset flag on error so it can retry on next session establishment
+        migrationAttemptedRef.current = false;
+      });
+  }, [session?.user?.id, isLoading]);
+
+  // Reset migration flag when user logs out
+  useEffect(() => {
+    if (!session?.user) {
+      migrationAttemptedRef.current = false;
+    }
+  }, [session?.user]);
 
   const value: AuthContextType = {
     user: session?.user || null,

@@ -8,6 +8,7 @@ import Link from "next/link";
 import { authClient } from "@/lib/better-auth/client";
 import LogoutButton from "./logout-button";
 import prisma from "@/lib/prisma";
+import NavBar from "@/components/NavBar";
 
 export default async function ProfilePage() {
   const session = await getServerSession();
@@ -48,90 +49,95 @@ export default async function ProfilePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-white mb-2">My Profile</h1>
-        <p className="text-gray-400">Manage your account information</p>
-      </div>
+    <div className="min-h-screen bg-black text-white">
+      <NavBar />
+      <section className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-white mb-2">My Profile</h1>
+            <p className="text-gray-400">Manage your account information</p>
+          </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* User Information Card */}
-        <Card className="bg-black/50 border-[#5865F2]/30">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <User className="h-5 w-5" />
-              Personal Information
-            </CardTitle>
-            <CardDescription className="text-gray-400">
-              Your account information
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center justify-center">
-              <Avatar className="h-24 w-24 border-2 border-[#5865F2]">
-                <AvatarImage src={user.image || undefined} alt={user.name || user.email || "User"} />
-                <AvatarFallback className="bg-[#0f0a47] text-white text-2xl font-semibold">
-                  {getUserInitials(user.name, user.email)}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-400">Name</label>
-                <p className="text-white mt-1">{user.name || "Not provided"}</p>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-400 flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  Email
-                </label>
-                <p className="text-white mt-1">{user.email}</p>
-              </div>
-
-              {dbUser?.createdAt && (
-                <div>
-                  <label className="text-sm font-medium text-gray-400 flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Account created on
-                  </label>
-                  <p className="text-white mt-1">{formatDate(dbUser.createdAt)}</p>
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* User Information Card */}
+            <Card className="bg-black/50 border-[#5865F2]/30">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Personal Information
+                </CardTitle>
+                <CardDescription className="text-gray-400">
+                  Your account information
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-center">
+                  <Avatar className="h-24 w-24 border-2 border-[#5865F2]">
+                    <AvatarImage src={user.image || undefined} alt={user.name || user.email || "User"} />
+                    <AvatarFallback className="bg-[#0f0a47] text-white text-2xl font-semibold">
+                      {getUserInitials(user.name, user.email)}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Quick Actions Card */}
-        <Card className="bg-black/50 border-[#5865F2]/30">
-          <CardHeader>
-            <CardTitle className="text-white">Quick Actions</CardTitle>
-            <CardDescription className="text-gray-400">
-              Manage your account and builds
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Button asChild variant="outline" className="w-full justify-start bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] text-white">
-              <Link href="/builds" className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                View My Builds
-              </Link>
-            </Button>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-400">Name</label>
+                    <p className="text-white mt-1">{user.name || "Not provided"}</p>
+                  </div>
 
-            <Button asChild variant="outline" className="w-full justify-start bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] text-white">
-              <Link href="/builds/create" className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Create New Build
-              </Link>
-            </Button>
+                  <div>
+                    <label className="text-sm font-medium text-gray-400 flex items-center gap-2">
+                      <Mail className="h-4 w-4" />
+                      Email
+                    </label>
+                    <p className="text-white mt-1">{user.email}</p>
+                  </div>
 
-            <div className="pt-4 border-t border-[#5865F2]/30">
-              <LogoutButton />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                  {dbUser?.createdAt && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-400 flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        Account created on
+                      </label>
+                      <p className="text-white mt-1">{formatDate(dbUser.createdAt)}</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions Card */}
+            <Card className="bg-black/50 border-[#5865F2]/30">
+              <CardHeader>
+                <CardTitle className="text-white">Quick Actions</CardTitle>
+                <CardDescription className="text-gray-400">
+                  Manage your account and builds
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Button asChild variant="outline" className="w-full justify-start bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] text-white">
+                  <Link href="/builds" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    View My Builds
+                  </Link>
+                </Button>
+
+                <Button asChild variant="outline" className="w-full justify-start bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] text-white">
+                  <Link href="/builds/create" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Create New Build
+                  </Link>
+                </Button>
+
+                <div className="pt-4 border-t border-[#5865F2]/30">
+                  <LogoutButton />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

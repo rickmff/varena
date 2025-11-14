@@ -3,8 +3,6 @@ import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import BuildsList from "@/components/builds/BuildsList";
 import SectionHeader from "@/app/components/ui/SectionHeader";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 export const metadata = {
   title: "V Arena - Builds",
@@ -35,7 +33,7 @@ export default function Builds() {
           <SectionHeader
             title="Build Collection"
             subtitle="Your Builds"
-            // description="Manage your saved builds, create new combinations"
+          // description="Manage your saved builds, create new combinations"
           />
         </div>
       </section>
