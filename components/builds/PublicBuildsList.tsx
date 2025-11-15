@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import "@/components/vbuilds/styles.css";
 import { VoteButtons } from "./VoteButtons";
+import { useAuth } from "@/hooks/use-auth";
+import { toast } from "sonner";
 
 type Build = {
   id?: string;
@@ -215,6 +217,7 @@ export default function PublicBuildsList() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState<"popular" | "newest" | "oldest">("popular");
   const fetchingRef = useRef(false);
+  const { isAdmin } = useAuth();
 
   // Filter states
   const [armourFilter, setArmourFilter] = useState<string | null>(null);
@@ -367,6 +370,39 @@ export default function PublicBuildsList() {
     setPrimaryBloodFilter(null);
     setSecondaryBloodFilter(null);
     setAuthorFilter("");
+  };
+
+  // Admin delete handler
+  const handleAdminDelete = async (event: React.MouseEvent, buildId: string) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!buildId) {
+      toast.error("Build ID not found");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this build? This action cannot be undone."
+    );
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/api/admin/builds/${buildId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete build");
+      }
+
+      // Remove build from state
+      setBuilds((prev) => prev.filter((b) => b.id !== buildId));
+      toast.success("Build deleted successfully");
+    } catch (error) {
+      console.error("Failed to delete build:", error);
+      toast.error("Failed to delete build");
+    }
   };
 
   // Check if any filters are active
@@ -677,31 +713,34 @@ export default function PublicBuildsList() {
             viewport={{ once: true }}
           >
             {filteredBuilds.map((build, index) => (
-              <motion.div key={build.id || index} variants={scaleIn}>
-                <Link
-                  href={`/builds/create?build=${encodeURIComponent(build.code)}`}
-                >
-                  <BuildContent
-                    code={build.code}
-                    name={build.name}
-                    author={build.author}
-                    isPublic={build.isPublic}
-                    showPublicToggle={false}
-                    upvotes={build.upvotes}
-                    downvotes={build.downvotes}
-                    userVote={build.userVote}
-                    buildId={build.id}
-                    onVoteChange={(upvotes, downvotes, userVote) => {
-                      setBuilds((prev) =>
-                        prev.map((b) =>
-                          b.id === build.id
-                            ? { ...b, upvotes, downvotes, userVote }
-                            : b
-                        )
-                      );
-                    }}
-                  />
-                </Link>
+              <motion.div key={build.id || index} variants={scaleIn} className="relative">
+                <BuildContent
+                  code={build.code}
+                  name={build.name}
+                  author={build.author}
+                  isPublic={build.isPublic}
+                  showPublicToggle={false}
+                  upvotes={build.upvotes}
+                  downvotes={build.downvotes}
+                  userVote={build.userVote}
+                  buildId={build.id}
+                  onVoteChange={(upvotes, downvotes, userVote) => {
+                    setBuilds((prev) =>
+                      prev.map((b) =>
+                        b.id === build.id
+                          ? { ...b, upvotes, downvotes, userVote }
+                          : b
+                      )
+                    );
+                  }}
+                  isAdmin={isAdmin}
+                  onAdminDelete={
+                    isAdmin && build.id
+                      ? (event: React.MouseEvent) => handleAdminDelete(event, build.id!)
+                      : undefined
+                  }
+                  buildLink={`/builds/create?build=${encodeURIComponent(build.code)}`}
+                />
               </motion.div>
             ))}
           </motion.div>

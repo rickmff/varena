@@ -19,7 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import GameMenu from "./game-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { authClient } from "@/lib/better-auth/client";
-import { LogIn, User, LogOut, Hammer } from "lucide-react";
+import { LogIn, User, LogOut, Hammer, Shield } from "lucide-react";
 import { toast } from "sonner";
 
 export const menuItems = [
@@ -109,7 +109,7 @@ export default function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const router = useRouter();
-  const { isAuthenticated, isLoading, user, refetch } = useAuth();
+  const { isAuthenticated, isLoading, user, refetch, isAdmin } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -286,6 +286,17 @@ export default function NavBar() {
                       <span>My Builds</span>
                     </Link>
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator className="bg-[#5865F2]/30" />
+                      <DropdownMenuItem asChild>
+                        <Link href="/capibara" className="cursor-pointer text-yellow-400 hover:bg-yellow-950/20">
+                          <Shield className="mr-2 h-4 w-4" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator className="bg-[#5865F2]/30" />
                   <DropdownMenuItem
                     onClick={handleLogout}

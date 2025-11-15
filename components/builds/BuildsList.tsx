@@ -145,6 +145,9 @@ export const BuildContent = ({
   userVote,
   buildId,
   onVoteChange,
+  isAdmin,
+  onAdminDelete,
+  buildLink,
 }: {
   code: string;
   name: string;
@@ -158,6 +161,9 @@ export const BuildContent = ({
   userVote?: "upvote" | "downvote" | null;
   buildId?: string;
   onVoteChange?: (upvotes: number, downvotes: number, userVote: "upvote" | "downvote" | null) => void;
+  isAdmin?: boolean;
+  onAdminDelete?: (event: React.MouseEvent) => void;
+  buildLink?: string;
 }) => {
   // Safely convert the arena code into a build structure.
   // If anything goes wrong we render a minimal, non-animated card instead
@@ -225,6 +231,22 @@ export const BuildContent = ({
           e.stopPropagation();
         }}
       >
+        {/* Admin delete button - left side of vote buttons */}
+        {isAdmin && onAdminDelete && (
+          <button
+            type="button"
+            className="bg-yellow-600/80 hover:bg-yellow-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-yellow-500/50 opacity-0 group-hover:opacity-100 z-20 mt-1"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onAdminDelete(e);
+            }}
+            aria-label="Admin delete build"
+            title="Admin: Delete this build"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
         {/* Vote buttons */}
         {buildId && onVoteChange && (
           <VoteButtons

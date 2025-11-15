@@ -9,6 +9,7 @@ interface AuthContextType {
   session: any;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isAdmin: boolean;
   refetch: () => Promise<void>;
 }
 
@@ -46,7 +47,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const result = await authClient.getSession();
       if (result.data) {
-        setSession(result.data);
+        // Always fetch admin status when session exists
+        let adminStatus = false;
+        try {
+          const adminCheck = await fetch("/api/admin/check");
+          if (adminCheck.ok) {
+            const adminData = await adminCheck.json();
+            adminStatus = adminData.isAdmin || false;
+          }
+        } catch (error) {
+          // Silently fail - admin check is not critical
+          console.error("Error checking admin status:", error);
+        }
+
+        // Set session with admin status included
+        const sessionWithAdmin = {
+          ...result.data,
+          isAdmin: adminStatus,
+        };
+        setSession(sessionWithAdmin);
       } else {
         setSession(null);
       }
@@ -158,6 +177,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     session: session,
     isAuthenticated: !!session?.user,
     isLoading,
+    isAdmin: session?.isAdmin || false, // Get from session (set by API check)
     refetch: () => fetchSession(true), // Force refresh when explicitly called
   };
 
