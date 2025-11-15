@@ -21,6 +21,7 @@ model User {
   accounts Account[]
   sessions Session[]
   builds   Build[]
+  votes    BuildVote[]
 }
 
 model Account {
@@ -70,14 +71,32 @@ model Build {
   authorTwitchUrl  String?
   authorYoutubeUrl String?
   isPublic         Boolean  @default(false)
+  upvotes          Int      @default(0)
+  downvotes        Int      @default(0)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   // Relacionamento com usuário
   userId String?
-  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user   User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  votes  BuildVote[]
 
   @@unique([name, userId]) // Permite mesmo nome para usuários diferentes
   @@index([userId])
   @@index([isPublic])
+}
+
+model BuildVote {
+  id        String   @id @default(uuid())
+  buildId   String
+  userId    String
+  voteType  String // "upvote" or "downvote"
+  createdAt DateTime @default(now())
+
+  build Build @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([buildId, userId])
+  @@index([buildId])
+  @@index([userId])
 }

@@ -14,7 +14,7 @@ import {
 } from "../vbuilds/components/DropdownSelect";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { X, Shield, Sparkles, Droplet, User, ChevronDown } from "lucide-react";
+import { X, Shield, Sparkles, Droplet, User, ChevronDown, ArrowUpDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import "@/components/vbuilds/styles.css";
+import { VoteButtons } from "./VoteButtons";
 
 type Build = {
   id?: string;
@@ -29,6 +30,9 @@ type Build = {
   code: string;
   author?: string;
   isPublic?: boolean;
+  upvotes?: number;
+  downvotes?: number;
+  userVote?: "upvote" | "downvote" | null;
 };
 
 type DecodedBuild = Build & {
@@ -209,6 +213,7 @@ export default function PublicBuildsList() {
   const [builds, setBuilds] = useState<DecodedBuild[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<"popular" | "newest" | "oldest">("popular");
   const fetchingRef = useRef(false);
 
   // Filter states
@@ -231,7 +236,7 @@ export default function PublicBuildsList() {
       fetchingRef.current = true;
       setLoading(true);
       try {
-        const response = await fetch("/api/public-builds");
+        const response = await fetch(`/api/public-builds?sort=${sortBy}`);
         if (!response.ok) {
           throw new Error("Failed to fetch public builds");
         }
@@ -251,6 +256,9 @@ export default function PublicBuildsList() {
               code: build.code,
               author: build.author,
               isPublic: build.isPublic || false,
+              upvotes: build.upvotes || 0,
+              downvotes: build.downvotes || 0,
+              userVote: build.userVote || null,
               decoded,
             };
           })
@@ -273,7 +281,7 @@ export default function PublicBuildsList() {
     };
 
     fetchBuilds();
-  }, []);
+  }, [sortBy]);
 
   // Filter logic
   const filteredBuilds = useMemo(() => {
@@ -573,7 +581,7 @@ export default function PublicBuildsList() {
         </div>
       </div>
 
-      {/* Build Count */}
+      {/* Build Count and Sort */}
       <div className="mb-6 flex items-center justify-between" >
         <div className="text-sm text-gray-300">
           <span className="font-semibold text-white">{filteredBuilds.length}</span> of{" "}
@@ -584,8 +592,47 @@ export default function PublicBuildsList() {
             </span>
           )}
         </div>
-        {
-          filtersOpen && !hasActiveFilters && (
+        <div className="flex items-center gap-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-black/50 border-white/20 text-white hover:border-red-900/50"
+              >
+                <ArrowUpDown className="w-4 h-4 mr-2" />
+                {sortBy === "popular"
+                  ? "Most Popular"
+                  : sortBy === "newest"
+                    ? "Newest"
+                    : "Oldest"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-black/95 border-white/10">
+              <DropdownMenuItem
+                onClick={() => setSortBy("popular")}
+                className={`cursor-pointer ${sortBy === "popular" ? "bg-red-900/30" : ""
+                  }`}
+              >
+                Most Popular
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setSortBy("newest")}
+                className={`cursor-pointer ${sortBy === "newest" ? "bg-red-900/30" : ""
+                  }`}
+              >
+                Newest
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setSortBy("oldest")}
+                className={`cursor-pointer ${sortBy === "oldest" ? "bg-red-900/30" : ""
+                  }`}
+              >
+                Oldest
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {filtersOpen && !hasActiveFilters && (
             <Button
               variant="ghost"
               size="sm"
@@ -594,8 +641,8 @@ export default function PublicBuildsList() {
             >
               Hide Filters
             </Button>
-          )
-        }
+          )}
+        </div>
       </div>
 
       {/* Builds Grid */}
@@ -640,6 +687,19 @@ export default function PublicBuildsList() {
                     author={build.author}
                     isPublic={build.isPublic}
                     showPublicToggle={false}
+                    upvotes={build.upvotes}
+                    downvotes={build.downvotes}
+                    userVote={build.userVote}
+                    buildId={build.id}
+                    onVoteChange={(upvotes, downvotes, userVote) => {
+                      setBuilds((prev) =>
+                        prev.map((b) =>
+                          b.id === build.id
+                            ? { ...b, upvotes, downvotes, userVote }
+                            : b
+                        )
+                      );
+                    }}
                   />
                 </Link>
               </motion.div>

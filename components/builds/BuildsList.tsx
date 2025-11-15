@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { Plus, Lock, Globe2, Trash2, User } from "lucide-react";
+import { VoteButtons } from "./VoteButtons";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -139,6 +140,11 @@ export const BuildContent = ({
   isPublic,
   onTogglePublic,
   showPublicToggle = true,
+  upvotes,
+  downvotes,
+  userVote,
+  buildId,
+  onVoteChange,
 }: {
   code: string;
   name: string;
@@ -147,6 +153,11 @@ export const BuildContent = ({
   isPublic?: boolean;
   onTogglePublic?: (checked: boolean) => void;
   showPublicToggle?: boolean;
+  upvotes?: number;
+  downvotes?: number;
+  userVote?: "upvote" | "downvote" | null;
+  buildId?: string;
+  onVoteChange?: (upvotes: number, downvotes: number, userVote: "upvote" | "downvote" | null) => void;
 }) => {
   // Safely convert the arena code into a build structure.
   // If anything goes wrong we render a minimal, non-animated card instead
@@ -206,13 +217,24 @@ export const BuildContent = ({
         />
       </div>
 
+      {/* Top right corner - Vote buttons and Action buttons */}
       <div
-        className="absolute top-4 right-4 flex gap-2 z-10"
+        className="absolute top-1 right-1 flex gap-2 z-10"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
       >
+        {/* Vote buttons */}
+        {buildId && onVoteChange && (
+          <VoteButtons
+            buildId={buildId}
+            initialUpvotes={upvotes || 0}
+            initialDownvotes={downvotes || 0}
+            initialUserVote={userVote || null}
+            onVoteChange={onVoteChange}
+          />
+        )}
         {handleDeleteBuild && (
           <button
             type="button"
@@ -603,12 +625,100 @@ export default function BuildsList({
     }
   };
 
+  // Helper function to check if a build code is empty (all zeros)
+  const isEmptyBuild = (code: string): boolean => {
+    if (!code || typeof code !== "string") return true;
+    // Remove all zeros and check if anything remains
+    return code.replace(/0/g, "").trim().length === 0;
+  };
+
+  // Helper function to check if a build is complete (all required slots filled)
+  const isBuildComplete = (code: string): boolean => {
+    if (!code || typeof code !== "string" || code.length < 78) return false;
+
+    try {
+      const elixir = code[0];
+      const amulet = code[70];
+      const armour = code.slice(71, 75);
+      const blood = code.slice(75, 78);
+      const spells = code.slice(14, 30);
+      const weapons = code.slice(30, 70);
+      const passives = code.slice(9, 14);
+
+      // Check elixir
+      if (elixir === '0' || !elixir) return false;
+
+      // Check amulet
+      if (amulet === '0' || !amulet) return false;
+
+      // Check armour (should not be all zeros)
+      if (armour.replace(/0/g, "").length === 0) return false;
+
+      // Check blood (all 3 chars must be non-zero)
+      if (blood.length !== 3 || blood.includes('0') || blood.replace(/0/g, "").length < 3) return false;
+
+      // Check spells: dash (index 10), spell1 (index 0), spell2 (index 5), ultimate (index 15)
+      if (spells.length < 16) return false;
+      if (spells[0] === '0' || !spells[0]) return false; // spell1
+      if (spells[5] === '0' || !spells[5]) return false; // spell2
+      if (spells[10] === '0' || !spells[10]) return false; // dash
+      if (spells[15] === '0' || !spells[15]) return false; // ultimate
+
+      // Check weapons (at least one weapon slot should be filled)
+      let hasWeapon = false;
+      for (let i = 0; i < 8; i++) {
+        const weaponStart = i * 5;
+        if (weapons[weaponStart] && weapons[weaponStart] !== '0') {
+          hasWeapon = true;
+          break;
+        }
+      }
+      if (!hasWeapon) return false;
+
+      // Check passives (all 5 should be filled)
+      if (passives.length < 5) return false;
+      for (let i = 0; i < 5; i++) {
+        if (passives[i] === '0' || !passives[i]) return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error checking build completeness:", error);
+      return false;
+    }
+  };
+
   const handleTogglePublic = async (
     buildId: string,
     currentIsPublic: boolean
   ) => {
-    // If trying to make build public, check if user already has 5 public builds
+    // If trying to make build public, check if user already has 5 public builds and if build is empty
     if (!currentIsPublic) {
+      // Find the build to check its code
+      const buildToToggle = builds.find(b => b.id === buildId);
+
+      // Check if build is empty
+      if (buildToToggle && isEmptyBuild(buildToToggle.code)) {
+        toast.error(
+          "Cannot make an empty build public. Please add items to your build first.",
+          {
+            duration: 5000,
+          }
+        );
+        return;
+      }
+
+      // Check if build is complete
+      if (buildToToggle && !isBuildComplete(buildToToggle.code)) {
+        toast.error(
+          "Cannot make an incomplete build public. Please fill all required slots (armour, amulet, elixir, blood, spells, weapons, and passives) first.",
+          {
+            duration: 5000,
+          }
+        );
+        return;
+      }
+
       const publicBuildCount = builds.filter(b => b.isPublic).length;
       if (publicBuildCount >= 5) {
         toast.error(
@@ -636,8 +746,8 @@ export default function BuildsList({
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData.error || "Failed to update build visibility";
 
-        // Show specific error message if it's about the limit
-        if (response.status === 400 && errorMessage.includes("5 public builds")) {
+        // Show specific error message if it's about the limit, empty build, or incomplete build
+        if (response.status === 400 && (errorMessage.includes("5 public builds") || errorMessage.includes("empty build") || errorMessage.includes("incomplete build"))) {
           toast.error(errorMessage, {
             duration: 5000,
           });
