@@ -65,8 +65,6 @@ export default function ResetPasswordConfirmPage() {
         throw new Error("Token is missing");
       }
 
-      console.log("[Reset Password] Attempting to reset password with token:", token.substring(0, 20) + "...");
-
       const result = await authClient.resetPassword({
         token,
         newPassword: formData.password,
@@ -166,11 +164,10 @@ export default function ResetPasswordConfirmPage() {
                       {[1, 2, 3, 4].map((level) => (
                         <div
                           key={level}
-                          className={`h-1 flex-1 rounded ${
-                            level <= passwordStrength.strength
+                          className={`h-1 flex-1 rounded ${level <= passwordStrength.strength
                               ? passwordStrength.color
                               : "bg-gray-700"
-                          }`}
+                            }`}
                         />
                       ))}
                     </div>

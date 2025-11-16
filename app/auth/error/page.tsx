@@ -10,12 +10,6 @@ function AuthErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
 
-  // Log para debug
-  useEffect(() => {
-    console.log("Auth error page - error param:", error);
-    console.log("All search params:", Object.fromEntries(searchParams.entries()));
-  }, [error, searchParams]);
-
   const getErrorMessage = (error: string | null) => {
     switch (error) {
       case "Configuration":

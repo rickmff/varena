@@ -593,7 +593,6 @@ export default function BuildsList({
           return 0;
         });
 
-        console.log("Builds loaded:", sortedBuilds.length, sortedBuilds);
         setBuilds(sortedBuilds);
         onBuildsLoaded?.(sortedBuilds.length > 0);
       } catch (error) {
@@ -813,9 +812,6 @@ export default function BuildsList({
 
   // // Get the builds to display (limited by maxBuilds if specified)
   const buildsToShow = maxBuilds ? builds.slice(0, maxBuilds) : builds;
-
-  // Debug: Log builds to show
-  console.log("buildsToShow:", buildsToShow.length, buildsToShow);
 
   // // Calculate button span based on grid layout and number of builds
   const getButtonSpanClass = () => {

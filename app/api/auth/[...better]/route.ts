@@ -23,10 +23,6 @@ export async function GET(request: NextRequest) {
       // Redirect to our custom reset page with token in path
       const baseURL = url.origin;
       const redirectUrl = `${baseURL}/auth/reset/${encodeURIComponent(token)}`;
-      console.log("[Auth API] Redirecting reset-password request to custom page:", {
-        original: request.url,
-        redirect: redirectUrl,
-      });
       return NextResponse.redirect(redirectUrl);
     }
   }
@@ -39,8 +35,8 @@ export async function POST(request: NextRequest) {
     // Apply rate limiting only for sensitive routes
     const url = new URL(request.url);
     const isAuthAction = url.pathname.includes("/sign-in") ||
-                         url.pathname.includes("/sign-up") ||
-                         url.pathname.includes("/reset-password");
+      url.pathname.includes("/sign-up") ||
+      url.pathname.includes("/reset-password");
 
     if (isAuthAction) {
       const identifier = getRequestIdentifier(request);

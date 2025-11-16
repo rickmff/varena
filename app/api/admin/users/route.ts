@@ -18,7 +18,6 @@ export async function GET(request: Request) {
 
     // Check if user is admin
     if (!isAdmin(session)) {
-      console.log(`[Admin API] Non-admin user ${session.user.email} attempted to access admin users endpoint`);
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
         { status: 403 }
@@ -55,8 +54,6 @@ export async function GET(request: Request) {
       }),
       prisma.user.count(),
     ]);
-
-    console.log(`[Admin API] Admin ${session.user.email} listed users (page ${page})`);
 
     return NextResponse.json({
       users,

@@ -24,7 +24,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     // Check if user is admin
     if (!isAdmin(session)) {
-      console.log(`[Admin API] Non-admin user ${session.user.email} attempted to delete user`);
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
         { status: 403 }
@@ -62,8 +61,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       where: { id },
     });
 
-    console.log(`[Admin API] Admin ${session.user.email} deleted user ${user.email} (${user.name || "unnamed"})`);
-
     return NextResponse.json({
       message: "User deleted successfully",
       deletedUser: {
@@ -95,7 +92,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     // Check if user is admin
     if (!isAdmin(session)) {
-      console.log(`[Admin API] Non-admin user ${session.user.email} attempted to ban/unban user`);
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
         { status: 403 }
@@ -157,10 +153,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
         },
       },
     });
-
-    console.log(
-      `[Admin API] Admin ${session.user.email} ${banned ? "banned" : "unbanned"} user ${user.email} (${user.name || "unnamed"})`
-    );
 
     return NextResponse.json(updatedUser);
   } catch (error: any) {

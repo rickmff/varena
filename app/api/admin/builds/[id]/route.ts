@@ -25,7 +25,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     // Check if user is admin
     if (!isAdmin(session)) {
-      console.log(`[Admin API] Non-admin user ${session.user.email} attempted to delete build`);
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
         { status: 403 }
@@ -65,10 +64,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     if (build.isPublic) {
       revalidateTag("public-builds");
     }
-
-    console.log(
-      `[Admin API] Admin ${session.user.email} deleted build "${build.name}" by ${build.author} (owner: ${build.userId || "none"})`
-    );
 
     return NextResponse.json({
       message: "Build deleted successfully",

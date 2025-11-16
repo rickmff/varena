@@ -95,9 +95,6 @@ function SignUpForm() {
         ? (process.env.NEXT_PUBLIC_APP_URL || window.location.origin)
         : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-      console.log("Attempting signup with baseURL:", baseURL);
-      console.log("API endpoint:", `${baseURL}/api/auth/sign-up`);
-
       const result = await authClient.signUp.email({
         email: formData.email,
         password: formData.password,

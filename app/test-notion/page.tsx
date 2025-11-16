@@ -4,10 +4,6 @@ import { getNewsPosts } from '@/lib/notion';
 export default async function TestNotionPage() {
   const newsPageId = process.env.NOTION_NEWS_PAGE_ID;
 
-  console.log('Environment variables check:');
-  console.log('NOTION_API_KEY exists:', !!process.env.NOTION_API_KEY);
-  console.log('NOTION_NEWS_PAGE_ID:', newsPageId);
-
   let newsPosts: any[] = [];
   let error: string | null = null;
 
