@@ -19,6 +19,23 @@ export async function middleware(request: NextRequest) {
     // The banned check will be more effective at the API level
   }
 
+  // List of auth routes that authenticated users should not access
+  const authRoutes = [
+    '/auth/signin',
+    '/auth/signup',
+    '/auth/reset',
+  ];
+
+  // Check if accessing an auth route while authenticated
+  const isAuthRoute = authRoutes.some(route =>
+    request.nextUrl.pathname.startsWith(route)
+  );
+
+  if (isAuthRoute && session?.user) {
+    // Redirect authenticated users away from auth routes to home page
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
   // Check if accessing admin routes
   const isAdminRoute = request.nextUrl.pathname.startsWith('/capibara');
 
@@ -60,5 +77,12 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/capibara/:path*', '/profile/:path*'],
+  matcher: [
+    '/capibara/:path*',
+    '/profile/:path*',
+    '/auth/signin',
+    '/auth/signup',
+    '/auth/reset',
+    '/auth/reset/:path*',
+  ],
 };

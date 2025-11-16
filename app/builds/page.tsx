@@ -1,15 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import BuildsList from "@/components/builds/BuildsList";
 import PublicBuildsList from "@/components/builds/PublicBuildsList";
 import SectionHeader from "@/app/components/ui/SectionHeader";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Builds() {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("mine");
+
+  // Set default tab to "community" for unauthenticated users
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      setActiveTab("community");
+    }
+  }, [isAuthenticated, authLoading]);
 
   return (
     <div

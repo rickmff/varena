@@ -13,6 +13,24 @@ const rateLimitOptions = {
 };
 
 export async function GET(request: NextRequest) {
+  const url = new URL(request.url);
+
+  // Intercept reset-password GET requests and redirect to our custom page
+  // This prevents Better Auth from validating the token server-side and showing error page
+  if (url.pathname.includes("/reset-password")) {
+    const token = url.searchParams.get("token");
+    if (token) {
+      // Redirect to our custom reset page with token in path
+      const baseURL = url.origin;
+      const redirectUrl = `${baseURL}/auth/reset/${encodeURIComponent(token)}`;
+      console.log("[Auth API] Redirecting reset-password request to custom page:", {
+        original: request.url,
+        redirect: redirectUrl,
+      });
+      return NextResponse.redirect(redirectUrl);
+    }
+  }
+
   return handler.GET(request);
 }
 

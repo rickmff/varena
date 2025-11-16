@@ -574,20 +574,20 @@ export default function BuildsList({
         // Handle both old format (array) and new format (object with builds array)
         const buildsArray = Array.isArray(data)
           ? data.map((build: any) => ({
-              id: build.id,
-              name: build.name,
-              code: build.code,
-              isPublic: build.isPublic || false,
-            }))
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+          }))
           : (data.builds || []).map((build: any) => ({
-              id: build.id,
-              name: build.name,
-              code: build.code,
-              isPublic: build.isPublic || false,
-            }));
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+          }));
 
         // Sort builds: public builds first, then private builds
-        const sortedBuilds = buildsArray.sort((a, b) => {
+        const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
           if (a.isPublic && !b.isPublic) return -1;
           if (!a.isPublic && b.isPublic) return 1;
           return 0;
@@ -938,19 +938,19 @@ export default function BuildsList({
           // Handle both old format (array) and new format (object with builds array)
           const buildsArray = Array.isArray(data)
             ? data.map((build: any) => ({
-                id: build.id,
-                name: build.name,
-                code: build.code,
-                isPublic: build.isPublic || false,
-              }))
+              id: build.id,
+              name: build.name,
+              code: build.code,
+              isPublic: build.isPublic || false,
+            }))
             : (data.builds || []).map((build: any) => ({
-                id: build.id,
-                name: build.name,
-                code: build.code,
-                isPublic: build.isPublic || false,
-              }));
+              id: build.id,
+              name: build.name,
+              code: build.code,
+              isPublic: build.isPublic || false,
+            }));
           // Sort builds: public builds first, then private builds
-          const sortedBuilds = buildsArray.sort((a, b) => {
+          const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
             if (a.isPublic && !b.isPublic) return -1;
             if (!a.isPublic && b.isPublic) return 1;
             return 0;
@@ -1082,7 +1082,7 @@ export default function BuildsList({
                   href="/auth/signin"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
                 >
-                  SIGN IN TO VIEW YOUR BUILDS
+                  SIGN IN TO SAVE YOUR BUILDS
                 </Link>
               )}
             </motion.div>

@@ -7,6 +7,8 @@ import { User, Mail, Calendar, LogOut } from "lucide-react";
 import Link from "next/link";
 import { authClient } from "@/lib/better-auth/client";
 import LogoutButton from "./logout-button";
+import ChangePassword from "./change-password";
+import SendPasswordResetButton from "./send-password-reset-button";
 import prisma from "@/lib/prisma";
 import NavBar from "@/components/NavBar";
 
@@ -130,7 +132,8 @@ export default async function ProfilePage() {
                   </Link>
                 </Button>
 
-                <div className="pt-4 border-t border-[#5865F2]/30">
+                <div className="pt-4 border-t border-[#5865F2]/30 space-y-2">
+                  <SendPasswordResetButton email={user.email || ""} />
                   <LogoutButton />
                 </div>
               </CardContent>

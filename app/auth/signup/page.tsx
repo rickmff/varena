@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,12 @@ import { toast } from "sonner";
 import { authClient } from "@/lib/better-auth/client";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import NavBar from "@/components/NavBar";
+import { useAuth } from "@/components/providers/session-provider";
 
 function SignUpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -41,6 +43,13 @@ function SignUpForm() {
   };
 
   const passwordStrength = getPasswordStrength(formData.password);
+
+  // Redirect authenticated users away from signup page
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.replace("/");
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,16 +118,18 @@ function SignUpForm() {
         throw new Error(errorMessage);
       }
 
-      // Don't show toast here - it will be shown on signin page
-      // Redirect to signin with callbackUrl if exists
+      // Show success message about verification email
+      toast.success("Account created! Please check your email to verify your account.");
+
+      // Redirect to signin with verification message
       const callbackUrl = searchParams.get("callbackUrl");
       setTimeout(() => {
         if (callbackUrl) {
-          router.push(`/auth/signin?registered=true&callbackUrl=${encodeURIComponent(callbackUrl)}`);
+          router.push(`/auth/signin?verify=email-sent&callbackUrl=${encodeURIComponent(callbackUrl)}`);
         } else {
-          router.push("/auth/signin?registered=true");
+          router.push("/auth/signin?verify=email-sent");
         }
-      }, 500);
+      }, 1500);
     } catch (error: any) {
       console.error("Signup catch error:", error);
 

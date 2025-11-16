@@ -8,21 +8,34 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { authClient } from "@/lib/better-auth/client";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
 import NavBar from "@/components/NavBar";
 import { migrateLocalBuilds } from "@/lib/migrate-local-builds";
+import { useAuth } from "@/components/providers/session-provider";
 
 function SignInForm() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [resendingEmail, setResendingEmail] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
-  const toastShownRef = useRef<{ registered?: boolean; reset?: boolean }>({});
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const toastShownRef = useRef<{ registered?: boolean; reset?: boolean; verify?: boolean; verified?: boolean }>({});
+
+  // Redirect authenticated users away from signin page
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.replace("/");
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   useEffect(() => {
     // Prevent duplicate toasts in React Strict Mode
     const registered = searchParams.get("registered");
     const reset = searchParams.get("reset");
+    const verify = searchParams.get("verify");
 
     if (registered === "true" && !toastShownRef.current.registered) {
       toast.success("Account created successfully! You can now sign in.");
@@ -33,7 +46,17 @@ function SignInForm() {
       toast.success("Password reset successfully! Please sign in with your new password.");
       toastShownRef.current.reset = true;
     }
-    // Note: Email verification messages removed as it's temporarily disabled
+
+    if (verify === "email-sent" && !toastShownRef.current.verify) {
+      toast.info("Please check your email to verify your account before signing in.");
+      toastShownRef.current.verify = true;
+    }
+
+    const verified = searchParams.get("verified");
+    if (verified === "true" && !toastShownRef.current.verified) {
+      toast.success("Email verified successfully! You can now sign in.");
+      toastShownRef.current.verified = true;
+    }
   }, [searchParams]);
 
   const [formData, setFormData] = useState({
@@ -71,11 +94,20 @@ function SignInForm() {
 
       if (result.error) {
         const errorMessage = result.error.message || result.error.code || "Invalid credentials";
-        toast.error(errorMessage);
+        const errorStatus = result.error.status || result.error.code;
 
-        // Set generic error for invalid credentials
-        if (result.error.code === "INVALID_CREDENTIALS" || errorMessage.includes("invalid")) {
-          setErrors({ password: "Email or password incorrect" });
+        // Check if error is due to unverified email (status 403 or specific error codes)
+        if (errorStatus === 403 || errorMessage.toLowerCase().includes("email") &&
+          (errorMessage.toLowerCase().includes("verify") || errorMessage.toLowerCase().includes("verification"))) {
+          setUnverifiedEmail(formData.email);
+          toast.error("Please verify your email address before signing in. Check your inbox for the verification link.");
+          setErrors({ email: "Email not verified. Please check your inbox." });
+        } else {
+          toast.error(errorMessage);
+          // Set generic error for invalid credentials
+          if (result.error.code === "INVALID_CREDENTIALS" || errorMessage.includes("invalid")) {
+            setErrors({ password: "Email or password incorrect" });
+          }
         }
         console.error("Login error:", result.error);
       } else if (result.data) {
@@ -110,6 +142,33 @@ function SignInForm() {
     }
   };
 
+  const handleResendVerificationEmail = async () => {
+    if (!unverifiedEmail && !formData.email) {
+      toast.error("Please enter your email address first");
+      return;
+    }
+
+    const emailToResend = unverifiedEmail || formData.email;
+    setResendingEmail(true);
+
+    try {
+      const result = await authClient.sendVerificationEmail({
+        email: emailToResend,
+      });
+
+      if (result.error) {
+        toast.error(result.error.message || "Failed to resend verification email");
+      } else {
+        toast.success("Verification email sent! Please check your inbox.");
+        setUnverifiedEmail(emailToResend);
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to resend verification email");
+      console.error("Resend verification email error:", error);
+    } finally {
+      setResendingEmail(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -193,6 +252,32 @@ function SignInForm() {
                     </p>
                   )}
                 </div>
+                {unverifiedEmail && (
+                  <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-md">
+                    <p className="text-sm text-yellow-500 mb-2">
+                      Your email address needs to be verified before you can sign in.
+                    </p>
+                    <Button
+                      type="button"
+                      onClick={handleResendVerificationEmail}
+                      disabled={resendingEmail}
+                      variant="outline"
+                      className="w-full text-sm"
+                    >
+                      {resendingEmail ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Mail className="mr-2 h-4 w-4" />
+                          Resend Verification Email
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
                 <Button type="submit" className="items-center justify-center gap-2 whitespace-nowrap rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border hover:text-accent-foreground h-10 px-4 py-2 hidden md:flex font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 w-full" disabled={loading}>
                   {loading ? (
                     <>
@@ -208,12 +293,12 @@ function SignInForm() {
               <div className="text-center text-sm space-y-2">
                 <div>
                   <span className="text-muted-foreground">Don't have an account? </span>
-                  <Link href="/auth/signup" className="text-primary hover:underline">
+                  <Link href="/auth/signup" className="text-primary underline underline-offset-2 text-[#5865F2] hover:text-[#4752C4]">
                     Sign up
                   </Link>
                 </div>
                 <div>
-                  <Link href="/auth/reset" className="text-primary hover:underline text-sm">
+                  <Link href="/auth/reset" className="underline underline-offset-2 text-[#5865F2] hover:text-[#4752C4]">
                     Forgot password
                   </Link>
                 </div>
