@@ -269,12 +269,27 @@ export async function GET(request: Request) {
       );
     }
 
-    // Cache builds for 1 week (604800 seconds), keyed by user ID
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "100"); // Default 100, max reasonable for user builds
+    const skip = (page - 1) * limit;
+
+    // Cache builds for 5 minutes (300 seconds), keyed by user ID
+    // Reduced from 1 week to improve freshness while still benefiting from cache
     const getCachedBuilds = unstable_cache(
       async (userId: string) => {
         return await prisma.build.findMany({
           where: {
             userId,
+          },
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            isPublic: true,
+            createdAt: true,
+            updatedAt: true,
+            // Exclude fields not needed for list view: description, author, authorTwitchUrl, authorYoutubeUrl
           },
           orderBy: {
             createdAt: "desc",
@@ -284,13 +299,23 @@ export async function GET(request: Request) {
       [`builds-${session.user.id}`],
       {
         tags: [`builds-${session.user.id}`],
-        revalidate: 604800, // 1 week in seconds
+        revalidate: 300, // 5 minutes in seconds
       }
     );
 
     const builds = await getCachedBuilds(session.user.id);
 
-    return NextResponse.json(builds);
+    // Apply pagination in memory (since we're caching the full list)
+    // For better performance with large datasets, consider paginating at DB level
+    const paginatedBuilds = builds.slice(skip, skip + limit);
+
+    return NextResponse.json({
+      builds: paginatedBuilds,
+      total: builds.length,
+      page,
+      limit,
+      totalPages: Math.ceil(builds.length / limit),
+    });
   } catch (error: any) {
     console.error("Error fetching builds:", error);
     return NextResponse.json(

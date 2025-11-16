@@ -159,7 +159,7 @@ export default function BuildsListHome({
 
       setLoading(true);
       try {
-        const response = await fetch("/api/builds");
+        const response = await fetch("/api/builds?limit=100");
 
         if (response.status === 401) {
           setBuilds([]);
@@ -173,12 +173,20 @@ export default function BuildsListHome({
         }
 
         const data = await response.json();
-        const buildsArray = Array.isArray(data) ? data.map((build: any) => ({
-          id: build.id,
-          name: build.name,
-          code: build.code,
-          isPublic: build.isPublic || false,
-        })) : [];
+        // Handle both old format (array) and new format (object with builds array)
+        const buildsArray = Array.isArray(data)
+          ? data.map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+          }))
+          : (data.builds || []).map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+          }));
 
         setBuilds(buildsArray);
         onBuildsLoaded?.(buildsArray.length > 0);

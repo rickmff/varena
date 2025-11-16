@@ -557,7 +557,7 @@ export default function BuildsList({
 
       setLoading(true);
       try {
-        const response = await fetch("/api/builds");
+        const response = await fetch("/api/builds?limit=100");
 
         if (response.status === 401) {
           setBuilds([]);
@@ -571,12 +571,20 @@ export default function BuildsList({
         }
 
         const data = await response.json();
-        const buildsArray = Array.isArray(data) ? data.map((build: any) => ({
-          id: build.id,
-          name: build.name,
-          code: build.code,
-          isPublic: build.isPublic || false,
-        })) : [];
+        // Handle both old format (array) and new format (object with builds array)
+        const buildsArray = Array.isArray(data)
+          ? data.map((build: any) => ({
+              id: build.id,
+              name: build.name,
+              code: build.code,
+              isPublic: build.isPublic || false,
+            }))
+          : (data.builds || []).map((build: any) => ({
+              id: build.id,
+              name: build.name,
+              code: build.code,
+              isPublic: build.isPublic || false,
+            }));
 
         // Sort builds: public builds first, then private builds
         const sortedBuilds = buildsArray.sort((a, b) => {
@@ -924,15 +932,23 @@ export default function BuildsList({
         setHasLocalBuilds(false);
 
         // Refresh builds list
-        const response = await fetch("/api/builds");
+        const response = await fetch("/api/builds?limit=100");
         if (response.ok) {
           const data = await response.json();
-          const buildsArray = Array.isArray(data) ? data.map((build: any) => ({
-            id: build.id,
-            name: build.name,
-            code: build.code,
-            isPublic: build.isPublic || false,
-          })) : [];
+          // Handle both old format (array) and new format (object with builds array)
+          const buildsArray = Array.isArray(data)
+            ? data.map((build: any) => ({
+                id: build.id,
+                name: build.name,
+                code: build.code,
+                isPublic: build.isPublic || false,
+              }))
+            : (data.builds || []).map((build: any) => ({
+                id: build.id,
+                name: build.name,
+                code: build.code,
+                isPublic: build.isPublic || false,
+              }));
           // Sort builds: public builds first, then private builds
           const sortedBuilds = buildsArray.sort((a, b) => {
             if (a.isPublic && !b.isPublic) return -1;

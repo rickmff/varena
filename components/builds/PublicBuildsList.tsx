@@ -73,6 +73,104 @@ type SpellOption = {
   category: string;
 };
 
+// Spell Schools Grid Component
+const SpellSchoolsGrid = ({
+  onSchoolSelect,
+}: {
+  onSchoolSelect: (school: string) => void;
+}) => {
+  const handleSchoolClick = (e: Event, school: string) => {
+    e.preventDefault();
+    onSchoolSelect(school);
+  };
+
+  return (
+    <div className="grid grid-cols-3 gap-2 p-2 bg-black/80 backdrop-blur-sm">
+      {spellSchools.map((school) => (
+        <DropdownMenuItem
+          key={school}
+          onSelect={(e) => handleSchoolClick(e, school)}
+          className="h-20 flex items-center justify-center cursor-pointer hover:bg-purple-900/30 focus:bg-purple-900/30 p-0 overflow-hidden relative"
+        >
+          <img
+            src={`/images/vbuilds/spellschools/${school}.webp`}
+            className={`spellSchool spellSchool-${school} w-12 h-12 pointer-events-none`}
+            alt={school}
+          />
+        </DropdownMenuItem>
+      ))}
+    </div>
+  );
+};
+
+// Spells List Component
+const SpellsList = ({
+  school,
+  selectedSpellId,
+  excludeSpellId,
+  onSpellSelect,
+  onBack,
+}: {
+  school: string;
+  selectedSpellId: string | null;
+  excludeSpellId?: string | null;
+  onSpellSelect: (spellId: string) => void;
+  onBack: () => void;
+}) => {
+  const getSpellsForSchool = (school: string): SpellOption[] => {
+    return Object.values(spellsData)
+      .filter((spell: any) => spell.spellSchool === school && spell.category === "spell")
+      .filter((spell: any) => spell.id !== excludeSpellId);
+  };
+
+  const handleSpellSelect = (e: Event, spellId: string) => {
+    e.preventDefault();
+    onSpellSelect(spellId);
+  };
+
+  const handleBackClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onBack();
+  };
+
+  const spells = getSpellsForSchool(school);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between p-2 border-b border-white/10">
+        <span className="text-sm text-gray-300">Select Spell</span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBackClick}
+          className="h-6 text-xs"
+        >
+          ← Back
+        </Button>
+      </div>
+      <div className="max-h-72 overflow-y-auto p-2">
+        <div className="grid grid-cols-3 gap-2">
+          {spells.map((spell) => (
+            <DropdownMenuItem
+              key={spell.id}
+              onSelect={(e) => handleSpellSelect(e, spell.id)}
+              className={`h-20 flex items-center justify-center cursor-pointer hover:bg-purple-900/30 focus:bg-purple-900/30 p-0 overflow-hidden relative ${selectedSpellId === spell.id ? "bg-purple-900/20" : ""
+                }`}
+            >
+              <img
+                src={spell.img}
+                className="w-12 h-12 rounded pointer-events-none"
+                alt={spell.name}
+              />
+            </DropdownMenuItem>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Spell Dropdown Select Component
 const SpellDropdownSelect = ({
   value,
@@ -94,12 +192,6 @@ const SpellDropdownSelect = ({
 
   const selectedSpell = value ? (spellsData as any)[value] : null;
 
-  const getSpellsForSchool = (school: string): SpellOption[] => {
-    return Object.values(spellsData)
-      .filter((spell: any) => spell.spellSchool === school && spell.category === "spell")
-      .filter((spell: any) => spell.id !== excludeSpellId);
-  };
-
   // Reset selectedSchool when dropdown closes
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
@@ -108,102 +200,76 @@ const SpellDropdownSelect = ({
     }
   };
 
+  const handleClear = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClear();
+    setSelectedSchool(null);
+    setIsOpen(false);
+  };
+
+  const handleSchoolSelect = (school: string) => {
+    setSelectedSchool(school);
+  };
+
+  const handleSpellSelect = (spellId: string) => {
+    onChange(spellId);
+    setSelectedSchool(null);
+    setIsOpen(false);
+  };
+
+  const handleBack = () => {
+    setSelectedSchool(null);
+  };
+
   return (
     <div className="relative w-full">
       <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className={`w-full h-20 justify-between bg-black/50 border-white/20 text-white hover:border-purple-900/50 ${value ? "border-purple-900/50 bg-purple-900/10" : ""
+            className={`w-full h-20 justify-between bg-black/50 border-white/10 text-white hover:border-purple-900/50 ${value ? "border-purple-900/50 bg-purple-900/10" : ""
               }`}
           >
             {selectedSpell ? (
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <img src={selectedSpell.img} alt={selectedSpell.name} className="w-10 h-10 rounded flex-shrink-0" />
+                <img
+                  src={selectedSpell.img}
+                  alt={selectedSpell.name}
+                  className="w-10 h-10 rounded flex-shrink-0"
+                />
                 <span className="text-sm truncate">{selectedSpell.name}</span>
               </div>
             ) : (
               <span className="text-gray-400">{placeholder}</span>
             )}
-            {!value && (
-              <ChevronDown className="w-4 h-4 ml-2 flex-shrink-0" />
-            )}
+            {!value && <ChevronDown className="w-4 h-4 ml-2 flex-shrink-0" />}
           </Button>
         </DropdownMenuTrigger>
         {value && (
           <button
             type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onClear();
-              setSelectedSchool(null);
-              setIsOpen(false);
-            }}
+            onClick={handleClear}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-purple-900/30 z-20"
             aria-label="Clear selection"
           >
             <X className="w-4 h-4" />
           </button>
         )}
-        <DropdownMenuContent className="w-80 max-h-96 overflow-y-auto" onCloseAutoFocus={(e) => e.preventDefault()}>
+        <DropdownMenuContent
+          className="w-80 max-h-96 overflow-y-auto"
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
           {!selectedSchool ? (
-            // Show spell schools
-            <div className="grid grid-cols-3 gap-2 p-2">
-              {spellSchools.map((school) => (
-                <DropdownMenuItem
-                  key={school}
-                  onSelect={(e) => {
-                    e.preventDefault();
-                    setSelectedSchool(school);
-                  }}
-                  className="h-20 flex items-center justify-center cursor-pointer hover:bg-purple-900/30 focus:bg-purple-900/30 p-0"
-                >
-                  <img
-                    src={`/images/vbuilds/spellschools/${school}.webp`}
-                    className={`spellSchool spellSchool-${school} w-12 h-12 pointer-events-none`}
-                    alt={school}
-                  />
-                </DropdownMenuItem>
-              ))}
-            </div>
+            <SpellSchoolsGrid onSchoolSelect={handleSchoolSelect} />
           ) : (
-            // Show spells for selected school
-            <div className="space-y-2">
-              <div className="flex items-center justify-between p-2 border-b border-white/10">
-                <span className="text-sm text-gray-300">Select Spell</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setSelectedSchool(null);
-                  }}
-                  className="h-6 text-xs"
-                >
-                  ← Back
-                </Button>
-              </div>
-              <div className="max-h-72 overflow-y-auto">
-                {getSpellsForSchool(selectedSchool).map((spell) => (
-                  <DropdownMenuItem
-                    key={spell.id}
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      onChange(spell.id);
-                      setSelectedSchool(null);
-                      setIsOpen(false);
-                    }}
-                    className={`flex items-center gap-3 p-2 cursor-pointer hover:bg-purple-900/30 focus:bg-purple-900/30 ${value === spell.id ? "bg-purple-900/20" : ""
-                      }`}
-                  >
-                    <img src={spell.img} className="w-10 h-10 rounded" alt={spell.name} />
-                    <span className="text-sm">{spell.name}</span>
-                  </DropdownMenuItem>
-                ))}
-              </div>
-            </div>
+            <SpellsList
+              school={selectedSchool}
+              selectedSpellId={value}
+              excludeSpellId={excludeSpellId}
+              onSpellSelect={handleSpellSelect}
+              onBack={handleBack}
+            />
           )}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -239,33 +305,27 @@ export default function PublicBuildsList() {
       fetchingRef.current = true;
       setLoading(true);
       try {
-        const response = await fetch(`/api/public-builds?sort=${sortBy}`);
+        const response = await fetch(`/api/public-builds?sort=${sortBy}&limit=50`);
         if (!response.ok) {
           throw new Error("Failed to fetch public builds");
         }
 
         const data = await response.json();
-        const buildsArray: DecodedBuild[] = Array.isArray(data)
-          ? data.map((build: any) => {
-            let decoded: ReturnType<typeof convertStringToBuild> | undefined = undefined;
-            try {
-              decoded = convertStringToBuild(build.code);
-            } catch (error) {
-              console.error("Failed to decode build:", build.id, error);
-            }
-            return {
-              id: build.id,
-              name: build.name,
-              code: build.code,
-              author: build.author,
-              isPublic: build.isPublic || false,
-              upvotes: build.upvotes || 0,
-              downvotes: build.downvotes || 0,
-              userVote: build.userVote || null,
-              decoded,
-            };
-          })
-          : [];
+        // Handle both old format (array) and new format (object with builds array)
+        const buildsData = Array.isArray(data) ? data : (data.builds || []);
+
+        // Don't decode builds immediately - decode lazily when needed for filtering
+        const buildsArray: DecodedBuild[] = buildsData.map((build: any) => ({
+          id: build.id,
+          name: build.name,
+          code: build.code,
+          author: build.author,
+          isPublic: build.isPublic || false,
+          upvotes: build.upvotes || 0,
+          downvotes: build.downvotes || 0,
+          userVote: build.userVote || null,
+          decoded: undefined, // Will be decoded lazily when needed
+        }));
 
         setBuilds(buildsArray);
 
@@ -286,9 +346,35 @@ export default function PublicBuildsList() {
     fetchBuilds();
   }, [sortBy]);
 
-  // Filter logic
+  // Check if we need to decode builds for filtering
+  const needsDecoding = armourFilter || spellSlot1Spell || spellSlot2Spell || primaryBloodFilter || secondaryBloodFilter;
+
+  // Filter logic with lazy decoding
   const filteredBuilds = useMemo(() => {
-    return builds.filter((build) => {
+    return builds.map((build) => {
+      // Only decode if needed for filtering and not already decoded
+      if (needsDecoding && !build.decoded) {
+        try {
+          return {
+            ...build,
+            decoded: convertStringToBuild(build.code),
+          };
+        } catch (error) {
+          console.error("Failed to decode build:", build.id, error);
+          return { ...build, decoded: null };
+        }
+      }
+      return build;
+    }).filter((build) => {
+      // If no filters need decoding, just check author filter
+      if (!needsDecoding) {
+        if (authorFilter && !build.author?.toLowerCase().includes(authorFilter.toLowerCase())) {
+          return false;
+        }
+        return true;
+      }
+
+      // For filters that need decoding
       if (!build.decoded) return false;
 
       const decoded = build.decoded;
@@ -351,14 +437,6 @@ export default function PublicBuildsList() {
     secondaryBloodFilter,
     authorFilter,
   ]);
-
-  // Get spells for a specific school
-  const getSpellsForSchool = (school: string) => {
-    return Object.values(spellsData).filter(
-      (spell) =>
-        spell.spellSchool === school && spell.category === "spell"
-    );
-  };
 
   // Clear all filters
   const clearAllFilters = () => {
@@ -576,7 +654,7 @@ export default function PublicBuildsList() {
               onBlur={() => {
                 setTimeout(() => setShowAuthorDropdown(false), 200);
               }}
-              className={`bg-black/50 h-20 border-white/20 text-white placeholder:text-gray-500 hover:border-red-900/50 focus:border-red-900/50 ${authorFilter ? "border-red-900/50 bg-red-900/10" : ""
+              className={`bg-black/50 h-20 border-white/10 text-white placeholder:text-gray-500 hover:border-red-900/50 focus:border-red-900/50 ${authorFilter ? "border-red-900/50 bg-red-900/10" : ""
                 }`}
             />
             {authorFilter && (
@@ -634,7 +712,7 @@ export default function PublicBuildsList() {
               <Button
                 variant="outline"
                 size="sm"
-                className="bg-black/50 border-white/20 text-white hover:border-red-900/50"
+                className="bg-black/50 border-white/10 text-white hover:border-red-900/50"
               >
                 <ArrowUpDown className="w-4 h-4 mr-2" />
                 {sortBy === "popular"

@@ -4,6 +4,15 @@
 
 @layer base {
   :root {
+    --background: #000000;
+    --foreground: #ffffff;
+    --card: #000000;
+    --card-foreground: #ffffff;
+    --popover: #000000;
+    --popover-foreground: #ffffff;
+    --primary: #ffffff;
+    --primary-foreground: #000000;
+    --secondary: #000000;
     --background: #ffffff;
     --foreground: #020817;
     --card: #ffffff;
