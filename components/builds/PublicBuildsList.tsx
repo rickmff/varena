@@ -792,33 +792,35 @@ export default function PublicBuildsList() {
           >
             {filteredBuilds.map((build, index) => (
               <motion.div key={build.id || index} variants={scaleIn} className="relative">
-                <BuildContent
-                  code={build.code}
-                  name={build.name}
-                  author={build.author}
-                  isPublic={build.isPublic}
-                  showPublicToggle={false}
-                  upvotes={build.upvotes}
-                  downvotes={build.downvotes}
-                  userVote={build.userVote}
-                  buildId={build.id}
-                  onVoteChange={(upvotes, downvotes, userVote) => {
-                    setBuilds((prev) =>
-                      prev.map((b) =>
-                        b.id === build.id
-                          ? { ...b, upvotes, downvotes, userVote }
-                          : b
-                      )
-                    );
-                  }}
-                  isAdmin={isAdmin}
-                  onAdminDelete={
-                    isAdmin && build.id
-                      ? (event: React.MouseEvent) => handleAdminDelete(event, build.id!)
-                      : undefined
-                  }
-                  buildLink={`/builds/create?build=${encodeURIComponent(build.code)}`}
-                />
+                <Link href={`/builds/create?build=${encodeURIComponent(build.code)}`}>
+                  <BuildContent
+                    code={build.code}
+                    name={build.name}
+                    author={build.author}
+                    isPublic={build.isPublic}
+                    showPublicToggle={false}
+                    upvotes={build.upvotes}
+                    downvotes={build.downvotes}
+                    userVote={build.userVote}
+                    buildId={build.id}
+                    onVoteChange={(upvotes, downvotes, userVote) => {
+                      setBuilds((prev) =>
+                        prev.map((b) =>
+                          b.id === build.id
+                            ? { ...b, upvotes, downvotes, userVote }
+                            : b
+                        )
+                      );
+                    }}
+                    isAdmin={isAdmin}
+                    onAdminDelete={
+                      isAdmin && build.id
+                        ? (event: React.MouseEvent) => handleAdminDelete(event, build.id!)
+                        : undefined
+                    }
+                    buildLink={`/builds/create?build=${encodeURIComponent(build.code)}`}
+                  />
+                </Link>
               </motion.div>
             ))}
           </motion.div>
