@@ -28,7 +28,9 @@ function VerifyEmailContent() {
 
       try {
         const result = await authClient.verifyEmail({
-          token,
+          query: {
+            token,
+          },
         });
 
         if (result.error) {
@@ -163,4 +165,5 @@ export default function VerifyEmailPage() {
     </Suspense>
   );
 }
+
 
