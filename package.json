@@ -96,5 +96,11 @@
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
   },
+  "resolutions": {
+    "react-day-picker/react": "^19",
+    "react-day-picker/react-dom": "^19",
+    "vaul/react": "^19",
+    "vaul/react-dom": "^19"
+  },
   "packageManager": "yarn@1.22.22"
 }
