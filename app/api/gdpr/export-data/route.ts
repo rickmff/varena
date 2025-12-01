@@ -25,7 +25,6 @@ export async function GET() {
             id: true,
             type: true,
             provider: true,
-            createdAt: true,
           },
         },
         builds: {
@@ -85,7 +84,7 @@ export async function GET() {
       votes: user.votes.map((vote) => ({
         id: vote.id,
         buildId: vote.buildId,
-        buildName: vote.build.build.name,
+        buildName: vote.build.name,
         voteType: vote.voteType,
         createdAt: vote.createdAt,
       })),
