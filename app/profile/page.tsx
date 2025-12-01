@@ -66,7 +66,7 @@ export default async function ProfilePage() {
             {/* User Information Card */}
             <Card className="bg-black/50 border-[#5865F2]/30">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
+                <CardTitle className="text-white flex items-start gap-2">
                   <User className="h-5 w-5" />
                   Personal Information
                 </CardTitle>
@@ -75,7 +75,7 @@ export default async function ProfilePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="flex items-center justify-center">
+                <div className="flex items-start justify-start">
                   <Avatar className="h-24 w-24 border-2 border-[#5865F2]">
                     <AvatarImage src={user.image || undefined} alt={user.name || user.email || "User"} />
                     <AvatarFallback className="bg-[#0f0a47] text-white text-2xl font-semibold">

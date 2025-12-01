@@ -262,7 +262,7 @@ function SignInForm() {
                       onClick={handleResendVerificationEmail}
                       disabled={resendingEmail}
                       variant="outline"
-                      className="w-full text-sm"
+                      className="w-full text-sm border-2 border-yellow-500/30 rounded-md hover:bg-yellow-500/10 hover:text-yellow-500"
                     >
                       {resendingEmail ? (
                         <>

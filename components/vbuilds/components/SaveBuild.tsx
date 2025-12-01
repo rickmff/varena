@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { arenaCode } from "@/components/machines/converter";
-import { Switch } from "@/components/ui/switch";
+import { isValidEnglishAlphabet, filterEnglishAlphabet } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -22,7 +22,7 @@ import {
 
 const SaveBuild: React.FC = () => {
   const { state } = useBuilder();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [name, setName] = useState("");
@@ -32,6 +32,10 @@ const SaveBuild: React.FC = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [buildId, setBuildId] = useState<string | null>(null);
   const [hasLoadedBuild, setHasLoadedBuild] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+  const [buildUpvotes, setBuildUpvotes] = useState(0);
+  const [buildDownvotes, setBuildDownvotes] = useState(0);
+  const [showVoteWarningDialog, setShowVoteWarningDialog] = useState(false);
 
   // Load build data when component mounts or when code from URL changes
   useEffect(() => {
@@ -47,70 +51,154 @@ const SaveBuild: React.FC = () => {
         if (!name) {
           setName("Build 1");
         }
+        // New build - user owns it
+        setIsOwner(true);
         setHasLoadedBuild(true);
         return;
       }
 
-      // If user is authenticated, try to find the build in the database
-      if (isAuthenticated) {
+      // If not authenticated, check localStorage first (before API)
+      if (!isAuthenticated && typeof window !== "undefined") {
         try {
-          const response = await fetch(`/api/builds?code=${encodeURIComponent(buildCode)}`);
-          if (response.ok) {
-            const build = await response.json();
-            if (build && build.name) {
-              setName(build.name);
-              setDescription(build.description || "");
-              setIsPublic(build.isPublic || false);
-              setBuildId(build.id);
-            } else {
-              // Build not found, initialize with default name
-              if (!name) {
-                setName("Build 1");
+          const localBuildsData = localStorage.getItem("vbuilds");
+          if (localBuildsData) {
+            const parsed = JSON.parse(localBuildsData);
+            if (Array.isArray(parsed)) {
+              const foundBuild = parsed.find((b: any) => b.code === buildCode);
+              if (foundBuild) {
+                // Build found in localStorage - user owns it
+                setName(foundBuild.name || "Build 1");
+                setDescription(foundBuild.description || "");
+                setIsPublic(false);
+                if (foundBuild.id) {
+                  setBuildId(foundBuild.id);
+                }
+                setIsOwner(true);
+                setHasLoadedBuild(true);
+                return;
               }
-            }
-          } else {
-            // Build not found or error, initialize with default name
-            if (!name) {
-              setName("Build 1");
             }
           }
         } catch (error) {
-          console.error("Error loading build data:", error);
-          // On error, initialize with default name
+          console.error("Error loading from localStorage:", error);
+        }
+      }
+
+      // Always try to fetch from API (works for public builds even when unauthenticated)
+      try {
+        const response = await fetch(`/api/builds?code=${encodeURIComponent(buildCode)}`);
+        if (response.ok) {
+          const build = await response.json();
+          if (build && build.name) {
+            setName(build.name);
+            setDescription(build.description || "");
+            setIsPublic(build.isPublic || false);
+            setBuildUpvotes(build.upvotes || 0);
+            setBuildDownvotes(build.downvotes || 0);
+
+            // Check ownership: compare build.userId with current user's ID
+            const currentUserId = user?.id;
+            const buildOwnerId = build.userId;
+            let ownsBuild = isAuthenticated && currentUserId && buildOwnerId && currentUserId === buildOwnerId;
+
+            // If not authenticated, check if this build also exists in localStorage (user's local copy)
+            if (!isAuthenticated && typeof window !== "undefined") {
+              try {
+                const localBuildsData = localStorage.getItem("vbuilds");
+                if (localBuildsData) {
+                  const parsed = JSON.parse(localBuildsData);
+                  if (Array.isArray(parsed)) {
+                    const localBuild = parsed.find((b: any) => b.code === buildCode);
+                    if (localBuild) {
+                      // Build exists in localStorage, so user owns a local copy
+                      ownsBuild = true;
+                      if (localBuild.id) {
+                        setBuildId(localBuild.id);
+                      }
+                      // Use local name and description if available
+                      if (localBuild.name) {
+                        setName(localBuild.name);
+                      }
+                      if (localBuild.description !== undefined) {
+                        setDescription(localBuild.description || "");
+                      }
+                    }
+                  }
+                }
+              } catch (error) {
+                console.error("Error checking localStorage:", error);
+              }
+            }
+
+            setIsOwner(ownsBuild);
+
+            // Set buildId if authenticated (needed for updates)
+            if (isAuthenticated) {
+              setBuildId(build.id);
+            }
+            setHasLoadedBuild(true);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Error loading build data from API:", error);
+      }
+
+      // If not found in API and authenticated, initialize with default name
+      if (isAuthenticated) {
+        if (!name) {
+          setName("Build 1");
+        }
+        // New build - user owns it
+        setIsOwner(true);
+        setHasLoadedBuild(true);
+        return;
+      }
+
+      // Not authenticated and not found in API, check localStorage
+      if (typeof window !== "undefined") {
+        try {
+          const localBuildsData = localStorage.getItem("vbuilds");
+          if (localBuildsData) {
+            const parsed = JSON.parse(localBuildsData);
+            if (Array.isArray(parsed)) {
+              const foundBuild = parsed.find((b: any) => b.code === buildCode);
+              if (foundBuild) {
+                setName(foundBuild.name || "Build 1");
+                setDescription(foundBuild.description || "");
+                // Unauthenticated users can't have public builds
+                setIsPublic(false);
+                // Set buildId from localStorage if it exists
+                if (foundBuild.id) {
+                  setBuildId(foundBuild.id);
+                }
+                // If build found in localStorage, user owns it (it's their local build)
+                setIsOwner(true);
+                setHasLoadedBuild(true);
+                return;
+              }
+            }
+          }
+          // Build not found in localStorage - it's a new build for unauthenticated user
+          // They own it locally since they're creating it
           if (!name) {
             setName("Build 1");
           }
+          setIsOwner(true);
+        } catch (error) {
+          console.error("Error loading local build:", error);
+          if (!name) {
+            setName("Build 1");
+          }
+          // On error, assume it's a new build - user owns it
+          setIsOwner(true);
         }
       } else {
-        // Not authenticated, check localStorage
-        if (typeof window !== "undefined") {
-          try {
-            const localBuildsData = localStorage.getItem("vbuilds");
-            if (localBuildsData) {
-              const parsed = JSON.parse(localBuildsData);
-              if (Array.isArray(parsed)) {
-                const foundBuild = parsed.find((b: any) => b.code === buildCode);
-                if (foundBuild) {
-                  setName(foundBuild.name || "Build 1");
-                  setDescription(foundBuild.description || "");
-                } else if (!name) {
-                  setName("Build 1");
-                }
-              } else if (!name) {
-                setName("Build 1");
-              }
-            } else if (!name) {
-              setName("Build 1");
-            }
-          } catch (error) {
-            console.error("Error loading local build:", error);
-            if (!name) {
-              setName("Build 1");
-            }
-          }
-        } else if (!name) {
+        if (!name) {
           setName("Build 1");
         }
+        // Server-side, assume new build - user owns it
+        setIsOwner(true);
       }
 
       setHasLoadedBuild(true);
@@ -190,13 +278,13 @@ const SaveBuild: React.FC = () => {
     return `${currentUrl}${buildQuery}`;
   };
 
-  const saveToLocalStorage = (buildName: string, buildCode: string, buildDescription: string) => {
-    if (typeof window === "undefined") return;
+  const saveToLocalStorage = (buildName: string, buildCode: string, buildDescription: string, localBuildId?: string | null) => {
+    if (typeof window === "undefined") return false;
 
     try {
       // Get existing builds from localStorage
       const existingBuildsData = localStorage.getItem("vbuilds");
-      let existingBuilds: Array<{ code: string; timestamp?: string; name: string; description?: string }> = [];
+      let existingBuilds: Array<{ id?: string; code: string; timestamp?: string; name: string; description?: string }> = [];
 
       if (existingBuildsData) {
         try {
@@ -210,11 +298,31 @@ const SaveBuild: React.FC = () => {
         }
       }
 
-      // Check if a build with the same name already exists
-      const existingIndex = existingBuilds.findIndex((b) => b.name === buildName);
+      // Determine if this is an update or new build
+      let existingIndex = -1;
+
+      // First try to find by ID if provided
+      if (localBuildId) {
+        existingIndex = existingBuilds.findIndex((b) => b.id === localBuildId);
+      }
+
+      // If not found by ID, try to find by code
+      if (existingIndex === -1) {
+        existingIndex = existingBuilds.findIndex((b) => b.code === buildCode);
+      }
+
+      // If still not found, try to find by name (fallback)
+      if (existingIndex === -1) {
+        existingIndex = existingBuilds.findIndex((b) => b.name === buildName);
+      }
+
+      // Generate ID if this is a new build
+      const buildIdToUse = localBuildId || `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
       if (existingIndex !== -1) {
         // Update existing build
         existingBuilds[existingIndex] = {
+          id: buildIdToUse,
           code: buildCode,
           name: buildName,
           description: buildDescription,
@@ -223,6 +331,7 @@ const SaveBuild: React.FC = () => {
       } else {
         // Add new build
         existingBuilds.push({
+          id: buildIdToUse,
           code: buildCode,
           name: buildName,
           description: buildDescription,
@@ -232,6 +341,12 @@ const SaveBuild: React.FC = () => {
 
       // Save back to localStorage
       localStorage.setItem("vbuilds", JSON.stringify(existingBuilds));
+
+      // Update buildId state for local builds
+      if (!isAuthenticated) {
+        setBuildId(buildIdToUse);
+      }
+
       return true;
     } catch (error) {
       console.error("Error saving build to localStorage:", error);
@@ -239,7 +354,7 @@ const SaveBuild: React.FC = () => {
     }
   };
 
-  const saveBuildCommand = async () => {
+  const saveBuildCommand = async (skipWarning = false) => {
     if (authLoading) {
       return;
     }
@@ -252,6 +367,12 @@ const SaveBuild: React.FC = () => {
       return;
     }
 
+    // Validate build name contains only English alphabet characters
+    if (!isValidEnglishAlphabet(buildName)) {
+      toast.error("Build name can only contain English alphabet characters, numbers, and spaces");
+      return;
+    }
+
     const buildCode = arenaCode(state.context);
 
     if (!buildCode) {
@@ -259,10 +380,30 @@ const SaveBuild: React.FC = () => {
       return;
     }
 
+    // Check if warning should be shown before saving
+    if (!skipWarning && isOwner && isPublic && (buildUpvotes > 0 || buildDownvotes > 0)) {
+      setShowVoteWarningDialog(true);
+      return;
+    }
+
     // Check if user is authenticated
     if (!isAuthenticated) {
+      // Force isPublic to false for unauthenticated users (they can't publish)
+      if (isPublic) {
+        setIsPublic(false);
+      }
+
+      // Validate description contains only English alphabet characters
+      const buildDescription = description.trim();
+      if (buildDescription && !isValidEnglishAlphabet(buildDescription)) {
+        toast.error("Build description can only contain English alphabet characters, numbers, and spaces");
+        return;
+      }
+
       // Save to localStorage for non-authenticated users
-      const saved = saveToLocalStorage(buildName, buildCode, description.trim());
+      // Use buildId if it's a local build ID, otherwise use null to generate new one
+      const localBuildId = buildId && buildId.startsWith("local-") ? buildId : null;
+      const saved = saveToLocalStorage(buildName, buildCode, buildDescription, localBuildId);
       if (saved) {
         toast.success("Build saved locally! Sign in to sync across devices.", {
           duration: 4000,
@@ -300,6 +441,14 @@ const SaveBuild: React.FC = () => {
       const url = buildId ? `/api/builds/${buildId}` : "/api/builds";
       const method = buildId ? "PUT" : "POST";
 
+      // Validate description contains only English alphabet characters
+      const buildDescription = description.trim();
+      if (buildDescription && !isValidEnglishAlphabet(buildDescription)) {
+        toast.error("Build description can only contain English alphabet characters, numbers, and spaces");
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -307,7 +456,7 @@ const SaveBuild: React.FC = () => {
         },
         body: JSON.stringify({
           name: buildName,
-          description: description.trim(),
+          description: buildDescription,
           code: buildCode,
           isPublic: isPublic,
         }),
@@ -365,6 +514,144 @@ const SaveBuild: React.FC = () => {
     router.push(`/auth/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   };
 
+  const handleClone = async () => {
+    if (authLoading) {
+      return;
+    }
+
+    const buildName = name.trim();
+
+    // Validate build name contains only English alphabet characters before cloning
+    if (buildName && !isValidEnglishAlphabet(buildName)) {
+      toast.error("Build name can only contain English alphabet characters, numbers, and spaces");
+      return;
+    }
+
+    // Generate cloned name with version number (v2, v3, etc.)
+    let clonedName: string;
+    if (!buildName) {
+      clonedName = "Build 1 v2";
+    } else {
+      // Check if name ends with vN pattern (v2, v3, v10, etc.)
+      const versionPattern = /\s+v(\d+)$/i;
+      const match = buildName.match(versionPattern);
+
+      if (match) {
+        // Name ends with version, increment it
+        const currentVersion = parseInt(match[1], 10);
+        const nextVersion = currentVersion + 1;
+        const baseName = buildName.substring(0, match.index).trim();
+        clonedName = `${baseName} v${nextVersion}`;
+      } else {
+        // Name doesn't have version, add v2
+        clonedName = `${buildName} v2`;
+      }
+    }
+
+    // Validate cloned name length (minimum 3 characters and max 42)
+    if (clonedName.length < 3) {
+      toast.error("Build name must be at least 3 characters long");
+      return;
+    }
+
+    if (clonedName.length > 42) {
+      // If name is too long, truncate base name and add version
+      const maxBaseLength = 42 - 4; // Reserve space for " v2" (4 chars)
+      const baseName = buildName.replace(/\s+v(\d+)$/i, "").trim();
+      const truncatedBase = baseName.substring(0, maxBaseLength).trim();
+      const versionPattern = /\s+v(\d+)$/i;
+      const match = buildName.match(versionPattern);
+
+      if (match) {
+        const currentVersion = parseInt(match[1], 10);
+        const nextVersion = currentVersion + 1;
+        clonedName = `${truncatedBase} v${nextVersion}`;
+      } else {
+        clonedName = `${truncatedBase} v2`;
+      }
+    }
+
+    const buildCode = arenaCode(state.context);
+
+    if (!buildCode) {
+      toast.error("No build to clone");
+      return;
+    }
+
+    // Set name to cloned name and clear buildId to treat as new build
+    setName(clonedName);
+    setBuildId(null);
+
+    // If not authenticated, save to localStorage
+    if (!isAuthenticated) {
+      const buildDescription = description.trim() ? filterEnglishAlphabet(description.trim()) : "";
+      const saved = saveToLocalStorage(clonedName, buildCode, buildDescription, null);
+      if (saved) {
+        toast.success("Build cloned locally! Sign in to sync across devices.", {
+          duration: 4000,
+        });
+        setTimeout(() => {
+          router.push("/builds");
+        }, 500);
+      } else {
+        toast.error("Failed to clone build locally");
+      }
+      return;
+    }
+
+    // For authenticated users, prevent making cloned builds public initially
+    const wasPublic = isPublic;
+    setIsPublic(false);
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/builds", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: clonedName,
+          description: description.trim() ? filterEnglishAlphabet(description.trim()) : "",
+          code: buildCode,
+          isPublic: false, // Cloned builds start as private
+        }),
+      });
+
+      if (response.status === 401) {
+        setShowAuthDialog(true);
+        setLoading(false);
+        setIsPublic(wasPublic);
+        return;
+      }
+
+      if (!response.ok) {
+        const error = await response.json();
+        const errorMessage = error.error || "Failed to clone build";
+        toast.error(errorMessage);
+        setLoading(false);
+        setIsPublic(wasPublic);
+        return;
+      }
+
+      const clonedBuild = await response.json();
+      setBuildId(clonedBuild.id);
+
+      toast.success("Build cloned successfully!");
+
+      // Redirect to builds page
+      setTimeout(() => {
+        router.push("/builds");
+      }, 500);
+    } catch (error) {
+      console.error("Error cloning build:", error);
+      toast.error("Failed to clone build");
+      setLoading(false);
+      setIsPublic(wasPublic);
+    }
+  };
+
   return (
     <>
       <div className="space-y-4">
@@ -372,24 +659,54 @@ const SaveBuild: React.FC = () => {
           <Input
             className="text-base bg-black/50 px-4 py-2 rounded-md border text-gray-400 flex-1"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              // Filter out non-English alphabet characters
+              const filteredValue = filterEnglishAlphabet(e.target.value);
+              setName(filteredValue);
+            }}
             placeholder="Build name"
             disabled={loading}
             maxLength={42}
           />
-          <Button
-            onClick={saveBuildCommand}
-            disabled={loading || authLoading || !name.trim() || name.trim().length < 3}
-            className="px-3 py-2 text-white group border-red-900/70  bg-red-900/50 hover:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? "SAVING..." : "SAVE"}
-          </Button>
+          {!isOwner && (
+            <Button
+              onClick={handleClone}
+              disabled={loading || authLoading || !name.trim() || name.trim().length < 3}
+              variant="outline"
+              className="px-3 py-2 text-white group border-white/30 bg-transparent hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              CLONE
+            </Button>
+          )}
+          {isOwner && (
+            <>
+              <Button
+                onClick={handleClone}
+                disabled={loading || authLoading || !name.trim() || name.trim().length < 3}
+                variant="outline"
+                className="px-3 py-2 text-white group border-white/30 bg-transparent hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                CLONE
+              </Button>
+              <Button
+                onClick={() => saveBuildCommand(false)}
+                disabled={loading || authLoading || !name.trim() || name.trim().length < 3}
+                className="px-3 py-2 text-white group border-red-900/70  bg-red-900/50 hover:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? "SAVING..." : "SAVE"}
+              </Button>
+            </>
+          )}
         </div>
         <div>
           <Input
             className="text-base bg-black/50 px-4 py-2 rounded-md border text-gray-400 w-full resize-none"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              // Filter out non-English alphabet characters
+              const filteredValue = filterEnglishAlphabet(e.target.value);
+              setDescription(filteredValue);
+            }}
             placeholder="Build description (optional)"
             disabled={loading}
             maxLength={50}
@@ -423,6 +740,42 @@ const SaveBuild: React.FC = () => {
               className="bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] text-white"
             >
               Sign In
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showVoteWarningDialog} onOpenChange={setShowVoteWarningDialog}>
+        <AlertDialogContent className="bg-black border-red-900/30">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">Warning: You Will Lose All Votes</AlertDialogTitle>
+            <AlertDialogDescription className="text-gray-400">
+              This build is public and has <span className="text-green-500">{buildUpvotes}</span> vote up and <span className="text-blue-500">{buildDownvotes}</span> vote down.
+              If you save changes, you will lose all votes on this build. Do you want to continue?              <span className="text-red-500 block mt-2">This action is irreversible and cannot be undone.</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel className="bg-gray-800 text-white hover:bg-gray-700">
+              Cancel
+            </AlertDialogCancel>
+            <Button
+              onClick={() => {
+                setShowVoteWarningDialog(false);
+                handleClone();
+              }}
+              variant="outline"
+              className="border-white/30 bg-transparent hover:bg-white/10 text-white"
+            >
+              Clone Instead
+            </Button>
+            <Button
+              onClick={() => {
+                setShowVoteWarningDialog(false);
+                saveBuildCommand(true);
+              }}
+              className="bg-red-900/50 hover:bg-red-800 border-red-900/70 text-white"
+            >
+              Save Anyway
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

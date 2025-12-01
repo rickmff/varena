@@ -72,7 +72,7 @@ export default function DeleteAccountButton({ userEmail }: DeleteAccountButtonPr
           className="w-full justify-start bg-red-950/50 hover:bg-red-900/50 border-red-800/50 text-red-400 hover:text-red-300"
         >
           <Trash2 className="h-4 w-4 mr-2" />
-          Delete My Account (GDPR)
+          Delete My Account
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="bg-black border-[#5865F2]/30">

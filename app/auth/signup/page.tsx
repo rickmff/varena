@@ -6,11 +6,13 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { authClient } from "@/lib/better-auth/client";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import NavBar from "@/components/NavBar";
 import { useAuth } from "@/components/providers/session-provider";
+import { isValidEnglishAlphabet, filterEnglishAlphabet } from "@/lib/utils";
 
 function SignUpForm() {
   const router = useRouter();
@@ -24,6 +26,7 @@ function SignUpForm() {
     email?: string;
     password?: string;
     confirmPassword?: string;
+    tos?: string;
   }>({});
   const [formData, setFormData] = useState({
     name: "",
@@ -31,6 +34,7 @@ function SignUpForm() {
     password: "",
     confirmPassword: "",
   });
+  const [acceptedTOS, setAcceptedTOS] = useState(false);
 
   const getPasswordStrength = (password: string) => {
     if (password.length === 0) return { strength: 0, label: "", color: "" };
@@ -61,10 +65,13 @@ function SignUpForm() {
       email?: string;
       password?: string;
       confirmPassword?: string;
+      tos?: string;
     } = {};
 
     if (!formData.name.trim()) {
       newErrors.name = "Name is required";
+    } else if (!isValidEnglishAlphabet(formData.name.trim())) {
+      newErrors.name = "Name can only contain English alphabet characters, numbers, and spaces";
     }
     if (!formData.email) {
       newErrors.email = "Email is required";
@@ -80,6 +87,9 @@ function SignUpForm() {
       newErrors.confirmPassword = "Please confirm your password";
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
+    }
+    if (!acceptedTOS) {
+      newErrors.tos = "You must accept the Terms of Service to create an account";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -107,10 +117,15 @@ function SignUpForm() {
         toast.error(errorMessage);
 
         // Map specific errors
-        if (errorMessage.includes("email") || errorMessage.includes("Email")) {
-          setErrors({ email: "This email is already in use" });
-        } else {
+        if (errorMessage.toLowerCase().includes("email")) {
           setErrors({ email: errorMessage });
+        } else if (errorMessage.toLowerCase().includes("password")) {
+          setErrors({ password: errorMessage });
+        } else if (errorMessage.toLowerCase().includes("name")) {
+          setErrors({ name: errorMessage });
+        } else {
+          // General error that doesn't map to a specific field
+          toast.error(errorMessage);
         }
         throw new Error(errorMessage);
       }
@@ -171,13 +186,15 @@ function SignUpForm() {
                     placeholder="Your name"
                     value={formData.name}
                     onChange={(e) => {
-                      setFormData({ ...formData, name: e.target.value });
+                      // Filter out non-English alphabet characters
+                      const filteredValue = filterEnglishAlphabet(e.target.value);
+                      setFormData({ ...formData, name: filteredValue });
                       if (errors.name) setErrors({ ...errors, name: undefined });
                     }}
                     disabled={loading}
                     aria-invalid={!!errors.name}
                     aria-describedby={errors.name ? "name-error" : undefined}
-                    className={errors.name ? "border-red-500" : ""}
+                    className={errors.name ? "border-red-500 placeholder:text-muted-foreground/20!" : "placeholder:text-muted-foreground/20!"}
                   />
                   {errors.name && (
                     <p id="name-error" className="text-sm text-red-500" role="alert">
@@ -192,7 +209,7 @@ function SignUpForm() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="seu@email.com"
+                    placeholder="your@email.com"
                     value={formData.email}
                     onChange={(e) => {
                       setFormData({ ...formData, email: e.target.value });
@@ -201,7 +218,7 @@ function SignUpForm() {
                     disabled={loading}
                     aria-invalid={!!errors.email}
                     aria-describedby={errors.email ? "email-error" : undefined}
-                    className={errors.email ? "border-red-500" : ""}
+                    className={errors.email ? "border-red-500 placeholder:text-muted-foreground/20!" : "placeholder:text-muted-foreground/20!"}
                   />
                   {errors.email && (
                     <p id="email-error" className="text-sm text-red-500" role="alert">
@@ -226,7 +243,7 @@ function SignUpForm() {
                       disabled={loading}
                       aria-invalid={!!errors.password}
                       aria-describedby={errors.password ? "password-error" : undefined}
-                      className={errors.password ? "border-red-500 pr-10" : "pr-10"}
+                      className={errors.password ? "border-red-500 pr-10 placeholder:text-muted-foreground/20!" : "pr-10 placeholder:text-muted-foreground/20!"}
                     />
                     <button
                       type="button"
@@ -243,21 +260,33 @@ function SignUpForm() {
                     </button>
                   </div>
                   {formData.password && (
-                    <div className="space-y-1">
+                    <div className="space-y-1.5">
                       <div className="flex gap-1">
                         {[1, 2, 3, 4].map((level) => (
                           <div
                             key={level}
-                            className={`h-1 flex-1 rounded ${level <= passwordStrength.strength
+                            className={`h-1 flex-1 rounded-full transition-all duration-300 ${level <= passwordStrength.strength
                               ? passwordStrength.color
-                              : "bg-gray-700"
+                              : "bg-gray-700/50"
                               }`}
                           />
                         ))}
                       </div>
                       {passwordStrength.label && (
-                        <p className="text-xs text-gray-400">
-                          Strength: <span className={passwordStrength.strength >= 3 ? "text-green-500" : "text-yellow-500"}>{passwordStrength.label}</span>
+                        <p className="text-xs text-gray-400 font-medium">
+                          Strength:{" "}
+                          <span
+                            className={`${passwordStrength.strength >= 4
+                              ? "text-green-500"
+                              : passwordStrength.strength === 3
+                                ? "text-yellow-500"
+                                : passwordStrength.strength === 2
+                                  ? "text-orange-500"
+                                  : "text-red-500"
+                              }`}
+                          >
+                            {passwordStrength.label}
+                          </span>
                         </p>
                       )}
                     </div>
@@ -285,7 +314,7 @@ function SignUpForm() {
                       disabled={loading}
                       aria-invalid={!!errors.confirmPassword}
                       aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
-                      className={errors.confirmPassword ? "border-red-500 pr-10" : "pr-10"}
+                      className={errors.confirmPassword ? "border-red-500 pr-10 placeholder:text-muted-foreground/20!" : "pr-10 placeholder:text-muted-foreground/20!"}
                     />
                     <button
                       type="button"
@@ -307,7 +336,33 @@ function SignUpForm() {
                     </p>
                   )}
                 </div>
-                <Button type="submit" className="items-center justify-center gap-2 whitespace-nowrap rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border hover:text-accent-foreground h-10 px-4 py-2 hidden md:flex font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 w-full" disabled={loading}>
+                <div className="space-y-2">
+                  <div className="flex items-start space-x-2">
+                    <Checkbox
+                      id="tos"
+                      checked={acceptedTOS}
+                      onCheckedChange={(checked) => {
+                        setAcceptedTOS(checked === true);
+                        if (errors.tos) setErrors({ ...errors, tos: undefined });
+                      }}
+                    />
+                    <label
+                      htmlFor="tos"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      I accept the{" "}
+                      <Link href="/terms-of-service" target="_blank" className="text-[#5865F2] hover:underline">
+                        Terms of Service
+                      </Link>
+                    </label>
+                  </div>
+                  {errors.tos && (
+                    <p className="text-sm text-red-500" role="alert">
+                      {errors.tos}
+                    </p>
+                  )}
+                </div>
+                <Button type="submit" className="items-center justify-center gap-2 whitespace-nowrap rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border hover:text-accent-foreground h-10 px-4 py-2 flex font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 w-full" disabled={loading || !acceptedTOS}>
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

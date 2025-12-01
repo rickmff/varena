@@ -142,6 +142,7 @@ export const BuildContent = ({
   isPublic,
   onTogglePublic,
   showPublicToggle = true,
+  isAuthenticated = true,
   upvotes,
   downvotes,
   userVote,
@@ -159,6 +160,7 @@ export const BuildContent = ({
   isPublic?: boolean;
   onTogglePublic?: (checked: boolean) => void;
   showPublicToggle?: boolean;
+  isAuthenticated?: boolean;
   upvotes?: number;
   downvotes?: number;
   userVote?: "upvote" | "downvote" | null;
@@ -270,23 +272,38 @@ export const BuildContent = ({
             <Trash2 className="w-4 h-4" />
           </button>
         )}
-        {showPublicToggle && onTogglePublic !== undefined && (
-          <button
-            type="button"
-            className="w-8 h-8 rounded-full border border-white/30 bg-black/80 flex items-center justify-center hover:border-white/60 hover:bg-black transition-colors opacity-100"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onTogglePublic(!isPublic);
-            }}
-            aria-label={isPublic ? "Make build private" : "Make build public"}
-          >
-            {isPublic ? (
-              <Globe2 className="w-4 h-4 text-green-400" />
-            ) : (
-              <Lock className="w-4 h-4 text-zinc-300" />
+        {showPublicToggle && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className={`w-8 h-8 rounded-full border border-white/30 bg-black/80 flex items-center justify-center transition-colors opacity-100 ${isAuthenticated && onTogglePublic !== undefined
+                  ? "hover:border-white/60 hover:bg-black cursor-pointer"
+                  : "opacity-50 cursor-not-allowed"
+                  }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (isAuthenticated && onTogglePublic !== undefined) {
+                    onTogglePublic(!isPublic);
+                  }
+                }}
+                disabled={!isAuthenticated || onTogglePublic === undefined}
+                aria-label={isPublic ? "Make build private" : "Make build public"}
+              >
+                {isPublic ? (
+                  <Globe2 className="w-4 h-4 text-green-400" />
+                ) : (
+                  <Lock className="w-4 h-4 text-zinc-300" />
+                )}
+              </button>
+            </TooltipTrigger>
+            {(!isAuthenticated || onTogglePublic === undefined) && (
+              <TooltipContent>
+                <p>Sign in to publish your builds</p>
+              </TooltipContent>
             )}
-          </button>
+          </Tooltip>
         )}
       </div>
 
@@ -302,11 +319,9 @@ export const BuildContent = ({
             {author}
           </p>
         )}
-        {description && description.trim() && (
-          <p className="text-sm text-gray-300 mt-2 line-clamp-2">
-            {description}
-          </p>
-        )}
+        <p className={`text-sm mt-2 line-clamp-2 ${description && description.trim() ? "text-gray-300" : "text-gray-500/50 italic"}`}>
+          {description && description.trim() ? description : "No description"}
+        </p>
       </CardHeader>
       <CardContent className="relative">
         <div className="space-y-6">
@@ -1127,12 +1142,13 @@ export default function BuildsList({
                     handleDelete(event, build.id || "", index)
                   }
                   isPublic={build.isPublic}
+                  isAuthenticated={isAuthenticated}
                   onTogglePublic={(checked) => {
                     if (build.id && !build.id.startsWith("local-")) {
                       handleTogglePublic(build.id, build.isPublic || false);
                     }
                   }}
-                  showPublicToggle={isAuthenticated && !build.id?.startsWith("local-")}
+                  showPublicToggle={true}
                 />
               </Link>
             </motion.div>
@@ -1141,31 +1157,42 @@ export default function BuildsList({
 
         {!loading && builds.length === 0 && (
           <motion.div
-            className="flex justify-center gap-4 mb-8"
+            className="flex justify-start"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            variants={staggerContainer}
+            variants={scaleIn}
           >
-            <motion.div>
-              {isAuthenticated ? (
-                <Link
-                  href="/builds/create"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
-                >
-                  <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
-                  CREATE YOUR FIRST BUILD
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link href="/builds/create">
+                  <Card className="text-card-foreground shadow-sm bg-black/80 backdrop-blur-sm rounded-lg border-2 border-dashed border-white/30 hover:border-white/60 transition-all duration-300 overflow-hidden group cursor-pointer h-full relative flex items-center justify-center min-h-[400px] w-96">
+                    {/* Glow effect on hover */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/10" />
+                    </div>
+
+                    <div className="flex flex-col items-center justify-center gap-4 p-8 relative z-10">
+                      {/* Plus icon in circle */}
+                      <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/40 flex items-center justify-center group-hover:border-white/60 transition-colors duration-300">
+                        <Plus className="w-8 h-8 text-white/60 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
+                      </div>
+
+                      {/* Text */}
+                      <span className="text-white/60 group-hover:text-white font-bold text-lg tracking-wide transition-colors duration-300 uppercase">
+                        CREATE A NEW BUILD
+                      </span>
+                    </div>
+                  </Card>
                 </Link>
-              ) : (
-                <Link
-                  href="/builds/create"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
-                >
-                  <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
-                  CREATE YOUR FIRST BUILD
-                </Link>
+              </TooltipTrigger>
+              {!isAuthenticated && (
+                <TooltipContent>
+                  <p>Sign in to publish your builds</p>
+                </TooltipContent>
               )}
-            </motion.div>
+            </Tooltip>
           </motion.div>
         )}
       </div>

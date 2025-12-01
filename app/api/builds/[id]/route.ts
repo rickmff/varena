@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/better-auth/server";
 import prisma from "@/lib/prisma";
 import { revalidateTag } from "next/cache";
+import { isValidEnglishAlphabet } from "@/lib/utils";
 
 // Helper function to check if a build code is empty (all zeros)
 function isEmptyBuild(code: string): boolean {
@@ -96,6 +97,22 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     const { id } = await params;
     const { name, description, code, author, authorTwitchUrl, authorYoutubeUrl, isPublic } = await request.json();
+
+    // Validate name contains only English alphabet characters if provided
+    if (name !== undefined && name !== null && name.trim() && !isValidEnglishAlphabet(name.trim())) {
+      return NextResponse.json(
+        { error: "Build name can only contain English alphabet characters, numbers, and spaces" },
+        { status: 400 }
+      );
+    }
+
+    // Validate description contains only English alphabet characters if provided
+    if (description !== undefined && description !== null && description.trim() && !isValidEnglishAlphabet(description.trim())) {
+      return NextResponse.json(
+        { error: "Build description can only contain English alphabet characters, numbers, and spaces" },
+        { status: 400 }
+      );
+    }
 
     // Verificar se a build pertence ao usuário
     const existingBuild = await prisma.build.findFirst({

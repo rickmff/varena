@@ -58,7 +58,7 @@ export default function DataExportButton() {
       ) : (
         <>
           <Download className="h-4 w-4 mr-2" />
-          Export My Data (GDPR)
+          Export My Data
         </>
       )}
     </Button>

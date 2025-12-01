@@ -8,6 +8,10 @@ import PublicBuildsList from "@/components/builds/PublicBuildsList";
 import SectionHeader from "@/app/components/ui/SectionHeader";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { LogIn, Globe, Cloud, ThumbsUp } from "lucide-react";
 
 export default function Builds() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -66,6 +70,47 @@ export default function Builds() {
                 COMMUNITY
               </TabsTrigger>
             </TabsList>
+
+            {/* Sign In Benefits Banner */}
+            {!isAuthenticated && !authLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="mb-6 p-4 rounded-lg border border-yellow-500/10 bg-yellow-500/5 backdrop-blur-sm"
+              >
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-400 mb-2">
+                      Sign in to sync builds across devices, publish to the community, and vote on builds.
+                    </p>
+                    <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
+                      <div className="flex items-center gap-1.5">
+                        <Cloud className="w-3.5 h-3.5" />
+                        <span>Cloud sync</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Globe className="w-3.5 h-3.5" />
+                        <span>Publish builds</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <ThumbsUp className="w-3.5 h-3.5" />
+                        <span>Vote & rate</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Link href="/auth/signin">
+                      <Button size="sm" variant="outline" className="border-white/20 text-white hover:bg-white/10 hover:border-white/30">
+                        <LogIn className="w-4 h-4" />
+                        Sign In
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
             <TabsContent value="mine">
               <BuildsList />
             </TabsContent>

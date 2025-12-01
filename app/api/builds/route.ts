@@ -3,6 +3,7 @@ import { getServerSession } from "@/lib/better-auth/server";
 import prisma from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
 import { revalidateTag } from "next/cache";
+import { isValidEnglishAlphabet } from "@/lib/utils";
 
 // Helper function to check if a build code is empty (all zeros)
 function isEmptyBuild(code: string): boolean {
@@ -97,6 +98,22 @@ export async function POST(request: Request) {
     if (!name || !code) {
       return NextResponse.json(
         { error: "Required fields: name, code" },
+        { status: 400 }
+      );
+    }
+
+    // Validate name contains only English alphabet characters
+    if (!isValidEnglishAlphabet(name.trim())) {
+      return NextResponse.json(
+        { error: "Build name can only contain English alphabet characters, numbers, and spaces" },
+        { status: 400 }
+      );
+    }
+
+    // Validate description contains only English alphabet characters if provided
+    if (description && description.trim() && !isValidEnglishAlphabet(description.trim())) {
+      return NextResponse.json(
+        { error: "Build description can only contain English alphabet characters, numbers, and spaces" },
         { status: 400 }
       );
     }
@@ -266,43 +283,81 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     const session = await getServerSession();
+    const { searchParams } = new URL(request.url);
+    const code = searchParams.get("code");
 
+    // If code is provided, allow unauthenticated access for public builds
+    if (code) {
+      if (session?.user?.id) {
+        // Authenticated: return build if userId matches OR isPublic is true
+        const build = await prisma.build.findFirst({
+          where: {
+            code,
+            OR: [
+              { userId: session.user.id },
+              { isPublic: true },
+            ],
+          },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            code: true,
+            isPublic: true,
+            userId: true,
+            upvotes: true,
+            downvotes: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
+
+        if (!build) {
+          return NextResponse.json(
+            { error: "Build not found" },
+            { status: 404 }
+          );
+        }
+
+        return NextResponse.json(build);
+      } else {
+        // Unauthenticated: return build only if isPublic is true
+        const build = await prisma.build.findFirst({
+          where: {
+            code,
+            isPublic: true,
+          },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            code: true,
+            isPublic: true,
+            userId: true,
+            upvotes: true,
+            downvotes: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        });
+
+        if (!build) {
+          return NextResponse.json(
+            { error: "Build not found" },
+            { status: 404 }
+          );
+        }
+
+        return NextResponse.json(build);
+      }
+    }
+
+    // If no code (list view), require authentication
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
-    }
-
-    const { searchParams } = new URL(request.url);
-    const code = searchParams.get("code");
-
-    // If code is provided, return the build with that code for the authenticated user
-    if (code) {
-      const build = await prisma.build.findFirst({
-        where: {
-          code,
-          userId: session.user.id,
-        },
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          code: true,
-          isPublic: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
-
-      if (!build) {
-        return NextResponse.json(
-          { error: "Build not found" },
-          { status: 404 }
-        );
-      }
-
-      return NextResponse.json(build);
     }
 
     const page = parseInt(searchParams.get("page") || "1");
