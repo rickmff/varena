@@ -35,6 +35,48 @@ function SignUpForm() {
     confirmPassword: "",
   });
   const [acceptedTOS, setAcceptedTOS] = useState(false);
+  const [isCheckingName, setIsCheckingName] = useState(false);
+
+  // Check if name is available
+  useEffect(() => {
+    const checkName = async () => {
+      if (!formData.name || formData.name.trim().length < 2) return;
+
+      setIsCheckingName(true);
+      try {
+        const response = await fetch("/api/auth/check-name", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: formData.name }),
+        });
+
+        const data = await response.json();
+        if (!data.available) {
+          setErrors((prev) => ({ ...prev, name: "This name is already taken" }));
+        } else {
+          setErrors((prev) => {
+            if (prev.name === "This name is already taken") {
+              const { name, ...rest } = prev;
+              return rest;
+            }
+            return prev;
+          });
+        }
+      } catch (error) {
+        console.error("Error checking name:", error);
+      } finally {
+        setIsCheckingName(false);
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
+      if (formData.name) {
+        checkName();
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.name]);
 
   const getPasswordStrength = (password: string) => {
     if (password.length === 0) return { strength: 0, label: "", color: "" };
@@ -57,7 +99,6 @@ function SignUpForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
 
     // Validation
     const newErrors: {
@@ -72,7 +113,23 @@ function SignUpForm() {
       newErrors.name = "Name is required";
     } else if (!isValidEnglishAlphabet(formData.name.trim())) {
       newErrors.name = "Name can only contain English alphabet characters, numbers, and spaces";
+    } else {
+      // Async check for name uniqueness
+      try {
+        const response = await fetch("/api/auth/check-name", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: formData.name }),
+        });
+        const data = await response.json();
+        if (!data.available) {
+          newErrors.name = "This name is already taken";
+        }
+      } catch (error) {
+        console.error("Error checking name availability:", error);
+      }
     }
+
     if (!formData.email) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -97,6 +154,7 @@ function SignUpForm() {
       return;
     }
 
+    setErrors({});
     setLoading(true);
 
     try {
@@ -362,7 +420,7 @@ function SignUpForm() {
                     </p>
                   )}
                 </div>
-                <Button type="submit" className="items-center justify-center gap-2 whitespace-nowrap rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border hover:text-accent-foreground h-10 px-4 py-2 flex font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 w-full" disabled={loading || !acceptedTOS}>
+                <Button type="submit" className="items-center justify-center gap-2 whitespace-nowrap rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border hover:text-accent-foreground h-10 px-4 py-2 flex font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 w-full" disabled={loading || !acceptedTOS || isCheckingName}>
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

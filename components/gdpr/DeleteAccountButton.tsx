@@ -54,9 +54,19 @@ export default function DeleteAccountButton({ userEmail }: DeleteAccountButtonPr
 
       toast.success("Your account and all data have been permanently deleted.");
 
-      // Sign out and redirect
-      await authClient.signOut();
-      router.push("/");
+      // Close dialog before redirect
+      setOpen(false);
+
+      // Force sign out to clear client-side session
+      try {
+        await authClient.signOut();
+      } catch (signOutError) {
+        // Ignore sign out errors - session is already invalidated server-side
+        console.warn("Sign out error (expected after account deletion):", signOutError);
+      }
+
+      // Force a hard redirect to clear any cached session state
+      window.location.href = "/";
     } catch (error: any) {
       console.error("Error deleting account:", error);
       toast.error(error.message || "Failed to delete account. Please try again.");

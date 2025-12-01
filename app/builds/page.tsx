@@ -11,7 +11,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { LogIn, Globe, Cloud, ThumbsUp } from "lucide-react";
+import { LogIn, Globe, Cloud, ThumbsUp, Hammer, Users } from "lucide-react";
 
 export default function Builds() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -32,7 +32,7 @@ export default function Builds() {
       <NavBar />
 
       {/* Hero Section */}
-      <section className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
+      <section className="relative pt-24 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
         <div className="absolute inset-0 z-0 opacity-20">
           <Image
             src="/hero-bg.webp"
@@ -41,7 +41,7 @@ export default function Builds() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black"></div>
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
@@ -56,20 +56,24 @@ export default function Builds() {
       <section className="bg-black relative -mt-20 pb-20">
         <div className="container mx-auto px-4 relative z-10">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full max-w-md grid-cols-2 mb-8 bg-black/50 border border-white/10">
-              <TabsTrigger
-                value="mine"
-                className="data-[state=active]:bg-red-900/50 data-[state=active]:text-white"
-              >
-                MAKE YOUR OWN
-              </TabsTrigger>
-              <TabsTrigger
-                value="community"
-                className="data-[state=active]:bg-red-900/50 data-[state=active]:text-white"
-              >
-                COMMUNITY
-              </TabsTrigger>
-            </TabsList>
+            <div className="flex justify-center mb-8">
+              <TabsList className="grid grid-cols-2 bg-black/60 backdrop-blur-sm border border-white/10 rounded-lg p-1.5 shadow-lg h-fit gap-2">
+                <TabsTrigger
+                  value="mine"
+                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-900/70 data-[state=active]:to-red-800/50 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-red-900/30 text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 rounded-md py-2.5 px-6 font-semibold text-sm uppercase tracking-wider data-[state=active]:scale-[1.02] data-[state=active]:border data-[state=active]:border-red-700/30"
+                >
+                  <Hammer className="w-4 h-4" />
+                  MAKE YOUR OWN
+                </TabsTrigger>
+                <TabsTrigger
+                  value="community"
+                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-900/70 data-[state=active]:to-red-800/50 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-red-900/30 text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 rounded-md py-2.5 px-6 font-semibold text-sm uppercase tracking-wider data-[state=active]:scale-[1.02] data-[state=active]:border data-[state=active]:border-red-700/30"
+                >
+                  <Users className="w-4 h-4" />
+                  COMMUNITY
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Sign In Benefits Banner */}
             {!isAuthenticated && !authLoading && (
