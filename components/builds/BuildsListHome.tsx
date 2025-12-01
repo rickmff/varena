@@ -151,9 +151,41 @@ export default function BuildsListHome({
       if (authLoading) return;
 
       if (!isAuthenticated) {
-        setBuilds([]);
-        setLoading(false);
-        onBuildsLoaded?.(false);
+        // Load builds from localStorage for non-authenticated users
+        setLoading(true);
+        try {
+          if (typeof window !== "undefined") {
+            const localBuildsData = localStorage.getItem("vbuilds");
+            if (localBuildsData) {
+              try {
+                const parsed = JSON.parse(localBuildsData);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                  // Convert localStorage format to Build format
+                  const buildsArray = parsed.map((build: any, index: number) => ({
+                    id: `local-${index}-${build.name}`, // Generate temporary ID
+                    name: build.name || `Build ${index + 1}`,
+                    code: build.code || "",
+                    isPublic: false, // LocalStorage builds are always private
+                  }));
+                  setBuilds(buildsArray);
+                  onBuildsLoaded?.(buildsArray.length > 0);
+                  setLoading(false);
+                  return;
+                }
+              } catch (error) {
+                console.error("Failed to parse local builds:", error);
+              }
+            }
+          }
+          setBuilds([]);
+          onBuildsLoaded?.(false);
+        } catch (error) {
+          console.error("Failed to load local builds:", error);
+          setBuilds([]);
+          onBuildsLoaded?.(false);
+        } finally {
+          setLoading(false);
+        }
         return;
       }
 
@@ -222,6 +254,41 @@ export default function BuildsListHome({
             return;
           }
 
+          // Check if this is a localStorage build
+          if (buildId.startsWith("local-")) {
+            try {
+              if (typeof window !== "undefined") {
+                const localBuildsData = localStorage.getItem("vbuilds");
+                if (localBuildsData) {
+                  const parsed = JSON.parse(localBuildsData);
+                  if (Array.isArray(parsed)) {
+                    // Remove the build at the specified index
+                    const updatedBuilds = parsed.filter((_, i) => i !== index);
+                    localStorage.setItem("vbuilds", JSON.stringify(updatedBuilds));
+
+                    // Update state
+                    const buildsArray = updatedBuilds.map((build: any, idx: number) => ({
+                      id: `local-${idx}-${build.name}`,
+                      name: build.name || `Build ${idx + 1}`,
+                      code: build.code || "",
+                      isPublic: false,
+                    }));
+                    setBuilds(buildsArray);
+                    onBuildsLoaded?.(buildsArray.length > 0);
+                    toast.success("Build deleted successfully");
+                    return;
+                  }
+                }
+              }
+              toast.error("Failed to delete build from local storage");
+            } catch (error) {
+              console.error("Failed to delete local build:", error);
+              toast.error("Failed to delete build");
+            }
+            return;
+          }
+
+          // Delete from API for authenticated users
           try {
             const response = await fetch(`/api/builds/${buildId}`, {
               method: "DELETE",
@@ -359,6 +426,8 @@ export default function BuildsListHome({
                   handleDeleteBuild={(event: React.MouseEvent) =>
                     handleDelete(event, build.id || "", index)
                   }
+                  isPublic={build.isPublic}
+                  showPublicToggle={false}
                 />
               </Link>
             </motion.div>
@@ -414,10 +483,11 @@ export default function BuildsListHome({
                 </Link>
               ) : (
                 <Link
-                  href="/auth/signin"
+                  href="/builds/create"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
                 >
-                  SIGN IN TO SAVE BUILDS
+                  <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+                  CREATE YOUR FIRST BUILD
                 </Link>
               )}
             </motion.div>

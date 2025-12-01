@@ -205,7 +205,7 @@ export const BuildContent = ({
 
   return (
     <Card
-      className={`bg-black/80 backdrop-blur-sm rounded-lg border-2 ${showPublicToggle && isPublic
+      className={`bg-black/80 backdrop-blur-sm rounded-lg border-2 hover:border-white/30 ${showPublicToggle && isPublic
         ? "border-green-500/50"
         : "border-zinc-800/50"
         } transition-all duration-300 overflow-hidden group cursor-pointer h-full relative build-spellSchool build-spellSchool-${school || "empty"
@@ -549,9 +549,41 @@ export default function BuildsList({
       if (authLoading) return;
 
       if (!isAuthenticated) {
-        setBuilds([]);
-        setLoading(false);
-        onBuildsLoaded?.(false);
+        // Load builds from localStorage for non-authenticated users
+        setLoading(true);
+        try {
+          if (typeof window !== "undefined") {
+            const localBuildsData = localStorage.getItem("vbuilds");
+            if (localBuildsData) {
+              try {
+                const parsed = JSON.parse(localBuildsData);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                  // Convert localStorage format to Build format
+                  const buildsArray = parsed.map((build: any, index: number) => ({
+                    id: `local-${index}-${build.name}`, // Generate temporary ID
+                    name: build.name || `Build ${index + 1}`,
+                    code: build.code || "",
+                    isPublic: false, // LocalStorage builds are always private
+                  }));
+                  setBuilds(buildsArray);
+                  onBuildsLoaded?.(buildsArray.length > 0);
+                  setLoading(false);
+                  return;
+                }
+              } catch (error) {
+                console.error("Failed to parse local builds:", error);
+              }
+            }
+          }
+          setBuilds([]);
+          onBuildsLoaded?.(false);
+        } catch (error) {
+          console.error("Failed to load local builds:", error);
+          setBuilds([]);
+          onBuildsLoaded?.(false);
+        } finally {
+          setLoading(false);
+        }
         return;
       }
 
@@ -620,6 +652,41 @@ export default function BuildsList({
     const confirmed = window.confirm("Are you sure you want to delete this build?");
     if (!confirmed) return;
 
+    // Check if this is a localStorage build
+    if (buildId.startsWith("local-")) {
+      try {
+        if (typeof window !== "undefined") {
+          const localBuildsData = localStorage.getItem("vbuilds");
+          if (localBuildsData) {
+            const parsed = JSON.parse(localBuildsData);
+            if (Array.isArray(parsed)) {
+              // Remove the build at the specified index
+              const updatedBuilds = parsed.filter((_, i) => i !== index);
+              localStorage.setItem("vbuilds", JSON.stringify(updatedBuilds));
+
+              // Update state
+              const buildsArray = updatedBuilds.map((build: any, idx: number) => ({
+                id: `local-${idx}-${build.name}`,
+                name: build.name || `Build ${idx + 1}`,
+                code: build.code || "",
+                isPublic: false,
+              }));
+              setBuilds(buildsArray);
+              onBuildsLoaded?.(buildsArray.length > 0);
+              toast.success("Build deleted successfully");
+              return;
+            }
+          }
+        }
+        toast.error("Failed to delete build from local storage");
+      } catch (error) {
+        console.error("Failed to delete local build:", error);
+        toast.error("Failed to delete build");
+      }
+      return;
+    }
+
+    // Delete from API for authenticated users
     try {
       const response = await fetch(`/api/builds/${buildId}`, {
         method: "DELETE",
@@ -1045,11 +1112,11 @@ export default function BuildsList({
                   }
                   isPublic={build.isPublic}
                   onTogglePublic={(checked) => {
-                    if (build.id) {
+                    if (build.id && !build.id.startsWith("local-")) {
                       handleTogglePublic(build.id, build.isPublic || false);
                     }
                   }}
-                  showPublicToggle={true}
+                  showPublicToggle={isAuthenticated && !build.id?.startsWith("local-")}
                 />
               </Link>
             </motion.div>
@@ -1075,10 +1142,11 @@ export default function BuildsList({
                 </Link>
               ) : (
                 <Link
-                  href="/auth/signin"
+                  href="/builds/create"
                   className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
                 >
-                  SIGN IN TO SAVE YOUR BUILDS
+                  <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+                  CREATE YOUR FIRST BUILD
                 </Link>
               )}
             </motion.div>

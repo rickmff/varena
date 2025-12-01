@@ -166,6 +166,12 @@ export async function PUT(request: Request, { params }: RouteParams) {
     // This ensures the cache is refreshed when builds are modified
     revalidateTag(`builds-${session.user.id}`);
 
+    // Invalidate public builds cache when public/private status changes
+    // This ensures public builds list is updated immediately when a build becomes public/private
+    if (isPublic !== undefined && isPublic !== existingBuild.isPublic) {
+      revalidateTag("public-builds");
+    }
+
     return NextResponse.json(build);
   } catch (error: any) {
     console.error("Error updating build:", error);
@@ -205,12 +211,20 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       );
     }
 
+    // Check if build was public before deleting
+    const wasPublic = existingBuild.isPublic;
+
     await prisma.build.delete({
       where: { id },
     });
 
     // Invalidate cache for this user's builds
     revalidateTag(`builds-${session.user.id}`);
+
+    // Invalidate public builds cache if the deleted build was public
+    if (wasPublic) {
+      revalidateTag("public-builds");
+    }
 
     return NextResponse.json({ message: "Build deletada com sucesso" });
   } catch (error: any) {

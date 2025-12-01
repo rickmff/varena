@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronUp, ChevronDown } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowBigDown, ArrowBigUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
@@ -126,7 +126,7 @@ export function VoteButtons({
   const isDownvoted = userVote === "downvote";
 
   return (
-    <div className="flex flex-col items-center gap-1 bg-black/40 backdrop-blur-sm rounded-lg p-1">
+    <div className="flex flex-col items-center gap-1 bg-black/40 backdrop-blur-sm rounded-lg p-1 border-2 border-zinc-800/20">
       <Button
         variant="ghost"
         size="icon"
@@ -138,7 +138,7 @@ export function VoteButtons({
         disabled={isLoading}
         aria-label="Upvote"
       >
-        <ChevronUp className="h-5 w-5" />
+        <ArrowBigUp />
       </Button>
       <span
         className={`text-sm font-bold min-w-[2.5ch] text-center ${score > 0
@@ -161,7 +161,7 @@ export function VoteButtons({
         disabled={isLoading}
         aria-label="Downvote"
       >
-        <ChevronDown className="h-5 w-5" />
+        <ArrowBigDown />
       </Button>
     </div>
   );

@@ -1044,24 +1044,41 @@ export default function Home() {
                 ))}
               </ul>
             </div>
-            {/*             <div>
+            <div>
               <h3 className="text-lg font-bold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm text-gray-100">
-                {["Privacy Policy", "Terms of Service", "Cookie Policy", "EULA"].map((item, i) => (
-                  <motion.li
-                    key={item}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    viewport={{ once: true }}
-                  >
-                    <Link href="#" className="hover:text-white transition-colors">
-                      {item}
-                    </Link>
-                  </motion.li>
-                ))}
+                <motion.li
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <Link href="/privacy-policy" className="hover:text-white transition-colors">
+                    Privacy Policy
+                  </Link>
+                </motion.li>
+                <motion.li
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 }}
+                  viewport={{ once: true }}
+                >
+                  <Link href="/terms-of-service" className="hover:text-white transition-colors">
+                    Terms of Service
+                  </Link>
+                </motion.li>
+                <motion.li
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                  viewport={{ once: true }}
+                >
+                  <Link href="/cookie-policy" className="hover:text-white transition-colors">
+                    Cookie Policy
+                  </Link>
+                </motion.li>
               </ul>
-            </div> */}
+            </div>
           </div>
           <motion.div
             className="border-t border-slate-800 mt-8 pt-8 text-center text-sm text-slate-700"

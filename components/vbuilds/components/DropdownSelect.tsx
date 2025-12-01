@@ -27,7 +27,7 @@ const DropdownItem = ({
   onClick: () => void;
 }) => (
   <DropdownMenuItem
-    className={`w-20 h-20 text-gray-200 rounded-md flex items-center justify-center ${string3}`}
+    className={`w-full md:w-20 h-20 text-gray-200 rounded-md flex items-center justify-center ${string3}`}
     onClick={onClick}
   >
     {option.label ? (
@@ -127,8 +127,8 @@ export const DropdownSelect: React.FC<{
             )}
           </DropdownMenuTrigger>
         </HoverInfoCard>
-        <DropdownMenuContent className="p-0 min-w-0 space-y-1 overflow-auto">
-          <div className="flex flex-wrap gap-2 p-2">
+        <DropdownMenuContent className="p-0 min-w-0 md:min-w-[8rem] w-full md:w-auto space-y-1 overflow-auto">
+          <div className="flex flex-col md:flex-row md:flex-wrap gap-2 p-2">
             {options
               .filter((option) => option.id !== selected)
               .map((option) => (

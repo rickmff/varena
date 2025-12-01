@@ -11,6 +11,8 @@ import ChangePassword from "./change-password";
 import SendPasswordResetButton from "./send-password-reset-button";
 import prisma from "@/lib/prisma";
 import NavBar from "@/components/NavBar";
+import DataExportButton from "@/components/gdpr/DataExportButton";
+import DeleteAccountButton from "@/components/gdpr/DeleteAccountButton";
 
 export default async function ProfilePage() {
   const session = await getServerSession();
@@ -135,6 +137,20 @@ export default async function ProfilePage() {
                 <div className="pt-4 border-t border-[#5865F2]/30 space-y-2">
                   <SendPasswordResetButton email={user.email || ""} />
                   <LogoutButton />
+                </div>
+
+                {/* GDPR Rights Section */}
+                <div className="pt-4 border-t border-[#5865F2]/30 space-y-2">
+                  <h3 className="text-sm font-medium text-gray-400 mb-2">GDPR Rights</h3>
+                  <DataExportButton />
+                  <DeleteAccountButton userEmail={user.email || ""} />
+                  <p className="text-xs text-gray-500 mt-2">
+                    Learn more about your rights in our{" "}
+                    <Link href="/privacy-policy" className="text-[#5865F2] hover:underline">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </p>
                 </div>
               </CardContent>
             </Card>

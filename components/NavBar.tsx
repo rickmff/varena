@@ -138,7 +138,7 @@ export default function NavBar() {
   };
 
   useEffect(() => {
-    let scrollContainer;
+    let scrollContainer: HTMLElement | Window | null;
 
     scrollContainer = document.getElementById("builder-page");
 
@@ -211,7 +211,7 @@ export default function NavBar() {
               />
             </motion.div>
           </Link>
-          <nav className="hidden md:flex items-center gap-6 relative z-50 ml-14">
+          <nav className="hidden md:flex items-center gap-6 relative z-50 ml-36">
             {menuItems.map(
               (item: { name: string; href: string }, i: number) => (
                 <motion.div

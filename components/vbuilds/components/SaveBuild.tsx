@@ -105,14 +105,55 @@ const SaveBuild: React.FC = () => {
     return `${currentUrl}${buildQuery}`;
   };
 
+  const saveToLocalStorage = (buildName: string, buildCode: string) => {
+    if (typeof window === "undefined") return;
+
+    try {
+      // Get existing builds from localStorage
+      const existingBuildsData = localStorage.getItem("vbuilds");
+      let existingBuilds: Array<{ code: string; timestamp?: string; name: string }> = [];
+
+      if (existingBuildsData) {
+        try {
+          existingBuilds = JSON.parse(existingBuildsData);
+          if (!Array.isArray(existingBuilds)) {
+            existingBuilds = [];
+          }
+        } catch (error) {
+          console.error("Failed to parse existing builds from localStorage:", error);
+          existingBuilds = [];
+        }
+      }
+
+      // Check if a build with the same name already exists
+      const existingIndex = existingBuilds.findIndex((b) => b.name === buildName);
+      if (existingIndex !== -1) {
+        // Update existing build
+        existingBuilds[existingIndex] = {
+          code: buildCode,
+          name: buildName,
+          timestamp: new Date().toISOString(),
+        };
+      } else {
+        // Add new build
+        existingBuilds.push({
+          code: buildCode,
+          name: buildName,
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      // Save back to localStorage
+      localStorage.setItem("vbuilds", JSON.stringify(existingBuilds));
+      return true;
+    } catch (error) {
+      console.error("Error saving build to localStorage:", error);
+      return false;
+    }
+  };
+
   const saveBuildCommand = async () => {
     if (authLoading) {
-      return;
-    }
-
-    // Check if user is authenticated
-    if (!isAuthenticated) {
-      setShowAuthDialog(true);
       return;
     }
 
@@ -121,6 +162,24 @@ const SaveBuild: React.FC = () => {
 
     if (!buildCode) {
       toast.error("No build to save");
+      return;
+    }
+
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      // Save to localStorage for non-authenticated users
+      const saved = saveToLocalStorage(buildName, buildCode);
+      if (saved) {
+        toast.success("Build saved locally! Sign in to sync across devices.", {
+          duration: 4000,
+        });
+        // Redirect to builds page to see the saved build
+        setTimeout(() => {
+          router.push("/builds");
+        }, 500);
+      } else {
+        toast.error("Failed to save build locally");
+      }
       return;
     }
 
@@ -226,9 +285,9 @@ const SaveBuild: React.FC = () => {
       <AlertDialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
         <AlertDialogContent className="bg-black border-[#5865F2]/30">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-white">Sign In Required</AlertDialogTitle>
+            <AlertDialogTitle className="text-white">Sign In to Sync Your Builds</AlertDialogTitle>
             <AlertDialogDescription className="text-gray-400">
-              You need to sign in to save your builds. Would you like to sign in or create a new account?
+              Your build has been saved locally. Sign in to sync your builds across devices and access them from anywhere.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-col sm:flex-row gap-2">

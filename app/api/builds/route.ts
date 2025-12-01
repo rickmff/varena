@@ -242,6 +242,11 @@ export async function POST(request: Request) {
     // Invalidate cache for this user's builds
     revalidateTag(`builds-${userIdToUse}`);
 
+    // Invalidate public builds cache if the new build is public
+    if (isPublic === true) {
+      revalidateTag("public-builds");
+    }
+
     return NextResponse.json(build, { status: 201 });
   } catch (error: any) {
     console.error("Error creating build:", error);

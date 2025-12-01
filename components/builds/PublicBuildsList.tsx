@@ -297,53 +297,69 @@ export default function PublicBuildsList() {
   const [authorSuggestions, setAuthorSuggestions] = useState<string[]>([]);
   const [showAuthorDropdown, setShowAuthorDropdown] = useState(false);
 
-  useEffect(() => {
+  const fetchBuilds = async () => {
     // Prevent duplicate fetches
     if (fetchingRef.current) return;
 
-    const fetchBuilds = async () => {
-      fetchingRef.current = true;
-      setLoading(true);
-      try {
-        const response = await fetch(`/api/public-builds?sort=${sortBy}&limit=50`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch public builds");
-        }
+    fetchingRef.current = true;
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/public-builds?sort=${sortBy}&limit=50`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch public builds");
+      }
 
-        const data = await response.json();
-        // Handle both old format (array) and new format (object with builds array)
-        const buildsData = Array.isArray(data) ? data : (data.builds || []);
+      const data = await response.json();
+      // Handle both old format (array) and new format (object with builds array)
+      const buildsData = Array.isArray(data) ? data : (data.builds || []);
 
-        // Don't decode builds immediately - decode lazily when needed for filtering
-        const buildsArray: DecodedBuild[] = buildsData.map((build: any) => ({
-          id: build.id,
-          name: build.name,
-          code: build.code,
-          author: build.author,
-          isPublic: build.isPublic || false,
-          upvotes: build.upvotes || 0,
-          downvotes: build.downvotes || 0,
-          userVote: build.userVote || null,
-          decoded: undefined, // Will be decoded lazily when needed
-        }));
+      // Don't decode builds immediately - decode lazily when needed for filtering
+      const buildsArray: DecodedBuild[] = buildsData.map((build: any) => ({
+        id: build.id,
+        name: build.name,
+        code: build.code,
+        author: build.author,
+        isPublic: build.isPublic || false,
+        upvotes: build.upvotes || 0,
+        downvotes: build.downvotes || 0,
+        userVote: build.userVote || null,
+        decoded: undefined, // Will be decoded lazily when needed
+      }));
 
-        setBuilds(buildsArray);
+      setBuilds(buildsArray);
 
-        // Extract unique authors for dropdown
-        const authors = Array.from(
-          new Set(buildsArray.map((b) => b.author).filter(Boolean))
-        ) as string[];
-        setAuthorSuggestions(authors.sort());
-      } catch (error) {
-        console.error("Failed to load public builds:", error);
-        setBuilds([]);
-      } finally {
-        setLoading(false);
+      // Extract unique authors for dropdown
+      const authors = Array.from(
+        new Set(buildsArray.map((b) => b.author).filter(Boolean))
+      ) as string[];
+      setAuthorSuggestions(authors.sort());
+    } catch (error) {
+      console.error("Failed to load public builds:", error);
+      setBuilds([]);
+    } finally {
+      setLoading(false);
+      fetchingRef.current = false;
+    }
+  };
+
+  useEffect(() => {
+    fetchBuilds();
+  }, [sortBy]);
+
+  // Refetch when page becomes visible (user switches back to tab/window)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Reset fetching ref to allow refetch
         fetchingRef.current = false;
+        fetchBuilds();
       }
     };
 
-    fetchBuilds();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [sortBy]);
 
   // Check if we need to decode builds for filtering
