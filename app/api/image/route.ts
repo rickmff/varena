@@ -11,9 +11,21 @@ export async function GET(request: Request) {
       return new NextResponse('Missing URL parameter', { status: 400 });
     }
 
-    // Verify this is a Notion URL
-    if (!imageUrl.includes('prod-files-secure.s3.us-west-2.amazonaws.com')) {
-      return new NextResponse('Invalid image source', { status: 400 });
+    // Verify this is a Notion URL (various domains)
+    try {
+      const urlObj = new URL(imageUrl);
+      const notionHostnames = [
+        'prod-files-secure.s3.us-west-2.amazonaws.com',
+        's3.us-west-2.amazonaws.com',
+        'notion.so',
+        'www.notion.so'
+      ];
+
+      if (!notionHostnames.some(hostname => urlObj.hostname === hostname || urlObj.hostname.endsWith('.' + hostname))) {
+        return new NextResponse('Invalid image source', { status: 400 });
+      }
+    } catch (e) {
+      return new NextResponse('Invalid URL format', { status: 400 });
     }
 
     const response = await fetch(imageUrl);
