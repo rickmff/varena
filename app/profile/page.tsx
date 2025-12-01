@@ -8,12 +8,12 @@ import Link from "next/link";
 import { authClient } from "@/lib/better-auth/client";
 import LogoutButton from "./logout-button";
 import ChangePassword from "./change-password";
+import InlineNameEditor from "./inline-name-editor";
 import SendPasswordResetButton from "./send-password-reset-button";
 import prisma from "@/lib/prisma";
 import NavBar from "@/components/NavBar";
 import DataExportButton from "@/components/gdpr/DataExportButton";
 import DeleteAccountButton from "@/components/gdpr/DeleteAccountButton";
-import { AuthorBadge } from "@/components/AuthorBadge";
 
 export default async function ProfilePage() {
   const session = await getServerSession();
@@ -97,15 +97,12 @@ export default async function ProfilePage() {
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm font-medium text-gray-400">Name</label>
-                    <p className="text-white mt-1 flex items-center gap-2">
-                      {dbUser?.badge && (
-                        <AuthorBadge
-                          badgeType={dbUser.badge.badgeType}
-                          description={dbUser.badge.description}
-                        />
-                      )}
-                      {user.name || "Not provided"}
-                    </p>
+                    <div className="mt-1">
+                      <InlineNameEditor
+                        currentName={user.name}
+                        badge={dbUser?.badge || null}
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -172,6 +169,11 @@ export default async function ProfilePage() {
                 </div>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Account Settings Section */}
+          <div className="grid gap-6 md:grid-cols-2 mt-6">
+            <ChangePassword />
           </div>
         </div>
       </section>

@@ -16,7 +16,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Shield, Trash2, UserX, UserCheck, Loader2, Award, X, ChevronDown, Sword, Crown, Check } from "lucide-react";
+import { Shield, Trash2, UserX, UserCheck, Loader2, Award, X, ChevronDown, Sword, Crown, Check, FileText, Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { AuthorBadge } from "@/components/AuthorBadge";
 import {
   DropdownMenu,
@@ -25,6 +25,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 
 type User = {
   id: string;
@@ -90,9 +91,16 @@ export default function AdminPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [builds, setBuilds] = useState<Build[]>([]);
   const [badges, setBadges] = useState<Record<string, UserBadgeType>>({});
+  const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [buildsLoading, setBuildsLoading] = useState(true);
+  const [logsLoading, setLogsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [userSearch, setUserSearch] = useState("");
+  const [userSortField, setUserSortField] = useState<string | null>(null);
+  const [userSortDirection, setUserSortDirection] = useState<"asc" | "desc">("asc");
+  const [buildSortField, setBuildSortField] = useState<string | null>(null);
+  const [buildSortDirection, setBuildSortDirection] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
     if (!authLoading && !isAdmin) {
@@ -105,6 +113,7 @@ export default function AdminPage() {
       fetchUsers();
       fetchBuilds();
       fetchBadges();
+      fetchLogs();
     }
   }, [isAdmin]);
 
@@ -160,6 +169,132 @@ export default function AdminPage() {
       // Don't show error toast for badges, it's not critical
     }
   };
+
+  const fetchLogs = async () => {
+    setLogsLoading(true);
+    try {
+      const response = await fetch("/api/admin/logs?limit=200");
+      if (!response.ok) {
+        throw new Error("Failed to fetch logs");
+      }
+      const data = await response.json();
+      setLogs(data.logs || []);
+    } catch (error) {
+      console.error("Error fetching logs:", error);
+      toast.error("Failed to load logs");
+    } finally {
+      setLogsLoading(false);
+    }
+  };
+
+  const handleUserSort = (field: string) => {
+    if (userSortField === field) {
+      setUserSortDirection(userSortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setUserSortField(field);
+      setUserSortDirection("asc");
+    }
+  };
+
+  const handleBuildSort = (field: string) => {
+    if (buildSortField === field) {
+      setBuildSortDirection(buildSortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setBuildSortField(field);
+      setBuildSortDirection("asc");
+    }
+  };
+
+  const getSortIcon = (field: string | null, currentField: string | null, direction: "asc" | "desc") => {
+    if (field !== currentField) {
+      return <ArrowUpDown className="w-4 h-4 ml-1 opacity-50" />;
+    }
+    return direction === "asc" ? <ArrowUp className="w-4 h-4 ml-1" /> : <ArrowDown className="w-4 h-4 ml-1" />;
+  };
+
+  const sortedUsers = [...users].sort((a, b) => {
+    if (!userSortField) return 0;
+
+    let aValue: any;
+    let bValue: any;
+
+    // Handle nested objects
+    if (userSortField === "_count") {
+      aValue = a._count.builds + a._count.votes;
+      bValue = b._count.builds + b._count.votes;
+    } else if (userSortField === "votes") {
+      aValue = a._count.votes;
+      bValue = b._count.votes;
+    } else {
+      aValue = (a as any)[userSortField];
+      bValue = (b as any)[userSortField];
+    }
+
+    // Handle null/undefined values
+    if (aValue === null || aValue === undefined) aValue = "";
+    if (bValue === null || bValue === undefined) bValue = "";
+
+    // Handle dates
+    if (userSortField === "createdAt") {
+      aValue = new Date(aValue).getTime();
+      bValue = new Date(bValue).getTime();
+    }
+
+    // Handle booleans
+    if (typeof aValue === "boolean") {
+      aValue = aValue ? 1 : 0;
+      bValue = bValue ? 1 : 0;
+    }
+
+    // Handle strings
+    if (typeof aValue === "string") {
+      aValue = aValue.toLowerCase();
+      bValue = bValue.toLowerCase();
+    }
+
+    if (aValue < bValue) return userSortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return userSortDirection === "asc" ? 1 : -1;
+    return 0;
+  }).filter((user) => {
+    if (!userSearch) return true;
+    const searchLower = userSearch.toLowerCase();
+    return (
+      (user.name?.toLowerCase().includes(searchLower)) ||
+      (user.email.toLowerCase().includes(searchLower))
+    );
+  });
+
+  const sortedBuilds = [...builds].sort((a, b) => {
+    if (!buildSortField) return 0;
+
+    let aValue: any = (a as any)[buildSortField];
+    let bValue: any = (b as any)[buildSortField];
+
+    // Handle null/undefined values
+    if (aValue === null || aValue === undefined) aValue = "";
+    if (bValue === null || bValue === undefined) bValue = "";
+
+    // Handle dates
+    if (buildSortField === "createdAt") {
+      aValue = new Date(aValue).getTime();
+      bValue = new Date(bValue).getTime();
+    }
+
+    // Handle strings
+    if (typeof aValue === "string") {
+      aValue = aValue.toLowerCase();
+      bValue = bValue.toLowerCase();
+    }
+
+    // Handle numbers (upvotes, downvotes)
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      // Numbers are already comparable
+    }
+
+    if (aValue < bValue) return buildSortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return buildSortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
 
   const handleBanUser = async (userId: string, currentlyBanned: boolean) => {
     const action = currentlyBanned ? "unban" : "ban";
@@ -286,6 +421,8 @@ export default function AdminPage() {
         [userId]: data.badge,
       }));
       toast.success(`${badgeInfo.label} badge assigned successfully`);
+      // Refresh logs to show the badge assignment
+      fetchLogs();
     } catch (error) {
       console.error("Error assigning badge:", error);
       toast.error("Failed to assign badge");
@@ -316,6 +453,8 @@ export default function AdminPage() {
         return updated;
       });
       toast.success("Badge removed successfully");
+      // Refresh logs
+      fetchLogs();
     } catch (error) {
       console.error("Error removing badge:", error);
       toast.error("Failed to remove badge");
@@ -347,6 +486,9 @@ export default function AdminPage() {
           <TabsTrigger value="builds" className="data-[state=active]:bg-red-900/50">
             Public Builds
           </TabsTrigger>
+          <TabsTrigger value="logs" className="data-[state=active]:bg-red-900/50">
+            System Logs
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="users">
@@ -358,28 +500,88 @@ export default function AdminPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <div className="mb-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Search by name or email..."
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    className="pl-10 bg-black/50 border-white/10 text-white placeholder:text-gray-500"
+                  />
+                </div>
+              </div>
               {loading ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="w-6 h-6 animate-spin text-red-500" />
                 </div>
-              ) : users.length === 0 ? (
+              ) : sortedUsers.length === 0 ? (
                 <p className="text-gray-400 text-center py-8">No users found</p>
               ) : (
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow className="border-white/10 hover:bg-white/5">
-                        <TableHead className="text-gray-300">Email</TableHead>
-                        <TableHead className="text-gray-300">Name</TableHead>
-                        <TableHead className="text-gray-300">Builds</TableHead>
-                        <TableHead className="text-gray-300">Votes</TableHead>
-                        <TableHead className="text-gray-300">Status</TableHead>
-                        <TableHead className="text-gray-300">Joined</TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleUserSort("email")}
+                        >
+                          <div className="flex items-center">
+                            Email
+                            {getSortIcon("email", userSortField, userSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleUserSort("name")}
+                        >
+                          <div className="flex items-center">
+                            Name
+                            {getSortIcon("name", userSortField, userSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleUserSort("_count")}
+                        >
+                          <div className="flex items-center">
+                            Builds
+                            {getSortIcon("_count", userSortField, userSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleUserSort("votes")}
+                        >
+                          <div className="flex items-center">
+                            Votes
+                            {getSortIcon("votes", userSortField, userSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleUserSort("banned")}
+                        >
+                          <div className="flex items-center">
+                            Status
+                            {getSortIcon("banned", userSortField, userSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleUserSort("createdAt")}
+                        >
+                          <div className="flex items-center">
+                            Joined
+                            {getSortIcon("createdAt", userSortField, userSortDirection)}
+                          </div>
+                        </TableHead>
                         <TableHead className="text-gray-300 text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {users.map((user) => (
+                      {sortedUsers.map((user) => (
                         <TableRow
                           key={user.id}
                           className="border-white/10 hover:bg-white/5"
@@ -545,18 +747,66 @@ export default function AdminPage() {
                   <Table>
                     <TableHeader>
                       <TableRow className="border-white/10 hover:bg-white/5">
-                        <TableHead className="text-gray-300">Build Name</TableHead>
-                        <TableHead className="text-gray-300">Description</TableHead>
-                        <TableHead className="text-gray-300">Author</TableHead>
-                        <TableHead className="text-gray-300">Upvotes</TableHead>
-                        <TableHead className="text-gray-300">Downvotes</TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleBuildSort("name")}
+                        >
+                          <div className="flex items-center">
+                            Build Name
+                            {getSortIcon("name", buildSortField, buildSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleBuildSort("description")}
+                        >
+                          <div className="flex items-center">
+                            Description
+                            {getSortIcon("description", buildSortField, buildSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleBuildSort("author")}
+                        >
+                          <div className="flex items-center">
+                            Author
+                            {getSortIcon("author", buildSortField, buildSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleBuildSort("upvotes")}
+                        >
+                          <div className="flex items-center">
+                            Upvotes
+                            {getSortIcon("upvotes", buildSortField, buildSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleBuildSort("downvotes")}
+                        >
+                          <div className="flex items-center">
+                            Downvotes
+                            {getSortIcon("downvotes", buildSortField, buildSortDirection)}
+                          </div>
+                        </TableHead>
                         <TableHead className="text-gray-300">Score</TableHead>
-                        <TableHead className="text-gray-300">Created</TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleBuildSort("createdAt")}
+                        >
+                          <div className="flex items-center">
+                            Created
+                            {getSortIcon("createdAt", buildSortField, buildSortDirection)}
+                          </div>
+                        </TableHead>
                         <TableHead className="text-gray-300 text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {builds.map((build) => {
+                      {sortedBuilds.map((build) => {
                         const score = build.upvotes - build.downvotes;
                         return (
                           <TableRow
@@ -623,6 +873,85 @@ export default function AdminPage() {
                           </TableRow>
                         );
                       })}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="logs">
+          <Card className="bg-black/80 border-white/10">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <FileText className="w-6 h-6" />
+                System Logs
+              </CardTitle>
+              <CardDescription className="text-gray-400">
+                View system activity: signups, logins, badges assigned, votes, and account deletions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {logsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-red-500" />
+                </div>
+              ) : logs.length === 0 ? (
+                <p className="text-gray-400 text-center py-8">No logs found</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-white/10 hover:bg-white/5">
+                        <TableHead className="text-gray-300">Type</TableHead>
+                        <TableHead className="text-gray-300">User</TableHead>
+                        <TableHead className="text-gray-300">Details</TableHead>
+                        <TableHead className="text-gray-300">Timestamp</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {logs.map((log) => (
+                        <TableRow
+                          key={log.id}
+                          className="border-white/10 hover:bg-white/5"
+                        >
+                          <TableCell>
+                            <Badge
+                              className={
+                                log.type === "signup"
+                                  ? "bg-purple-900/50"
+                                  : log.type === "login"
+                                    ? "bg-blue-900/50"
+                                    : log.type === "badge"
+                                      ? "bg-yellow-900/50"
+                                      : log.type === "vote"
+                                        ? "bg-green-900/50"
+                                        : "bg-gray-900/50"
+                              }
+                            >
+                              {log.type === "signup"
+                                ? "Signup"
+                                : log.type === "login"
+                                  ? "Login"
+                                  : log.type === "badge"
+                                    ? "Badge"
+                                    : log.type === "vote"
+                                      ? "Vote"
+                                      : "Other"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-white">
+                            {log.userName || log.userEmail || "Unknown"}
+                          </TableCell>
+                          <TableCell className="text-gray-300">
+                            {log.details}
+                          </TableCell>
+                          <TableCell className="text-gray-300">
+                            {new Date(log.timestamp).toLocaleString()}
+                          </TableCell>
+                        </TableRow>
+                      ))}
                     </TableBody>
                   </Table>
                 </div>
