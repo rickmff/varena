@@ -92,7 +92,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, description, code, author, authorTwitchUrl, authorYoutubeUrl, isPublic } = await request.json();
+    const { name, code, author, authorTwitchUrl, authorYoutubeUrl, isPublic } = await request.json();
 
     // Only name and code are required
     if (!name || !code) {
@@ -106,14 +106,6 @@ export async function POST(request: Request) {
     if (!isValidEnglishAlphabet(name.trim())) {
       return NextResponse.json(
         { error: "Build name can only contain English alphabet characters, numbers, and spaces" },
-        { status: 400 }
-      );
-    }
-
-    // Validate description contains only English alphabet characters if provided
-    if (description && description.trim() && !isValidEnglishAlphabet(description.trim())) {
-      return NextResponse.json(
-        { error: "Build description can only contain English alphabet characters, numbers, and spaces" },
         { status: 400 }
       );
     }
@@ -193,7 +185,6 @@ export async function POST(request: Request) {
 
     // Derive author from session user if not provided
     const buildAuthor = author || session.user.name || session.user.email || "Anonymous";
-    const buildDescription = description || "";
 
     // Check if a build with the same name already exists for this user
     const existingBuild = await prisma.build.findFirst({
@@ -246,7 +237,6 @@ export async function POST(request: Request) {
     const build = await prisma.build.create({
       data: {
         name,
-        description: buildDescription,
         code,
         author: buildAuthor,
         authorTwitchUrl: authorTwitchUrl || null,
@@ -301,7 +291,6 @@ export async function GET(request: Request) {
           select: {
             id: true,
             name: true,
-            description: true,
             code: true,
             isPublic: true,
             userId: true,
@@ -330,7 +319,6 @@ export async function GET(request: Request) {
           select: {
             id: true,
             name: true,
-            description: true,
             code: true,
             isPublic: true,
             userId: true,
@@ -375,7 +363,6 @@ export async function GET(request: Request) {
           select: {
             id: true,
             name: true,
-            description: true,
             code: true,
             isPublic: true,
             createdAt: true,

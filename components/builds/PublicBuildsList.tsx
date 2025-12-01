@@ -25,12 +25,13 @@ import "@/components/vbuilds/styles.css";
 import { VoteButtons } from "./VoteButtons";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { AuthorBadge } from "@/components/AuthorBadge";
+import { useUserBadges } from "@/hooks/use-author-badges";
 
 type Build = {
   id?: string;
   name: string;
   code: string;
-  description?: string;
   author?: string;
   userId?: string | null;
   isPublic?: boolean;
@@ -279,6 +280,56 @@ const SpellDropdownSelect = ({
   );
 };
 
+// Author Suggestions Dropdown Component with Badges
+const AuthorSuggestionsDropdown = ({
+  suggestions,
+  authorToUserIdMap,
+  onSelect,
+}: {
+  suggestions: string[];
+  authorToUserIdMap: Map<string, string | null>;
+  onSelect: (author: string) => void;
+}) => {
+  // Get all userIds from the suggestions
+  const userIds = suggestions
+    .map((author) => authorToUserIdMap.get(author))
+    .filter((id): id is string => id !== null && id !== undefined);
+
+  // Fetch badges for all users
+  const { badges } = useUserBadges(userIds);
+
+  return (
+    <div className="absolute z-10 w-full top-full mt-1 bg-black/95 border border-red-900/30 rounded-md shadow-lg max-h-48 overflow-y-auto">
+      {suggestions.map((author) => {
+        const userId = authorToUserIdMap.get(author);
+        const badge = userId ? badges[userId] : null;
+
+        return (
+          <button
+            key={author}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              onSelect(author);
+            }}
+            className="w-full px-4 py-2 text-left text-white hover:bg-red-900/50 flex items-center gap-2 transition-colors"
+          >
+            <User className="w-3 h-3 text-gray-400 flex-shrink-0" />
+            <span className="flex items-center gap-1.5 flex-1 min-w-0">
+              <span className="truncate">{author}</span>
+              {badge && (
+                <AuthorBadge
+                  badgeType={badge.badgeType}
+                  description={badge.description}
+                />
+              )}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
 export default function PublicBuildsList() {
   const [builds, setBuilds] = useState<DecodedBuild[]>([]);
   const [loading, setLoading] = useState(true);
@@ -298,6 +349,7 @@ export default function PublicBuildsList() {
   const [authorFilter, setAuthorFilter] = useState<string>("");
   const [authorSuggestions, setAuthorSuggestions] = useState<string[]>([]);
   const [showAuthorDropdown, setShowAuthorDropdown] = useState(false);
+  const [authorToUserIdMap, setAuthorToUserIdMap] = useState<Map<string, string | null>>(new Map());
 
   const fetchBuilds = async () => {
     // Prevent duplicate fetches
@@ -320,7 +372,6 @@ export default function PublicBuildsList() {
         id: build.id,
         name: build.name,
         code: build.code,
-        description: build.description || "",
         author: build.author,
         userId: build.userId || null,
         isPublic: build.isPublic || false,
@@ -332,11 +383,20 @@ export default function PublicBuildsList() {
 
       setBuilds(buildsArray);
 
-      // Extract unique authors for dropdown
+      // Extract unique authors for dropdown and create author -> userId mapping
       const authors = Array.from(
         new Set(buildsArray.map((b) => b.author).filter(Boolean))
       ) as string[];
       setAuthorSuggestions(authors.sort());
+
+      // Create mapping of author name to userId (take first userId found for each author)
+      const authorMap = new Map<string, string | null>();
+      buildsArray.forEach((build) => {
+        if (build.author && !authorMap.has(build.author)) {
+          authorMap.set(build.author, build.userId || null);
+        }
+      });
+      setAuthorToUserIdMap(authorMap);
     } catch (error) {
       console.error("Failed to load public builds:", error);
       setBuilds([]);
@@ -688,28 +748,16 @@ export default function PublicBuildsList() {
               </Button>
             )}
             {showAuthorDropdown && authorSuggestions.length > 0 && (
-              <div className="absolute z-10 w-full top-full mt-1 bg-black/95 border border-red-900/30 rounded-md shadow-lg max-h-48 overflow-y-auto">
-                {authorSuggestions
-                  .filter((author) =>
-                    author
-                      .toLowerCase()
-                      .includes(authorFilter.toLowerCase())
-                  )
-                  .map((author) => (
-                    <button
-                      key={author}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        setAuthorFilter(author);
-                        setShowAuthorDropdown(false);
-                      }}
-                      className="w-full px-4 py-2 text-left text-white hover:bg-red-900/50 flex items-center gap-2 transition-colors"
-                    >
-                      <User className="w-3 h-3 text-gray-400" />
-                      {author}
-                    </button>
-                  ))}
-              </div>
+              <AuthorSuggestionsDropdown
+                suggestions={authorSuggestions.filter((author) =>
+                  author.toLowerCase().includes(authorFilter.toLowerCase())
+                )}
+                authorToUserIdMap={authorToUserIdMap}
+                onSelect={(author) => {
+                  setAuthorFilter(author);
+                  setShowAuthorDropdown(false);
+                }}
+              />
             )}
           </div>
         </div>
@@ -816,7 +864,6 @@ export default function PublicBuildsList() {
                   <BuildContent
                     code={build.code}
                     name={build.name}
-                    description={build.description}
                     author={build.author}
                     userId={build.userId}
                     isPublic={build.isPublic}

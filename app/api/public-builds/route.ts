@@ -50,7 +50,6 @@ export async function GET(request: Request) {
             select: {
               id: true,
               name: true,
-              description: true,
               code: true,
               author: true,
               isPublic: true,
@@ -85,7 +84,6 @@ export async function GET(request: Request) {
               select: {
                 id: true,
                 name: true,
-                description: true,
                 code: true,
                 author: true,
                 isPublic: true,

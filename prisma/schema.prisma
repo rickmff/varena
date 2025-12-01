@@ -67,7 +67,6 @@ model VerificationToken {
 model Build {
   id               String   @id @default(uuid())
   name             String
-  description      String   @db.Text
   code             String   @db.Text
   author           String
   authorTwitchUrl  String?

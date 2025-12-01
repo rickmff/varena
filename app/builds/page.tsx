@@ -6,11 +6,11 @@ import NavBar from "@/components/NavBar";
 import BuildsList from "@/components/builds/BuildsList";
 import PublicBuildsList from "@/components/builds/PublicBuildsList";
 import SectionHeader from "@/app/components/ui/SectionHeader";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { LogIn, Globe, Cloud, ThumbsUp, Hammer, Users } from "lucide-react";
 
 export default function Builds() {
@@ -57,20 +57,40 @@ export default function Builds() {
         <div className="container mx-auto px-4 relative z-10">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="flex justify-center mb-8">
-              <TabsList className="grid grid-cols-2 bg-black/60 backdrop-blur-sm border border-white/10 rounded-lg p-1.5 shadow-lg h-fit gap-2">
+              <TabsList className="grid grid-cols-2 bg-black/60 backdrop-blur-sm border border-white/10 rounded-lg p-1.5 shadow-lg h-fit gap-2 w-full max-w-md mx-auto">
                 <TabsTrigger
                   value="mine"
-                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-900/70 data-[state=active]:to-red-800/50 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-red-900/30 text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 rounded-md py-2.5 px-6 font-semibold text-sm uppercase tracking-wider data-[state=active]:scale-[1.02] data-[state=active]:border data-[state=active]:border-red-700/30"
+                  className="relative z-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none text-gray-400 hover:text-white hover:bg-white/5 transition-colors duration-300 rounded-md py-2.5 px-6 font-semibold text-sm uppercase tracking-wider data-[state=active]:text-white w-full"
                 >
-                  <Hammer className="w-4 h-4" />
-                  MAKE YOUR OWN
+                  {activeTab === "mine" && (
+                    <motion.div
+                      layoutId="active-tab-bg"
+                      className="absolute inset-0 bg-gradient-to-r from-red-900/70 to-red-800/50 rounded-md shadow-lg shadow-red-900/30 border border-red-700/30 z-[-1]"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  )}
+                  <div className="flex items-center gap-2 relative z-10">
+                    <Hammer className="w-4 h-4" />
+                    <span>MAKE YOUR OWN</span>
+                  </div>
                 </TabsTrigger>
                 <TabsTrigger
                   value="community"
-                  className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-900/70 data-[state=active]:to-red-800/50 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-red-900/30 text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 rounded-md py-2.5 px-6 font-semibold text-sm uppercase tracking-wider data-[state=active]:scale-[1.02] data-[state=active]:border data-[state=active]:border-red-700/30"
+                  className="relative z-0 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none text-gray-400 hover:text-white hover:bg-white/5 transition-colors duration-300 rounded-md py-2.5 px-6 font-semibold text-sm uppercase tracking-wider data-[state=active]:text-white w-full"
                 >
-                  <Users className="w-4 h-4" />
-                  COMMUNITY
+                  {activeTab === "community" && (
+                    <motion.div
+                      layoutId="active-tab-bg"
+                      className="absolute inset-0 bg-gradient-to-r from-red-900/70 to-red-800/50 rounded-md shadow-lg shadow-red-900/30 border border-red-700/30 z-[-1]"
+                      initial={false}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  )}
+                  <div className="flex items-center gap-2 relative z-10">
+                    <Users className="w-4 h-4" />
+                    <span>COMMUNITY</span>
+                  </div>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -115,12 +135,29 @@ export default function Builds() {
               </motion.div>
             )}
 
-            <TabsContent value="mine">
-              <BuildsList />
-            </TabsContent>
-            <TabsContent value="community">
-              <PublicBuildsList />
-            </TabsContent>
+            <AnimatePresence mode="wait">
+              {activeTab === "mine" ? (
+                <motion.div
+                  key="mine"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <BuildsList />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="community"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <PublicBuildsList />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Tabs>
         </div>
       </section>

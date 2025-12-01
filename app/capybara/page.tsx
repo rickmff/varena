@@ -42,7 +42,6 @@ type User = {
 type Build = {
   id: string;
   name: string;
-  description: string | null;
   author: string;
   upvotes: number;
   downvotes: number;
@@ -758,15 +757,6 @@ export default function AdminPage() {
                         </TableHead>
                         <TableHead
                           className="text-gray-300 cursor-pointer hover:text-white"
-                          onClick={() => handleBuildSort("description")}
-                        >
-                          <div className="flex items-center">
-                            Description
-                            {getSortIcon("description", buildSortField, buildSortDirection)}
-                          </div>
-                        </TableHead>
-                        <TableHead
-                          className="text-gray-300 cursor-pointer hover:text-white"
                           onClick={() => handleBuildSort("author")}
                         >
                           <div className="flex items-center">
@@ -815,9 +805,6 @@ export default function AdminPage() {
                           >
                             <TableCell className="text-white font-medium">
                               {build.name}
-                            </TableCell>
-                            <TableCell className="text-gray-300 max-w-xs truncate" title={build.description || undefined}>
-                              {build.description || "-"}
                             </TableCell>
                             <TableCell className="text-gray-300">
                               <div className="flex items-center gap-2">

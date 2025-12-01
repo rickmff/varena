@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/better-auth/server";
 import prisma from "@/lib/prisma";
 import { createPool } from "mysql2/promise";
+import { revalidateTag } from "next/cache";
 
 // Parse DATABASE_URL to create MySQL pool for Better Auth
 function parseDatabaseUrl(url: string) {
@@ -67,6 +68,35 @@ export async function PUT(request: Request) {
       );
     }
 
+    // Get current user to check old name
+    const currentUser = await prisma.user.findUnique({
+      where: { email: session.user.email || "" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+
+    // If name is being changed (not empty and different from current), check if it already exists
+    if (trimmedName && trimmedName !== (currentUser?.name || "")) {
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          name: trimmedName,
+          id: { not: session.user.id }, // Exclude current user
+        },
+      });
+
+      if (existingUser) {
+        return NextResponse.json(
+          { error: "This name is already taken. Please choose a different name." },
+          { status: 400 }
+        );
+      }
+    }
+
+    const oldName = currentUser?.name || null;
+
     // Use upsert to handle case where user might not exist in Prisma yet
     // Find by email (source of truth) and update or create as needed
     const updatedPrismaUser = await prisma.user.upsert({
@@ -87,6 +117,22 @@ export async function PUT(request: Request) {
         email: true,
       },
     });
+
+    // Update all builds where author matches the old name and userId matches current user
+    if (oldName && trimmedName && oldName !== trimmedName) {
+      await prisma.build.updateMany({
+        where: {
+          userId: session.user.id,
+          author: oldName,
+        },
+        data: {
+          author: trimmedName,
+        },
+      });
+
+      // Invalidate public builds cache so author names update immediately
+      revalidateTag("public-builds");
+    }
 
     // Also update Better Auth user table directly (if it exists separately)
     // Better Auth may use a lowercase 'user' table separate from Prisma's 'User' table

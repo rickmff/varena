@@ -16,7 +16,6 @@ import { BuildContent } from "./BuildsList";
 import { useAuth } from "@/hooks/use-auth";
 
 type Build = {
-  description: string | undefined;
   id?: string;
   name: string;
   code: string;
@@ -102,7 +101,6 @@ export default function BuildsListHome({
                     id: `local-${index}-${build.name}`, // Generate temporary ID
                     name: build.name || `Build ${index + 1}`,
                     code: build.code || "",
-                    description: build.description || "",
                     isPublic: false, // LocalStorage builds are always private
                   }));
                   setBuilds(buildsArray);
@@ -149,14 +147,12 @@ export default function BuildsListHome({
             id: build.id,
             name: build.name,
             code: build.code,
-            description: build.description || "",
             isPublic: build.isPublic || false,
           }))
           : (data.builds || []).map((build: any) => ({
             id: build.id,
             name: build.name,
             code: build.code,
-            description: build.description || "",
             isPublic: build.isPublic || false,
           }));
 
@@ -208,7 +204,6 @@ export default function BuildsListHome({
                       id: `local-${idx}-${build.name}`,
                       name: build.name || `Build ${idx + 1}`,
                       code: build.code || "",
-                      description: build.description || "",
                       isPublic: false,
                     }));
                     setBuilds(buildsArray);
@@ -361,7 +356,6 @@ export default function BuildsListHome({
                 <BuildContent
                   code={build.code}
                   name={build.name}
-                  description={build.description}
                   handleDeleteBuild={(event: React.MouseEvent) =>
                     handleDelete(event, build.id || "", index)
                   }

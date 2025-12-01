@@ -30,7 +30,6 @@ type Build = {
   id?: string;
   name: string;
   code: string;
-  description?: string;
   isPublic?: boolean;
 };
 
@@ -119,6 +118,16 @@ const borderVariants: Record<string, string> = {
   illusion: "border-spellSchool-illusion/30",
 };
 
+const textColorVariants: Record<string, string> = {
+  empty: "text-gray-400",
+  storm: "text-yellow-400",
+  blood: "text-red-400",
+  chaos: "text-purple-400",
+  arcane: "text-blue-400",
+  frost: "text-cyan-400",
+  illusion: "text-pink-400",
+};
+
 const Item = ({
   school,
   children,
@@ -159,7 +168,6 @@ export const BuildContent = ({
   code,
   name,
   author,
-  description,
   handleDeleteBuild,
   isPublic,
   onTogglePublic,
@@ -178,7 +186,6 @@ export const BuildContent = ({
   code: string;
   name: string;
   author?: string;
-  description?: string;
   handleDeleteBuild?: (event: React.MouseEvent) => void;
   isPublic?: boolean;
   onTogglePublic?: (checked: boolean) => void;
@@ -231,6 +238,19 @@ export const BuildContent = ({
     spell2SpellSchool,
     ultimateSpellSchool,
   ]);
+
+  // Determine header color based on card border logic
+  // Card border uses: border-green-500/50 if public, border-zinc-800/50 otherwise
+  const getHeaderColor = () => {
+    if (showPublicToggle && isPublic) {
+      return "text-green-400";
+    }
+    // For private builds, use a color that matches the zinc-800 border
+    // Using gray-400 to match the subtle zinc-800/50 border
+    return "text-gray-400";
+  };
+
+  const headerColor = getHeaderColor();
 
   return (
     <Card
@@ -340,9 +360,6 @@ export const BuildContent = ({
         {author && (
           <AuthorNameWithBadge authorName={author} userId={userId} />
         )}
-        <p className={`text-sm mt-2 line-clamp-2 ${description && description.trim() ? "text-gray-300" : "text-gray-500/50 italic"}`}>
-          {description && description.trim() ? description : "No description"}
-        </p>
       </CardHeader>
       <CardContent className="relative">
         <div className="space-y-6">
@@ -350,7 +367,7 @@ export const BuildContent = ({
           <div className="grid grid-cols-3 gap-4">
             {/* Armor Section */}
             <div className="space-y-2">
-              <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
+              <div className={`text-xs font-bold ${headerColor} uppercase tracking-wider`}>
                 Armour
               </div>
               <div className="flex gap-1">
@@ -373,7 +390,7 @@ export const BuildContent = ({
 
             {/* Buffs Section */}
             <div className="space-y-2">
-              <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
+              <div className={`text-xs font-bold ${headerColor} uppercase tracking-wider`}>
                 Buffs
               </div>
               <div className="flex gap-1">
@@ -412,7 +429,7 @@ export const BuildContent = ({
 
             {/* Blood Section */}
             <div className="space-y-2">
-              <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
+              <div className={`text-xs font-bold ${headerColor} uppercase tracking-wider`}>
                 Blood
               </div>
               <div className="flex gap-1">
@@ -448,7 +465,7 @@ export const BuildContent = ({
           <div className="grid grid-cols-2 gap-4">
             {/* Spells Section */}
             <div className="space-y-2">
-              <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
+              <div className={`text-xs font-bold ${headerColor} uppercase tracking-wider`}>
                 Spells
               </div>
               <div className="flex flex-1 gap-1">
@@ -488,7 +505,7 @@ export const BuildContent = ({
 
             {/* Passives Section */}
             <div className="space-y-2">
-              <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
+              <div className={`text-xs font-bold ${headerColor} uppercase tracking-wider`}>
                 Passives
               </div>
               <div className="flex gap-1">
@@ -541,7 +558,7 @@ export const BuildContent = ({
 
           {/* Bottom Row - Weapons */}
           <div className="space-y-2">
-            <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
+            <div className={`text-xs font-bold ${headerColor} uppercase tracking-wider`}>
               Weapons
             </div>
             <div className="flex gap-1 flex-wrap">
@@ -607,7 +624,6 @@ export default function BuildsList({
                     id: `local-${index}-${build.name}`, // Generate temporary ID
                     name: build.name || `Build ${index + 1}`,
                     code: build.code || "",
-                    description: build.description || "",
                     isPublic: false, // LocalStorage builds are always private
                   }));
                   setBuilds(buildsArray);
@@ -654,14 +670,12 @@ export default function BuildsList({
             id: build.id,
             name: build.name,
             code: build.code,
-            description: build.description || "",
             isPublic: build.isPublic || false,
           }))
           : (data.builds || []).map((build: any) => ({
             id: build.id,
             name: build.name,
             code: build.code,
-            description: build.description || "",
             isPublic: build.isPublic || false,
           }));
 
@@ -716,7 +730,6 @@ export default function BuildsList({
                 id: `local-${idx}-${build.name}`,
                 name: build.name || `Build ${idx + 1}`,
                 code: build.code || "",
-                description: build.description || "",
                 isPublic: false,
               }));
               setBuilds(buildsArray);
@@ -1023,7 +1036,6 @@ export default function BuildsList({
             },
             body: JSON.stringify({
               name: localBuild.name || `Imported Build ${imported + 1}`,
-              description: localBuild.description || "",
               code: localBuild.code,
             }),
           });
@@ -1053,14 +1065,12 @@ export default function BuildsList({
               id: build.id,
               name: build.name,
               code: build.code,
-              description: build.description || "",
               isPublic: build.isPublic || false,
             }))
             : (data.builds || []).map((build: any) => ({
               id: build.id,
               name: build.name,
               code: build.code,
-              description: build.description || "",
               isPublic: build.isPublic || false,
             }));
           // Sort builds: public builds first, then private builds
@@ -1158,7 +1168,6 @@ export default function BuildsList({
                 <BuildContent
                   code={build.code}
                   name={build.name}
-                  description={build.description}
                   handleDeleteBuild={(event: React.MouseEvent) =>
                     handleDelete(event, build.id || "", index)
                   }
