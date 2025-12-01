@@ -13,6 +13,7 @@ import prisma from "@/lib/prisma";
 import NavBar from "@/components/NavBar";
 import DataExportButton from "@/components/gdpr/DataExportButton";
 import DeleteAccountButton from "@/components/gdpr/DeleteAccountButton";
+import { AuthorBadge } from "@/components/AuthorBadge";
 
 export default async function ProfilePage() {
   const session = await getServerSession();
@@ -23,10 +24,19 @@ export default async function ProfilePage() {
 
   const user = session.user;
 
-  // Fetch user from database to get createdAt
+  // Fetch user from database to get createdAt and badge
   const dbUser = await prisma.user.findUnique({
     where: { email: user.email },
-    select: { createdAt: true },
+    select: {
+      id: true,
+      createdAt: true,
+      badge: {
+        select: {
+          badgeType: true,
+          description: true,
+        },
+      },
+    },
   });
 
   const getUserInitials = (name?: string | null, email?: string | null) => {
@@ -87,7 +97,15 @@ export default async function ProfilePage() {
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm font-medium text-gray-400">Name</label>
-                    <p className="text-white mt-1">{user.name || "Not provided"}</p>
+                    <p className="text-white mt-1 flex items-center gap-2">
+                      {dbUser?.badge && (
+                        <AuthorBadge
+                          badgeType={dbUser.badge.badgeType}
+                          description={dbUser.badge.description}
+                        />
+                      )}
+                      {user.name || "Not provided"}
+                    </p>
                   </div>
 
                   <div>

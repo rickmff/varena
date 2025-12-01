@@ -23,6 +23,8 @@ import { Switch } from "@/components/ui/switch";
 import React from "react";
 import "@/components/vbuilds/styles.css";
 import { useAuth } from "@/hooks/use-auth";
+import { AuthorBadge } from "@/components/AuthorBadge";
+import { useUserBadges } from "@/hooks/use-author-badges";
 
 type Build = {
   id?: string;
@@ -133,6 +135,24 @@ const Item = ({
   );
 };
 
+const AuthorNameWithBadge = ({ authorName, userId }: { authorName?: string; userId?: string | null }) => {
+  const { badges } = useUserBadges([userId].filter(Boolean) as string[]);
+  const badge = userId ? badges[userId] : null;
+
+  return (
+    <p className="text-sm text-gray-400 mt-1 flex items-center gap-1">
+      <User className="w-3 h-3" />
+      {badge && (
+        <AuthorBadge
+          badgeType={badge.badgeType}
+          description={badge.description}
+        />
+      )}
+      {authorName || "Unknown"}
+    </p>
+  );
+};
+
 export const BuildContent = ({
   code,
   name,
@@ -147,6 +167,7 @@ export const BuildContent = ({
   downvotes,
   userVote,
   buildId,
+  userId,
   onVoteChange,
   isAdmin,
   onAdminDelete,
@@ -165,6 +186,7 @@ export const BuildContent = ({
   downvotes?: number;
   userVote?: "upvote" | "downvote" | null;
   buildId?: string;
+  userId?: string | null;
   onVoteChange?: (upvotes: number, downvotes: number, userVote: "upvote" | "downvote" | null) => void;
   isAdmin?: boolean;
   onAdminDelete?: (event: React.MouseEvent) => void;
@@ -314,10 +336,7 @@ export const BuildContent = ({
           </CardTitle>
         </div>
         {author && (
-          <p className="text-sm text-gray-400 mt-1 flex items-center gap-1">
-            <User className="w-3 h-3" />
-            {author}
-          </p>
+          <AuthorNameWithBadge authorName={author} userId={userId} />
         )}
         <p className={`text-sm mt-2 line-clamp-2 ${description && description.trim() ? "text-gray-300" : "text-gray-500/50 italic"}`}>
           {description && description.trim() ? description : "No description"}

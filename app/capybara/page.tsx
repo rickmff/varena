@@ -16,7 +16,15 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Shield, Trash2, UserX, UserCheck, Loader2 } from "lucide-react";
+import { Shield, Trash2, UserX, UserCheck, Loader2, Award, X, ChevronDown, Sword, Crown, Check } from "lucide-react";
+import { AuthorBadge } from "@/components/AuthorBadge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type User = {
   id: string;
@@ -33,6 +41,7 @@ type User = {
 type Build = {
   id: string;
   name: string;
+  description: string | null;
   author: string;
   upvotes: number;
   downvotes: number;
@@ -40,11 +49,47 @@ type Build = {
   userId: string | null;
 };
 
+type UserBadgeType = {
+  id: string;
+  userId: string;
+  badgeType: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    id: string;
+    email: string;
+    name: string | null;
+  };
+};
+
+// Badge type definitions
+const BADGE_TYPES = {
+  veteran: {
+    label: "Veteran",
+    description: "Veteran player recognized by V Arena staff",
+    color: "blue",
+  },
+  champion: {
+    label: "Arena Champion",
+    description: "Arena Champion recognized by V Arena staff",
+    color: "yellow",
+  },
+  verified: {
+    label: "Verified",
+    description: "Verified by V Arena staff",
+    color: "green",
+  },
+} as const;
+
+type BadgeTypeKey = keyof typeof BADGE_TYPES;
+
 export default function AdminPage() {
   const { isAdmin, isLoading: authLoading, user } = useAuth();
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [builds, setBuilds] = useState<Build[]>([]);
+  const [badges, setBadges] = useState<Record<string, UserBadgeType>>({});
   const [loading, setLoading] = useState(true);
   const [buildsLoading, setBuildsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -59,6 +104,7 @@ export default function AdminPage() {
     if (isAdmin) {
       fetchUsers();
       fetchBuilds();
+      fetchBadges();
     }
   }, [isAdmin]);
 
@@ -87,12 +133,31 @@ export default function AdminPage() {
         throw new Error("Failed to fetch builds");
       }
       const data = await response.json();
-      setBuilds(data || []);
+      setBuilds(data.builds || []);
     } catch (error) {
       console.error("Error fetching builds:", error);
       toast.error("Failed to load builds");
     } finally {
       setBuildsLoading(false);
+    }
+  };
+
+  const fetchBadges = async () => {
+    try {
+      const response = await fetch("/api/admin/badges");
+      if (!response.ok) {
+        throw new Error("Failed to fetch badges");
+      }
+      const data = await response.json();
+      // Convert array to object keyed by userId for easy lookup
+      const badgesMap: Record<string, UserBadgeType> = {};
+      (data.badges || []).forEach((badge: UserBadgeType) => {
+        badgesMap[badge.userId] = badge;
+      });
+      setBadges(badgesMap);
+    } catch (error) {
+      console.error("Error fetching badges:", error);
+      // Don't show error toast for badges, it's not critical
     }
   };
 
@@ -190,6 +255,75 @@ export default function AdminPage() {
     }
   };
 
+  const handleAssignBadge = async (userId: string, userEmail: string, badgeType: BadgeTypeKey) => {
+    const badgeInfo = BADGE_TYPES[badgeType];
+    const confirmed = window.confirm(
+      `Are you sure you want to assign the "${badgeInfo.label}" badge to user "${userEmail}"?`
+    );
+    if (!confirmed) return;
+
+    setActionLoading(`badge-${userId}`);
+    try {
+      const response = await fetch("/api/admin/badges", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          badgeType,
+          description: badgeInfo.description,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to assign badge");
+      }
+
+      const data = await response.json();
+      setBadges((prev) => ({
+        ...prev,
+        [userId]: data.badge,
+      }));
+      toast.success(`${badgeInfo.label} badge assigned successfully`);
+    } catch (error) {
+      console.error("Error assigning badge:", error);
+      toast.error("Failed to assign badge");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRemoveBadge = async (userId: string, userEmail: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to remove the badge from user "${userEmail}"?`
+    );
+    if (!confirmed) return;
+
+    setActionLoading(`badge-${userId}`);
+    try {
+      const response = await fetch(`/api/admin/badges/${userId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to remove badge");
+      }
+
+      setBadges((prev) => {
+        const updated = { ...prev };
+        delete updated[userId];
+        return updated;
+      });
+      toast.success("Badge removed successfully");
+    } catch (error) {
+      console.error("Error removing badge:", error);
+      toast.error("Failed to remove badge");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   if (authLoading || !isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -254,7 +388,15 @@ export default function AdminPage() {
                             {user.email}
                           </TableCell>
                           <TableCell className="text-gray-300">
-                            {user.name || "-"}
+                            <div className="flex items-center gap-2">
+                              {user.name || "-"}
+                              {badges[user.id] && (
+                                <AuthorBadge
+                                  badgeType={badges[user.id].badgeType}
+                                  description={badges[user.id].description}
+                                />
+                              )}
+                            </div>
                           </TableCell>
                           <TableCell className="text-gray-300">
                             {user._count.builds}
@@ -278,11 +420,64 @@ export default function AdminPage() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-2">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={actionLoading === `badge-${user.id}` || actionLoading === user.id}
+                                    className={
+                                      badges[user.id]
+                                        ? "bg-blue-900/20 border-blue-900/50 text-blue-400 hover:bg-blue-900/30"
+                                        : "bg-gray-900/20 border-gray-900/50 text-gray-400 hover:bg-gray-900/30"
+                                    }
+                                  >
+                                    {actionLoading === `badge-${user.id}` ? (
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                      <>
+                                        <Award className="w-4 h-4 mr-1" />
+                                        {badges[user.id]
+                                          ? BADGE_TYPES[badges[user.id].badgeType as BadgeTypeKey]?.label || badges[user.id].badgeType
+                                          : "Badge"}
+                                        <ChevronDown className="w-3 h-3 ml-1" />
+                                      </>
+                                    )}
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="bg-black/95 border-white/10">
+                                  {badges[user.id] ? (
+                                    <>
+                                      <DropdownMenuItem
+                                        onClick={() => handleRemoveBadge(user.id, user.email)}
+                                        className="text-red-400 hover:bg-red-900/20 cursor-pointer"
+                                      >
+                                        <X className="w-4 h-4 mr-2" />
+                                        Remove Badge
+                                      </DropdownMenuItem>
+                                      <DropdownMenuSeparator className="bg-white/10" />
+                                    </>
+                                  ) : null}
+                                  {Object.entries(BADGE_TYPES).map(([key, badgeInfo]) => (
+                                    <DropdownMenuItem
+                                      key={key}
+                                      onClick={() => handleAssignBadge(user.id, user.email, key as BadgeTypeKey)}
+                                      className={`cursor-pointer ${badges[user.id]?.badgeType === key
+                                        ? "bg-blue-900/30 text-blue-400"
+                                        : "text-white hover:bg-white/5"
+                                        }`}
+                                    >
+                                      <Award className="w-4 h-4 mr-2" />
+                                      {badgeInfo.label}
+                                    </DropdownMenuItem>
+                                  ))}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleBanUser(user.id, user.banned)}
-                                disabled={actionLoading === user.id}
+                                disabled={actionLoading === user.id || actionLoading === `badge-${user.id}` || actionLoading?.startsWith("badge-")}
                                 className={
                                   user.banned
                                     ? "bg-green-900/20 border-green-900/50 text-green-400 hover:bg-green-900/30"
@@ -305,17 +500,16 @@ export default function AdminPage() {
                               </Button>
                               <Button
                                 variant="outline"
-                                size="sm"
+                                size="icon"
                                 onClick={() => handleDeleteUser(user.id, user.email)}
-                                disabled={actionLoading === user.id}
+                                disabled={actionLoading === user.id || actionLoading === `badge-${user.id}`}
                                 className="bg-red-900/20 border-red-900/50 text-red-400 hover:bg-red-900/30"
                               >
                                 {actionLoading === user.id ? (
                                   <Loader2 className="w-4 h-4 animate-spin" />
                                 ) : (
                                   <>
-                                    <Trash2 className="w-4 h-4 mr-1" />
-                                    Delete
+                                    <Trash2 className="w-4 h-4" />
                                   </>
                                 )}
                               </Button>
@@ -352,6 +546,7 @@ export default function AdminPage() {
                     <TableHeader>
                       <TableRow className="border-white/10 hover:bg-white/5">
                         <TableHead className="text-gray-300">Build Name</TableHead>
+                        <TableHead className="text-gray-300">Description</TableHead>
                         <TableHead className="text-gray-300">Author</TableHead>
                         <TableHead className="text-gray-300">Upvotes</TableHead>
                         <TableHead className="text-gray-300">Downvotes</TableHead>
@@ -371,8 +566,19 @@ export default function AdminPage() {
                             <TableCell className="text-white font-medium">
                               {build.name}
                             </TableCell>
+                            <TableCell className="text-gray-300 max-w-xs truncate" title={build.description || undefined}>
+                              {build.description || "-"}
+                            </TableCell>
                             <TableCell className="text-gray-300">
-                              {build.author}
+                              <div className="flex items-center gap-2">
+                                {build.author}
+                                {build.userId && badges[build.userId] && (
+                                  <AuthorBadge
+                                    badgeType={badges[build.userId].badgeType}
+                                    description={badges[build.userId].description}
+                                  />
+                                )}
+                              </div>
                             </TableCell>
                             <TableCell className="text-green-400">
                               {build.upvotes}

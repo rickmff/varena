@@ -37,7 +37,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Check if accessing admin routes
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/capibara');
+  const isAdminRoute = request.nextUrl.pathname.startsWith('/capybara');
 
   if (isAdminRoute) {
     // Admin routes require authentication
@@ -78,7 +78,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/capibara/:path*',
+    '/capybara/:path*',
     '/profile/:path*',
     '/auth/signin',
     '/auth/signup',

@@ -32,6 +32,7 @@ type Build = {
   code: string;
   description?: string;
   author?: string;
+  userId?: string | null;
   isPublic?: boolean;
   upvotes?: number;
   downvotes?: number;
@@ -321,6 +322,7 @@ export default function PublicBuildsList() {
         code: build.code,
         description: build.description || "",
         author: build.author,
+        userId: build.userId || null,
         isPublic: build.isPublic || false,
         upvotes: build.upvotes || 0,
         downvotes: build.downvotes || 0,
@@ -816,6 +818,7 @@ export default function PublicBuildsList() {
                     name={build.name}
                     description={build.description}
                     author={build.author}
+                    userId={build.userId}
                     isPublic={build.isPublic}
                     showPublicToggle={false}
                     upvotes={build.upvotes}

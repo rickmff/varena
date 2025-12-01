@@ -21,6 +21,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { authClient } from "@/lib/better-auth/client";
 import { LogIn, User, LogOut, Hammer, Shield } from "lucide-react";
 import { toast } from "sonner";
+import { AuthorBadge } from "@/components/AuthorBadge";
+import { useUserBadges } from "@/hooks/use-author-badges";
 
 export const menuItems = [
   { name: "HOME", href: "/" },
@@ -110,6 +112,7 @@ export default function NavBar() {
   const [scrollY, setScrollY] = useState(0);
   const router = useRouter();
   const { isAuthenticated, isLoading, user, refetch, isAdmin } = useAuth();
+  const { badges } = useUserBadges(user?.id ? [user.id] : []);
 
   const handleLogout = async () => {
     try {
@@ -269,7 +272,15 @@ export default function NavBar() {
                 <DropdownMenuContent align="end" className="w-56 bg-black border-[#5865F2]/30">
                   <DropdownMenuLabel className="text-white">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium">{user.name || "User"}</p>
+                      <p className="text-sm font-medium flex items-center gap-2">
+                        {user.id && badges[user.id] && (
+                          <AuthorBadge
+                            badgeType={badges[user.id].badgeType}
+                            description={badges[user.id].description}
+                          />
+                        )}
+                        {user.name || "User"}
+                      </p>
                       <p className="text-xs text-gray-400">{user.email}</p>
                     </div>
                   </DropdownMenuLabel>
@@ -290,7 +301,7 @@ export default function NavBar() {
                     <>
                       <DropdownMenuSeparator className="bg-[#5865F2]/30" />
                       <DropdownMenuItem asChild>
-                        <Link href="/capibara" className="cursor-pointer text-yellow-400 hover:bg-yellow-950/20">
+                        <Link href="/capybara" className="cursor-pointer text-yellow-400 hover:bg-yellow-950/20">
                           <Shield className="mr-2 h-4 w-4" />
                           <span>Admin Dashboard</span>
                         </Link>
