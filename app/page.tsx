@@ -179,7 +179,7 @@ const NewsCard = memo(({ news, index, onImageError }: {
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         quality={75}
         priority={index === 0}
-        unoptimized={imageUrl.startsWith('data:') || imageUrl === '/news.webp'}
+        unoptimized={imageUrl.startsWith('data:') || imageUrl === '/news.webp' || imageUrl.startsWith('/api/image')}
       />
     );
   }, [isVisible, imageUrl, news.title, index]); // Remove function dependencies to prevent recreations
@@ -509,7 +509,6 @@ export default function Home() {
       return [];
     }
 
-    const seenImages = new Set<string>();
     const processedItems = newsItems.map(news => {
       if (!news) {
         console.warn('Found null/undefined news item');
@@ -526,15 +525,15 @@ export default function Home() {
         const newsCategory = news.category || news.type || "News";
         const newsIconName = news.iconName || "Terminal";
 
-        // Process image URL and ensure uniqueness
-        let newsCoverImage = news.coverImageUrl || news.image || news.cover || "/news.webp";
+        // Process image URL
+        let newsCoverImage = news.coverImageUrl || news.image || news.cover || null;
 
         // Clean up the URL to ensure consistent format
         if (newsCoverImage && newsCoverImage !== "/news.webp") {
           try {
-            // Check if it's a relative URL (starts with /)
+            // Check if it's a relative URL (starts with /) - includes proxy URLs like /api/image?url=...
             if (newsCoverImage.startsWith('/')) {
-              // Keep relative URLs as is
+              // Keep relative URLs as is (including proxy URLs)
               newsCoverImage = newsCoverImage;
             } else {
               // For absolute URLs, validate them
@@ -542,16 +541,15 @@ export default function Home() {
               newsCoverImage = url.toString();
             }
           } catch (e) {
-            console.warn('Invalid image URL:', newsCoverImage);
-            newsCoverImage = "/news.webp";
+            console.warn('Invalid image URL:', newsCoverImage, e);
+            newsCoverImage = null;
           }
         }
 
-        // If image URL is already seen, invalid, or had errors, use fallback
-        if (!newsCoverImage || seenImages.has(newsCoverImage) || imageLoadErrors[newsCoverImage]) {
+        // Only use fallback if URL is null/undefined or had previous errors
+        // Allow same image URL for multiple news items (removed seenImages check)
+        if (!newsCoverImage || imageLoadErrors[newsCoverImage]) {
           newsCoverImage = "/news.webp";
-        } else {
-          seenImages.add(newsCoverImage);
         }
 
         return {

@@ -14,7 +14,7 @@ interface AuthorBadgeProps {
   className?: string;
 }
 
-const BADGE_CONFIG: Record<string, { color: string; icon: React.ComponentType<{ className?: string }> }> = {
+const BADGE_CONFIG: Record<string, { color: string; icon: React.ComponentType<{ className?: string; strokeWidth?: number }> }> = {
   veteran: {
     color: "bg-blue-500",
     icon: Sword,

@@ -140,15 +140,17 @@ const AuthorNameWithBadge = ({ authorName, userId }: { authorName?: string; user
   const badge = userId ? badges[userId] : null;
 
   return (
-    <p className="text-sm text-gray-400 mt-1 flex items-center gap-1">
+    <p className="text-sm text-gray-400 mt-1 flex items-center gap-1.5">
       <User className="w-3 h-3" />
-      {badge && (
-        <AuthorBadge
-          badgeType={badge.badgeType}
-          description={badge.description}
-        />
-      )}
-      {authorName || "Unknown"}
+      <span className="flex items-center gap-1.5">
+        {authorName || "Unknown"}
+        {badge && (
+          <AuthorBadge
+            badgeType={badge.badgeType}
+            description={badge.description}
+          />
+        )}
+      </span>
     </p>
   );
 };
