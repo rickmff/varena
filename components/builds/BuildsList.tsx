@@ -28,6 +28,7 @@ type Build = {
   id?: string;
   name: string;
   code: string;
+  description?: string;
   isPublic?: boolean;
 };
 
@@ -136,6 +137,7 @@ export const BuildContent = ({
   code,
   name,
   author,
+  description,
   handleDeleteBuild,
   isPublic,
   onTogglePublic,
@@ -152,6 +154,7 @@ export const BuildContent = ({
   code: string;
   name: string;
   author?: string;
+  description?: string;
   handleDeleteBuild?: (event: React.MouseEvent) => void;
   isPublic?: boolean;
   onTogglePublic?: (checked: boolean) => void;
@@ -297,6 +300,11 @@ export const BuildContent = ({
           <p className="text-sm text-gray-400 mt-1 flex items-center gap-1">
             <User className="w-3 h-3" />
             {author}
+          </p>
+        )}
+        {description && description.trim() && (
+          <p className="text-sm text-gray-300 mt-2 line-clamp-2">
+            {description}
           </p>
         )}
       </CardHeader>
@@ -563,6 +571,7 @@ export default function BuildsList({
                     id: `local-${index}-${build.name}`, // Generate temporary ID
                     name: build.name || `Build ${index + 1}`,
                     code: build.code || "",
+                    description: build.description || "",
                     isPublic: false, // LocalStorage builds are always private
                   }));
                   setBuilds(buildsArray);
@@ -609,12 +618,14 @@ export default function BuildsList({
             id: build.id,
             name: build.name,
             code: build.code,
+            description: build.description || "",
             isPublic: build.isPublic || false,
           }))
           : (data.builds || []).map((build: any) => ({
             id: build.id,
             name: build.name,
             code: build.code,
+            description: build.description || "",
             isPublic: build.isPublic || false,
           }));
 
@@ -669,6 +680,7 @@ export default function BuildsList({
                 id: `local-${idx}-${build.name}`,
                 name: build.name || `Build ${idx + 1}`,
                 code: build.code || "",
+                description: build.description || "",
                 isPublic: false,
               }));
               setBuilds(buildsArray);
@@ -975,6 +987,7 @@ export default function BuildsList({
             },
             body: JSON.stringify({
               name: localBuild.name || `Imported Build ${imported + 1}`,
+              description: localBuild.description || "",
               code: localBuild.code,
             }),
           });
@@ -1004,12 +1017,14 @@ export default function BuildsList({
               id: build.id,
               name: build.name,
               code: build.code,
+              description: build.description || "",
               isPublic: build.isPublic || false,
             }))
             : (data.builds || []).map((build: any) => ({
               id: build.id,
               name: build.name,
               code: build.code,
+              description: build.description || "",
               isPublic: build.isPublic || false,
             }));
           // Sort builds: public builds first, then private builds
@@ -1107,6 +1122,7 @@ export default function BuildsList({
                 <BuildContent
                   code={build.code}
                   name={build.name}
+                  description={build.description}
                   handleDeleteBuild={(event: React.MouseEvent) =>
                     handleDelete(event, build.id || "", index)
                   }

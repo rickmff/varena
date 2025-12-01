@@ -275,6 +275,36 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
+    const code = searchParams.get("code");
+
+    // If code is provided, return the build with that code for the authenticated user
+    if (code) {
+      const build = await prisma.build.findFirst({
+        where: {
+          code,
+          userId: session.user.id,
+        },
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          code: true,
+          isPublic: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      if (!build) {
+        return NextResponse.json(
+          { error: "Build not found" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(build);
+    }
+
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "100"); // Default 100, max reasonable for user builds
     const skip = (page - 1) * limit;
@@ -290,11 +320,12 @@ export async function GET(request: Request) {
           select: {
             id: true,
             name: true,
+            description: true,
             code: true,
             isPublic: true,
             createdAt: true,
             updatedAt: true,
-            // Exclude fields not needed for list view: description, author, authorTwitchUrl, authorYoutubeUrl
+            // Exclude fields not needed for list view: author, authorTwitchUrl, authorYoutubeUrl
           },
           orderBy: {
             createdAt: "desc",

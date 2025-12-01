@@ -16,6 +16,7 @@ import { BuildContent } from "./BuildsList";
 import { useAuth } from "@/hooks/use-auth";
 
 type Build = {
+  description: string | undefined;
   id?: string;
   name: string;
   code: string;
@@ -47,35 +48,6 @@ const Img = ({
   );
 };
 
-function findMostFrequentSpellSchool(words: any[]): string {
-  // Filter out undefined values
-  const validWords = words.filter((word) => word !== undefined);
-
-  // Return early if no valid words
-  if (validWords.length === 0) return "";
-
-  // Create a frequency map
-  const frequency: Record<string, number> = {};
-
-  // Count occurrences of each word
-  for (const word of validWords) {
-    frequency[word] = (frequency[word] || 0) + 1;
-  }
-
-  // Find the word with the highest frequency
-  let mostFrequentWord = "";
-  let highestFrequency = 0;
-
-  for (const word in frequency) {
-    if (frequency[word] > highestFrequency) {
-      mostFrequentWord = word;
-      highestFrequency = frequency[word];
-    }
-  }
-
-  return mostFrequentWord;
-}
-
 const borderVariants: Record<string, string> = {
   empty: "border-spellSchool-empty/30",
   storm: "border-spellSchool-storm/30",
@@ -101,41 +73,6 @@ const Item = ({
     </div>
   );
 };
-
-const premadeBuilds = [
-  {
-    name: "CASTER",
-    background: "/images/templates/caster.webp",
-    code: "722222222bcg9af3456g2456413656o6479n218700000000000000000000000000000033333961",
-    baseBorder: "border-purple-500/30",
-    hoverBorder: "hover:border-purple-500",
-    hoverGlow: "from-purple-900/20",
-  },
-  {
-    name: "ASSASSIN",
-    background: "/images/templates/assassin.webp",
-    code: "622222222bcn8721367j1245523642d03824083200000000000000000000000000000014444751",
-    baseBorder: "border-orange-500/30",
-    hoverBorder: "hover:border-orange-500",
-    hoverGlow: "from-orange-900/20",
-  },
-  {
-    name: "BRAWLER",
-    background: "/images/templates/brawler.webp",
-    code: "822222222bc1k42136734563223565103E8n218700000000000000000000000000000052222751",
-    baseBorder: "border-red-500/30",
-    hoverBorder: "hover:border-red-500",
-    hoverGlow: "from-red-900/20",
-  },
-  {
-    name: "SUPPORT",
-    background: "/images/templates/support.webp",
-    code: "222222222bcaoif3462l3452412461c07B9b0B7900000000000000000000000000000041111643",
-    baseBorder: "border-green-500/30",
-    hoverBorder: "hover:border-green-500",
-    hoverGlow: "from-green-900/20",
-  },
-];
 
 export default function BuildsListHome({
   maxBuilds = 3,
@@ -165,6 +102,7 @@ export default function BuildsListHome({
                     id: `local-${index}-${build.name}`, // Generate temporary ID
                     name: build.name || `Build ${index + 1}`,
                     code: build.code || "",
+                    description: build.description || "",
                     isPublic: false, // LocalStorage builds are always private
                   }));
                   setBuilds(buildsArray);
@@ -211,12 +149,14 @@ export default function BuildsListHome({
             id: build.id,
             name: build.name,
             code: build.code,
+            description: build.description || "",
             isPublic: build.isPublic || false,
           }))
           : (data.builds || []).map((build: any) => ({
             id: build.id,
             name: build.name,
             code: build.code,
+            description: build.description || "",
             isPublic: build.isPublic || false,
           }));
 
@@ -234,9 +174,6 @@ export default function BuildsListHome({
     fetchBuilds();
   }, [isAuthenticated, authLoading, onBuildsLoaded]);
 
-  const handleBuildClick = (code: string) => {
-    router.push(`/builds/create?build=${encodeURIComponent(code)}`);
-  };
 
   const handleDelete = async (event: React.MouseEvent, buildId: string, index: number) => {
     // Prevent the card click event from triggering
@@ -271,6 +208,7 @@ export default function BuildsListHome({
                       id: `local-${idx}-${build.name}`,
                       name: build.name || `Build ${idx + 1}`,
                       code: build.code || "",
+                      description: build.description || "",
                       isPublic: false,
                     }));
                     setBuilds(buildsArray);
@@ -423,6 +361,7 @@ export default function BuildsListHome({
                 <BuildContent
                   code={build.code}
                   name={build.name}
+                  description={build.description}
                   handleDeleteBuild={(event: React.MouseEvent) =>
                     handleDelete(event, build.id || "", index)
                   }

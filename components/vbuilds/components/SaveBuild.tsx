@@ -5,8 +5,9 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useBuilder } from "../BuildProvider";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { arenaCode } from "@/components/machines/converter";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -23,17 +24,101 @@ const SaveBuild: React.FC = () => {
   const { state } = useBuilder();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [buildId, setBuildId] = useState<string | null>(null);
+  const [hasLoadedBuild, setHasLoadedBuild] = useState(false);
 
-  // Initialize name
+  // Load build data when component mounts or when code from URL changes
   useEffect(() => {
-    if (!name) {
-      setName("Build 1");
-    }
-  }, [name]);
+    const loadBuildData = async () => {
+      if (authLoading || hasLoadedBuild) return;
+
+      // Get build code from URL first, then fallback to current state
+      const urlCode = searchParams.get("build");
+      const buildCode = urlCode || arenaCode(state.context);
+
+      if (!buildCode || isEmptyBuild(buildCode)) {
+        // Initialize name only if no build code
+        if (!name) {
+          setName("Build 1");
+        }
+        setHasLoadedBuild(true);
+        return;
+      }
+
+      // If user is authenticated, try to find the build in the database
+      if (isAuthenticated) {
+        try {
+          const response = await fetch(`/api/builds?code=${encodeURIComponent(buildCode)}`);
+          if (response.ok) {
+            const build = await response.json();
+            if (build && build.name) {
+              setName(build.name);
+              setDescription(build.description || "");
+              setIsPublic(build.isPublic || false);
+              setBuildId(build.id);
+            } else {
+              // Build not found, initialize with default name
+              if (!name) {
+                setName("Build 1");
+              }
+            }
+          } else {
+            // Build not found or error, initialize with default name
+            if (!name) {
+              setName("Build 1");
+            }
+          }
+        } catch (error) {
+          console.error("Error loading build data:", error);
+          // On error, initialize with default name
+          if (!name) {
+            setName("Build 1");
+          }
+        }
+      } else {
+        // Not authenticated, check localStorage
+        if (typeof window !== "undefined") {
+          try {
+            const localBuildsData = localStorage.getItem("vbuilds");
+            if (localBuildsData) {
+              const parsed = JSON.parse(localBuildsData);
+              if (Array.isArray(parsed)) {
+                const foundBuild = parsed.find((b: any) => b.code === buildCode);
+                if (foundBuild) {
+                  setName(foundBuild.name || "Build 1");
+                  setDescription(foundBuild.description || "");
+                } else if (!name) {
+                  setName("Build 1");
+                }
+              } else if (!name) {
+                setName("Build 1");
+              }
+            } else if (!name) {
+              setName("Build 1");
+            }
+          } catch (error) {
+            console.error("Error loading local build:", error);
+            if (!name) {
+              setName("Build 1");
+            }
+          }
+        } else if (!name) {
+          setName("Build 1");
+        }
+      }
+
+      setHasLoadedBuild(true);
+    };
+
+    loadBuildData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, authLoading, searchParams]);
 
   // Helper function to check if a build code is empty (all zeros)
   const isEmptyBuild = (code: string): boolean => {
@@ -105,13 +190,13 @@ const SaveBuild: React.FC = () => {
     return `${currentUrl}${buildQuery}`;
   };
 
-  const saveToLocalStorage = (buildName: string, buildCode: string) => {
+  const saveToLocalStorage = (buildName: string, buildCode: string, buildDescription: string) => {
     if (typeof window === "undefined") return;
 
     try {
       // Get existing builds from localStorage
       const existingBuildsData = localStorage.getItem("vbuilds");
-      let existingBuilds: Array<{ code: string; timestamp?: string; name: string }> = [];
+      let existingBuilds: Array<{ code: string; timestamp?: string; name: string; description?: string }> = [];
 
       if (existingBuildsData) {
         try {
@@ -132,6 +217,7 @@ const SaveBuild: React.FC = () => {
         existingBuilds[existingIndex] = {
           code: buildCode,
           name: buildName,
+          description: buildDescription,
           timestamp: new Date().toISOString(),
         };
       } else {
@@ -139,6 +225,7 @@ const SaveBuild: React.FC = () => {
         existingBuilds.push({
           code: buildCode,
           name: buildName,
+          description: buildDescription,
           timestamp: new Date().toISOString(),
         });
       }
@@ -157,7 +244,14 @@ const SaveBuild: React.FC = () => {
       return;
     }
 
-    const buildName = name.trim() || "Build 1";
+    const buildName = name.trim();
+
+    // Validate build name length (minimum 3 characters)
+    if (!buildName || buildName.length < 3) {
+      toast.error("Build name must be at least 3 characters long");
+      return;
+    }
+
     const buildCode = arenaCode(state.context);
 
     if (!buildCode) {
@@ -168,7 +262,7 @@ const SaveBuild: React.FC = () => {
     // Check if user is authenticated
     if (!isAuthenticated) {
       // Save to localStorage for non-authenticated users
-      const saved = saveToLocalStorage(buildName, buildCode);
+      const saved = saveToLocalStorage(buildName, buildCode, description.trim());
       if (saved) {
         toast.success("Build saved locally! Sign in to sync across devices.", {
           duration: 4000,
@@ -202,13 +296,18 @@ const SaveBuild: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/builds", {
-        method: "POST",
+      // If buildId exists, update the existing build, otherwise create a new one
+      const url = buildId ? `/api/builds/${buildId}` : "/api/builds";
+      const method = buildId ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: buildName,
+          description: description.trim(),
           code: buildCode,
           isPublic: isPublic,
         }),
@@ -237,7 +336,13 @@ const SaveBuild: React.FC = () => {
       }
 
       const savedBuild = await response.json();
-      toast.success("Build saved successfully!");
+
+      // Update buildId if it's a new build
+      if (!buildId && savedBuild.id) {
+        setBuildId(savedBuild.id);
+      }
+
+      toast.success(buildId ? "Build updated successfully!" : "Build saved successfully!");
 
       // Redirect to builds page
       setTimeout(() => {
@@ -274,11 +379,24 @@ const SaveBuild: React.FC = () => {
           />
           <Button
             onClick={saveBuildCommand}
-            disabled={loading || authLoading}
-            className="px-3 py-2 text-white group border-red-900/70  bg-red-900/50 hover:bg-red-800 transition-colors"
+            disabled={loading || authLoading || !name.trim() || name.trim().length < 3}
+            className="px-3 py-2 text-white group border-red-900/70  bg-red-900/50 hover:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "SAVING..." : "SAVE"}
           </Button>
+        </div>
+        <div>
+          <Input
+            className="text-base bg-black/50 px-4 py-2 rounded-md border text-gray-400 w-full resize-none"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Build description (optional)"
+            disabled={loading}
+            maxLength={50}
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            {description.length}/50 characters
+          </p>
         </div>
       </div>
 
