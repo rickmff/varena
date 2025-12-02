@@ -29,11 +29,11 @@ export async function GET(request: Request) {
     const offset = parseInt(searchParams.get("offset") || "0");
 
     // Get recent sessions (logins)
-    const recentSessions = await prisma.session.findMany({
+    const recentSessions = await prisma.authSession.findMany({
       take: limit,
       skip: offset,
       orderBy: {
-        expires: "desc",
+        expiresAt: "desc",
       },
       include: {
         user: {
@@ -126,7 +126,7 @@ export async function GET(request: Request) {
         userName: session.user?.name || null,
         userEmail: session.user?.email || null,
         details: "User logged in",
-        timestamp: session.expires,
+        timestamp: session.expiresAt,
         metadata: {
           sessionId: session.id,
         },

@@ -48,12 +48,35 @@ export async function DELETE(request: Request) {
           select: {
             builds: true,
             votes: true,
-            sessions: true,
-            accounts: true,
+            spellTierLists: true,
+            spellTierListVotes: true,
           },
         },
       },
     });
+
+    // Get session and account counts from AuthUser if it exists
+    let sessionsDeleted = 0;
+    let accountsDeleted = 0;
+    try {
+      const authUser = await prisma.authUser.findUnique({
+        where: { id: sessionUserId },
+        select: {
+          _count: {
+            select: {
+              sessions: true,
+              accounts: true,
+            },
+          },
+        },
+      });
+      if (authUser) {
+        sessionsDeleted = authUser._count.sessions;
+        accountsDeleted = authUser._count.accounts;
+      }
+    } catch (error) {
+      // Ignore if AuthUser doesn't exist
+    }
 
     // Track deletion counts for response
     let deletedData = {
@@ -61,8 +84,8 @@ export async function DELETE(request: Request) {
       name: session.user.name || null,
       buildsDeleted: 0,
       votesDeleted: 0,
-      sessionsDeleted: 0,
-      accountsDeleted: 0,
+      sessionsDeleted: sessionsDeleted,
+      accountsDeleted: accountsDeleted,
     };
 
     // If user exists in Prisma, delete all Prisma data
@@ -73,8 +96,8 @@ export async function DELETE(request: Request) {
         name: user.name,
         buildsDeleted: user._count.builds,
         votesDeleted: user._count.votes,
-        sessionsDeleted: user._count.sessions,
-        accountsDeleted: user._count.accounts,
+        sessionsDeleted: sessionsDeleted,
+        accountsDeleted: accountsDeleted,
       };
 
       // Delete all user data in a transaction to ensure atomicity
@@ -93,18 +116,18 @@ export async function DELETE(request: Request) {
           where: { userId: userId },
         });
 
-        // 3. Delete all sessions (cascade would handle this, but being explicit)
-        await tx.session.deleteMany({
+        // 3. Delete all sessions from AuthSession (cascade would handle this, but being explicit)
+        await tx.authSession.deleteMany({
           where: { userId: userId },
         });
 
-        // 4. Delete all OAuth accounts (cascade would handle this, but being explicit)
-        await tx.account.deleteMany({
+        // 4. Delete all OAuth accounts from AuthAccount (cascade would handle this, but being explicit)
+        await tx.authAccount.deleteMany({
           where: { userId: userId },
         });
 
         // 5. Delete verification tokens associated with the user's email
-        await tx.verificationToken.deleteMany({
+        await tx.authVerification.deleteMany({
           where: { identifier: sessionUserEmail },
         });
 
@@ -121,7 +144,7 @@ export async function DELETE(request: Request) {
       console.warn("[GDPR Delete] User not found in Prisma, but proceeding with Better Auth deletion");
 
       // Clean up verification tokens by email (safe to do even if user doesn't exist)
-      await prisma.verificationToken.deleteMany({
+      await prisma.authVerification.deleteMany({
         where: { identifier: sessionUserEmail },
       });
 
@@ -134,10 +157,10 @@ export async function DELETE(request: Request) {
         await prisma.buildVote.deleteMany({
           where: { userId: sessionUserId },
         });
-        await prisma.session.deleteMany({
+        await prisma.authSession.deleteMany({
           where: { userId: sessionUserId },
         });
-        await prisma.account.deleteMany({
+        await prisma.authAccount.deleteMany({
           where: { userId: sessionUserId },
         });
       } catch (orphanError: any) {

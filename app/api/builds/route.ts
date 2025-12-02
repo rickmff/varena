@@ -133,12 +133,12 @@ export async function POST(request: Request) {
       });
 
       // Migrate accounts and sessions if they exist
-      await prisma.account.updateMany({
+      await prisma.authAccount.updateMany({
         where: { userId: user.id },
         data: { userId: session.user.id },
       });
 
-      await prisma.session.updateMany({
+      await prisma.authSession.updateMany({
         where: { userId: user.id },
         data: { userId: session.user.id },
       });
@@ -201,6 +201,20 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check total build limit (33 per user)
+    const totalBuildCount = await prisma.build.count({
+      where: {
+        userId: userIdToUse,
+      },
+    });
+
+    if (totalBuildCount >= 33) {
+      return NextResponse.json(
+        { error: "You can only have 33 builds. Please delete a build first." },
+        { status: 400 }
+      );
+    }
+
     // Check public build limit (5 per user) and validate empty/incomplete builds
     if (isPublic === true) {
       // Prevent making empty builds public
@@ -248,6 +262,7 @@ export async function POST(request: Request) {
 
     // Invalidate cache for this user's builds
     revalidateTag(`builds-${userIdToUse}`);
+    revalidateTag(`builds-count-${userIdToUse}`);
 
     // Invalidate public builds cache if the new build is public
     if (isPublic === true) {
@@ -349,13 +364,28 @@ export async function GET(request: Request) {
     }
 
     const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "100"); // Default 100, max reasonable for user builds
+    const limit = parseInt(searchParams.get("limit") || "11"); // Default 11 builds per page for better performance
     const skip = (page - 1) * limit;
 
-    // Cache builds for 5 minutes (300 seconds), keyed by user ID
-    // Reduced from 1 week to improve freshness while still benefiting from cache
-    const getCachedBuilds = unstable_cache(
+    // Get total count for pagination (cached)
+    const getCachedTotalCount = unstable_cache(
       async (userId: string) => {
+        return await prisma.build.count({
+          where: {
+            userId,
+          },
+        });
+      },
+      [`builds-count-${session.user.id}`],
+      {
+        tags: [`builds-${session.user.id}`],
+        revalidate: 300, // 5 minutes in seconds
+      }
+    );
+
+    // Get paginated builds with database-level pagination for better performance
+    const getCachedBuilds = unstable_cache(
+      async (userId: string, pageLimit: number, pageSkip: number) => {
         return await prisma.build.findMany({
           where: {
             userId,
@@ -372,27 +402,28 @@ export async function GET(request: Request) {
           orderBy: {
             createdAt: "desc",
           },
+          take: pageLimit,
+          skip: pageSkip,
         });
       },
-      [`builds-${session.user.id}`],
+      [`builds-${session.user.id}-page-${page}`],
       {
         tags: [`builds-${session.user.id}`],
         revalidate: 300, // 5 minutes in seconds
       }
     );
 
-    const builds = await getCachedBuilds(session.user.id);
-
-    // Apply pagination in memory (since we're caching the full list)
-    // For better performance with large datasets, consider paginating at DB level
-    const paginatedBuilds = builds.slice(skip, skip + limit);
+    const [total, builds] = await Promise.all([
+      getCachedTotalCount(session.user.id),
+      getCachedBuilds(session.user.id, limit, skip),
+    ]);
 
     return NextResponse.json({
-      builds: paginatedBuilds,
-      total: builds.length,
+      builds,
+      total,
       page,
       limit,
-      totalPages: Math.ceil(builds.length / limit),
+      totalPages: Math.ceil(total / limit),
     });
   } catch (error: any) {
     console.error("Error fetching builds:", error);

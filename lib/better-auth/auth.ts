@@ -293,7 +293,6 @@ export const auth = betterAuth({
               name: user.name || null,
               image: user.image || null,
               emailVerified: user.emailVerified ? new Date() : null,
-              password: null, // Password is managed by Better Auth
             },
           });
           console.log("[Better Auth Hook] User synced successfully");

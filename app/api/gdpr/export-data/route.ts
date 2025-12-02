@@ -20,13 +20,6 @@ export async function GET() {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        accounts: {
-          select: {
-            id: true,
-            type: true,
-            provider: true,
-          },
-        },
         builds: {
           select: {
             id: true,
@@ -48,10 +41,60 @@ export async function GET() {
             },
           },
         },
+        spellTierLists: {
+          select: {
+            id: true,
+            name: true,
+            isPublic: true,
+            upvotes: true,
+            downvotes: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+        spellTierListVotes: {
+          include: {
+            tierList: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
         _count: {
           select: {
             builds: true,
             votes: true,
+            spellTierLists: true,
+            spellTierListVotes: true,
+          },
+        },
+      },
+    });
+
+    // Fetch auth-related data separately from AuthUser
+    const authUser = await prisma.authUser.findUnique({
+      where: { id: userId },
+      include: {
+        accounts: {
+          select: {
+            id: true,
+            providerId: true,
+            accountId: true,
+            createdAt: true,
+          },
+        },
+        sessions: {
+          select: {
+            id: true,
+            expiresAt: true,
+            ipAddress: true,
+            createdAt: true,
+          },
+        },
+        _count: {
+          select: {
             sessions: true,
             accounts: true,
           },
@@ -78,7 +121,18 @@ export async function GET() {
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
-      accounts: user.accounts,
+      accounts: authUser?.accounts.map((account) => ({
+        id: account.id,
+        provider: account.providerId,
+        accountId: account.accountId,
+        createdAt: account.createdAt,
+      })) || [],
+      sessions: authUser?.sessions.map((session) => ({
+        id: session.id,
+        expiresAt: session.expiresAt,
+        ipAddress: session.ipAddress,
+        createdAt: session.createdAt,
+      })) || [],
       builds: user.builds,
       votes: user.votes.map((vote) => ({
         id: vote.id,
@@ -87,11 +141,21 @@ export async function GET() {
         voteType: vote.voteType,
         createdAt: vote.createdAt,
       })),
+      spellTierLists: user.spellTierLists,
+      spellTierListVotes: user.spellTierListVotes.map((vote) => ({
+        id: vote.id,
+        tierListId: vote.tierListId,
+        tierListName: vote.tierList.name,
+        voteType: vote.voteType,
+        createdAt: vote.createdAt,
+      })),
       statistics: {
         totalBuilds: user._count.builds,
         totalVotes: user._count.votes,
-        activeSessions: user._count.sessions,
-        linkedAccounts: user._count.accounts,
+        totalSpellTierLists: user._count.spellTierLists,
+        totalSpellTierListVotes: user._count.spellTierListVotes,
+        activeSessions: authUser?._count.sessions || 0,
+        linkedAccounts: authUser?._count.accounts || 0,
       },
       exportDate: new Date().toISOString(),
       exportFormat: "JSON",

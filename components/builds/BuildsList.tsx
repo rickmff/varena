@@ -25,6 +25,16 @@ import "@/components/vbuilds/styles.css";
 import { useAuth } from "@/hooks/use-auth";
 import { AuthorBadge } from "@/components/AuthorBadge";
 import { useUserBadges } from "@/hooks/use-author-badges";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Build = {
   id?: string;
@@ -600,6 +610,9 @@ export default function BuildsList({
 }: BuildsListProps = {}) {
   const [builds, setBuilds] = useState<Build[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalBuilds, setTotalBuilds] = useState(0);
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
@@ -648,7 +661,10 @@ export default function BuildsList({
 
       setLoading(true);
       try {
-        const response = await fetch("/api/builds?limit=100");
+        // Use pagination: 11 builds per page
+        const page = maxBuilds ? 1 : currentPage; // If maxBuilds is set (homepage), always fetch page 1
+        const limit = maxBuilds || 11; // Use maxBuilds if set, otherwise 11 per page
+        const response = await fetch(`/api/builds?page=${page}&limit=${limit}`);
 
         if (response.status === 401) {
           setBuilds([]);
@@ -685,6 +701,13 @@ export default function BuildsList({
         });
 
         setBuilds(sortedBuilds);
+
+        // Update pagination info if available
+        if (data.total !== undefined) {
+          setTotalBuilds(data.total);
+          setTotalPages(data.totalPages || 1);
+        }
+
         onBuildsLoaded?.(sortedBuilds.length > 0);
       } catch (error) {
         console.error("Failed to load builds:", error);
@@ -696,7 +719,7 @@ export default function BuildsList({
     };
 
     fetchBuilds();
-  }, [isAuthenticated, authLoading, onBuildsLoaded]);
+  }, [isAuthenticated, authLoading, onBuildsLoaded, currentPage, maxBuilds]);
 
   const handleDelete = async (event: React.MouseEvent, buildId: string, index: number) => {
     // Prevent the card click event from triggering
@@ -755,9 +778,52 @@ export default function BuildsList({
         throw new Error("Failed to delete build");
       }
 
-      const updatedBuilds = builds.filter((_, i) => i !== index);
-      setBuilds(updatedBuilds);
-      onBuildsLoaded?.(updatedBuilds.length > 0);
+      // Refresh builds list after deletion
+      // If this was the last item on the page and not page 1, go to previous page
+      const shouldGoToPreviousPage = !maxBuilds && builds.length === 1 && currentPage > 1;
+      const page = maxBuilds ? 1 : (shouldGoToPreviousPage ? currentPage - 1 : currentPage);
+      const limit = maxBuilds || 11;
+
+      if (shouldGoToPreviousPage) {
+        setCurrentPage(page);
+      }
+
+      const refreshResponse = await fetch(`/api/builds?page=${page}&limit=${limit}`);
+      if (refreshResponse.ok) {
+        const refreshData = await refreshResponse.json();
+        const buildsArray = Array.isArray(refreshData)
+          ? refreshData.map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+          }))
+          : (refreshData.builds || []).map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+          }));
+        const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
+          if (a.isPublic && !b.isPublic) return -1;
+          if (!a.isPublic && b.isPublic) return 1;
+          return 0;
+        });
+        setBuilds(sortedBuilds);
+
+        // Update pagination info if available
+        if (refreshData.total !== undefined) {
+          setTotalBuilds(refreshData.total);
+          setTotalPages(refreshData.totalPages || 1);
+        }
+
+        onBuildsLoaded?.(sortedBuilds.length > 0);
+      } else {
+        // Fallback: remove from current list
+        const updatedBuilds = builds.filter((_, i) => i !== index);
+        setBuilds(updatedBuilds);
+        onBuildsLoaded?.(updatedBuilds.length > 0);
+      }
       toast.success("Build deleted successfully");
     } catch (error) {
       console.error("Failed to delete build:", error);
@@ -912,20 +978,38 @@ export default function BuildsList({
         return;
       }
 
-      // Update local state and maintain sort order (public first)
-      setBuilds((prevBuilds) => {
-        const updated = prevBuilds.map((build) =>
-          build.id === buildId
-            ? { ...build, isPublic: !currentIsPublic }
-            : build
-        );
-        // Sort: public builds first, then private builds
-        return updated.sort((a, b) => {
+      // Refresh builds list to get updated data
+      const page = maxBuilds ? 1 : currentPage;
+      const limit = maxBuilds || 11;
+      const refreshResponse = await fetch(`/api/builds?page=${page}&limit=${limit}`);
+      if (refreshResponse.ok) {
+        const refreshData = await refreshResponse.json();
+        const buildsArray = Array.isArray(refreshData)
+          ? refreshData.map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+          }))
+          : (refreshData.builds || []).map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+          }));
+        const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
           if (a.isPublic && !b.isPublic) return -1;
           if (!a.isPublic && b.isPublic) return 1;
           return 0;
         });
-      });
+        setBuilds(sortedBuilds);
+
+        // Update pagination info if available
+        if (refreshData.total !== undefined) {
+          setTotalBuilds(refreshData.total);
+          setTotalPages(refreshData.totalPages || 1);
+        }
+      }
 
       toast.success(
         `Build ${!currentIsPublic ? "made public" : "made private"}`
@@ -979,6 +1063,78 @@ export default function BuildsList({
       },
     },
   };
+
+  // Build Card Skeleton Component
+  const BuildCardSkeleton = () => (
+    <Card className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-zinc-800/50 h-full flex flex-col">
+      <CardHeader className="relative">
+        <Skeleton className="h-6 w-3/4 mb-2" />
+        <Skeleton className="h-4 w-1/2" />
+      </CardHeader>
+      <CardContent className="relative space-y-6">
+        {/* Top Row - Armor, Buffs, Blood */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-16" />
+            <div className="flex gap-1">
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="w-8 h-8 rounded" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-12" />
+            <div className="flex gap-1">
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="w-8 h-8 rounded" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-12" />
+            <div className="flex gap-1">
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="w-8 h-8 rounded" />
+            </div>
+          </div>
+        </div>
+
+        {/* Middle Row - Spells and Passives */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-16" />
+            <div className="flex gap-1">
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="w-8 h-8 rounded" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-20" />
+            <div className="flex gap-1 flex-wrap">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="w-8 h-8 rounded" />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Row - Weapons */}
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-20" />
+          <div className="flex gap-1 flex-wrap">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="w-8 h-8 rounded" />
+            ))}
+          </div>
+        </div>
+
+        {/* Arena Code */}
+        <div className="mt-4">
+          <Skeleton className="h-8 w-full" />
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   // Custom container for premade builds without stagger delay
 
@@ -1054,7 +1210,9 @@ export default function BuildsList({
         setHasLocalBuilds(false);
 
         // Refresh builds list
-        const response = await fetch("/api/builds?limit=100");
+        const page = maxBuilds ? 1 : currentPage;
+        const limit = maxBuilds || 11;
+        const response = await fetch(`/api/builds?page=${page}&limit=${limit}`);
         if (response.ok) {
           const data = await response.json();
           // Handle both old format (array) and new format (object with builds array)
@@ -1078,6 +1236,13 @@ export default function BuildsList({
             return 0;
           });
           setBuilds(sortedBuilds);
+
+          // Update pagination info if available
+          if (data.total !== undefined) {
+            setTotalBuilds(data.total);
+            setTotalPages(data.totalPages || 1);
+          }
+
           onBuildsLoaded?.(sortedBuilds.length > 0);
         }
 
@@ -1123,14 +1288,21 @@ export default function BuildsList({
           </motion.div>
         )}
 
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          viewport={{ once: true }}
-        >
-          {buildsToShow.length !== 0 && (
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array.from({ length: 11 }).map((_, index) => (
+              <BuildCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+            viewport={{ once: true }}
+          >
+            {buildsToShow.length !== 0 && (
             <motion.div variants={scaleIn}>
               <Link href="/builds/create">
                 <Card className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-dashed border-white/30 hover:border-white/60 transition-all duration-300 overflow-hidden group cursor-pointer h-full relative flex items-center justify-center min-h-[400px]">
@@ -1181,7 +1353,116 @@ export default function BuildsList({
               </Link>
             </motion.div>
           ))}
-        </motion.div>
+          </motion.div>
+        )}
+
+        {/* Pagination Controls - Only show when there are 11+ builds and not using maxBuilds (homepage) */}
+        {!maxBuilds && totalBuilds >= 11 && totalPages > 1 && (
+          <div className="mt-8 flex justify-center">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (currentPage > 1) {
+                        setCurrentPage(currentPage - 1);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }
+                    }}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+
+                {/* Page numbers */}
+                {(() => {
+                  const pagesToShow: (number | 'ellipsis')[] = [];
+
+                  if (totalPages <= 7) {
+                    // Show all pages if 7 or fewer
+                    for (let i = 1; i <= totalPages; i++) {
+                      pagesToShow.push(i);
+                    }
+                  } else {
+                    // Show first page
+                    pagesToShow.push(1);
+
+                    if (currentPage <= 4) {
+                      // Show pages 2-7
+                      for (let i = 2; i <= 7; i++) {
+                        pagesToShow.push(i);
+                      }
+                      pagesToShow.push('ellipsis');
+                      pagesToShow.push(totalPages);
+                    } else if (currentPage >= totalPages - 3) {
+                      // Show last 7 pages
+                      pagesToShow.push('ellipsis');
+                      for (let i = totalPages - 6; i <= totalPages; i++) {
+                        pagesToShow.push(i);
+                      }
+                    } else {
+                      // Show pages around current page
+                      pagesToShow.push('ellipsis');
+                      for (let i = currentPage - 2; i <= currentPage + 2; i++) {
+                        pagesToShow.push(i);
+                      }
+                      pagesToShow.push('ellipsis');
+                      pagesToShow.push(totalPages);
+                    }
+                  }
+
+                  return pagesToShow.map((item, idx) => {
+                    if (item === 'ellipsis') {
+                      return (
+                        <PaginationItem key={`ellipsis-${idx}`}>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      );
+                    }
+                    return (
+                      <PaginationItem key={item}>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(item);
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }}
+                          isActive={currentPage === item}
+                          className="cursor-pointer"
+                        >
+                          {item}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  });
+                })()}
+
+                <PaginationItem>
+                  <PaginationNext
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (currentPage < totalPages) {
+                        setCurrentPage(currentPage + 1);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }
+                    }}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
+
+        {/* Build count info */}
+        {!maxBuilds && totalBuilds > 0 && (
+          <div className="mt-4 text-center text-sm text-gray-400">
+            Showing {((currentPage - 1) * 11) + 1} - {Math.min(currentPage * 11, totalBuilds)} of {totalBuilds} builds
+          </div>
+        )}
 
         {!loading && builds.length === 0 && (
           <motion.div

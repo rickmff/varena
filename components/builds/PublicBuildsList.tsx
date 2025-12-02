@@ -27,6 +27,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { AuthorBadge } from "@/components/AuthorBadge";
 import { useUserBadges } from "@/hooks/use-author-badges";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 type Build = {
   id?: string;
@@ -830,8 +832,77 @@ export default function PublicBuildsList() {
       {/* Builds Grid */}
       {
         loading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="text-gray-400">Loading public builds...</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array.from({ length: 11 }).map((_, index) => (
+              <Card key={index} className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-zinc-800/50 h-full flex flex-col">
+                <CardHeader className="relative">
+                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-1/2" />
+                </CardHeader>
+                <CardContent className="relative space-y-6">
+                  {/* Top Row - Armor, Buffs, Blood */}
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Skeleton className="h-3 w-16" />
+                      <div className="flex gap-1">
+                        <Skeleton className="w-8 h-8 rounded" />
+                        <Skeleton className="w-8 h-8 rounded" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-3 w-12" />
+                      <div className="flex gap-1">
+                        <Skeleton className="w-8 h-8 rounded" />
+                        <Skeleton className="w-8 h-8 rounded" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-3 w-12" />
+                      <div className="flex gap-1">
+                        <Skeleton className="w-8 h-8 rounded" />
+                        <Skeleton className="w-8 h-8 rounded" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Middle Row - Spells and Passives */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Skeleton className="h-3 w-16" />
+                      <div className="flex gap-1">
+                        <Skeleton className="w-8 h-8 rounded" />
+                        <Skeleton className="w-8 h-8 rounded" />
+                        <Skeleton className="w-8 h-8 rounded" />
+                        <Skeleton className="w-8 h-8 rounded" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-3 w-20" />
+                      <div className="flex gap-1 flex-wrap">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Skeleton key={i} className="w-8 h-8 rounded" />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom Row - Weapons */}
+                  <div className="space-y-2">
+                    <Skeleton className="h-3 w-20" />
+                    <div className="flex gap-1 flex-wrap">
+                      {Array.from({ length: 8 }).map((_, i) => (
+                        <Skeleton key={i} className="w-8 h-8 rounded" />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Arena Code */}
+                  <div className="mt-4">
+                    <Skeleton className="h-8 w-full" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         ) : filteredBuilds.length === 0 ? (
           <div className="flex flex-col justify-center items-center py-20">

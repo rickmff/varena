@@ -173,6 +173,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
     // Invalidate cache when public/private status changes (or any update)
     // This ensures the cache is refreshed when builds are modified
     revalidateTag(`builds-${session.user.id}`);
+    // Note: We don't invalidate count cache here as update doesn't change the count
 
     // Invalidate public builds cache when public/private status changes
     // This ensures public builds list is updated immediately when a build becomes public/private
@@ -228,6 +229,7 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     // Invalidate cache for this user's builds
     revalidateTag(`builds-${session.user.id}`);
+    revalidateTag(`builds-count-${session.user.id}`);
 
     // Invalidate public builds cache if the deleted build was public
     if (wasPublic) {
