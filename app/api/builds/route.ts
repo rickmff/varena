@@ -83,7 +83,16 @@ function isBuildComplete(code: string): boolean {
 // Create a new build
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession();
+    let session: any = null;
+    try {
+      session = await getServerSession();
+    } catch (error) {
+      console.error("[Builds API] Session error:", error);
+      return NextResponse.json(
+        { error: "Failed to get session" },
+        { status: 401 }
+      );
+    }
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -287,7 +296,14 @@ export async function POST(request: Request) {
 // List user builds
 export async function GET(request: Request) {
   try {
-    const session = await getServerSession();
+    // Get current user session if available
+    let session: any = null;
+    try {
+      session = await getServerSession();
+    } catch (error) {
+      // Session fetch failed, continue without session
+    }
+
     const { searchParams } = new URL(request.url);
     const code = searchParams.get("code");
 
@@ -395,9 +411,11 @@ export async function GET(request: Request) {
             name: true,
             code: true,
             isPublic: true,
+            author: true,
+            userId: true,
             createdAt: true,
             updatedAt: true,
-            // Exclude fields not needed for list view: author, authorTwitchUrl, authorYoutubeUrl
+            // Exclude fields not needed for list view: authorTwitchUrl, authorYoutubeUrl
           },
           orderBy: {
             createdAt: "desc",

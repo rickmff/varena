@@ -26,7 +26,6 @@ import { useUserBadges } from "@/hooks/use-author-badges";
 
 export const menuItems = [
   { name: "HOME", href: "/" },
-  { name: "FEATURES", href: "/#features" },
   { name: "BUILDS", href: "/builds" },
   { name: "TIER LIST", href: "/tier-list" },
   { name: "COMMANDS", href: "/commands" },

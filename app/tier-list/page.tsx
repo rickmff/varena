@@ -17,12 +17,12 @@ export default function TierListPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("mine");
 
-  // Set default tab to "community" for unauthenticated users
+  // Set default tab to "mine" for all users (allows localStorage tier lists)
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      setActiveTab("community");
+    if (!authLoading) {
+      setActiveTab("mine");
     }
-  }, [isAuthenticated, authLoading]);
+  }, [authLoading]);
 
   return (
     <div

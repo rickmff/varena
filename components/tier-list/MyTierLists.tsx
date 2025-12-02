@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Plus, Loader2, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { TierListCard } from "./TierListCard";
 import {
   Tooltip,
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type TierKey = "S" | "A" | "B" | "C" | "D" | "Unranked";
 
@@ -62,13 +63,6 @@ export function MyTierLists() {
 
   useEffect(() => {
     if (authLoading) return;
-
-    if (!isAuthenticated) {
-      setTierLists([]);
-      setLoading(false);
-      return;
-    }
-
     fetchTierLists();
   }, [isAuthenticated, authLoading]);
 
@@ -277,30 +271,47 @@ export function MyTierLists() {
     }
   };
 
-  if (!isAuthenticated && !authLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="w-16 h-16 mb-4 rounded-full bg-white/5 flex items-center justify-center">
-          <LogIn className="w-8 h-8 text-gray-400" />
-        </div>
-        <h3 className="text-xl font-semibold text-white mb-2">Sign In Required</h3>
-        <p className="text-gray-400 mb-6 max-w-sm">
-          Sign in to create and manage your spell tier lists.
-        </p>
-        <Link href="/auth/signin">
-          <Button className="bg-red-700 hover:bg-red-600 text-white">
-            <LogIn className="w-4 h-4 mr-2" />
-            Sign In
-          </Button>
-        </Link>
-      </div>
-    );
-  }
-
   if (loading || authLoading) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <Card
+            key={index}
+            className="bg-gradient-to-br from-black/90 via-zinc-900/80 to-black/90 border border-white/10 overflow-hidden h-full flex flex-col"
+          >
+            <CardContent className="p-4 relative flex flex-col flex-1">
+              {/* Top right corner - Action buttons skeleton */}
+              <div className="absolute top-1 right-1 flex gap-2 z-10">
+                <Skeleton className="w-8 h-8 rounded-full" />
+                <Skeleton className="w-8 h-8 rounded-full" />
+              </div>
+
+              {/* Header skeleton */}
+              <div className="flex items-start justify-between mb-4 pr-12">
+                <div className="flex-1 min-w-0">
+                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              </div>
+
+              {/* Tier Preview skeleton */}
+              <div className="space-y-2 mb-4 flex-1">
+                {["S", "A", "B", "C", "D"].map((tierKey, tierIndex) => (
+                  <div key={tierKey} className="flex items-stretch gap-1">
+                    <Skeleton className="w-8 h-8 rounded-l" />
+                    <div className="flex-1 min-h-[32px] rounded-r border border-white/10 bg-black/40 px-1.5 py-1 flex flex-wrap gap-1 items-center">
+                      {Array.from({ length: (tierIndex % 3) + 2 }).map(
+                        (_, i) => (
+                          <Skeleton key={i} className="w-6 h-6 rounded" />
+                        )
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     );
   }

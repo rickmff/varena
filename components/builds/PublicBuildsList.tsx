@@ -338,7 +338,7 @@ export default function PublicBuildsList() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState<"popular" | "newest" | "oldest">("popular");
   const fetchingRef = useRef(false);
-  const { isAdmin } = useAuth();
+  const { isAdmin, isAuthenticated, user } = useAuth();
 
   // Filter states
   const [armourFilter, setArmourFilter] = useState<string | null>(null);
@@ -530,6 +530,61 @@ export default function PublicBuildsList() {
     setPrimaryBloodFilter(null);
     setSecondaryBloodFilter(null);
     setAuthorFilter("");
+  };
+
+  // Clone handler
+  const handleClone = async (event: React.MouseEvent, buildId: string, code: string, name: string) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast.error("Please sign in to clone builds");
+      return;
+    }
+
+    if (!buildId) {
+      toast.error("Build ID not found");
+      return;
+    }
+
+    try {
+      // Generate a cloned name
+      const clonedName = `${name} (Copy)`;
+
+      const response = await fetch("/api/builds", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: clonedName,
+          code: code,
+          isPublic: false, // Cloned builds start as private
+        }),
+      });
+
+      if (response.status === 401) {
+        toast.error("Please sign in to clone builds");
+        return;
+      }
+
+      if (!response.ok) {
+        const error = await response.json();
+        const errorMessage = error.error || "Failed to clone build";
+        toast.error(errorMessage);
+        return;
+      }
+
+      toast.success("Build cloned successfully! Redirecting to your builds...");
+
+      // Redirect to builds page after a short delay
+      setTimeout(() => {
+        window.location.href = "/builds";
+      }, 1000);
+    } catch (error) {
+      console.error("Error cloning build:", error);
+      toast.error("Failed to clone build");
+    }
   };
 
   // Admin delete handler
@@ -959,6 +1014,8 @@ export default function PublicBuildsList() {
                         : undefined
                     }
                     buildLink={`/builds/create?build=${encodeURIComponent(build.code)}`}
+                    onClone={build.id ? handleClone : undefined}
+                    currentUserId={user?.id || null}
                   />
                 </Link>
               </motion.div>

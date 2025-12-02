@@ -14,6 +14,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
 
 type TierKey = "S" | "A" | "B" | "C" | "D" | "Unranked";
 
@@ -127,8 +129,54 @@ export function CommunityTierLists() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
+      <div>
+        {/* Filters skeleton */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <Skeleton className="h-10 flex-1" />
+          <Skeleton className="h-10 w-[140px]" />
+        </div>
+
+        {/* Tier lists grid skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Card
+              key={index}
+              className="bg-gradient-to-br from-black/90 via-zinc-900/80 to-black/90 border border-white/10 overflow-hidden h-full flex flex-col"
+            >
+              <CardContent className="p-4 relative flex flex-col flex-1">
+                {/* Top right corner - Action buttons skeleton */}
+                <div className="absolute top-1 right-1 flex gap-2 z-10">
+                  <Skeleton className="w-8 h-8 rounded-full" />
+                  <Skeleton className="w-8 h-8 rounded-full" />
+                </div>
+
+                {/* Header skeleton */}
+                <div className="flex items-start justify-between mb-4 pr-12">
+                  <div className="flex-1 min-w-0">
+                    <Skeleton className="h-6 w-3/4 mb-2" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                </div>
+
+                {/* Tier Preview skeleton */}
+                <div className="space-y-2 mb-4 flex-1">
+                  {["S", "A", "B", "C", "D"].map((tierKey, tierIndex) => (
+                    <div key={tierKey} className="flex items-stretch gap-1">
+                      <Skeleton className="w-8 h-8 rounded-l" />
+                      <div className="flex-1 min-h-[32px] rounded-r border border-white/10 bg-black/40 px-1.5 py-1 flex flex-wrap gap-1 items-center">
+                        {Array.from({ length: (tierIndex % 3) + 2 }).map(
+                          (_, i) => (
+                            <Skeleton key={i} className="w-6 h-6 rounded" />
+                          )
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }

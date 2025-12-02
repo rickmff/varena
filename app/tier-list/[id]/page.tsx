@@ -15,10 +15,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { toJpeg } from "html-to-image";
 import { ArrowLeft, Loader2, Pencil, Check, X, Share2, Copy } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import spellsData from "@/data/vbuilds/spells.json";
-import { TierListVoteButtons } from "@/components/tier-list/TierListVoteButtons";
 import { useAuth } from "@/hooks/use-auth";
 import Link from "next/link";
 
@@ -106,8 +105,8 @@ export default function TierListEditPage({ params }: PageProps) {
   const fetchTierList = async () => {
     setLoading(true);
     try {
-      // Check if this is a local tier list (not authenticated or ID starts with "local-")
-      if ((!isAuthenticated || id.startsWith("local-")) && typeof window !== "undefined") {
+      // Check if this is a local tier list (ID starts with "local-")
+      if (id.startsWith("local-") && typeof window !== "undefined") {
         const localTierListsData = localStorage.getItem("vtierlists");
         if (localTierListsData) {
           try {
@@ -158,17 +157,14 @@ export default function TierListEditPage({ params }: PageProps) {
             console.error("Error loading from localStorage:", error);
           }
         }
-
-        // If not found in localStorage and not authenticated, redirect
-        if (!isAuthenticated) {
-          toast.error("Tier list not found");
-          router.push("/tier-list");
-          setLoading(false);
-          return;
-        }
+        // If local tier list not found in localStorage, redirect
+        toast.error("Tier list not found");
+        router.push("/tier-list");
+        setLoading(false);
+        return;
       }
 
-      // Try to fetch from API
+      // Try to fetch from API (works for both authenticated and unauthenticated users for public tier lists)
       const response = await fetch(`/api/tier-lists/${id}`);
       if (!response.ok) {
         if (response.status === 404) {
@@ -385,47 +381,6 @@ export default function TierListEditPage({ params }: PageProps) {
     }
   };
 
-  const handleExportImage = async () => {
-    if (!boardRef.current) {
-      toast.error("Could not find tier list to export");
-      return;
-    }
-
-    try {
-      const dataUrl = await toJpeg(boardRef.current, {
-        quality: 0.95,
-        backgroundColor: "#000000",
-      });
-
-      const supportsClipboard =
-        typeof navigator !== "undefined" &&
-        !!navigator.clipboard &&
-        typeof window !== "undefined" &&
-        "ClipboardItem" in window;
-
-      if (supportsClipboard) {
-        const res = await fetch(dataUrl);
-        const blob = await res.blob();
-        const clipboardItem = new (window as any).ClipboardItem({
-          [blob.type]: blob,
-        });
-        await (navigator.clipboard as any).write([clipboardItem]);
-        toast.success("Tier list image copied to clipboard!");
-        return;
-      }
-
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = `${name || "tier-list"}.jpg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      toast.success("Tier list exported as JPEG!");
-    } catch (error) {
-      console.error("Error exporting tier list image:", error);
-      toast.error("Failed to export tier list image");
-    }
-  };
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -553,9 +508,51 @@ export default function TierListEditPage({ params }: PageProps) {
     return (
       <div className="min-h-screen bg-black text-white">
         <NavBar />
-        <div className="flex items-center justify-center pt-32">
-          <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
-        </div>
+        <section className="relative pt-24 pb-20 md:pt-32 md:pb-32 overflow-hidden bg-gradient-to-b from-black to-black">
+          <div className="container mx-auto px-4 relative z-10">
+            {/* Back button skeleton */}
+            <div className="mb-6">
+              <Skeleton className="h-6 w-32" />
+            </div>
+
+            {/* Header skeleton */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+              <div className="flex-1">
+                <Skeleton className="h-10 w-64 mb-2" />
+                <Skeleton className="h-5 w-48" />
+              </div>
+
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+
+                {/* Action buttons skeleton */}
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-10 w-24" />
+                  <Skeleton className="h-10 w-24" />
+                  <Skeleton className="h-10 w-32" />
+                </div>
+              </div>
+            </div>
+
+            {/* Tier Board skeleton */}
+            <div className="space-y-2">
+              {tierLabels.map((tier, index) => (
+                <div key={tier.key} className="flex items-stretch gap-2">
+                  {tier.key !== "Unranked" && (
+                    <Skeleton className="w-16 md:w-20 h-20 rounded-l-md" />
+                  )}
+                  <div
+                    className={`flex-1 min-h-[72px] ${tier.key === "Unranked" ? "rounded-md" : "rounded-r-md"
+                      } border border-white/10 bg-black/60 px-2 py-2 md:px-3 md:py-3 flex flex-wrap gap-2 items-center`}
+                  >
+                    {Array.from({ length: (index % 4) + 3 }).map((_, i) => (
+                      <Skeleton key={i} className="w-12 h-12 md:w-14 md:h-14 rounded-md" />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
     );
   }
@@ -645,34 +642,19 @@ export default function TierListEditPage({ params }: PageProps) {
               </div>
 
               <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                {/* Vote buttons for non-owners */}
-                {!isOwner && tierListData.isPublic && (
-                  <TierListVoteButtons
-                    tierListId={tierListData.id}
-                    initialUpvotes={tierListData.upvotes}
-                    initialDownvotes={tierListData.downvotes}
-                    initialUserVote={tierListData.userVote}
-                    onVoteChange={(upvotes, downvotes, userVote) => {
-                      setTierListData((prev) =>
-                        prev ? { ...prev, upvotes, downvotes, userVote } : prev
-                      );
-                    }}
-                  />
-                )}
 
-                {/* Share button */}
-                {tierListData.isPublic && (
-                  <Button
-                    variant="outline"
-                    onClick={handleShare}
-                    className="border-white/30 text-white bg-transparent hover:bg-white/10"
-                  >
-                    <Share2 className="w-4 h-4 mr-2" />
-                    Share
-                  </Button>
-                )}
 
                 <div className="flex items-center gap-2">
+                  {tierListData.isPublic && (
+                    <Button
+                      variant="outline"
+                      onClick={handleShare}
+                      className="border-white/30 text-white bg-transparent hover:bg-white/10"
+                    >
+                      <Share2 className="w-4 h-4 mr-2" />
+                      Share
+                    </Button>
+                  )}
                   {isOwner && (
                     <>
                       <Button
@@ -709,14 +691,6 @@ export default function TierListEditPage({ params }: PageProps) {
                       Clone
                     </Button>
                   )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleExportImage}
-                    className="border-white/30 text-white bg-transparent hover:bg-white/10"
-                  >
-                    Export Image
-                  </Button>
                 </div>
               </div>
             </div>
@@ -778,11 +752,9 @@ function TierRow({
       )}
       <div
         ref={setNodeRef}
-        className={`flex-1 min-h-[72px] ${
-          isUnranked ? "rounded-md" : "rounded-r-md"
-        } border border-white/10 bg-black/60 px-2 py-2 md:px-3 md:py-3 flex flex-wrap gap-2 items-center ${
-          isOver ? "ring-2 ring-red-500/70" : ""
-        }`}
+        className={`flex-1 min-h-[72px] ${isUnranked ? "rounded-md" : "rounded-r-md"
+          } border border-white/10 bg-black/60 px-2 py-2 md:px-3 md:py-3 flex flex-wrap gap-2 items-center ${isOver ? "ring-2 ring-red-500/70" : ""
+          }`}
       >
         {spellIds.length === 0 && (
           <span className="text-xs text-gray-500">
@@ -827,9 +799,8 @@ function SpellIcon({ spell, disabled }: SpellIconProps) {
           {...listeners}
           {...attributes}
           type="button"
-          className={`relative w-12 h-12 md:w-14 md:h-14 rounded-md overflow-hidden border border-white/30 shadow-md shadow-black/60 bg-black/80 ${
-            disabled ? "cursor-default" : "cursor-grab active:cursor-grabbing"
-          }`}
+          className={`relative w-12 h-12 md:w-14 md:h-14 rounded-md overflow-hidden border border-white/10 shadow-md shadow-black/60 bg-black/80 ${disabled ? "cursor-default" : "cursor-grab active:cursor-grabbing"
+            }`}
         >
           <img
             src={spell.img}
@@ -838,7 +809,7 @@ function SpellIcon({ spell, disabled }: SpellIconProps) {
           />
         </button>
       </TooltipTrigger>
-      <TooltipContent side="top">{spell.name}</TooltipContent>
+      <TooltipContent side="top" className="bg-black/80 border border-white/10">{spell.name}</TooltipContent>
     </Tooltip>
   );
 }

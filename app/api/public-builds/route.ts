@@ -14,7 +14,12 @@ export async function GET(request: Request) {
     const skip = (page - 1) * limit;
 
     // Get session if user is authenticated (optional)
-    const session = await getServerSession();
+    let session: any = null;
+    try {
+      session = await getServerSession();
+    } catch (error) {
+      // Session fetch failed, continue without session
+    }
     const userId = session?.user?.id;
 
     // Cache key based on sort and author filter

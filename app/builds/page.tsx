@@ -20,7 +20,7 @@ export default function Builds() {
   // Set default tab to "community" for unauthenticated users
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      setActiveTab("community");
+      setActiveTab("mine");
     }
   }, [isAuthenticated, authLoading]);
 
