@@ -241,86 +241,86 @@ export function SpellTierListBoard({
 
   return (
     <TooltipProvider>
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-white">Spell Tier List</h2>
-          {ownerName && (
-            <p className="text-sm text-gray-400">
-              Created by <span className="font-semibold text-white">{ownerName}</span>
-            </p>
-          )}
-        </div>
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-          {!readOnly && (
-            <div className="flex items-center gap-3">
-              <Switch
-                id="spell-tierlist-public"
-                checked={isPublic}
-                onCheckedChange={(value) => setIsPublic(value)}
-              />
-              <Label
-                htmlFor="spell-tierlist-public"
-                className="text-sm text-gray-300 cursor-pointer"
-              >
-                Make this tier list public
-              </Label>
-            </div>
-          )}
-          {shareUrl && isPublic && (
-            <button
-              type="button"
-              onClick={async () => {
-                try {
-                  await navigator.clipboard.writeText(shareUrl);
-                  toast.success("Public URL copied to clipboard!");
-                } catch {
-                  toast.error("Failed to copy link");
-                }
-              }}
-              className="text-xs px-3 py-2 rounded-md border border-white/20 text-white bg-white/5 hover:bg-white/10 transition-colors"
-            >
-              Copy public URL
-            </button>
-          )}
-          <div className="flex items-center gap-2">
-            {!readOnly && (
-              <Button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="bg-red-700 hover:bg-red-600 text-white"
-              >
-                {isSaving ? "Saving..." : "Save Tier List"}
-              </Button>
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-white">Spell Tier List</h2>
+            {ownerName && (
+              <p className="text-sm text-gray-400">
+                Created by <span className="font-semibold text-white">{ownerName}</span>
+              </p>
             )}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleExportImage}
-              className="border-white/30 text-white bg-transparent hover:bg-white/10"
-            >
-              Export JPEG
-            </Button>
+          </div>
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+            {!readOnly && (
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="spell-tierlist-public"
+                  checked={isPublic}
+                  onCheckedChange={(value) => setIsPublic(value)}
+                />
+                <Label
+                  htmlFor="spell-tierlist-public"
+                  className="text-sm text-gray-300 cursor-pointer"
+                >
+                  Make this tier list public
+                </Label>
+              </div>
+            )}
+            {shareUrl && isPublic && (
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    toast.success("Public URL copied to clipboard!");
+                  } catch {
+                    toast.error("Failed to copy link");
+                  }
+                }}
+                className="text-xs px-3 py-2 rounded-md border border-white/20 text-white bg-white/5 hover:bg-white/10 transition-colors"
+              >
+                Copy public URL
+              </button>
+            )}
+            <div className="flex items-center gap-2">
+              {!readOnly && (
+                <Button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="bg-red-700 hover:bg-red-600 text-white"
+                >
+                  {isSaving ? "Saving..." : "Save"}
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleExportImage}
+                className="border-white/30 text-white bg-transparent hover:bg-white/10"
+              >
+                Export Image
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <DndContext onDragEnd={handleDragEnd}>
-        <div className="space-y-2" ref={boardRef}>
-          {tierLabels.map((tier) => (
-            <TierRow
-              key={tier.key}
-              tierKey={tier.key}
-              label={tier.label}
-              colorClass={tier.color}
-              spellIds={tiers[tier.key]}
-              getSpell={getSpell}
-              readOnly={readOnly}
-            />
-          ))}
-        </div>
-      </DndContext>
-    </div>
+        <DndContext onDragEnd={handleDragEnd}>
+          <div className="space-y-2" ref={boardRef}>
+            {tierLabels.map((tier) => (
+              <TierRow
+                key={tier.key}
+                tierKey={tier.key}
+                label={tier.label}
+                colorClass={tier.color}
+                spellIds={tiers[tier.key]}
+                getSpell={getSpell}
+                readOnly={readOnly}
+              />
+            ))}
+          </div>
+        </DndContext>
+      </div>
     </TooltipProvider>
   );
 }
@@ -359,11 +359,9 @@ function TierRow({
       )}
       <div
         ref={setNodeRef}
-        className={`flex-1 min-h-[72px] ${
-          isUnranked ? "rounded-md" : "rounded-r-md"
-        } border border-white/10 bg-black/60 px-2 py-2 md:px-3 md:py-3 flex flex-wrap gap-2 items-center ${
-          isOver ? "ring-2 ring-red-500/70" : ""
-        }`}
+        className={`flex-1 min-h-[72px] ${isUnranked ? "rounded-md" : "rounded-r-md"
+          } border border-white/10 bg-black/60 px-2 py-2 md:px-3 md:py-3 flex flex-wrap gap-2 items-center ${isOver ? "ring-2 ring-red-500/70" : ""
+          }`}
       >
         {spellIds.length === 0 && (
           <span className="text-xs text-gray-500">
@@ -413,9 +411,8 @@ function SpellIcon({ spell, disabled }: SpellIconProps) {
           {...listeners}
           {...attributes}
           type="button"
-          className={`relative w-12 h-12 md:w-14 md:h-14 rounded-md overflow-hidden border border-white/30 shadow-md shadow-black/60 bg-black/80 ${
-            disabled ? "cursor-default" : "cursor-grab active:cursor-grabbing"
-          }`}
+          className={`relative w-12 h-12 md:w-14 md:h-14 rounded-md overflow-hidden border border-white/30 shadow-md shadow-black/60 bg-black/80 ${disabled ? "cursor-default" : "cursor-grab active:cursor-grabbing"
+            }`}
         >
           <img
             src={spell.img}

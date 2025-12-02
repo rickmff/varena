@@ -252,21 +252,21 @@ export const BuildContent = ({
 
   return (
     <Card
-      className={`bg-black/80 backdrop-blur-sm rounded-lg border-2 hover:border-white/30 ${showPublicToggle && isPublic
+      className={`bg-black/80 backdrop-blur-sm rounded-lg border-2 ${showPublicToggle && isPublic
         ? "border-green-500/50"
         : "border-zinc-800/50"
         } transition-all duration-300 overflow-hidden group cursor-pointer h-full relative build-spellSchool build-spellSchool-${school || "empty"
         }`}
     >
       {/* Glow effect on hover */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div className="pointer-events-none absolute -inset-1 rounded-[14px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div
           className={`absolute inset-0 bg-gradient-to-r ${fromVariants[school || "empty"]
-            } to-transparent`}
+            } to-transparent blur-xl`}
         />
         <div
           className={`absolute inset-0 bg-gradient-to-b ${fromVariants[school || "empty"]
-            } via-transparent ${toVariants[school || "empty"]}`}
+            } via-transparent ${toVariants[school || "empty"]} blur-xl`}
         />
       </div>
 

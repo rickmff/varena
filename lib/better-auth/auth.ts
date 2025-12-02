@@ -71,9 +71,10 @@ try {
 // Initialize Resend client for email sending
 const resendApiKey = process.env.RESEND_API_KEY;
 if (!resendApiKey) {
-  console.warn("⚠️  RESEND_API_KEY is not set. Email verification will not work.");
+  console.warn("⚠️  RESEND_API_KEY is not set. Email verification emails will be disabled.");
 }
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
+const emailVerificationConfigured = !!resend;
 
 export const auth = betterAuth({
   database: pool,
@@ -88,10 +89,12 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: true, // Email verification enabled - users must verify email before signing in
+    // Only require email verification when the email service is configured
+    requireEmailVerification: emailVerificationConfigured,
     sendResetPassword: async ({ user, url }) => {
       if (!resend) {
-        const errorMsg = "Resend API key is not configured. Please set RESEND_API_KEY in your .env file.";
+        const errorMsg =
+          "Resend API key is not configured. Password reset email cannot be sent.";
         console.error("[Better Auth] ❌", errorMsg);
         throw new Error(errorMsg);
       }
@@ -173,9 +176,11 @@ export const auth = betterAuth({
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
       if (!resend) {
-        const errorMsg = "Resend API key is not configured. Please set RESEND_API_KEY in your .env file.";
-        console.error("[Better Auth] ❌", errorMsg);
-        throw new Error(errorMsg);
+        const errorMsg =
+          "Resend API key is not configured. Skipping verification email send.";
+        console.warn("[Better Auth] ⚠️", errorMsg);
+        // In development/local without email service, allow signup to succeed even without email
+        return;
       }
 
       const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
@@ -257,8 +262,9 @@ export const auth = betterAuth({
         throw error;
       }
     },
-    sendOnSignUp: true, // Automatically send verification email on signup
-    sendOnSignIn: true, // Resend verification email if user tries to sign in unverified
+    // Only send verification emails when email service is configured
+    sendOnSignUp: emailVerificationConfigured,
+    sendOnSignIn: emailVerificationConfigured,
     autoSignInAfterVerification: true, // Automatically sign in user after email verification
   },
   trustedOrigins: [

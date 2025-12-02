@@ -11,6 +11,7 @@ import { authClient } from "@/lib/better-auth/client";
 import { Eye, EyeOff, Loader2, Mail } from "lucide-react";
 import NavBar from "@/components/NavBar";
 import { migrateLocalBuilds } from "@/lib/migrate-local-builds";
+import { migrateLocalTierLists } from "@/lib/migrate-local-tier-lists";
 import { useAuth } from "@/components/providers/session-provider";
 
 function SignInForm() {
@@ -113,14 +114,25 @@ function SignInForm() {
       } else if (result.data) {
         toast.success("Signed in successfully!");
 
-        // Migrate builds from localStorage to database
+        // Migrate builds and tier lists from localStorage to database
         try {
-          const migrationResult = await migrateLocalBuilds();
-          if (migrationResult.migrated > 0) {
-            toast.success(`Migrated ${migrationResult.migrated} build(s) from local storage`);
+          const [buildsResult, tierListsResult] = await Promise.all([
+            migrateLocalBuilds(),
+            migrateLocalTierLists(),
+          ]);
+          const totalMigrated = buildsResult.migrated + tierListsResult.migrated;
+          if (totalMigrated > 0) {
+            const messages = [];
+            if (buildsResult.migrated > 0) {
+              messages.push(`${buildsResult.migrated} build(s)`);
+            }
+            if (tierListsResult.migrated > 0) {
+              messages.push(`${tierListsResult.migrated} tier list(s)`);
+            }
+            toast.success(`Migrated ${messages.join(" and ")} from local storage`);
           }
         } catch (migrationError) {
-          console.error("Error during build migration:", migrationError);
+          console.error("Error during migration:", migrationError);
           // Don't block login if migration fails
         }
 

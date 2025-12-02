@@ -72,7 +72,15 @@ export async function GET(request: Request) {
     }
 
     // Authenticated user's own tier list
-    const session = await getServerSession();
+    let session: any = null;
+    try {
+      session = await getServerSession();
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Failed to get session", code: "FAILED_TO_GET_SESSION" },
+        { status: 401 }
+      );
+    }
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -115,7 +123,15 @@ export async function GET(request: Request) {
 // PUT to create/update current user's tier list
 export async function PUT(request: Request) {
   try {
-    const session = await getServerSession();
+    let session: any = null;
+    try {
+      session = await getServerSession();
+    } catch (error) {
+      return NextResponse.json(
+        { error: "Failed to get session", code: "FAILED_TO_GET_SESSION" },
+        { status: 401 }
+      );
+    }
 
     if (!session?.user?.id) {
       return NextResponse.json(

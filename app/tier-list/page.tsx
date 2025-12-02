@@ -3,17 +3,17 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import NavBar from "@/components/NavBar";
-import BuildsList from "@/components/builds/BuildsList";
-import PublicBuildsList from "@/components/builds/PublicBuildsList";
+import { MyTierLists } from "@/components/tier-list/MyTierLists";
+import { CommunityTierLists } from "@/components/tier-list/CommunityTierLists";
 import SectionHeader from "@/app/components/ui/SectionHeader";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogIn, Globe, Cloud, ThumbsUp, Hammer, Users } from "lucide-react";
+import { LogIn, Globe, Cloud, ThumbsUp, ListOrdered, Users } from "lucide-react";
 
-export default function Builds() {
+export default function TierListPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("mine");
 
@@ -27,7 +27,7 @@ export default function Builds() {
   return (
     <div
       className="min-h-screen bg-black text-white overflow-auto"
-      id="builder-page"
+      id="tier-list-page"
     >
       <NavBar />
 
@@ -46,13 +46,13 @@ export default function Builds() {
 
         <div className="container mx-auto px-4 relative z-10">
           <SectionHeader
-            title="Build Collection"
-            subtitle={activeTab === "mine" ? "Your Builds" : "Community Builds"}
+            title="Spell Tier Lists"
+            subtitle={activeTab === "mine" ? "Your Tier Lists" : "Community Tier Lists"}
           />
         </div>
       </section>
 
-      {/* Builds Section */}
+      {/* Tier Lists Section */}
       <section className="bg-black relative -mt-20 pb-20">
         <div className="container mx-auto px-4 relative z-10">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -64,15 +64,15 @@ export default function Builds() {
                 >
                   {activeTab === "mine" && (
                     <motion.div
-                      layoutId="active-tab-bg"
+                      layoutId="active-tier-tab-bg"
                       className="absolute inset-0 bg-gradient-to-r from-red-900/70 to-red-800/50 rounded-md shadow-lg shadow-red-900/30 border border-red-700/30 z-[-1]"
                       initial={false}
                       transition={{ type: "spring", stiffness: 500, damping: 30 }}
                     />
                   )}
                   <div className="flex items-center gap-2 relative z-10">
-                    <Hammer className="w-4 h-4" />
-                    <span>MY BUILDS</span>
+                    <ListOrdered className="w-4 h-4" />
+                    <span>MY TIER LISTS</span>
                   </div>
                 </TabsTrigger>
                 <TabsTrigger
@@ -81,7 +81,7 @@ export default function Builds() {
                 >
                   {activeTab === "community" && (
                     <motion.div
-                      layoutId="active-tab-bg"
+                      layoutId="active-tier-tab-bg"
                       className="absolute inset-0 bg-gradient-to-r from-red-900/70 to-red-800/50 rounded-md shadow-lg shadow-red-900/30 border border-red-700/30 z-[-1]"
                       initial={false}
                       transition={{ type: "spring", stiffness: 500, damping: 30 }}
@@ -106,7 +106,7 @@ export default function Builds() {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="flex-1">
                     <p className="text-sm text-gray-400 mb-2">
-                      Sign in to sync builds across devices, publish to the community, and vote on builds.
+                      Sign in to create tier lists, publish to the community, and vote on others&apos; lists.
                     </p>
                     <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
                       <div className="flex items-center gap-1.5">
@@ -115,7 +115,7 @@ export default function Builds() {
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Globe className="w-3.5 h-3.5" />
-                        <span>Publish builds</span>
+                        <span>Publish lists</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <ThumbsUp className="w-3.5 h-3.5" />
@@ -144,7 +144,7 @@ export default function Builds() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <BuildsList />
+                  <MyTierLists />
                 </motion.div>
               ) : (
                 <motion.div
@@ -154,7 +154,7 @@ export default function Builds() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <PublicBuildsList />
+                  <CommunityTierLists />
                 </motion.div>
               )}
             </AnimatePresence>

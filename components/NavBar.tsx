@@ -28,6 +28,7 @@ export const menuItems = [
   { name: "HOME", href: "/" },
   { name: "FEATURES", href: "/#features" },
   { name: "BUILDS", href: "/builds" },
+  { name: "TIER LIST", href: "/tier-list" },
   { name: "COMMANDS", href: "/commands" },
   { name: "NEWS", href: "/news" },
 ];
@@ -320,18 +321,58 @@ export default function NavBar() {
               </DropdownMenu>
             ) : (
               <motion.div
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3 }}
+                animate={{
+                  scale: [1, 1.08, 1],
+                }}
+                transition={{
+                  duration: 1.0,
+                  repeat: Infinity,
+                  repeatDelay: 2.5,
+                  ease: [0.68, -0.55, 0.265, 1.55],
+                }}
               >
                 <Button
                   asChild
                   variant="outline"
-                  className="hidden md:flex text-xs font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300"
+                  size="sm"
+                  className="hidden md:flex text-xs font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 relative overflow-hidden"
                 >
                   <Link href="/auth/signin" className="flex items-center gap-2">
-                    <LogIn className="h-4 w-4" />
-                    <span>SIGN IN</span>
+                    <div className="flex items-center justify-center gap-2 relative z-10">
+                      <LogIn className="h-4 w-4" />
+                      <span>SIGN IN</span>
+                    </div>
+
+                    {/* Diagonal flash effect */}
+                    <motion.div
+                      className="absolute inset-0 pointer-events-none"
+                      initial={{ x: "100%" }}
+                      animate={{ x: "-100%" }}
+                      transition={{
+                        duration: 0.4,
+                        repeat: Infinity,
+                        repeatDelay: 2.5,
+                        ease: [0.76, 0, 0.24, 1],
+                      }}
+                    >
+                      <div className="absolute inset-0 w-8 h-full bg-gradient-to-r from-transparent via-white/25 to-transparent transform rotate-45 translate-x-4 -translate-y-2" />
+                    </motion.div>
+
+                    {/* Second diagonal flash following behind */}
+                    <motion.div
+                      className="absolute inset-0 pointer-events-none"
+                      initial={{ x: "100%" }}
+                      animate={{ x: "-100%" }}
+                      transition={{
+                        duration: 0.6,
+                        repeat: Infinity,
+                        repeatDelay: 2.2,
+                        ease: [0.87, 0, 0.13, 1],
+                        delay: 0.2,
+                      }}
+                    >
+                      <div className="absolute inset-0 w-6 h-full bg-gradient-to-r from-transparent via-blue-200/15 to-transparent transform rotate-45 translate-x-2 -translate-y-1" />
+                    </motion.div>
                   </Link>
                 </Button>
               </motion.div>
