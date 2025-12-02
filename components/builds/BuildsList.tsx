@@ -239,15 +239,16 @@ export const BuildContent = ({
     ultimateSpellSchool,
   ]);
 
-  // Determine header color based on card border logic
-  // Card border uses: border-green-500/50 if public, border-zinc-800/50 otherwise
   const getHeaderColor = () => {
+    // When the card border is green for public builds,
+    // make the section headers green as well.
     if (showPublicToggle && isPublic) {
       return "text-green-400";
     }
-    // For private builds, use a color that matches the zinc-800 border
-    // Using gray-400 to match the subtle zinc-800/50 border
-    return "text-gray-400";
+
+    // Otherwise, follow the spell school color used for the card/border
+    // (same mapping used by the item borders / background gradients).
+    return textColorVariants[school || "empty"] || "text-gray-400";
   };
 
   const headerColor = getHeaderColor();
