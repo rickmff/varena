@@ -118,14 +118,17 @@ const borderVariants: Record<string, string> = {
   illusion: "border-spellSchool-illusion/30",
 };
 
+// Text colors follow the same custom spell school palette used for borders/backgrounds
+// (see `styles.css` .spellSchool-* classes) so headers visually match the card border.
 const textColorVariants: Record<string, string> = {
   empty: "text-gray-400",
-  storm: "text-yellow-400",
-  blood: "text-red-400",
-  chaos: "text-purple-400",
-  arcane: "text-blue-400",
-  frost: "text-cyan-400",
-  illusion: "text-pink-400",
+  storm: "spellSchool-storm",
+  blood: "spellSchool-blood",
+  chaos: "spellSchool-chaos",
+  // Arcane builds reuse the \"unholy\" color in the existing palette
+  arcane: "spellSchool-unholy",
+  frost: "spellSchool-frost",
+  illusion: "spellSchool-illusion",
 };
 
 const Item = ({
@@ -240,13 +243,7 @@ export const BuildContent = ({
   ]);
 
   const getHeaderColor = () => {
-    // When the card border is green for public builds,
-    // make the section headers green as well.
-    if (showPublicToggle && isPublic) {
-      return "text-green-400";
-    }
-
-    // Otherwise, follow the spell school color used for the card/border
+    // Always follow the spell school color used for the card/border
     // (same mapping used by the item borders / background gradients).
     return textColorVariants[school || "empty"] || "text-gray-400";
   };
