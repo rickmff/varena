@@ -19,6 +19,8 @@ import "@/components/vbuilds/styles.css";
 import { useAuth } from "@/hooks/use-auth";
 import { AuthorBadge } from "@/components/AuthorBadge";
 import { useUserBadges } from "@/hooks/use-author-badges";
+import { Input } from "@/components/ui/input";
+import { isValidEnglishAlphabet } from "@/lib/utils";
 import {
   Pagination,
   PaginationContent,
@@ -194,6 +196,8 @@ export const BuildContent = ({
   onClone,
   onRename,
   currentUserId,
+  onNameUpdated,
+  isMineTab,
 }: {
   code: string;
   name: string;
@@ -215,7 +219,20 @@ export const BuildContent = ({
   onClone?: (event: React.MouseEvent, buildId: string, code: string, name: string) => void;
   onRename?: (event: React.MouseEvent, buildId: string, currentName: string) => void;
   currentUserId?: string | null;
+  onNameUpdated?: (buildId: string, newName: string) => void;
+  isMineTab?: boolean;
 }) => {
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editingName, setEditingName] = useState(name);
+  const [isSavingName, setIsSavingName] = useState(false);
+
+  // Update editing name when name prop changes
+  useEffect(() => {
+    if (!isEditingName) {
+      setEditingName(name);
+    }
+  }, [name, isEditingName]);
+
   // Safely convert the arena code into a build structure.
   // If anything goes wrong we render a minimal, non-animated card instead
   // so that a bad code never breaks the whole builds grid.
@@ -262,6 +279,117 @@ export const BuildContent = ({
 
   const headerColor = getHeaderColor();
 
+  // Handle inline name editing
+  const canEditName = onRename && buildId && currentUserId && userId === currentUserId && !buildId.startsWith("local-");
+
+  const handleStartEdit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditingName(name);
+    setIsEditingName(true);
+  };
+
+  const handleSaveName = async () => {
+    const trimmedName = editingName.trim();
+
+    // Validate name length (minimum 3 characters)
+    if (!trimmedName || trimmedName.length < 3) {
+      toast.error("Build name must be at least 3 characters long");
+      setEditingName(name);
+      setIsEditingName(false);
+      return;
+    }
+
+    // Validate name length (maximum 30 characters)
+    if (trimmedName.length > 30) {
+      toast.error("Build name must be 30 characters or less");
+      setEditingName(name);
+      setIsEditingName(false);
+      return;
+    }
+
+    // Validate name contains only English alphabet characters
+    if (!isValidEnglishAlphabet(trimmedName)) {
+      toast.error("Build name can only contain English alphabet characters, numbers, and spaces");
+      setEditingName(name);
+      setIsEditingName(false);
+      return;
+    }
+
+    // Don't update if name hasn't changed
+    if (trimmedName === name) {
+      setIsEditingName(false);
+      setEditingName(name);
+      return;
+    }
+
+    if (!buildId || !onRename) return;
+
+    setIsSavingName(true);
+
+    try {
+      // Create a synthetic event for onRename
+      const syntheticEvent = {
+        preventDefault: () => { },
+        stopPropagation: () => { },
+      } as React.MouseEvent;
+
+      // Call the rename handler with the new name
+      await new Promise<void>((resolve, reject) => {
+        // We need to call the API directly since onRename uses window.prompt
+        fetch(`/api/builds/${buildId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: trimmedName,
+          }),
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              const error = await response.json();
+              throw new Error(error.error || "Failed to rename build");
+            }
+            return response.json();
+          })
+          .then(() => {
+            setIsEditingName(false);
+            setEditingName(trimmedName);
+            toast.success("Build renamed successfully!");
+            // Notify parent component to update the name
+            if (onNameUpdated && buildId) {
+              onNameUpdated(buildId, trimmedName);
+            }
+            resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to rename build";
+      toast.error(errorMessage);
+      setEditingName(name);
+    } finally {
+      setIsSavingName(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingName(name);
+    setIsEditingName(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSaveName();
+    } else if (e.key === "Escape") {
+      handleCancelEdit();
+    }
+  };
+
   return (
     <Card
       className={`bg-black/80 backdrop-blur-sm rounded-lg border-2 ${showPublicToggle && isPublic
@@ -284,7 +412,7 @@ export const BuildContent = ({
 
       {/* Top right corner - Vote buttons and Action buttons */}
       <div
-        className="absolute top-1 right-1 flex gap-2 z-10"
+        className="absolute top-2 right-1 flex gap-2 z-10"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -294,7 +422,7 @@ export const BuildContent = ({
         {isAdmin && onAdminDelete && (
           <button
             type="button"
-            className="bg-yellow-600/80 hover:bg-yellow-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-yellow-500/50 opacity-0 group-hover:opacity-100 z-20 mt-1"
+            className="bg-yellow-600/80 hover:bg-yellow-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-yellow-500/50 opacity-0 group-hover:opacity-100 z-20"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -306,15 +434,16 @@ export const BuildContent = ({
             <Trash2 className="w-4 h-4" />
           </button>
         )}
-        {/* Clone button */}
-        {onClone && buildId && (
+
+        {/* Clone button - below vote buttons for community builds */}
+        {onClone && (
           <button
             type="button"
             className="bg-blue-600/80 hover:bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-blue-500/50 opacity-0 group-hover:opacity-100"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              onClone(e, buildId, code, name);
+              onClone(e, buildId || `local-${code}`, code, name);
             }}
             aria-label="Clone build"
           >
@@ -369,29 +498,52 @@ export const BuildContent = ({
 
       <CardHeader className="relative">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-xl font-bold text-white">
-            {name || "Unnamed Build"}
-          </CardTitle>
-          {/* Rename button - only show if user owns the build */}
-          {onRename && buildId && currentUserId && userId === currentUserId && (
-            <button
-              type="button"
-              className="text-gray-400 hover:text-white transition-colors opacity-0 group-hover:opacity-100 p-1"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onRename(e, buildId, name);
-              }}
-              aria-label="Rename build"
-            >
-              <Pencil className="w-4 h-4" />
-            </button>
+          {isEditingName ? (
+            <Input
+              type="text"
+              value={editingName}
+              onChange={(e) => setEditingName(e.target.value)}
+              onBlur={handleSaveName}
+              onKeyDown={handleKeyDown}
+              disabled={isSavingName}
+              maxLength={30}
+              className="text-xl font-bold bg-black/50 border-white/10 text-white placeholder:text-gray-500 h-auto py-1 px-2"
+              autoFocus
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <>
+              <CardTitle
+                className={`text-xl font-bold text-white ${isMineTab ? "group-hover:truncate group-hover:max-w-[10ch] group-hover:overflow-hidden group-hover:text-ellipsis" : ""}`}
+                title={name || "Unnamed Build"}
+              >
+                {isMineTab ? (
+                  <>
+                    <span className="group-hover:hidden">{name || "Unnamed Build"}</span>
+                    <span className="hidden group-hover:inline">
+                      {name && name.length > 10 ? `${name.substring(0, 10)}...` : name || "Unnamed Build"}
+                    </span>
+                  </>
+                ) : (
+                  name || "Unnamed Build"
+                )}
+              </CardTitle>
+              {/* Rename button - only show if user owns the build */}
+              {canEditName && (
+                <button
+                  type="button"
+                  className="text-gray-400 hover:text-white transition-colors opacity-0 group-hover:opacity-100 p-1"
+                  onClick={handleStartEdit}
+                  aria-label="Rename build"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+              )}
+            </>
           )}
         </div>
-        {/* Always show author if available */}
-        {author && (
-          <AuthorNameWithBadge authorName={author} userId={userId} />
-        )}
+        {/* Always show author - use "You" as fallback */}
+        <AuthorNameWithBadge authorName={author || "You"} userId={userId} />
       </CardHeader>
       <CardContent className="relative">
         <div className="space-y-6">
@@ -660,6 +812,8 @@ export default function BuildsList({
                     name: build.name || `Build ${index + 1}`,
                     code: build.code || "",
                     isPublic: false, // LocalStorage builds are always private
+                    author: "You", // Fallback for localStorage builds
+                    userId: null,
                   }));
                   setBuilds(buildsArray);
                   onBuildsLoaded?.(buildsArray.length > 0);
@@ -709,7 +863,7 @@ export default function BuildsList({
             name: build.name,
             code: build.code,
             isPublic: build.isPublic || false,
-            author: build.author,
+            author: build.author || "You", // Fallback to "You" if author is missing
             userId: build.userId || null,
           }))
           : (data.builds || []).map((build: any) => ({
@@ -717,7 +871,7 @@ export default function BuildsList({
             name: build.name,
             code: build.code,
             isPublic: build.isPublic || false,
-            author: build.author,
+            author: build.author || "You", // Fallback to "You" if author is missing
             userId: build.userId || null,
           }));
 
@@ -825,7 +979,7 @@ export default function BuildsList({
             name: build.name,
             code: build.code,
             isPublic: build.isPublic || false,
-            author: build.author,
+            author: build.author || "You", // Fallback to "You" if author is missing
             userId: build.userId || null,
           }))
           : (refreshData.builds || []).map((build: any) => ({
@@ -833,7 +987,7 @@ export default function BuildsList({
             name: build.name,
             code: build.code,
             isPublic: build.isPublic || false,
-            author: build.author,
+            author: build.author || "You", // Fallback to "You" if author is missing
             userId: build.userId || null,
           }));
         const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
@@ -945,13 +1099,110 @@ export default function BuildsList({
     event.preventDefault();
     event.stopPropagation();
 
+    // If user is not authenticated, clone to localStorage
     if (!isAuthenticated) {
-      toast.error("Please sign in to clone builds");
+      try {
+        if (typeof window !== "undefined") {
+          const clonedName = `${name} (Copy)`;
+          const localBuildsData = localStorage.getItem("vbuilds");
+          const existingBuilds = localBuildsData ? JSON.parse(localBuildsData) : [];
+
+          // Add cloned build to localStorage
+          existingBuilds.push({
+            name: clonedName,
+            code: code,
+          });
+
+          localStorage.setItem("vbuilds", JSON.stringify(existingBuilds));
+
+          // Update state
+          const buildsArray = existingBuilds.map((build: any, idx: number) => ({
+            id: `local-${idx}-${build.name}`,
+            name: build.name || `Build ${idx + 1}`,
+            code: build.code || "",
+            isPublic: false,
+            author: "You",
+            userId: null,
+          }));
+          setBuilds(buildsArray);
+          onBuildsLoaded?.(buildsArray.length > 0);
+
+          toast.success("Build cloned to local storage!");
+        }
+      } catch (error) {
+        console.error("Error cloning build to localStorage:", error);
+        toast.error("Failed to clone build");
+      }
       return;
     }
 
+    // If authenticated, clone via API
     if (!buildId || buildId.startsWith("local-")) {
-      toast.error("Cannot clone local builds. Please sign in first.");
+      // Clone local build to API
+      try {
+        const clonedName = `${name} (Copy)`;
+        const response = await fetch("/api/builds", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: clonedName,
+            code: code,
+            isPublic: false,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          const errorMessage = error.error || "Failed to clone build";
+          toast.error(errorMessage);
+          return;
+        }
+
+        toast.success("Build cloned successfully!");
+
+        // Refresh builds list
+        const page = maxBuilds ? 1 : currentPage;
+        const limit = maxBuilds || 11;
+        const refreshResponse = await fetch(`/api/builds?page=${page}&limit=${limit}`);
+        if (refreshResponse.ok) {
+          const refreshData = await refreshResponse.json();
+          const buildsArray = Array.isArray(refreshData)
+            ? refreshData.map((build: any) => ({
+              id: build.id,
+              name: build.name,
+              code: build.code,
+              isPublic: build.isPublic || false,
+              author: build.author || "You",
+              userId: build.userId || null,
+            }))
+            : (refreshData.builds || []).map((build: any) => ({
+              id: build.id,
+              name: build.name,
+              code: build.code,
+              isPublic: build.isPublic || false,
+              author: build.author || "You",
+              userId: build.userId || null,
+            }));
+          const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
+            if (a.isPublic && !b.isPublic) return -1;
+            if (!a.isPublic && b.isPublic) return 1;
+            return 0;
+          });
+          setBuilds(sortedBuilds);
+
+          if (refreshData.total !== undefined) {
+            setTotalBuilds(refreshData.total);
+            setTotalPages(refreshData.totalPages || 1);
+          }
+
+          onBuildsLoaded?.(sortedBuilds.length > 0);
+        }
+      } catch (error) {
+        console.error("Error cloning build:", error);
+        toast.error("Failed to clone build");
+      }
       return;
     }
 
@@ -997,7 +1248,7 @@ export default function BuildsList({
             name: build.name,
             code: build.code,
             isPublic: build.isPublic || false,
-            author: build.author,
+            author: build.author || "You", // Fallback to "You" if author is missing
             userId: build.userId || null,
           }))
           : (refreshData.builds || []).map((build: any) => ({
@@ -1005,7 +1256,7 @@ export default function BuildsList({
             name: build.name,
             code: build.code,
             isPublic: build.isPublic || false,
-            author: build.author,
+            author: build.author || "You", // Fallback to "You" if author is missing
             userId: build.userId || null,
           }));
         const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
@@ -1080,7 +1331,7 @@ export default function BuildsList({
             name: build.name,
             code: build.code,
             isPublic: build.isPublic || false,
-            author: build.author,
+            author: build.author || "You", // Fallback to "You" if author is missing
             userId: build.userId || null,
           }))
           : (refreshData.builds || []).map((build: any) => ({
@@ -1088,7 +1339,7 @@ export default function BuildsList({
             name: build.name,
             code: build.code,
             isPublic: build.isPublic || false,
-            author: build.author,
+            author: build.author || "You", // Fallback to "You" if author is missing
             userId: build.userId || null,
           }));
         const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
@@ -1193,7 +1444,7 @@ export default function BuildsList({
             name: build.name,
             code: build.code,
             isPublic: build.isPublic || false,
-            author: build.author,
+            author: build.author || "You", // Fallback to "You" if author is missing
             userId: build.userId || null,
           }))
           : (refreshData.builds || []).map((build: any) => ({
@@ -1201,7 +1452,7 @@ export default function BuildsList({
             name: build.name,
             code: build.code,
             isPublic: build.isPublic || false,
-            author: build.author,
+            author: build.author || "You", // Fallback to "You" if author is missing
             userId: build.userId || null,
           }));
         const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
@@ -1558,9 +1809,18 @@ export default function BuildsList({
                   }}
                   showPublicToggle={true}
                   buildId={build.id}
-                  onClone={build.id && !build.id.startsWith("local-") ? handleClone : undefined}
+                  onClone={handleClone}
                   onRename={build.id && !build.id.startsWith("local-") ? handleRename : undefined}
                   currentUserId={user?.id || null}
+                  onNameUpdated={(buildId, newName) => {
+                    // Update the build name in the local state
+                    setBuilds((prev) =>
+                      prev.map((b) =>
+                        b.id === buildId ? { ...b, name: newName } : b
+                      )
+                    );
+                  }}
+                  isMineTab={true}
                 />
               </Link>
             </motion.div>

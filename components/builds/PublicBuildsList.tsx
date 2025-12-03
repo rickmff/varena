@@ -90,12 +90,12 @@ const SpellSchoolsGrid = ({
   };
 
   return (
-    <div className="grid grid-cols-3 gap-2 p-2 bg-black/80 backdrop-blur-sm">
+    <div className="grid grid-cols-3 gap-2 p-2">
       {spellSchools.map((school) => (
         <DropdownMenuItem
           key={school}
           onSelect={(e) => handleSchoolClick(e, school)}
-          className="h-20 flex items-center justify-center cursor-pointer hover:bg-purple-900/30 focus:bg-purple-900/30 p-0 overflow-hidden relative"
+          className="h-20 flex items-center justify-center cursor-pointer bg-zinc-900 border-2 border-zinc-700 hover:border-red-500 focus:border-red-500 rounded-md transition-all duration-100 p-0 overflow-hidden relative"
         >
           <img
             src={`/images/vbuilds/spellschools/${school}.webp`}
@@ -160,7 +160,7 @@ const SpellsList = ({
             <DropdownMenuItem
               key={spell.id}
               onSelect={(e) => handleSpellSelect(e, spell.id)}
-              className={`h-20 flex items-center justify-center cursor-pointer hover:bg-purple-900/30 focus:bg-purple-900/30 p-0 overflow-hidden relative ${selectedSpellId === spell.id ? "bg-purple-900/20" : ""
+              className={`h-20 flex items-center justify-center cursor-pointer bg-zinc-900 border-2 hover:border-red-500 focus:border-red-500 rounded-md transition-all duration-100 p-0 overflow-hidden relative ${selectedSpellId === spell.id ? "border-red-500" : "border-zinc-700"
                 }`}
             >
               <img
@@ -189,7 +189,7 @@ const SpellDropdownSelect = ({
   onChange: (spellId: string) => void;
   onClear: () => void;
   excludeSpellId?: string | null;
-  placeholder: string;
+  placeholder: React.ReactNode;
   slotNumber: number;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -233,29 +233,26 @@ const SpellDropdownSelect = ({
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className={`w-full h-20 justify-between bg-black/50 border-white/10 text-white hover:border-purple-900/50 ${value ? "border-purple-900/50 bg-purple-900/10" : ""
+            className={`w-20 h-20 p-0 justify-center bg-zinc-900 border-2 border-zinc-700 text-gray-200 hover:border-red-500 transition-all duration-100 ${value ? "border-red-500" : ""
               }`}
+            style={{ backgroundColor: 'rgb(24 24 27)' }}
           >
             {selectedSpell ? (
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <img
-                  src={selectedSpell.img}
-                  alt={selectedSpell.name}
-                  className="w-10 h-10 rounded flex-shrink-0"
-                />
-                <span className="text-sm truncate">{selectedSpell.name}</span>
-              </div>
+              <img
+                src={selectedSpell.img}
+                alt={selectedSpell.name}
+                className="w-full h-full object-cover rounded-sm pointer-events-none"
+              />
             ) : (
-              <span className="text-gray-400">{placeholder}</span>
+              placeholder
             )}
-            {!value && <ChevronDown className="w-4 h-4 ml-2 flex-shrink-0" />}
           </Button>
         </DropdownMenuTrigger>
         {value && (
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-purple-900/30 z-20"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-red-900/30 z-20"
             aria-label="Clear selection"
           >
             <X className="w-4 h-4" />
@@ -537,11 +534,31 @@ export default function PublicBuildsList() {
     event.preventDefault();
     event.stopPropagation();
 
+    // If user is not authenticated, clone to localStorage
     if (!isAuthenticated) {
-      toast.error("Please sign in to clone builds");
+      try {
+        if (typeof window !== "undefined") {
+          const clonedName = `${name} (Copy)`;
+          const localBuildsData = localStorage.getItem("vbuilds");
+          const existingBuilds = localBuildsData ? JSON.parse(localBuildsData) : [];
+
+          // Add cloned build to localStorage
+          existingBuilds.push({
+            name: clonedName,
+            code: code,
+          });
+
+          localStorage.setItem("vbuilds", JSON.stringify(existingBuilds));
+          toast.success("Build cloned to local storage!");
+        }
+      } catch (error) {
+        console.error("Error cloning build to localStorage:", error);
+        toast.error("Failed to clone build");
+      }
       return;
     }
 
+    // If authenticated, clone via API
     if (!buildId) {
       toast.error("Build ID not found");
       return;
@@ -719,10 +736,10 @@ export default function PublicBuildsList() {
 
 
         {/* Spell Slot 1 Filter */}
-        <div className="flex-1 p-3">
+        <div className="p-3">
           <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="w-3 h-3 text-purple-400" />
-            <label className="text-xs font-semibold text-purple-400">Spell 1</label>
+            <Sparkles className="w-3 h-3 text-red-400" />
+            <label className="text-xs font-semibold text-red-400">Spell 1</label>
           </div>
           <SpellDropdownSelect
             value={spellSlot1Spell}
@@ -738,16 +755,21 @@ export default function PublicBuildsList() {
               setSpellSlot1School(null);
             }}
             excludeSpellId={spellSlot2Spell}
-            placeholder="Select Spell 1"
+            placeholder={
+              <DropdownSelectPlaceholder
+                image="/images/vbuilds/spells/spell-blood-blood_rage.webp"
+                text="Spell 1"
+              />
+            }
             slotNumber={1}
           />
         </div>
 
         {/* Spell Slot 2 Filter */}
-        <div className="flex-1 p-3">
+        <div className="p-3">
           <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="w-3 h-3 text-purple-400" />
-            <label className="text-xs font-semibold text-purple-400">Spell 2</label>
+            <Sparkles className="w-3 h-3 text-red-400" />
+            <label className="text-xs font-semibold text-red-400">Spell 2</label>
           </div>
           <SpellDropdownSelect
             value={spellSlot2Spell}
@@ -763,7 +785,12 @@ export default function PublicBuildsList() {
               setSpellSlot2School(null);
             }}
             excludeSpellId={spellSlot1Spell}
-            placeholder="Select Spell 2"
+            placeholder={
+              <DropdownSelectPlaceholder
+                image="/images/vbuilds/spells/spell-blood-blood_rite.webp"
+                text="Spell 2"
+              />
+            }
             slotNumber={2}
           />
         </div>
@@ -791,8 +818,9 @@ export default function PublicBuildsList() {
               onBlur={() => {
                 setTimeout(() => setShowAuthorDropdown(false), 200);
               }}
-              className={`bg-black/50 h-20 border-white/10 text-white placeholder:text-gray-500 hover:border-red-900/50 focus:border-red-900/50 ${authorFilter ? "border-red-900/50 bg-red-900/10" : ""
+              className={`h-20 bg-zinc-900 border-2 border-zinc-700 text-gray-200 placeholder:text-gray-400 hover:border-red-500 focus:border-red-500 rounded-md transition-all duration-100 ${authorFilter ? "border-red-500" : ""
                 }`}
+              style={{ backgroundColor: 'rgb(24 24 27)' }}
             />
             {authorFilter && (
               <Button
@@ -1014,7 +1042,7 @@ export default function PublicBuildsList() {
                         : undefined
                     }
                     buildLink={`/builds/create?build=${encodeURIComponent(build.code)}`}
-                    onClone={build.id ? handleClone : undefined}
+                    onClone={handleClone}
                     currentUserId={user?.id || null}
                   />
                 </Link>

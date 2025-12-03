@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-type UserBadgeType = {
+export type UserBadgeType = {
   id: string;
   userId: string;
   badgeType: string;

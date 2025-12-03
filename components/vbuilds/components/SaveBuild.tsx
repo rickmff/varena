@@ -522,15 +522,15 @@ const SaveBuild: React.FC = () => {
       }
     }
 
-    // Validate cloned name length (minimum 3 characters and max 42)
+    // Validate cloned name length (minimum 3 characters and max 30)
     if (clonedName.length < 3) {
       toast.error("Build name must be at least 3 characters long");
       return;
     }
 
-    if (clonedName.length > 42) {
+    if (clonedName.length > 30) {
       // If name is too long, truncate base name and add version
-      const maxBaseLength = 42 - 4; // Reserve space for " v2" (4 chars)
+      const maxBaseLength = 30 - 4; // Reserve space for " v2" (4 chars)
       const baseName = buildName.replace(/\s+v(\d+)$/i, "").trim();
       const truncatedBase = baseName.substring(0, maxBaseLength).trim();
       const versionPattern = /\s+v(\d+)$/i;
@@ -638,7 +638,7 @@ const SaveBuild: React.FC = () => {
             }}
             placeholder="Build name"
             disabled={loading}
-            maxLength={42}
+            maxLength={30}
           />
           {!isOwner && (
             <Button
