@@ -160,7 +160,44 @@ let newsCache: {
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 const MAX_ITEMS = 3; // Maximum number of items to fetch for homepage
 
-// Helper function to optimize Notion image URLs
+// Allowed Notion hostnames
+const NOTION_HOSTNAMES = [
+  'prod-files-secure.s3.us-west-2.amazonaws.com',
+  's3.us-west-2.amazonaws.com',
+  'notion.so',
+  'www.notion.so'
+];
+
+/**
+ * Create a stable hash from a URL pathname for caching purposes
+ * This creates a consistent identifier regardless of changing query parameters
+ */
+function createStableImageId(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    // Use pathname only - this is stable and doesn't include expiring tokens
+    const stablePart = urlObj.pathname;
+
+    // Create a simple hash for shorter URLs
+    let hash = 0;
+    for (let i = 0; i < stablePart.length; i++) {
+      const char = stablePart.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+
+    // Return absolute value as hex string
+    return Math.abs(hash).toString(16);
+  } catch {
+    // Fallback: use base64 of full URL
+    return Buffer.from(url).toString('base64url').slice(0, 32);
+  }
+}
+
+/**
+ * Helper function to optimize Notion image URLs
+ * Creates stable proxy URLs that can be cached by CDN
+ */
 function optimizeNotionImageUrl(url: string | null): string | null {
   if (!url) return null;
 
@@ -168,16 +205,13 @@ function optimizeNotionImageUrl(url: string | null): string | null {
     const urlObj = new URL(url);
 
     // Check if it's a Notion URL (various domains)
-    const notionHostnames = [
-      'prod-files-secure.s3.us-west-2.amazonaws.com',
-      's3.us-west-2.amazonaws.com',
-      'notion.so',
-      'www.notion.so'
-    ];
+    if (NOTION_HOSTNAMES.some(hostname => urlObj.hostname === hostname || urlObj.hostname.endsWith('.' + hostname))) {
+      // Create a stable ID from the URL pathname (excludes changing tokens)
+      const stableId = createStableImageId(url);
 
-    if (notionHostnames.some(hostname => urlObj.hostname === hostname || urlObj.hostname.endsWith('.' + hostname))) {
-      // Use our proxy endpoint
-      return `/api/image?url=${encodeURIComponent(url)}`;
+      // Use stable ID in the URL for better CDN caching
+      // The full URL is still passed for fetching, but the stable ID helps with cache keys
+      return `/api/image?id=${stableId}&url=${encodeURIComponent(url)}`;
     }
 
     return url;

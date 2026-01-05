@@ -18,7 +18,7 @@ import React from "react";
 import "@/components/vbuilds/styles.css";
 import { useAuth } from "@/hooks/use-auth";
 import { AuthorBadge } from "@/components/AuthorBadge";
-import { useUserBadges } from "@/hooks/use-author-badges";
+import { useUserBadges, UserBadgeType } from "@/hooks/use-author-badges";
 import { Input } from "@/components/ui/input";
 import { isValidEnglishAlphabet } from "@/lib/utils";
 import {
@@ -155,10 +155,7 @@ const Item = ({
   );
 };
 
-const AuthorNameWithBadge = ({ authorName, userId }: { authorName?: string; userId?: string | null }) => {
-  const { badges } = useUserBadges([userId].filter(Boolean) as string[]);
-  const badge = userId ? badges[userId] : null;
-
+const AuthorNameWithBadge = ({ authorName, badge }: { authorName?: string; badge?: UserBadgeType | null }) => {
   return (
     <p className="text-sm text-gray-400 mt-1 flex items-center gap-1.5">
       <User className="w-3 h-3" />
@@ -198,6 +195,7 @@ export const BuildContent = ({
   currentUserId,
   onNameUpdated,
   isMineTab,
+  userBadge,
 }: {
   code: string;
   name: string;
@@ -221,6 +219,7 @@ export const BuildContent = ({
   currentUserId?: string | null;
   onNameUpdated?: (buildId: string, newName: string) => void;
   isMineTab?: boolean;
+  userBadge?: UserBadgeType | null;
 }) => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editingName, setEditingName] = useState(name);
@@ -543,7 +542,7 @@ export const BuildContent = ({
           )}
         </div>
         {/* Always show author - use "You" as fallback */}
-        <AuthorNameWithBadge authorName={author || "You"} userId={userId} />
+        <AuthorNameWithBadge authorName={author || "You"} badge={userBadge} />
       </CardHeader>
       <CardContent className="relative">
         <div className="space-y-6">
@@ -791,6 +790,16 @@ export default function BuildsList({
   const [totalBuilds, setTotalBuilds] = useState(0);
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+
+  // Get the builds to display (limited by maxBuilds if specified)
+  const buildsToShow = maxBuilds ? builds.slice(0, maxBuilds) : builds;
+
+  // Collect user IDs for batch fetching badges
+  const userIds = Array.from(new Set(buildsToShow
+    .map((build) => build.userId)
+    .filter((id): id is string => Boolean(id))));
+
+  const { badges } = useUserBadges(userIds);
 
   useEffect(() => {
     const fetchBuilds = async () => {
@@ -1478,8 +1487,6 @@ export default function BuildsList({
     }
   };
 
-  // // Get the builds to display (limited by maxBuilds if specified)
-  const buildsToShow = maxBuilds ? builds.slice(0, maxBuilds) : builds;
 
   // // Calculate button span based on grid layout and number of builds
   const getButtonSpanClass = () => {
@@ -1821,6 +1828,7 @@ export default function BuildsList({
                     );
                   }}
                   isMineTab={true}
+                  userBadge={build.userId ? badges[build.userId] : null}
                 />
               </Link>
             </motion.div>

@@ -200,6 +200,7 @@ export default function NewsPostPage({ params }: NewsPostPageProps) {
                     alt={post.title}
                     fill
                     className="object-cover"
+                    unoptimized={post.coverImageUrl?.includes('/api/image')}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.style.display = "none";

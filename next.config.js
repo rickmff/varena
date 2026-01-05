@@ -32,30 +32,106 @@ const nextConfig = {
   reactStrictMode: true,
   async headers() {
     return [
+      // Image proxy endpoint - aggressive CDN caching
       {
         source: '/api/image',
         headers: [
           {
             key: 'Cache-Control',
+            value: 'public, s-maxage=31536000, max-age=604800, stale-while-revalidate=86400, immutable',
+          },
+          {
+            key: 'CDN-Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+          {
+            key: 'Vercel-CDN-Cache-Control',
             value: 'public, max-age=31536000, immutable',
           },
         ],
       },
+      // Static images in public folder
       {
         source: '/images/:all*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, s-maxage=31536000, max-age=31536000, immutable',
           },
         ],
       },
+      // Static assets
+      {
+        source: '/:path*.webp',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=31536000, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*.png',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=31536000, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*.svg',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=31536000, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*.ico',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=31536000, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // News API - moderate caching with revalidation
       {
         source: '/api/news',
         headers: [
           {
             key: 'Cache-Control',
             value: 'public, s-maxage=3600, max-age=3600, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
+        source: '/api/news/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=3600, max-age=3600, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      // Site manifest and favicon
+      {
+        source: '/site.webmanifest',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=86400, max-age=86400, stale-while-revalidate=604800',
+          },
+        ],
+      },
+      {
+        source: '/favicon.ico',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=31536000, max-age=31536000, immutable',
           },
         ],
       },

@@ -646,6 +646,15 @@ export default function PublicBuildsList() {
     secondaryBloodFilter ||
     authorFilter;
 
+  // Collect user IDs for batch fetching badges for the visible builds
+  const userIds = Array.from(new Set(filteredBuilds
+    .map((build) => build.userId)
+    .filter((id): id is string => Boolean(id))));
+
+  // Fetch badges for visible builds
+  // We alias the result to avoid conflict with badges from AuthorSuggestionsDropdown if any (actually AuthorSuggestionsDropdown has its own scope so it is fine, but wait, AuthorSuggestionsDropdown is a separate component in this file, so no conflict variable name wise)
+  const { badges: buildBadges } = useUserBadges(userIds);
+
   const scaleIn = {
     hidden: { opacity: 0, scale: 0.9 },
     visible: {
@@ -1020,6 +1029,7 @@ export default function PublicBuildsList() {
                     name={build.name}
                     author={build.author}
                     userId={build.userId}
+                    userBadge={build.userId ? buildBadges[build.userId] : null}
                     isPublic={build.isPublic}
                     showPublicToggle={false}
                     upvotes={build.upvotes}
