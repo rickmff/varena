@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { logger } from "@/lib/logger";
 
 // GET /api/badges - Get badges for specific users (public endpoint)
 export async function GET(request: Request) {
@@ -11,7 +12,6 @@ export async function GET(request: Request) {
       return NextResponse.json({ badges: [] });
     }
 
-    // Get badges for specific users
     const userIdList = userIds.split(",").map((id) => id.trim()).filter(Boolean);
 
     if (userIdList.length === 0) {
@@ -20,9 +20,7 @@ export async function GET(request: Request) {
 
     const badges = await prisma.userBadge.findMany({
       where: {
-        userId: {
-          in: userIdList,
-        },
+        userId: { in: userIdList },
       },
       select: {
         id: true,
@@ -35,12 +33,11 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json({ badges });
-  } catch (error: any) {
-    console.error("[Badges API] Error fetching badges:", error);
+  } catch (error) {
+    logger.error("Error fetching badges", error);
     return NextResponse.json(
       { error: "Error fetching badges" },
       { status: 500 }
     );
   }
 }
-

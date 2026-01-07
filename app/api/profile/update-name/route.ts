@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/better-auth/server";
 import prisma from "@/lib/prisma";
 import { createPool } from "mysql2/promise";
+import { rateLimit, getRateLimitHeaders } from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
+
+// Rate limit: 10 name changes per hour
+const PROFILE_RATE_LIMIT = {
+  windowMs: 60 * 60 * 1000, // 1 hour
+  maxRequests: 10,
+};
 
 // Parse DATABASE_URL to create MySQL pool for Better Auth
 function parseDatabaseUrl(url: string) {
@@ -14,7 +22,7 @@ function parseDatabaseUrl(url: string) {
       password: decodeURIComponent(parsedUrl.password),
       database: parsedUrl.pathname.slice(1),
     };
-  } catch (error) {
+  } catch {
     throw new Error("Invalid DATABASE_URL format");
   }
 }
@@ -46,6 +54,20 @@ export async function PUT(request: Request) {
       );
     }
 
+    // Apply rate limiting
+    const identifier = `profile:${session.user.id}`;
+    const rateLimitResult = await rateLimit(identifier, PROFILE_RATE_LIMIT);
+
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { error: "Too many profile updates. Please try again later." },
+        {
+          status: 429,
+          headers: getRateLimitHeaders(rateLimitResult),
+        }
+      );
+    }
+
     const { name } = await request.json();
 
     // Validate name
@@ -56,10 +78,8 @@ export async function PUT(request: Request) {
       );
     }
 
-    // Trim whitespace
     const trimmedName = typeof name === "string" ? name.trim() : "";
 
-    // Allow empty string to clear name, but validate length if provided
     if (trimmedName.length > 100) {
       return NextResponse.json(
         { error: "Name must be 100 characters or less" },
@@ -67,8 +87,7 @@ export async function PUT(request: Request) {
       );
     }
 
-    // Use upsert to handle case where user might not exist in Prisma yet
-    // Find by email (source of truth) and update or create as needed
+    // Update Prisma user
     const updatedPrismaUser = await prisma.user.upsert({
       where: { email: session.user.email || "" },
       update: {
@@ -88,21 +107,18 @@ export async function PUT(request: Request) {
       },
     });
 
-    // Also update Better Auth user table directly (if it exists separately)
-    // Better Auth may use a lowercase 'user' table separate from Prisma's 'User' table
+    // Also update Better Auth user table
     try {
       const pool = getBetterAuthPool();
       await pool.execute(
         "UPDATE `user` SET name = ? WHERE id = ?",
         [trimmedName || null, session.user.id]
       );
-    } catch (error: any) {
-      // If the Better Auth 'user' table doesn't exist or has a different name, log but continue
-      // This is not critical since Prisma is updated and the session will refresh
-      if (error.code !== 'ER_NO_SUCH_TABLE' && error.code !== '42S02') {
-        console.error("[Profile API] Error updating Better Auth user table:", error);
+    } catch (error: unknown) {
+      const errorCode = (error as { code?: string })?.code;
+      if (errorCode !== 'ER_NO_SUCH_TABLE' && errorCode !== '42S02') {
+        logger.error("Error updating Better Auth user table", error);
       }
-      // Don't fail the request if Better Auth update fails - Prisma is the source of truth
     }
 
     return NextResponse.json({
@@ -111,12 +127,11 @@ export async function PUT(request: Request) {
         name: updatedPrismaUser.name,
       },
     });
-  } catch (error: any) {
-    console.error("[Profile API] Error updating name:", error);
+  } catch (error) {
+    logger.error("Error updating profile name", error);
     return NextResponse.json(
-      { error: error.message || "Failed to update name" },
+      { error: "Failed to update name" },
       { status: 500 }
     );
   }
 }
-

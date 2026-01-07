@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getNewsPosts } from '@/lib/notion';
+import { logger } from '@/lib/logger';
 
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 3600;
 
 export async function GET() {
   try {
@@ -9,25 +10,23 @@ export async function GET() {
 
     if (!newsPageId) {
       return NextResponse.json({
-        error: 'NOTION_NEWS_PAGE_ID not configured'
+        error: 'News not configured'
       }, { status: 500 });
     }
 
     const newsPosts = await getNewsPosts(newsPageId, false);
 
-    // Transform news posts to match the NewsItem interface expected by the frontend
     const newsItems = newsPosts.map((post) => ({
       id: post.id,
       title: post.title,
       date: post.publishedDate || new Date().toISOString(),
       excerpt: post.excerpt || 'No excerpt available',
       category: 'News',
-      iconName: 'Terminal', // Default icon, you can customize this
-      slug: post.id, // Use the Notion page ID as slug
-      coverImageUrl: post.coverImageUrl, // Already optimized by the Notion helper
+      iconName: 'Terminal',
+      slug: post.id,
+      coverImageUrl: post.coverImageUrl,
     }));
 
-    // Cache the response for 1 hour
     return new NextResponse(JSON.stringify(newsItems), {
       headers: {
         'Content-Type': 'application/json',
@@ -35,7 +34,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('Error fetching news posts:', error);
+    logger.error('Error fetching all news posts', error);
     return NextResponse.json({
       error: 'Failed to fetch news posts'
     }, { status: 500 });

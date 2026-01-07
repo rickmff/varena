@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getServerSession } from '@/lib/better-auth/server';
+import { isAdmin } from '@/lib/utils/admin';
+import { logger } from '@/lib/logger';
 
-// Função para serializar dados do banco para JSON
-function serializeData(data: any): any {
+// Serialize database data for JSON response
+function serializeData(data: unknown): unknown {
   if (data === null || data === undefined) {
     return null;
   }
@@ -24,10 +27,10 @@ function serializeData(data: any): any {
   }
 
   if (typeof data === 'object') {
-    const serialized: any = {};
+    const serialized: Record<string, unknown> = {};
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        serialized[key] = serializeData(data[key]);
+        serialized[key] = serializeData((data as Record<string, unknown>)[key]);
       }
     }
     return serialized;
@@ -38,13 +41,30 @@ function serializeData(data: any): any {
 
 export async function GET(request: Request) {
   try {
+    // CRITICAL: Admin authentication required
+    const session = await getServerSession();
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    if (!isAdmin(session)) {
+      logger.warn("Unauthorized database access attempt", { userId: session.user.id });
+      return NextResponse.json(
+        { success: false, error: "Forbidden - Admin access required" },
+        { status: 403 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const action = searchParams.get('action');
     const tableName = searchParams.get('table');
 
     if (action === 'tables') {
       try {
-        // Listar todas as tabelas do banco
         const tables = await prisma.$queryRaw<Array<{ TABLE_NAME: string }>>`
           SELECT TABLE_NAME
           FROM information_schema.TABLES
@@ -55,42 +75,26 @@ export async function GET(request: Request) {
         return NextResponse.json({
           success: true,
           tables: tables.map(t => t.TABLE_NAME)
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-          }
         });
-      } catch (dbError: any) {
-        console.error('Database query error:', dbError);
+      } catch (dbError) {
+        logger.error('Database query error', dbError);
         return NextResponse.json({
           success: false,
-          error: 'Erro ao conectar com o banco de dados',
-          details: process.env.NODE_ENV === 'development' ? dbError.message : undefined
-        }, {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
+          error: 'Database connection error'
+        }, { status: 500 });
       }
     }
 
     if (action === 'table-info' && tableName) {
-      // Validar nome da tabela (apenas letras, números e underscore)
+      // Validate table name (alphanumeric and underscore only)
       if (!/^[a-zA-Z0-9_]+$/.test(tableName)) {
         return NextResponse.json(
           { success: false, error: 'Invalid table name' },
-          {
-            status: 400,
-            headers: {
-              'Content-Type': 'application/json',
-            }
-          }
+          { status: 400 }
         );
       }
 
       try {
-        // Obter informações sobre uma tabela específica (colunas, tipos, etc.)
         const columns = await prisma.$queryRaw<Array<{
           COLUMN_NAME: string;
           DATA_TYPE: string;
@@ -110,7 +114,6 @@ export async function GET(request: Request) {
           ORDER BY ORDINAL_POSITION
         `;
 
-        // Contar total de registros
         const countResult = await prisma.$queryRawUnsafe<Array<{ count: bigint }>>(
           `SELECT COUNT(*) as count FROM \`${tableName}\``
         );
@@ -127,54 +130,36 @@ export async function GET(request: Request) {
             default: col.COLUMN_DEFAULT
           })),
           totalRecords
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-          }
         });
-      } catch (dbError: any) {
-        console.error('Database query error:', dbError);
+      } catch (dbError) {
+        logger.error('Database query error', dbError);
         return NextResponse.json({
           success: false,
-          error: 'Erro ao buscar informações da tabela',
-          details: process.env.NODE_ENV === 'development' ? dbError.message : undefined
-        }, {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
+          error: 'Error fetching table info'
+        }, { status: 500 });
       }
     }
 
     if (action === 'table-data' && tableName) {
-      // Validar nome da tabela (apenas letras, números e underscore)
+      // Validate table name
       if (!/^[a-zA-Z0-9_]+$/.test(tableName)) {
         return NextResponse.json(
           { success: false, error: 'Invalid table name' },
-          {
-            status: 400,
-            headers: {
-              'Content-Type': 'application/json',
-            }
-          }
+          { status: 400 }
         );
       }
 
       const page = parseInt(searchParams.get('page') || '1');
-      const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100); // Max 100 registros
+      const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 100);
       const offset = (page - 1) * limit;
 
       try {
-        // Obter dados da tabela com paginação
         const rawData = await prisma.$queryRawUnsafe(
           `SELECT * FROM \`${tableName}\` LIMIT ${limit} OFFSET ${offset}`
         );
 
-        // Serializar dados para JSON (converter BigInt, Date, Buffer, etc.)
         const data = serializeData(rawData);
 
-        // Contar total de registros
         const countResult = await prisma.$queryRawUnsafe<Array<{ count: bigint }>>(
           `SELECT COUNT(*) as count FROM \`${tableName}\``
         );
@@ -190,59 +175,25 @@ export async function GET(request: Request) {
             totalRecords,
             totalPages: Math.ceil(totalRecords / limit)
           }
-        }, {
-          headers: {
-            'Content-Type': 'application/json',
-          }
         });
-      } catch (dbError: any) {
-        console.error('Database query error:', {
-          message: dbError.message,
-          stack: dbError.stack,
-          code: dbError.code,
-          tableName
-        });
+      } catch (dbError) {
+        logger.error('Database query error', dbError);
         return NextResponse.json({
           success: false,
-          error: 'Erro ao buscar dados da tabela',
-          details: process.env.NODE_ENV === 'development' ? {
-            message: dbError.message,
-            code: dbError.code,
-            tableName
-          } : undefined
-        }, {
-          status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
+          error: 'Error fetching table data'
+        }, { status: 500 });
       }
     }
 
     return NextResponse.json(
       { success: false, error: 'Invalid action or missing parameters' },
-      {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      }
+      { status: 400 }
     );
-  } catch (error: any) {
-    console.error('Database API error:', error);
+  } catch (error) {
+    logger.error('Database API error', error);
     return NextResponse.json(
-      {
-        success: false,
-        error: error.message || 'Database error',
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
-      },
-      {
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      }
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
     );
   }
 }
-

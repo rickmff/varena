@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "@/lib/better-auth/server";
 import { isAdmin } from "@/lib/utils/admin";
+import { logger } from "@/lib/logger";
 
 // GET /api/admin/logs - Get system logs (admin only)
 export async function GET(request: Request) {
   try {
     const session = await getServerSession();
 
-    // Check if user is authenticated
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -16,7 +16,6 @@ export async function GET(request: Request) {
       );
     }
 
-    // Check if user is admin
     if (!isAdmin(session)) {
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
@@ -28,13 +27,10 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get("limit") || "100");
     const offset = parseInt(searchParams.get("offset") || "0");
 
-    // Get recent sessions (logins)
     const recentSessions = await prisma.session.findMany({
       take: limit,
       skip: offset,
-      orderBy: {
-        expires: "desc",
-      },
+      orderBy: { expires: "desc" },
       include: {
         user: {
           select: {
@@ -46,13 +42,10 @@ export async function GET(request: Request) {
       },
     });
 
-    // Get recent badges
     const recentBadges = await prisma.userBadge.findMany({
       take: limit,
       skip: offset,
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
       include: {
         user: {
           select: {
@@ -64,13 +57,10 @@ export async function GET(request: Request) {
       },
     });
 
-    // Get recent votes
     const recentVotes = await prisma.buildVote.findMany({
       take: limit,
       skip: offset,
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
       include: {
         user: {
           select: {
@@ -88,13 +78,10 @@ export async function GET(request: Request) {
       },
     });
 
-    // Get recent user signups (users ordered by createdAt)
     const recentSignups = await prisma.user.findMany({
       take: limit,
       skip: offset,
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
       select: {
         id: true,
         email: true,
@@ -103,9 +90,7 @@ export async function GET(request: Request) {
       },
     });
 
-    // Format logs
     const logs = [
-      // Signup logs (new users)
       ...recentSignups.map((user) => ({
         id: `signup-${user.id}`,
         type: "signup" as const,
@@ -114,11 +99,8 @@ export async function GET(request: Request) {
         userEmail: user.email || null,
         details: "New user signed up",
         timestamp: user.createdAt,
-        metadata: {
-          userId: user.id,
-        },
+        metadata: { userId: user.id },
       })),
-      // Login logs (sessions)
       ...recentSessions.map((session) => ({
         id: `session-${session.id}`,
         type: "login" as const,
@@ -127,11 +109,8 @@ export async function GET(request: Request) {
         userEmail: session.user?.email || null,
         details: "User logged in",
         timestamp: session.expires,
-        metadata: {
-          sessionId: session.id,
-        },
+        metadata: { sessionId: session.id },
       })),
-      // Badge logs
       ...recentBadges.map((badge) => ({
         id: `badge-${badge.id}`,
         type: "badge" as const,
@@ -140,12 +119,8 @@ export async function GET(request: Request) {
         userEmail: badge.user?.email || null,
         details: `Badge "${badge.badgeType}" assigned`,
         timestamp: badge.createdAt,
-        metadata: {
-          badgeType: badge.badgeType,
-          badgeId: badge.id,
-        },
+        metadata: { badgeType: badge.badgeType, badgeId: badge.id },
       })),
-      // Vote logs
       ...recentVotes.map((vote) => ({
         id: `vote-${vote.id}`,
         type: "vote" as const,
@@ -163,12 +138,11 @@ export async function GET(request: Request) {
     ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     return NextResponse.json({ logs: logs.slice(0, limit) });
-  } catch (error: any) {
-    console.error("[Admin API] Error fetching logs:", error);
+  } catch (error) {
+    logger.error("Error fetching logs", error);
     return NextResponse.json(
       { error: "Error fetching logs" },
       { status: 500 }
     );
   }
 }
-

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/better-auth/server";
 import prisma from "@/lib/prisma";
+import { logger } from "@/lib/logger";
 
 // GET /api/gdpr/export-data - Export all user data (GDPR Right to Access)
 export async function GET() {
@@ -16,7 +17,6 @@ export async function GET() {
 
     const userId = session.user.id;
 
-    // Fetch all user data
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -67,7 +67,6 @@ export async function GET() {
       );
     }
 
-    // Prepare export data (exclude sensitive fields)
     const exportData = {
       user: {
         id: user.id,
@@ -99,19 +98,17 @@ export async function GET() {
       gdprCompliant: true,
     };
 
-    // Return as downloadable JSON file
     return new NextResponse(JSON.stringify(exportData, null, 2), {
       headers: {
         "Content-Type": "application/json",
         "Content-Disposition": `attachment; filename="varena-data-export-${userId}-${Date.now()}.json"`,
       },
     });
-  } catch (error: any) {
-    console.error("[GDPR Export] Error:", error);
+  } catch (error) {
+    logger.error("Error exporting user data", error);
     return NextResponse.json(
       { error: "Failed to export user data" },
       { status: 500 }
     );
   }
 }
-

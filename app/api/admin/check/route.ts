@@ -14,9 +14,7 @@ export async function GET() {
     const adminStatus = isAdmin(session);
 
     return NextResponse.json({ isAdmin: adminStatus });
-  } catch (error: any) {
-    console.error("[Admin Check API] Error:", error);
+  } catch {
     return NextResponse.json({ isAdmin: false }, { status: 200 });
   }
 }
-

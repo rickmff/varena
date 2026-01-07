@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "@/lib/better-auth/server";
 import { isAdmin } from "@/lib/utils/admin";
+import { logger } from "@/lib/logger";
 
 interface RouteParams {
   params: Promise<{
@@ -14,7 +15,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
   try {
     const session = await getServerSession();
 
-    // Check if user is authenticated
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -22,7 +22,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Check if user is admin
     if (!isAdmin(session)) {
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
@@ -32,11 +31,8 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     const { userId } = await params;
 
-    // Check if badge exists
     const badge = await prisma.userBadge.findUnique({
-      where: {
-        userId: userId,
-      },
+      where: { userId },
       include: {
         user: {
           select: {
@@ -55,11 +51,8 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Delete the badge
     await prisma.userBadge.delete({
-      where: {
-        userId: userId,
-      },
+      where: { userId },
     });
 
     return NextResponse.json({
@@ -69,12 +62,11 @@ export async function DELETE(request: Request, { params }: RouteParams) {
         badgeType: badge.badgeType,
       },
     });
-  } catch (error: any) {
-    console.error("[Admin API] Error removing badge:", error);
+  } catch (error) {
+    logger.error("Error removing badge", error);
     return NextResponse.json(
       { error: "Error removing badge" },
       { status: 500 }
     );
   }
 }
-

@@ -2,13 +2,13 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "@/lib/better-auth/server";
 import { isAdmin } from "@/lib/utils/admin";
+import { logger } from "@/lib/logger";
 
 // GET /api/admin/badges - Get all badges or badges for specific users
 export async function GET(request: Request) {
   try {
     const session = await getServerSession();
 
-    // Check if user is authenticated
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -16,7 +16,6 @@ export async function GET(request: Request) {
       );
     }
 
-    // Check if user is admin
     if (!isAdmin(session)) {
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
@@ -29,13 +28,10 @@ export async function GET(request: Request) {
 
     let badges;
     if (userIds) {
-      // Get badges for specific users
       const userIdList = userIds.split(",").map((id) => id.trim()).filter(Boolean);
       badges = await prisma.userBadge.findMany({
         where: {
-          userId: {
-            in: userIdList,
-          },
+          userId: { in: userIdList },
         },
         include: {
           user: {
@@ -48,7 +44,6 @@ export async function GET(request: Request) {
         },
       });
     } else {
-      // Get all badges
       badges = await prisma.userBadge.findMany({
         include: {
           user: {
@@ -66,8 +61,8 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json({ badges });
-  } catch (error: any) {
-    console.error("[Admin API] Error fetching badges:", error);
+  } catch (error) {
+    logger.error("Error fetching badges", error);
     return NextResponse.json(
       { error: "Error fetching badges" },
       { status: 500 }
@@ -80,7 +75,6 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession();
 
-    // Check if user is authenticated
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -88,7 +82,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if user is admin
     if (!isAdmin(session)) {
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
@@ -99,7 +92,6 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { userId, badgeType = "verified", description = "Verified by V Arena staff" } = body;
 
-    // Validate userId
     if (!userId || typeof userId !== "string" || userId.trim().length === 0) {
       return NextResponse.json(
         { error: "Invalid request - userId is required" },
@@ -107,7 +99,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if user exists
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { id: true },
@@ -120,20 +111,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Upsert badge (create or update)
     const badge = await prisma.userBadge.upsert({
-      where: {
-        userId: userId,
-      },
-      update: {
-        badgeType,
-        description,
-      },
-      create: {
-        userId: userId,
-        badgeType,
-        description,
-      },
+      where: { userId },
+      update: { badgeType, description },
+      create: { userId, badgeType, description },
       include: {
         user: {
           select: {
@@ -146,12 +127,11 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ badge });
-  } catch (error: any) {
-    console.error("[Admin API] Error assigning badge:", error);
+  } catch (error) {
+    logger.error("Error assigning badge", error);
     return NextResponse.json(
       { error: "Error assigning badge" },
       { status: 500 }
     );
   }
 }
-

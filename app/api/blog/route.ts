@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getNewsPosts } from '@/lib/notion';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -7,28 +8,27 @@ export async function GET() {
 
     if (!newsPageId) {
       return NextResponse.json({
-        error: 'NOTION_NEWS_PAGE_ID not configured'
+        error: 'News not configured'
       }, { status: 500 });
     }
 
     const newsPosts = await getNewsPosts(newsPageId);
 
-    // Transform news posts to match the NewsItem interface expected by the frontend
-    const newsItems = newsPosts.map((post, index) => ({
+    const newsItems = newsPosts.map((post) => ({
       id: post.id,
       title: post.title,
       date: post.publishedDate || new Date().toISOString(),
       excerpt: post.excerpt || 'No excerpt available',
       category: 'News',
-      iconName: 'Terminal', // Default icon, you can customize this
-      slug: post.id, // Use the Notion page ID as slug
+      iconName: 'Terminal',
+      slug: post.id,
     }));
 
     return NextResponse.json(newsItems);
   } catch (error) {
-    console.error('Error fetching news posts:', error);
+    logger.error('Error fetching blog posts', error);
     return NextResponse.json({
-      error: 'Failed to fetch news posts'
+      error: 'Failed to fetch posts'
     }, { status: 500 });
   }
 }

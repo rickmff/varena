@@ -2,37 +2,31 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "@/lib/better-auth/server";
 import { unstable_cache } from "next/cache";
+import { logger } from "@/lib/logger";
 
 // Get all public builds (no authentication required, but session used for vote status)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const authorFilter = searchParams.get("author");
-    const sortBy = searchParams.get("sort") || "popular"; // "popular", "newest", "oldest"
+    const sortBy = searchParams.get("sort") || "popular";
     const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "50"); // Default 50 for public builds
+    const limit = parseInt(searchParams.get("limit") || "50");
     const skip = (page - 1) * limit;
-
-    // Get session if user is authenticated (optional)
-    const session = await getServerSession();
-    const userId = session?.user?.id;
 
     // Cache key based on sort and author filter
     const cacheKey = `public-builds-${sortBy}-${authorFilter || "all"}`;
 
-    // Cache public builds for 2 minutes (120 seconds)
+    // Cache public builds for 2 minutes
     const getCachedBuilds = unstable_cache(
       async (sort: string, author: string | null) => {
-        // Determine orderBy based on sort parameter
-        let orderBy: any;
+        let orderBy: { createdAt: "desc" | "asc" };
         if (sort === "newest") {
           orderBy = { createdAt: "desc" };
         } else if (sort === "oldest") {
           orderBy = { createdAt: "asc" };
         } else {
-          // For popular, we'll sort by score (upvotes - downvotes) after fetching
-          // MySQL doesn't support computed columns easily, so we sort in memory
-          orderBy = { createdAt: "desc" }; // Temporary, will sort by popularity after
+          orderBy = { createdAt: "desc" };
         }
 
         let builds;
@@ -59,19 +53,16 @@ export async function GET(request: Request) {
               createdAt: true,
               updatedAt: true,
               userId: true,
-              // Exclude fields not needed: authorTwitchUrl, authorYoutubeUrl
             },
           });
-        } catch (error: any) {
-          // Fallback if migration hasn't been applied yet
-          const errorMessage = error.message || error.toString() || "";
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
           if (
             errorMessage.includes("upvotes") ||
             errorMessage.includes("downvotes") ||
-            errorMessage.includes("Unknown column") ||
-            error.code === "P2009" // Prisma query validation error
+            errorMessage.includes("Unknown column")
           ) {
-            console.warn("Vote columns not found, using fallback. Please run migration:", errorMessage);
+            logger.warn("Vote columns not found, using fallback");
             builds = await prisma.build.findMany({
               where: {
                 isPublic: true,
@@ -94,8 +85,7 @@ export async function GET(request: Request) {
                 userId: true,
               },
             });
-            // Add default vote values
-            builds = builds.map((build: any) => ({
+            builds = builds.map((build) => ({
               ...build,
               upvotes: 0,
               downvotes: 0,
@@ -105,12 +95,12 @@ export async function GET(request: Request) {
           }
         }
 
-        // Sort by popularity if requested (upvotes - downvotes)
+        // Sort by popularity if requested
         if (sort === "popular") {
           builds = [...builds].sort((a, b) => {
             const scoreA = a.upvotes - a.downvotes;
             const scoreB = b.upvotes - b.downvotes;
-            return scoreB - scoreA; // Descending order
+            return scoreB - scoreA;
           });
         }
 
@@ -119,27 +109,32 @@ export async function GET(request: Request) {
       [cacheKey],
       {
         tags: ["public-builds"],
-        revalidate: 120, // 2 minutes in seconds
+        revalidate: 120,
       }
     );
 
     const builds = await getCachedBuilds(sortBy, authorFilter);
 
-    // Get user votes if authenticated (only for builds in current page)
-    let userVotes: Record<string, "upvote" | "downvote"> = {};
-    if (userId && builds.length > 0) {
-      try {
-        // Only fetch votes for builds in the current page range
-        const pageBuilds = builds.slice(skip, skip + limit);
-        const buildIds = pageBuilds.map((b) => b.id);
+    // Apply pagination first
+    const paginatedBuilds = builds.slice(skip, skip + limit);
 
-        if (buildIds.length > 0) {
+    // OPTIMIZATION: Only fetch session and votes if user might be authenticated
+    // Check for session cookie before making expensive getServerSession call
+    const hasCookie = request.headers.get("cookie")?.includes("better-auth");
+
+    let userVotes: Record<string, "upvote" | "downvote"> = {};
+
+    if (hasCookie && paginatedBuilds.length > 0) {
+      try {
+        const session = await getServerSession();
+
+        if (session?.user?.id) {
+          const buildIds = paginatedBuilds.map((b) => b.id);
+
           const votes = await prisma.buildVote.findMany({
             where: {
-              userId,
-              buildId: {
-                in: buildIds,
-              },
+              userId: session.user.id,
+              buildId: { in: buildIds },
             },
             select: {
               buildId: true,
@@ -151,16 +146,11 @@ export async function GET(request: Request) {
             userVotes[vote.buildId] = vote.voteType as "upvote" | "downvote";
           });
         }
-      } catch (error: any) {
-        // Ignore if BuildVote table doesn't exist yet (migration not applied)
-        if (!error.message?.includes("BuildVote")) {
-          console.error("Error fetching user votes:", error);
-        }
+      } catch (error) {
+        // Ignore session/vote fetch errors for public endpoint
+        logger.debug("Could not fetch user votes", { error });
       }
     }
-
-    // Apply pagination
-    const paginatedBuilds = builds.slice(skip, skip + limit);
 
     // Add user vote status to each build
     const buildsWithVotes = paginatedBuilds.map((build) => ({
@@ -175,12 +165,11 @@ export async function GET(request: Request) {
       limit,
       totalPages: Math.ceil(builds.length / limit),
     });
-  } catch (error: any) {
-    console.error("Error fetching public builds:", error);
+  } catch (error) {
+    logger.error("Error fetching public builds", error);
     return NextResponse.json(
       { error: "Error fetching public builds" },
       { status: 500 }
     );
   }
 }
-

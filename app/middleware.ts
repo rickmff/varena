@@ -3,7 +3,29 @@ import type { NextRequest } from 'next/server';
 import { auth } from '@/lib/better-auth/auth';
 import { isAdminEmail } from '@/lib/utils/admin';
 
+// Routes that require admin access
+const ADMIN_ROUTES = ['/capybara', '/database'];
+
+// Routes that require authentication
+const PROTECTED_ROUTES = ['/profile'];
+
+// Auth routes that authenticated users should not access
+const AUTH_ROUTES = ['/auth/signin', '/auth/signup', '/auth/reset'];
+
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Check route types
+  const isAdminRoute = ADMIN_ROUTES.some(route => pathname.startsWith(route));
+  const isProtectedRoute = PROTECTED_ROUTES.some(route => pathname.startsWith(route));
+  const isAuthRoute = AUTH_ROUTES.some(route => pathname.startsWith(route));
+
+  // Only fetch session if the route actually needs it
+  // This reduces unnecessary database calls for public routes
+  if (!isAdminRoute && !isProtectedRoute && !isAuthRoute) {
+    return NextResponse.next();
+  }
+
   // Verify session using Better Auth
   const cookieHeader = request.headers.get('cookie') || '';
   const session = await auth.api.getSession({
@@ -12,42 +34,19 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // Check if user is banned
-  if (session?.user) {
-    // We need to check the database for banned status
-    // For now, we'll check this in the API routes
-    // The banned check will be more effective at the API level
-  }
-
-  // List of auth routes that authenticated users should not access
-  const authRoutes = [
-    '/auth/signin',
-    '/auth/signup',
-    '/auth/reset',
-  ];
-
-  // Check if accessing an auth route while authenticated
-  const isAuthRoute = authRoutes.some(route =>
-    request.nextUrl.pathname.startsWith(route)
-  );
-
+  // Handle auth routes - redirect authenticated users away
   if (isAuthRoute && session?.user) {
-    // Redirect authenticated users away from auth routes to home page
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  // Check if accessing admin routes
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/capybara');
-
+  // Handle admin routes
   if (isAdminRoute) {
-    // Admin routes require authentication
     if (!session?.user) {
       const signInUrl = new URL('/auth/signin', request.url);
-      signInUrl.searchParams.set('callbackUrl', request.nextUrl.pathname + request.nextUrl.search);
+      signInUrl.searchParams.set('callbackUrl', pathname + request.nextUrl.search);
       return NextResponse.redirect(signInUrl);
     }
 
-    // Admin routes require admin status
     if (!isAdminEmail(session.user.email)) {
       const errorUrl = new URL('/auth/error', request.url);
       errorUrl.searchParams.set('error', 'AccessDenied');
@@ -55,21 +54,10 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // List of protected routes that require authentication
-  // Note: /builds/create is accessible anonymously, but saving requires auth
-  const protectedRoutes = [
-    '/profile',
-  ];
-
-  // Check if current route requires authentication
-  const isProtectedRoute = protectedRoutes.some(route =>
-    request.nextUrl.pathname.startsWith(route)
-  );
-
+  // Handle protected routes
   if (isProtectedRoute && !session?.user) {
-    // Create redirect URL with callbackUrl
     const signInUrl = new URL('/auth/signin', request.url);
-    signInUrl.searchParams.set('callbackUrl', request.nextUrl.pathname + request.nextUrl.search);
+    signInUrl.searchParams.set('callbackUrl', pathname + request.nextUrl.search);
     return NextResponse.redirect(signInUrl);
   }
 
@@ -78,8 +66,12 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    // Admin routes
     '/capybara/:path*',
+    '/database/:path*',
+    // Protected routes
     '/profile/:path*',
+    // Auth routes
     '/auth/signin',
     '/auth/signup',
     '/auth/reset',

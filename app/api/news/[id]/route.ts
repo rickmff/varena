@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getNewsPostContent } from '@/lib/notion';
+import { logger } from '@/lib/logger';
 
 interface RouteParams {
   params: Promise<{
@@ -28,7 +29,7 @@ export async function GET(request: Request, { params }: RouteParams) {
 
     return NextResponse.json(post);
   } catch (error) {
-    console.error('Error fetching news post:', error);
+    logger.error('Error fetching news post', error);
     return NextResponse.json({
       error: 'Failed to fetch news post'
     }, { status: 500 });

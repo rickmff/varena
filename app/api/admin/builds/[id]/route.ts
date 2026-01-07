@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/better-auth/server";
 import { isAdmin } from "@/lib/utils/admin";
 import { revalidateTag } from "next/cache";
+import { logger } from "@/lib/logger";
 
 interface RouteParams {
   params: Promise<{
@@ -15,7 +16,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
   try {
     const session = await getServerSession();
 
-    // Check if user is authenticated
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -23,7 +23,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Check if user is admin
     if (!isAdmin(session)) {
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
@@ -33,7 +32,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     const { id } = await params;
 
-    // Check if build exists
     const build = await prisma.build.findUnique({
       where: { id },
       select: {
@@ -52,12 +50,10 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Delete the build (cascade will delete votes)
     await prisma.build.delete({
       where: { id },
     });
 
-    // Invalidate caches
     if (build.userId) {
       revalidateTag(`builds-${build.userId}`);
     }
@@ -73,12 +69,11 @@ export async function DELETE(request: Request, { params }: RouteParams) {
         author: build.author,
       }
     });
-  } catch (error: any) {
-    console.error("[Admin API] Error deleting build:", error);
+  } catch (error) {
+    logger.error("Error deleting build (admin)", error);
     return NextResponse.json(
       { error: "Error deleting build" },
       { status: 500 }
     );
   }
 }
-

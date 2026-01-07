@@ -1,12 +1,20 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/better-auth/server";
 import prisma from "@/lib/prisma";
+import { rateLimit, getRequestIdentifier, getRateLimitHeaders } from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
 
 interface RouteParams {
   params: Promise<{
     id: string;
   }>;
 }
+
+// Rate limit: 30 votes per minute per user
+const VOTE_RATE_LIMIT = {
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 30,
+};
 
 // Handle upvote/downvote/remove vote
 export async function POST(request: Request, { params }: RouteParams) {
@@ -20,8 +28,22 @@ export async function POST(request: Request, { params }: RouteParams) {
       );
     }
 
+    // Apply rate limiting
+    const identifier = `vote:${session.user.id}`;
+    const rateLimitResult = await rateLimit(identifier, VOTE_RATE_LIMIT);
+
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        { error: "Too many vote requests. Please slow down." },
+        {
+          status: 429,
+          headers: getRateLimitHeaders(rateLimitResult),
+        }
+      );
+    }
+
     const { id: buildId } = await params;
-    const { voteType } = await request.json(); // "upvote", "downvote", or "remove"
+    const { voteType } = await request.json();
 
     if (!voteType || !["upvote", "downvote", "remove"].includes(voteType)) {
       return NextResponse.json(
@@ -45,10 +67,9 @@ export async function POST(request: Request, { params }: RouteParams) {
     // Check for existing vote
     let existingVote = null;
     try {
-      // Check if BuildVote model exists (Prisma client needs to be regenerated)
       if (!('buildVote' in prisma) || !prisma.buildVote) {
         return NextResponse.json(
-          { error: "Vote system not initialized. Please restart the dev server after running 'npx prisma generate'." },
+          { error: "Vote system not initialized. Please restart the server." },
           { status: 503 }
         );
       }
@@ -61,19 +82,15 @@ export async function POST(request: Request, { params }: RouteParams) {
           },
         },
       });
-    } catch (error: any) {
-      // If BuildVote model doesn't exist or table doesn't exist
-      const errorMessage = error.message || error.toString() || "";
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       if (
-        errorMessage.includes("Cannot read properties of undefined") ||
         errorMessage.includes("buildVote") ||
         errorMessage.includes("BuildVote") ||
-        errorMessage.includes("does not exist") ||
-        error.code === "P2001" ||
-        error.code === "P2025"
+        errorMessage.includes("does not exist")
       ) {
         return NextResponse.json(
-          { error: "Vote system not initialized. Please run 'npx prisma generate' and restart the dev server, then run 'npx prisma migrate deploy'." },
+          { error: "Vote system not initialized. Please run migrations." },
           { status: 503 }
         );
       }
@@ -86,7 +103,6 @@ export async function POST(request: Request, { params }: RouteParams) {
     let userVote: "upvote" | "downvote" | null = null;
 
     if (voteType === "remove") {
-      // Remove existing vote
       if (existingVote) {
         if (existingVote.voteType === "upvote") {
           upvoteDelta = -1;
@@ -103,10 +119,9 @@ export async function POST(request: Request, { params }: RouteParams) {
         });
       }
     } else {
-      // Add or change vote
       if (existingVote) {
         if (existingVote.voteType === voteType) {
-          // Same vote type - remove it (toggle off)
+          // Same vote type - toggle off
           if (voteType === "upvote") {
             upvoteDelta = -1;
           } else {
@@ -136,9 +151,7 @@ export async function POST(request: Request, { params }: RouteParams) {
                 userId: session.user.id,
               },
             },
-            data: {
-              voteType,
-            },
+            data: { voteType },
           });
           userVote = voteType as "upvote" | "downvote";
         }
@@ -160,18 +173,14 @@ export async function POST(request: Request, { params }: RouteParams) {
       }
     }
 
-    // Update denormalized counts on Build
+    // Update denormalized counts
     let updatedBuild;
     try {
       updatedBuild = await prisma.build.update({
         where: { id: buildId },
         data: {
-          upvotes: {
-            increment: upvoteDelta,
-          },
-          downvotes: {
-            increment: downvoteDelta,
-          },
+          upvotes: { increment: upvoteDelta },
+          downvotes: { increment: downvoteDelta },
         },
         select: {
           id: true,
@@ -179,17 +188,14 @@ export async function POST(request: Request, { params }: RouteParams) {
           downvotes: true,
         },
       });
-    } catch (error: any) {
-      // If upvotes/downvotes columns don't exist, return error
-      const errorMessage = error.message || error.toString() || "";
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       if (
         errorMessage.includes("upvotes") ||
-        errorMessage.includes("downvotes") ||
-        errorMessage.includes("Unknown column") ||
-        error.code === "P2009"
+        errorMessage.includes("downvotes")
       ) {
         return NextResponse.json(
-          { error: "Vote system not initialized. Please run database migration: npx prisma migrate deploy" },
+          { error: "Vote system not initialized. Please run migrations." },
           { status: 503 }
         );
       }
@@ -201,12 +207,11 @@ export async function POST(request: Request, { params }: RouteParams) {
       downvotes: updatedBuild.downvotes,
       userVote,
     });
-  } catch (error: any) {
-    console.error("Error handling vote:", error);
+  } catch (error) {
+    logger.error("Error handling vote", error);
     return NextResponse.json(
-      { error: "Error processing vote", details: error.message },
+      { error: "Error processing vote" },
       { status: 500 }
     );
   }
 }
-

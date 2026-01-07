@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/better-auth/server";
 import { isAdmin } from "@/lib/utils/admin";
+import { logger } from "@/lib/logger";
 
 interface RouteParams {
   params: Promise<{
@@ -14,7 +15,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
   try {
     const session = await getServerSession();
 
-    // Check if user is authenticated
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -22,7 +22,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Check if user is admin
     if (!isAdmin(session)) {
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
@@ -32,7 +31,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     const { id } = await params;
 
-    // Prevent admin from deleting themselves
     if (id === session.user.id) {
       return NextResponse.json(
         { error: "Cannot delete your own account" },
@@ -40,7 +38,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Check if user exists
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
@@ -56,7 +53,6 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Delete the user (cascade will delete builds, votes, sessions, accounts)
     await prisma.user.delete({
       where: { id },
     });
@@ -68,8 +64,8 @@ export async function DELETE(request: Request, { params }: RouteParams) {
         name: user.name,
       }
     });
-  } catch (error: any) {
-    console.error("[Admin API] Error deleting user:", error);
+  } catch (error) {
+    logger.error("Error deleting user", error);
     return NextResponse.json(
       { error: "Error deleting user" },
       { status: 500 }
@@ -82,7 +78,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
   try {
     const session = await getServerSession();
 
-    // Check if user is authenticated
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -90,7 +85,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Check if user is admin
     if (!isAdmin(session)) {
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
@@ -102,7 +96,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
     const body = await request.json();
     const { banned } = body;
 
-    // Validate banned field
     if (typeof banned !== "boolean") {
       return NextResponse.json(
         { error: "Invalid request - banned must be a boolean" },
@@ -110,7 +103,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Prevent admin from banning themselves
     if (id === session.user.id) {
       return NextResponse.json(
         { error: "Cannot ban your own account" },
@@ -118,7 +110,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Check if user exists
     const user = await prisma.user.findUnique({
       where: { id },
       select: {
@@ -135,7 +126,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Update user banned status
     const updatedUser = await prisma.user.update({
       where: { id },
       data: { banned },
@@ -155,12 +145,11 @@ export async function PUT(request: Request, { params }: RouteParams) {
     });
 
     return NextResponse.json(updatedUser);
-  } catch (error: any) {
-    console.error("[Admin API] Error updating user:", error);
+  } catch (error) {
+    logger.error("Error updating user", error);
     return NextResponse.json(
       { error: "Error updating user" },
       { status: 500 }
     );
   }
 }
-
