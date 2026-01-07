@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -13,29 +13,27 @@ function AuthErrorContent() {
   const getErrorMessage = (error: string | null) => {
     switch (error) {
       case "Configuration":
-        return "Há um problema com a configuração do servidor. Verifique as variáveis de ambiente.";
+        return "There is a problem with the server configuration. Please contact support.";
       case "AccessDenied":
-        return "Você não tem permissão para fazer login.";
+        return "You do not have permission to access this resource.";
       case "Verification":
-        return "O link de verificação expirou ou já foi usado.";
+        return "The verification link has expired or has already been used.";
       case "OAuthAccountNotLinked":
-        return "Esta conta já está vinculada a outro método de login.";
+        return "This account is already linked to another sign-in method.";
       case "OAuthSignin":
-        return "Erro ao iniciar autenticação OAuth.";
+        return "Error starting OAuth authentication.";
       case "OAuthCallback":
-        return "Erro no callback OAuth.";
+        return "Error in OAuth callback.";
       case "OAuthCreateAccount":
-        return "Não foi possível criar a conta OAuth.";
+        return "Could not create OAuth account.";
       case "EmailCreateAccount":
-        return "Não foi possível criar a conta.";
+        return "Could not create account.";
       case "Callback":
-        return "Erro no callback de autenticação.";
-      case "OAuthAccountNotLinked":
-        return "Esta conta já está vinculada a outro método de login.";
+        return "Error in authentication callback.";
       default:
         return error
-          ? `Erro: ${error}. Tente novamente.`
-          : "Ocorreu um erro ao fazer login. Tente novamente.";
+          ? `Error: ${error}. Please try again.`
+          : "An error occurred while signing in. Please try again.";
     }
   };
 
@@ -44,7 +42,7 @@ function AuthErrorContent() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-destructive">
-            Erro de Autenticação
+            Authentication Error
           </CardTitle>
           <CardDescription>
             {getErrorMessage(error)}
@@ -53,10 +51,10 @@ function AuthErrorContent() {
         <CardContent className="space-y-4">
           <div className="flex gap-4">
             <Button asChild className="flex-1">
-              <Link href="/auth/signin">Tentar Novamente</Link>
+              <Link href="/auth/signin">Try Again</Link>
             </Button>
             <Button asChild variant="outline" className="flex-1">
-              <Link href="/">Voltar ao Início</Link>
+              <Link href="/">Go Home</Link>
             </Button>
           </div>
         </CardContent>
@@ -72,10 +70,10 @@ export default function AuthErrorPage() {
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold text-destructive">
-              Erro de Autenticação
+              Authentication Error
             </CardTitle>
             <CardDescription>
-              Carregando...
+              Loading...
             </CardDescription>
           </CardHeader>
         </Card>
@@ -85,4 +83,3 @@ export default function AuthErrorPage() {
     </Suspense>
   );
 }
-

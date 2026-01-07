@@ -3,6 +3,7 @@ import { toNextJsHandler } from "better-auth/next-js";
 import { rateLimit, getRequestIdentifier } from "@/lib/rate-limit";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { logger } from "@/lib/logger";
 
 const handler = toNextJsHandler(auth);
 
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     if (isAuthAction) {
       const identifier = getRequestIdentifier(request);
-      const result = rateLimit(identifier, rateLimitOptions);
+      const result = await rateLimit(identifier, rateLimitOptions);
 
       if (!result.allowed) {
         const resetDate = new Date(result.resetTime);
@@ -70,13 +71,13 @@ export async function POST(request: NextRequest) {
           const responseClone = response.clone();
           try {
             const errorData = await responseClone.json();
-            console.error("[Auth API] Handler returned error:", {
+            logger.error("Auth handler returned error", null, {
               status: response.status,
               path: url.pathname,
               error: errorData,
             });
-          } catch (e) {
-            console.error("[Auth API] Handler returned error (non-JSON):", {
+          } catch {
+            logger.error("Auth handler returned error (non-JSON)", null, {
               status: response.status,
               path: url.pathname,
             });
@@ -87,31 +88,24 @@ export async function POST(request: NextRequest) {
         response.headers.set("X-RateLimit-Remaining", result.remaining.toString());
         response.headers.set("X-RateLimit-Reset", result.resetTime.toString());
         return response;
-      } catch (handlerError: any) {
-        console.error("[Auth API] Handler threw error:", handlerError);
-        console.error("[Auth API] Handler error stack:", handlerError?.stack);
+      } catch (handlerError: unknown) {
+        logger.error("Auth handler threw error", handlerError);
         throw handlerError;
       }
     }
 
     return handler.POST(request);
-  } catch (error: any) {
-    console.error("[Auth API] Error processing request:", error);
-    console.error("[Auth API] Error name:", error?.name);
-    console.error("[Auth API] Error message:", error?.message);
-    console.error("[Auth API] Error stack:", error?.stack);
-    console.error("[Auth API] Error cause:", error?.cause);
+  } catch (error: unknown) {
+    logger.error("Auth API error processing request", error);
 
-    // Try to extract more details
-    if (error?.message) {
-      console.error("[Auth API] Full error details:", JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
-    }
+    const errorMessage = error instanceof Error ? error.message : undefined;
+    const errorStack = error instanceof Error ? error.stack : undefined;
 
     return NextResponse.json(
       {
         error: "Internal server error",
-        message: process.env.NODE_ENV === "development" ? error?.message : undefined,
-        ...(process.env.NODE_ENV === "development" && error?.stack ? { stack: error.stack } : {}),
+        message: process.env.NODE_ENV === "development" ? errorMessage : undefined,
+        ...(process.env.NODE_ENV === "development" && errorStack ? { stack: errorStack } : {}),
       },
       { status: 500 }
     );

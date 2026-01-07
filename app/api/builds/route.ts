@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
 import { revalidateTag } from "next/cache";
 import { isValidEnglishAlphabet } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 // Helper function to check if a build code is empty (all zeros)
 function isEmptyBuild(code: string): boolean {
@@ -75,7 +76,7 @@ function isBuildComplete(code: string): boolean {
 
     return true;
   } catch (error) {
-    console.error("Error checking build completeness:", error);
+    logger.error("Error checking build completeness", error);
     return false;
   }
 }
@@ -265,15 +266,12 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(build, { status: 201 });
-  } catch (error: any) {
-    console.error("Error creating build:", error);
-    // Return more detailed error in development
-    const errorMessage = process.env.NODE_ENV === "development"
-      ? error?.message || String(error)
-      : "Error creating build";
+  } catch (error: unknown) {
+    logger.error("Error creating build", error);
+    const errorMessage = error instanceof Error ? error.message : "Error creating build";
 
     return NextResponse.json(
-      { error: errorMessage, details: process.env.NODE_ENV === "development" ? error : undefined },
+      { error: process.env.NODE_ENV === "development" ? errorMessage : "Error creating build" },
       { status: 500 }
     );
   }
@@ -407,8 +405,8 @@ export async function GET(request: Request) {
       limit,
       totalPages: Math.ceil(builds.length / limit),
     });
-  } catch (error: any) {
-    console.error("Error fetching builds:", error);
+  } catch (error: unknown) {
+    logger.error("Error fetching builds", error);
     return NextResponse.json(
       { error: "Error fetching builds" },
       { status: 500 }

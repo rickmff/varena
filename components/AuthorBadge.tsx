@@ -14,7 +14,9 @@ interface AuthorBadgeProps {
   className?: string;
 }
 
-const BADGE_CONFIG: Record<string, { color: string; icon: React.ComponentType<{ className?: string }> }> = {
+import type { LucideProps } from "lucide-react";
+
+const BADGE_CONFIG: Record<string, { color: string; icon: React.ComponentType<LucideProps> }> = {
   veteran: {
     color: "bg-blue-500",
     icon: Sword,
