@@ -194,6 +194,7 @@ export default function NewsPage() {
                             alt={news.title}
                             fill
                             className="object-cover transition-transform duration-500 group-hover:scale-110 filter brightness-60"
+                            unoptimized={(news.coverImageUrl || '').startsWith('/api/image')}
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               if (target.src !== "/news.webp") {

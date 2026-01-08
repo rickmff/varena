@@ -179,7 +179,7 @@ const NewsCard = memo(({ news, index, onImageError }: {
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         quality={75}
         priority={index === 0}
-        unoptimized={imageUrl.startsWith('data:') || imageUrl === '/news.webp'}
+        unoptimized={imageUrl.startsWith('data:') || imageUrl === '/news.webp' || imageUrl.startsWith('/api/image')}
       />
     );
   }, [isVisible, imageUrl, news.title, index]); // Remove function dependencies to prevent recreations
