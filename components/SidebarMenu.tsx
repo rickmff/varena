@@ -33,13 +33,6 @@ const routes = [
     disabled: true,
   },
   {
-    label: 'News',
-    icon: HelpCircle,
-    href: '/admin/news',
-    color: 'text-violet-500',
-    disabled: false,
-  },
-  {
     label: 'Guide',
     icon: Book,
     href: '/admin/guides',

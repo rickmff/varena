@@ -11,9 +11,7 @@ export const menuItems = [
   { name: "HOME", href: "/" },
   { name: "FEATURES", href: "/#features" },
   { name: "BUILDS", href: "/builds" },
-  { name: "COMMANDS", href: "/commands" },
-  { name: "NEWS", href: "/news" },
-];
+  { name: "COMMANDS", href: "/commands" },];
 
 export const DiscordButton = ({
   size = "sm",
@@ -95,12 +93,14 @@ export default function NavBar() {
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
-    let scrollContainer;
+    let scrollContainer: HTMLElement | Window;
 
-    scrollContainer = document.getElementById("builder-page");
+    const element = document.getElementById("builder-page");
 
-    if (!scrollContainer) {
-      scrollContainer = window; // Fallback to documentElement if not found
+    if (element) {
+      scrollContainer = element;
+    } else {
+      scrollContainer = window; // Fallback to window if not found
     }
 
     const handleScroll = () => {
@@ -113,16 +113,12 @@ export default function NavBar() {
     };
 
     // Add the event listener to the scrolling container
-    if (scrollContainer) {
-      scrollContainer.addEventListener("scroll", handleScroll);
-      handleScroll(); // Initial position
-    }
+    scrollContainer.addEventListener("scroll", handleScroll);
+    handleScroll(); // Initial position
 
     // Clean up
     return () => {
-      if (scrollContainer) {
-        scrollContainer.removeEventListener("scroll", handleScroll);
-      }
+      scrollContainer.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
