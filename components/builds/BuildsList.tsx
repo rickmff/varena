@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { Plus, Lock, Globe2, Trash2, User } from "lucide-react";
+import { Plus, Lock, Globe2, Trash2, User, Copy, Pencil } from "lucide-react";
 import { VoteButtons } from "./VoteButtons";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -13,25 +13,32 @@ import bloodData from "@/data/vbuilds/bloodtypes.json";
 import { Button } from "@/components/ui/button";
 import { ArenaCodeOutsideBuilder } from "../vbuilds/components/ArenaCode";
 import epicWeaponData from "@/data/vbuilds/epic-weapons.json";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider,
-} from "@/components/ui/tooltip";
 import { Switch } from "@/components/ui/switch";
 import React from "react";
 import "@/components/vbuilds/styles.css";
 import { useAuth } from "@/hooks/use-auth";
 import { AuthorBadge } from "@/components/AuthorBadge";
-import { useUserBadges } from "@/hooks/use-author-badges";
+import { useUserBadges, UserBadgeType } from "@/hooks/use-author-badges";
+import { Input } from "@/components/ui/input";
+import { isValidEnglishAlphabet } from "@/lib/utils";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Build = {
   id?: string;
   name: string;
   code: string;
-  description?: string;
   isPublic?: boolean;
+  author?: string;
+  userId?: string | null;
 };
 
 interface BuildsListProps {
@@ -119,6 +126,19 @@ const borderVariants: Record<string, string> = {
   illusion: "border-spellSchool-illusion/30",
 };
 
+// Text colors follow the same custom spell school palette used for borders/backgrounds
+// (see `styles.css` .spellSchool-* classes) so headers visually match the card border.
+const textColorVariants: Record<string, string> = {
+  empty: "text-gray-400",
+  storm: "spellSchool-storm",
+  blood: "spellSchool-blood",
+  chaos: "spellSchool-chaos",
+  // Arcane builds reuse the \"unholy\" color in the existing palette
+  arcane: "spellSchool-unholy",
+  frost: "spellSchool-frost",
+  illusion: "spellSchool-illusion",
+};
+
 const Item = ({
   school,
   children,
@@ -135,20 +155,19 @@ const Item = ({
   );
 };
 
-const AuthorNameWithBadge = ({ authorName, userId }: { authorName?: string; userId?: string | null }) => {
-  const { badges } = useUserBadges([userId].filter(Boolean) as string[]);
-  const badge = userId ? badges[userId] : null;
-
+const AuthorNameWithBadge = ({ authorName, badge }: { authorName?: string; badge?: UserBadgeType | null }) => {
   return (
-    <p className="text-sm text-gray-400 mt-1 flex items-center gap-1">
+    <p className="text-sm text-gray-400 mt-1 flex items-center gap-1.5">
       <User className="w-3 h-3" />
-      {badge && (
-        <AuthorBadge
-          badgeType={badge.badgeType}
-          description={badge.description}
-        />
-      )}
-      {authorName || "Unknown"}
+      <span className="flex items-center gap-1.5">
+        {authorName || "Unknown"}
+        {badge && (
+          <AuthorBadge
+            badgeType={badge.badgeType}
+            description={badge.description}
+          />
+        )}
+      </span>
     </p>
   );
 };
@@ -157,7 +176,6 @@ export const BuildContent = ({
   code,
   name,
   author,
-  description,
   handleDeleteBuild,
   isPublic,
   onTogglePublic,
@@ -172,11 +190,16 @@ export const BuildContent = ({
   isAdmin,
   onAdminDelete,
   buildLink,
+  onClone,
+  onRename,
+  currentUserId,
+  onNameUpdated,
+  isMineTab,
+  userBadge,
 }: {
   code: string;
   name: string;
   author?: string;
-  description?: string;
   handleDeleteBuild?: (event: React.MouseEvent) => void;
   isPublic?: boolean;
   onTogglePublic?: (checked: boolean) => void;
@@ -191,7 +214,24 @@ export const BuildContent = ({
   isAdmin?: boolean;
   onAdminDelete?: (event: React.MouseEvent) => void;
   buildLink?: string;
+  onClone?: (event: React.MouseEvent, buildId: string, code: string, name: string) => void;
+  onRename?: (event: React.MouseEvent, buildId: string, currentName: string) => void;
+  currentUserId?: string | null;
+  onNameUpdated?: (buildId: string, newName: string) => void;
+  isMineTab?: boolean;
+  userBadge?: UserBadgeType | null;
 }) => {
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editingName, setEditingName] = useState(name);
+  const [isSavingName, setIsSavingName] = useState(false);
+
+  // Update editing name when name prop changes
+  useEffect(() => {
+    if (!isEditingName) {
+      setEditingName(name);
+    }
+  }, [name, isEditingName]);
+
   // Safely convert the arena code into a build structure.
   // If anything goes wrong we render a minimal, non-animated card instead
   // so that a bad code never breaks the whole builds grid.
@@ -230,29 +270,148 @@ export const BuildContent = ({
     ultimateSpellSchool,
   ]);
 
+  const getHeaderColor = () => {
+    // Always follow the spell school color used for the card/border
+    // (same mapping used by the item borders / background gradients).
+    return textColorVariants[school || "empty"] || "text-gray-400";
+  };
+
+  const headerColor = getHeaderColor();
+
+  // Handle inline name editing
+  const canEditName = onRename && buildId && currentUserId && userId === currentUserId && !buildId.startsWith("local-");
+
+  const handleStartEdit = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditingName(name);
+    setIsEditingName(true);
+  };
+
+  const handleSaveName = async () => {
+    const trimmedName = editingName.trim();
+
+    // Validate name length (minimum 3 characters)
+    if (!trimmedName || trimmedName.length < 3) {
+      toast.error("Build name must be at least 3 characters long");
+      setEditingName(name);
+      setIsEditingName(false);
+      return;
+    }
+
+    // Validate name length (maximum 30 characters)
+    if (trimmedName.length > 30) {
+      toast.error("Build name must be 30 characters or less");
+      setEditingName(name);
+      setIsEditingName(false);
+      return;
+    }
+
+    // Validate name contains only English alphabet characters
+    if (!isValidEnglishAlphabet(trimmedName)) {
+      toast.error("Build name can only contain English alphabet characters, numbers, and spaces");
+      setEditingName(name);
+      setIsEditingName(false);
+      return;
+    }
+
+    // Don't update if name hasn't changed
+    if (trimmedName === name) {
+      setIsEditingName(false);
+      setEditingName(name);
+      return;
+    }
+
+    if (!buildId || !onRename) return;
+
+    setIsSavingName(true);
+
+    try {
+      // Create a synthetic event for onRename
+      const syntheticEvent = {
+        preventDefault: () => { },
+        stopPropagation: () => { },
+      } as React.MouseEvent;
+
+      // Call the rename handler with the new name
+      await new Promise<void>((resolve, reject) => {
+        // We need to call the API directly since onRename uses window.prompt
+        fetch(`/api/builds/${buildId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: trimmedName,
+          }),
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              const error = await response.json();
+              throw new Error(error.error || "Failed to rename build");
+            }
+            return response.json();
+          })
+          .then(() => {
+            setIsEditingName(false);
+            setEditingName(trimmedName);
+            toast.success("Build renamed successfully!");
+            // Notify parent component to update the name
+            if (onNameUpdated && buildId) {
+              onNameUpdated(buildId, trimmedName);
+            }
+            resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    } catch (error: any) {
+      const errorMessage = error.message || "Failed to rename build";
+      toast.error(errorMessage);
+      setEditingName(name);
+    } finally {
+      setIsSavingName(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingName(name);
+    setIsEditingName(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSaveName();
+    } else if (e.key === "Escape") {
+      handleCancelEdit();
+    }
+  };
+
   return (
     <Card
-      className={`bg-black/80 backdrop-blur-sm rounded-lg border-2 hover:border-white/30 ${showPublicToggle && isPublic
+      className={`bg-black/80 backdrop-blur-sm rounded-lg border-2 ${showPublicToggle && isPublic
         ? "border-green-500/50"
         : "border-zinc-800/50"
         } transition-all duration-300 overflow-hidden group cursor-pointer h-full relative build-spellSchool build-spellSchool-${school || "empty"
         }`}
     >
       {/* Glow effect on hover */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div className="pointer-events-none absolute -inset-1 rounded-[14px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div
           className={`absolute inset-0 bg-gradient-to-r ${fromVariants[school || "empty"]
-            } to-transparent`}
+            } to-transparent blur-xl`}
         />
         <div
           className={`absolute inset-0 bg-gradient-to-b ${fromVariants[school || "empty"]
-            } via-transparent ${toVariants[school || "empty"]}`}
+            } via-transparent ${toVariants[school || "empty"]} blur-xl`}
         />
       </div>
 
       {/* Top right corner - Vote buttons and Action buttons */}
       <div
-        className="absolute top-1 right-1 flex gap-2 z-10"
+        className="absolute top-2 right-1 flex gap-2 z-10"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -262,7 +421,7 @@ export const BuildContent = ({
         {isAdmin && onAdminDelete && (
           <button
             type="button"
-            className="bg-yellow-600/80 hover:bg-yellow-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-yellow-500/50 opacity-0 group-hover:opacity-100 z-20 mt-1"
+            className="bg-yellow-600/80 hover:bg-yellow-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-yellow-500/50 opacity-0 group-hover:opacity-100 z-20"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -272,6 +431,22 @@ export const BuildContent = ({
             title="Admin: Delete this build"
           >
             <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+
+        {/* Clone button - below vote buttons for community builds */}
+        {onClone && (
+          <button
+            type="button"
+            className="bg-blue-600/80 hover:bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-blue-500/50 opacity-0 group-hover:opacity-100"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onClone(e, buildId || `local-${code}`, code, name);
+            }}
+            aria-label="Clone build"
+          >
+            <Copy className="w-4 h-4" />
           </button>
         )}
         {/* Vote buttons */}
@@ -295,52 +470,79 @@ export const BuildContent = ({
           </button>
         )}
         {showPublicToggle && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                type="button"
-                className={`w-8 h-8 rounded-full border border-white/30 bg-black/80 flex items-center justify-center transition-colors opacity-100 ${isAuthenticated && onTogglePublic !== undefined
-                  ? "hover:border-white/60 hover:bg-black cursor-pointer"
-                  : "opacity-50 cursor-not-allowed"
-                  }`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (isAuthenticated && onTogglePublic !== undefined) {
-                    onTogglePublic(!isPublic);
-                  }
-                }}
-                disabled={!isAuthenticated || onTogglePublic === undefined}
-                aria-label={isPublic ? "Make build private" : "Make build public"}
-              >
-                {isPublic ? (
-                  <Globe2 className="w-4 h-4 text-green-400" />
-                ) : (
-                  <Lock className="w-4 h-4 text-zinc-300" />
-                )}
-              </button>
-            </TooltipTrigger>
-            {(!isAuthenticated || onTogglePublic === undefined) && (
-              <TooltipContent>
-                <p>Sign in to publish your builds</p>
-              </TooltipContent>
+          <button
+            type="button"
+            className={`w-8 h-8 rounded-full border border-white/30 bg-black/80 flex items-center justify-center transition-colors opacity-100 ${isAuthenticated && onTogglePublic !== undefined
+              ? "hover:border-white/60 hover:bg-black cursor-pointer"
+              : "opacity-50 cursor-not-allowed"
+              }`}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (isAuthenticated && onTogglePublic !== undefined) {
+                onTogglePublic(!isPublic);
+              }
+            }}
+            disabled={!isAuthenticated || onTogglePublic === undefined}
+            aria-label={isPublic ? "Make build private" : "Make build public"}
+          >
+            {isPublic ? (
+              <Globe2 className="w-4 h-4 text-green-400" />
+            ) : (
+              <Lock className="w-4 h-4 text-zinc-300" />
             )}
-          </Tooltip>
+          </button>
         )}
       </div>
 
       <CardHeader className="relative">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-xl font-bold text-white">
-            {name || "Unnamed Build"}
-          </CardTitle>
+          {isEditingName ? (
+            <Input
+              type="text"
+              value={editingName}
+              onChange={(e) => setEditingName(e.target.value)}
+              onBlur={handleSaveName}
+              onKeyDown={handleKeyDown}
+              disabled={isSavingName}
+              maxLength={30}
+              className="text-xl font-bold bg-black/50 border-white/10 text-white placeholder:text-gray-500 h-auto py-1 px-2"
+              autoFocus
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <>
+              <CardTitle
+                className={`text-xl font-bold text-white ${isMineTab ? "group-hover:truncate group-hover:max-w-[10ch] group-hover:overflow-hidden group-hover:text-ellipsis" : ""}`}
+                title={name || "Unnamed Build"}
+              >
+                {isMineTab ? (
+                  <>
+                    <span className="group-hover:hidden">{name || "Unnamed Build"}</span>
+                    <span className="hidden group-hover:inline">
+                      {name && name.length > 10 ? `${name.substring(0, 10)}...` : name || "Unnamed Build"}
+                    </span>
+                  </>
+                ) : (
+                  name || "Unnamed Build"
+                )}
+              </CardTitle>
+              {/* Rename button - only show if user owns the build */}
+              {canEditName && (
+                <button
+                  type="button"
+                  className="text-gray-400 hover:text-white transition-colors opacity-0 group-hover:opacity-100 p-1"
+                  onClick={handleStartEdit}
+                  aria-label="Rename build"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+              )}
+            </>
+          )}
         </div>
-        {author && (
-          <AuthorNameWithBadge authorName={author} userId={userId} />
-        )}
-        <p className={`text-sm mt-2 line-clamp-2 ${description && description.trim() ? "text-gray-300" : "text-gray-500/50 italic"}`}>
-          {description && description.trim() ? description : "No description"}
-        </p>
+        {/* Always show author - use "You" as fallback */}
+        <AuthorNameWithBadge authorName={author || "You"} badge={userBadge} />
       </CardHeader>
       <CardContent className="relative">
         <div className="space-y-6">
@@ -348,7 +550,7 @@ export const BuildContent = ({
           <div className="grid grid-cols-3 gap-4">
             {/* Armor Section */}
             <div className="space-y-2">
-              <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
+              <div className={`text-xs font-bold ${headerColor} uppercase tracking-wider`}>
                 Armour
               </div>
               <div className="flex gap-1">
@@ -371,7 +573,7 @@ export const BuildContent = ({
 
             {/* Buffs Section */}
             <div className="space-y-2">
-              <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
+              <div className={`text-xs font-bold ${headerColor} uppercase tracking-wider`}>
                 Buffs
               </div>
               <div className="flex gap-1">
@@ -410,7 +612,7 @@ export const BuildContent = ({
 
             {/* Blood Section */}
             <div className="space-y-2">
-              <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
+              <div className={`text-xs font-bold ${headerColor} uppercase tracking-wider`}>
                 Blood
               </div>
               <div className="flex gap-1">
@@ -446,7 +648,7 @@ export const BuildContent = ({
           <div className="grid grid-cols-2 gap-4">
             {/* Spells Section */}
             <div className="space-y-2">
-              <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
+              <div className={`text-xs font-bold ${headerColor} uppercase tracking-wider`}>
                 Spells
               </div>
               <div className="flex flex-1 gap-1">
@@ -486,7 +688,7 @@ export const BuildContent = ({
 
             {/* Passives Section */}
             <div className="space-y-2">
-              <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
+              <div className={`text-xs font-bold ${headerColor} uppercase tracking-wider`}>
                 Passives
               </div>
               <div className="flex gap-1">
@@ -539,7 +741,7 @@ export const BuildContent = ({
 
           {/* Bottom Row - Weapons */}
           <div className="space-y-2">
-            <div className="text-xs font-bold text-red-400 uppercase tracking-wider">
+            <div className={`text-xs font-bold ${headerColor} uppercase tracking-wider`}>
               Weapons
             </div>
             <div className="flex gap-1 flex-wrap">
@@ -583,8 +785,21 @@ export default function BuildsList({
 }: BuildsListProps = {}) {
   const [builds, setBuilds] = useState<Build[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalBuilds, setTotalBuilds] = useState(0);
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+
+  // Get the builds to display (limited by maxBuilds if specified)
+  const buildsToShow = maxBuilds ? builds.slice(0, maxBuilds) : builds;
+
+  // Collect user IDs for batch fetching badges
+  const userIds = Array.from(new Set(buildsToShow
+    .map((build) => build.userId)
+    .filter((id): id is string => Boolean(id))));
+
+  const { badges } = useUserBadges(userIds);
 
   useEffect(() => {
     const fetchBuilds = async () => {
@@ -605,8 +820,9 @@ export default function BuildsList({
                     id: `local-${index}-${build.name}`, // Generate temporary ID
                     name: build.name || `Build ${index + 1}`,
                     code: build.code || "",
-                    description: build.description || "",
                     isPublic: false, // LocalStorage builds are always private
+                    author: "You", // Fallback for localStorage builds
+                    userId: null,
                   }));
                   setBuilds(buildsArray);
                   onBuildsLoaded?.(buildsArray.length > 0);
@@ -632,7 +848,10 @@ export default function BuildsList({
 
       setLoading(true);
       try {
-        const response = await fetch("/api/builds?limit=100");
+        // Use pagination: 11 builds per page
+        const page = maxBuilds ? 1 : currentPage; // If maxBuilds is set (homepage), always fetch page 1
+        const limit = maxBuilds || 11; // Use maxBuilds if set, otherwise 11 per page
+        const response = await fetch(`/api/builds?page=${page}&limit=${limit}`);
 
         if (response.status === 401) {
           setBuilds([]);
@@ -652,15 +871,17 @@ export default function BuildsList({
             id: build.id,
             name: build.name,
             code: build.code,
-            description: build.description || "",
             isPublic: build.isPublic || false,
+            author: build.author || "You", // Fallback to "You" if author is missing
+            userId: build.userId || null,
           }))
           : (data.builds || []).map((build: any) => ({
             id: build.id,
             name: build.name,
             code: build.code,
-            description: build.description || "",
             isPublic: build.isPublic || false,
+            author: build.author || "You", // Fallback to "You" if author is missing
+            userId: build.userId || null,
           }));
 
         // Sort builds: public builds first, then private builds
@@ -671,6 +892,13 @@ export default function BuildsList({
         });
 
         setBuilds(sortedBuilds);
+
+        // Update pagination info if available
+        if (data.total !== undefined) {
+          setTotalBuilds(data.total);
+          setTotalPages(data.totalPages || 1);
+        }
+
         onBuildsLoaded?.(sortedBuilds.length > 0);
       } catch (error) {
         console.error("Failed to load builds:", error);
@@ -682,7 +910,7 @@ export default function BuildsList({
     };
 
     fetchBuilds();
-  }, [isAuthenticated, authLoading, onBuildsLoaded]);
+  }, [isAuthenticated, authLoading, onBuildsLoaded, currentPage, maxBuilds]);
 
   const handleDelete = async (event: React.MouseEvent, buildId: string, index: number) => {
     // Prevent the card click event from triggering
@@ -714,7 +942,6 @@ export default function BuildsList({
                 id: `local-${idx}-${build.name}`,
                 name: build.name || `Build ${idx + 1}`,
                 code: build.code || "",
-                description: build.description || "",
                 isPublic: false,
               }));
               setBuilds(buildsArray);
@@ -742,9 +969,56 @@ export default function BuildsList({
         throw new Error("Failed to delete build");
       }
 
-      const updatedBuilds = builds.filter((_, i) => i !== index);
-      setBuilds(updatedBuilds);
-      onBuildsLoaded?.(updatedBuilds.length > 0);
+      // Refresh builds list after deletion
+      // If this was the last item on the page and not page 1, go to previous page
+      const shouldGoToPreviousPage = !maxBuilds && builds.length === 1 && currentPage > 1;
+      const page = maxBuilds ? 1 : (shouldGoToPreviousPage ? currentPage - 1 : currentPage);
+      const limit = maxBuilds || 11;
+
+      if (shouldGoToPreviousPage) {
+        setCurrentPage(page);
+      }
+
+      const refreshResponse = await fetch(`/api/builds?page=${page}&limit=${limit}`);
+      if (refreshResponse.ok) {
+        const refreshData = await refreshResponse.json();
+        const buildsArray = Array.isArray(refreshData)
+          ? refreshData.map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+            author: build.author || "You", // Fallback to "You" if author is missing
+            userId: build.userId || null,
+          }))
+          : (refreshData.builds || []).map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+            author: build.author || "You", // Fallback to "You" if author is missing
+            userId: build.userId || null,
+          }));
+        const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
+          if (a.isPublic && !b.isPublic) return -1;
+          if (!a.isPublic && b.isPublic) return 1;
+          return 0;
+        });
+        setBuilds(sortedBuilds);
+
+        // Update pagination info if available
+        if (refreshData.total !== undefined) {
+          setTotalBuilds(refreshData.total);
+          setTotalPages(refreshData.totalPages || 1);
+        }
+
+        onBuildsLoaded?.(sortedBuilds.length > 0);
+      } else {
+        // Fallback: remove from current list
+        const updatedBuilds = builds.filter((_, i) => i !== index);
+        setBuilds(updatedBuilds);
+        onBuildsLoaded?.(updatedBuilds.length > 0);
+      }
       toast.success("Build deleted successfully");
     } catch (error) {
       console.error("Failed to delete build:", error);
@@ -830,6 +1104,274 @@ export default function BuildsList({
     }
   };
 
+  const handleClone = async (event: React.MouseEvent, buildId: string, code: string, name: string) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // If user is not authenticated, clone to localStorage
+    if (!isAuthenticated) {
+      try {
+        if (typeof window !== "undefined") {
+          const clonedName = `${name} (Copy)`;
+          const localBuildsData = localStorage.getItem("vbuilds");
+          const existingBuilds = localBuildsData ? JSON.parse(localBuildsData) : [];
+
+          // Add cloned build to localStorage
+          existingBuilds.push({
+            name: clonedName,
+            code: code,
+          });
+
+          localStorage.setItem("vbuilds", JSON.stringify(existingBuilds));
+
+          // Update state
+          const buildsArray = existingBuilds.map((build: any, idx: number) => ({
+            id: `local-${idx}-${build.name}`,
+            name: build.name || `Build ${idx + 1}`,
+            code: build.code || "",
+            isPublic: false,
+            author: "You",
+            userId: null,
+          }));
+          setBuilds(buildsArray);
+          onBuildsLoaded?.(buildsArray.length > 0);
+
+          toast.success("Build cloned to local storage!");
+        }
+      } catch (error) {
+        console.error("Error cloning build to localStorage:", error);
+        toast.error("Failed to clone build");
+      }
+      return;
+    }
+
+    // If authenticated, clone via API
+    if (!buildId || buildId.startsWith("local-")) {
+      // Clone local build to API
+      try {
+        const clonedName = `${name} (Copy)`;
+        const response = await fetch("/api/builds", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: clonedName,
+            code: code,
+            isPublic: false,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          const errorMessage = error.error || "Failed to clone build";
+          toast.error(errorMessage);
+          return;
+        }
+
+        toast.success("Build cloned successfully!");
+
+        // Refresh builds list
+        const page = maxBuilds ? 1 : currentPage;
+        const limit = maxBuilds || 11;
+        const refreshResponse = await fetch(`/api/builds?page=${page}&limit=${limit}`);
+        if (refreshResponse.ok) {
+          const refreshData = await refreshResponse.json();
+          const buildsArray = Array.isArray(refreshData)
+            ? refreshData.map((build: any) => ({
+              id: build.id,
+              name: build.name,
+              code: build.code,
+              isPublic: build.isPublic || false,
+              author: build.author || "You",
+              userId: build.userId || null,
+            }))
+            : (refreshData.builds || []).map((build: any) => ({
+              id: build.id,
+              name: build.name,
+              code: build.code,
+              isPublic: build.isPublic || false,
+              author: build.author || "You",
+              userId: build.userId || null,
+            }));
+          const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
+            if (a.isPublic && !b.isPublic) return -1;
+            if (!a.isPublic && b.isPublic) return 1;
+            return 0;
+          });
+          setBuilds(sortedBuilds);
+
+          if (refreshData.total !== undefined) {
+            setTotalBuilds(refreshData.total);
+            setTotalPages(refreshData.totalPages || 1);
+          }
+
+          onBuildsLoaded?.(sortedBuilds.length > 0);
+        }
+      } catch (error) {
+        console.error("Error cloning build:", error);
+        toast.error("Failed to clone build");
+      }
+      return;
+    }
+
+    try {
+      // Generate a cloned name
+      const clonedName = `${name} (Copy)`;
+
+      const response = await fetch("/api/builds", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: clonedName,
+          code: code,
+          isPublic: false, // Cloned builds start as private
+        }),
+      });
+
+      if (response.status === 401) {
+        toast.error("Please sign in to clone builds");
+        return;
+      }
+
+      if (!response.ok) {
+        const error = await response.json();
+        const errorMessage = error.error || "Failed to clone build";
+        toast.error(errorMessage);
+        return;
+      }
+
+      toast.success("Build cloned successfully!");
+
+      // Refresh builds list
+      const page = maxBuilds ? 1 : currentPage;
+      const limit = maxBuilds || 11;
+      const refreshResponse = await fetch(`/api/builds?page=${page}&limit=${limit}`);
+      if (refreshResponse.ok) {
+        const refreshData = await refreshResponse.json();
+        const buildsArray = Array.isArray(refreshData)
+          ? refreshData.map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+            author: build.author || "You", // Fallback to "You" if author is missing
+            userId: build.userId || null,
+          }))
+          : (refreshData.builds || []).map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+            author: build.author || "You", // Fallback to "You" if author is missing
+            userId: build.userId || null,
+          }));
+        const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
+          if (a.isPublic && !b.isPublic) return -1;
+          if (!a.isPublic && b.isPublic) return 1;
+          return 0;
+        });
+        setBuilds(sortedBuilds);
+
+        // Update pagination info if available
+        if (refreshData.total !== undefined) {
+          setTotalBuilds(refreshData.total);
+          setTotalPages(refreshData.totalPages || 1);
+        }
+
+        onBuildsLoaded?.(sortedBuilds.length > 0);
+      }
+    } catch (error) {
+      console.error("Error cloning build:", error);
+      toast.error("Failed to clone build");
+    }
+  };
+
+  const handleRename = async (event: React.MouseEvent, buildId: string, currentName: string) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!isAuthenticated) {
+      toast.error("Please sign in to rename builds");
+      return;
+    }
+
+    if (!buildId || buildId.startsWith("local-")) {
+      toast.error("Cannot rename local builds. Please sign in first.");
+      return;
+    }
+
+    const newName = window.prompt("Enter new build name:", currentName);
+    if (!newName || newName.trim() === currentName) {
+      return; // User cancelled or didn't change the name
+    }
+
+    try {
+      const response = await fetch(`/api/builds/${buildId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: newName.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        const errorMessage = error.error || "Failed to rename build";
+        toast.error(errorMessage);
+        return;
+      }
+
+      toast.success("Build renamed successfully!");
+
+      // Refresh builds list
+      const page = maxBuilds ? 1 : currentPage;
+      const limit = maxBuilds || 11;
+      const refreshResponse = await fetch(`/api/builds?page=${page}&limit=${limit}`);
+      if (refreshResponse.ok) {
+        const refreshData = await refreshResponse.json();
+        const buildsArray = Array.isArray(refreshData)
+          ? refreshData.map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+            author: build.author || "You", // Fallback to "You" if author is missing
+            userId: build.userId || null,
+          }))
+          : (refreshData.builds || []).map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+            author: build.author || "You", // Fallback to "You" if author is missing
+            userId: build.userId || null,
+          }));
+        const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
+          if (a.isPublic && !b.isPublic) return -1;
+          if (!a.isPublic && b.isPublic) return 1;
+          return 0;
+        });
+        setBuilds(sortedBuilds);
+
+        // Update pagination info if available
+        if (refreshData.total !== undefined) {
+          setTotalBuilds(refreshData.total);
+          setTotalPages(refreshData.totalPages || 1);
+        }
+
+        onBuildsLoaded?.(sortedBuilds.length > 0);
+      }
+    } catch (error) {
+      console.error("Error renaming build:", error);
+      toast.error("Failed to rename build");
+    }
+  };
+
   const handleTogglePublic = async (
     buildId: string,
     currentIsPublic: boolean
@@ -899,20 +1441,42 @@ export default function BuildsList({
         return;
       }
 
-      // Update local state and maintain sort order (public first)
-      setBuilds((prevBuilds) => {
-        const updated = prevBuilds.map((build) =>
-          build.id === buildId
-            ? { ...build, isPublic: !currentIsPublic }
-            : build
-        );
-        // Sort: public builds first, then private builds
-        return updated.sort((a, b) => {
+      // Refresh builds list to get updated data
+      const page = maxBuilds ? 1 : currentPage;
+      const limit = maxBuilds || 11;
+      const refreshResponse = await fetch(`/api/builds?page=${page}&limit=${limit}`);
+      if (refreshResponse.ok) {
+        const refreshData = await refreshResponse.json();
+        const buildsArray = Array.isArray(refreshData)
+          ? refreshData.map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+            author: build.author || "You", // Fallback to "You" if author is missing
+            userId: build.userId || null,
+          }))
+          : (refreshData.builds || []).map((build: any) => ({
+            id: build.id,
+            name: build.name,
+            code: build.code,
+            isPublic: build.isPublic || false,
+            author: build.author || "You", // Fallback to "You" if author is missing
+            userId: build.userId || null,
+          }));
+        const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
           if (a.isPublic && !b.isPublic) return -1;
           if (!a.isPublic && b.isPublic) return 1;
           return 0;
         });
-      });
+        setBuilds(sortedBuilds);
+
+        // Update pagination info if available
+        if (refreshData.total !== undefined) {
+          setTotalBuilds(refreshData.total);
+          setTotalPages(refreshData.totalPages || 1);
+        }
+      }
 
       toast.success(
         `Build ${!currentIsPublic ? "made public" : "made private"}`
@@ -923,8 +1487,6 @@ export default function BuildsList({
     }
   };
 
-  // // Get the builds to display (limited by maxBuilds if specified)
-  const buildsToShow = maxBuilds ? builds.slice(0, maxBuilds) : builds;
 
   // // Calculate button span based on grid layout and number of builds
   const getButtonSpanClass = () => {
@@ -966,6 +1528,78 @@ export default function BuildsList({
       },
     },
   };
+
+  // Build Card Skeleton Component
+  const BuildCardSkeleton = () => (
+    <Card className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-zinc-800/50 h-full flex flex-col">
+      <CardHeader className="relative">
+        <Skeleton className="h-6 w-3/4 mb-2" />
+        <Skeleton className="h-4 w-1/2" />
+      </CardHeader>
+      <CardContent className="relative space-y-6">
+        {/* Top Row - Armor, Buffs, Blood */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-16" />
+            <div className="flex gap-1">
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="w-8 h-8 rounded" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-12" />
+            <div className="flex gap-1">
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="w-8 h-8 rounded" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-12" />
+            <div className="flex gap-1">
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="w-8 h-8 rounded" />
+            </div>
+          </div>
+        </div>
+
+        {/* Middle Row - Spells and Passives */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-16" />
+            <div className="flex gap-1">
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="w-8 h-8 rounded" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-20" />
+            <div className="flex gap-1 flex-wrap">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="w-8 h-8 rounded" />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Row - Weapons */}
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-20" />
+          <div className="flex gap-1 flex-wrap">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="w-8 h-8 rounded" />
+            ))}
+          </div>
+        </div>
+
+        {/* Arena Code */}
+        <div className="mt-4">
+          <Skeleton className="h-8 w-full" />
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   // Custom container for premade builds without stagger delay
 
@@ -1021,7 +1655,6 @@ export default function BuildsList({
             },
             body: JSON.stringify({
               name: localBuild.name || `Imported Build ${imported + 1}`,
-              description: localBuild.description || "",
               code: localBuild.code,
             }),
           });
@@ -1042,7 +1675,9 @@ export default function BuildsList({
         setHasLocalBuilds(false);
 
         // Refresh builds list
-        const response = await fetch("/api/builds?limit=100");
+        const page = maxBuilds ? 1 : currentPage;
+        const limit = maxBuilds || 11;
+        const response = await fetch(`/api/builds?page=${page}&limit=${limit}`);
         if (response.ok) {
           const data = await response.json();
           // Handle both old format (array) and new format (object with builds array)
@@ -1051,14 +1686,12 @@ export default function BuildsList({
               id: build.id,
               name: build.name,
               code: build.code,
-              description: build.description || "",
               isPublic: build.isPublic || false,
             }))
             : (data.builds || []).map((build: any) => ({
               id: build.id,
               name: build.name,
               code: build.code,
-              description: build.description || "",
               isPublic: build.isPublic || false,
             }));
           // Sort builds: public builds first, then private builds
@@ -1068,6 +1701,13 @@ export default function BuildsList({
             return 0;
           });
           setBuilds(sortedBuilds);
+
+          // Update pagination info if available
+          if (data.total !== undefined) {
+            setTotalBuilds(data.total);
+            setTotalPages(data.totalPages || 1);
+          }
+
           onBuildsLoaded?.(sortedBuilds.length > 0);
         }
 
@@ -1086,33 +1726,39 @@ export default function BuildsList({
   };
 
   return (
-    <TooltipProvider>
-      <div className="pb-16">
-        {/* Import Local Builds Banner */}
-        {hasLocalBuilds && isAuthenticated && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 bg-yellow-900/20 border border-yellow-800/50 rounded-lg flex items-center justify-between gap-4"
+    <div className="pb-16">
+      {/* Import Local Builds Banner */}
+      {hasLocalBuilds && isAuthenticated && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 p-4 bg-yellow-900/20 border border-yellow-800/50 rounded-lg flex items-center justify-between gap-4"
+        >
+          <div>
+            <p className="text-yellow-200 font-medium">
+              You have local builds that can be imported
+            </p>
+            <p className="text-yellow-300/70 text-sm">
+              Import your saved builds to access them from any device
+            </p>
+          </div>
+          <Button
+            onClick={handleImportLocalBuilds}
+            disabled={importing}
+            className="bg-yellow-900/50 hover:bg-yellow-900/70 border-yellow-800 text-yellow-200"
           >
-            <div>
-              <p className="text-yellow-200 font-medium">
-                You have local builds that can be imported
-              </p>
-              <p className="text-yellow-300/70 text-sm">
-                Import your saved builds to access them from any device
-              </p>
-            </div>
-            <Button
-              onClick={handleImportLocalBuilds}
-              disabled={importing}
-              className="bg-yellow-900/50 hover:bg-yellow-900/70 border-yellow-800 text-yellow-200"
-            >
-              {importing ? "Importing..." : "Import Local Builds"}
-            </Button>
-          </motion.div>
-        )}
+            {importing ? "Importing..." : "Import Local Builds"}
+          </Button>
+        </motion.div>
+      )}
 
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {Array.from({ length: 11 }).map((_, index) => (
+            <BuildCardSkeleton key={index} />
+          ))}
+        </div>
+      ) : (
         <motion.div
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           variants={staggerContainer}
@@ -1156,7 +1802,8 @@ export default function BuildsList({
                 <BuildContent
                   code={build.code}
                   name={build.name}
-                  description={build.description}
+                  author={build.author}
+                  userId={build.userId}
                   handleDeleteBuild={(event: React.MouseEvent) =>
                     handleDelete(event, build.id || "", index)
                   }
@@ -1168,53 +1815,166 @@ export default function BuildsList({
                     }
                   }}
                   showPublicToggle={true}
+                  buildId={build.id}
+                  onClone={handleClone}
+                  onRename={build.id && !build.id.startsWith("local-") ? handleRename : undefined}
+                  currentUserId={user?.id || null}
+                  onNameUpdated={(buildId, newName) => {
+                    // Update the build name in the local state
+                    setBuilds((prev) =>
+                      prev.map((b) =>
+                        b.id === buildId ? { ...b, name: newName } : b
+                      )
+                    );
+                  }}
+                  isMineTab={true}
+                  userBadge={build.userId ? badges[build.userId] : null}
                 />
               </Link>
             </motion.div>
           ))}
         </motion.div>
+      )}
 
-        {!loading && builds.length === 0 && (
-          <motion.div
-            className="flex justify-start"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={scaleIn}
-          >
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Link href="/builds/create">
-                  <Card className="text-card-foreground shadow-sm bg-black/80 backdrop-blur-sm rounded-lg border-2 border-dashed border-white/30 hover:border-white/60 transition-all duration-300 overflow-hidden group cursor-pointer h-full relative flex items-center justify-center min-h-[400px] w-96">
-                    {/* Glow effect on hover */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
-                      <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/10" />
-                    </div>
+      {/* Pagination Controls - Only show when there are 11+ builds and not using maxBuilds (homepage) */}
+      {!maxBuilds && totalBuilds >= 11 && totalPages > 1 && (
+        <div className="mt-8 flex justify-center">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (currentPage > 1) {
+                      setCurrentPage(currentPage - 1);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                  }}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
 
-                    <div className="flex flex-col items-center justify-center gap-4 p-8 relative z-10">
-                      {/* Plus icon in circle */}
-                      <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/40 flex items-center justify-center group-hover:border-white/60 transition-colors duration-300">
-                        <Plus className="w-8 h-8 text-white/60 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
-                      </div>
+              {/* Page numbers */}
+              {(() => {
+                const pagesToShow: (number | 'ellipsis')[] = [];
 
-                      {/* Text */}
-                      <span className="text-white/60 group-hover:text-white font-bold text-lg tracking-wide transition-colors duration-300 uppercase">
-                        CREATE A NEW BUILD
-                      </span>
-                    </div>
-                  </Card>
-                </Link>
-              </TooltipTrigger>
-              {!isAuthenticated && (
-                <TooltipContent>
-                  <p>Sign in to publish your builds</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </motion.div>
-        )}
-      </div>
-    </TooltipProvider>
+                if (totalPages <= 7) {
+                  // Show all pages if 7 or fewer
+                  for (let i = 1; i <= totalPages; i++) {
+                    pagesToShow.push(i);
+                  }
+                } else {
+                  // Show first page
+                  pagesToShow.push(1);
+
+                  if (currentPage <= 4) {
+                    // Show pages 2-7
+                    for (let i = 2; i <= 7; i++) {
+                      pagesToShow.push(i);
+                    }
+                    pagesToShow.push('ellipsis');
+                    pagesToShow.push(totalPages);
+                  } else if (currentPage >= totalPages - 3) {
+                    // Show last 7 pages
+                    pagesToShow.push('ellipsis');
+                    for (let i = totalPages - 6; i <= totalPages; i++) {
+                      pagesToShow.push(i);
+                    }
+                  } else {
+                    // Show pages around current page
+                    pagesToShow.push('ellipsis');
+                    for (let i = currentPage - 2; i <= currentPage + 2; i++) {
+                      pagesToShow.push(i);
+                    }
+                    pagesToShow.push('ellipsis');
+                    pagesToShow.push(totalPages);
+                  }
+                }
+
+                return pagesToShow.map((item, idx) => {
+                  if (item === 'ellipsis') {
+                    return (
+                      <PaginationItem key={`ellipsis-${idx}`}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    );
+                  }
+                  return (
+                    <PaginationItem key={item}>
+                      <PaginationLink
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(item);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        isActive={currentPage === item}
+                        className="cursor-pointer"
+                      >
+                        {item}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                });
+              })()}
+
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (currentPage < totalPages) {
+                      setCurrentPage(currentPage + 1);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                  }}
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
+
+      {/* Build count info */}
+      {!maxBuilds && totalBuilds > 0 && (
+        <div className="mt-4 text-center text-sm text-gray-400">
+          Showing {((currentPage - 1) * 11) + 1} - {Math.min(currentPage * 11, totalBuilds)} of {totalBuilds} builds
+        </div>
+      )}
+
+      {!loading && builds.length === 0 && (
+        <motion.div
+          className="flex justify-start"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={scaleIn}
+        >
+          <Link href="/builds/create">
+            <Card className="text-card-foreground shadow-sm bg-black/80 backdrop-blur-sm rounded-lg border-2 border-dashed border-white/30 hover:border-white/60 transition-all duration-300 overflow-hidden group cursor-pointer h-full relative flex items-center justify-center min-h-[400px] w-96">
+              {/* Glow effect on hover */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/10" />
+              </div>
+
+              <div className="flex flex-col items-center justify-center gap-4 p-8 relative z-10">
+                {/* Plus icon in circle */}
+                <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/40 flex items-center justify-center group-hover:border-white/60 transition-colors duration-300">
+                  <Plus className="w-8 h-8 text-white/60 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
+                </div>
+
+                {/* Text */}
+                <span className="text-white/60 group-hover:text-white font-bold text-lg tracking-wide transition-colors duration-300 uppercase">
+                  CREATE A NEW BUILD
+                </span>
+              </div>
+            </Card>
+          </Link>
+        </motion.div>
+      )}
+    </div>
   );
 }

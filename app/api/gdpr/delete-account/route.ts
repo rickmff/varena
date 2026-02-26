@@ -48,12 +48,35 @@ export async function DELETE(request: Request) {
           select: {
             builds: true,
             votes: true,
-            sessions: true,
-            accounts: true,
+            spellTierLists: true,
+            spellTierListVotes: true,
           },
         },
       },
     });
+
+    // Get session and account counts from AuthUser if it exists
+    let sessionsDeleted = 0;
+    let accountsDeleted = 0;
+    try {
+      const authUser = await prisma.authUser.findUnique({
+        where: { id: sessionUserId },
+        select: {
+          _count: {
+            select: {
+              sessions: true,
+              accounts: true,
+            },
+          },
+        },
+      });
+      if (authUser) {
+        sessionsDeleted = authUser._count.sessions;
+        accountsDeleted = authUser._count.accounts;
+      }
+    } catch (error) {
+      // Ignore if AuthUser doesn't exist
+    }
 
     // Track deletion counts for response
     let deletedData = {
@@ -61,8 +84,8 @@ export async function DELETE(request: Request) {
       name: session.user.name || null,
       buildsDeleted: 0,
       votesDeleted: 0,
-      sessionsDeleted: 0,
-      accountsDeleted: 0,
+      sessionsDeleted: sessionsDeleted,
+      accountsDeleted: accountsDeleted,
     };
 
     // If user exists in Prisma, delete all Prisma data
@@ -73,32 +96,32 @@ export async function DELETE(request: Request) {
         name: user.name,
         buildsDeleted: user._count.builds,
         votesDeleted: user._count.votes,
-        sessionsDeleted: user._count.sessions,
-        accountsDeleted: user._count.accounts,
+        sessionsDeleted: sessionsDeleted,
+        accountsDeleted: accountsDeleted,
       };
 
       // Delete all user data in a transaction
       await prisma.$transaction(async (tx) => {
         await tx.build.deleteMany({ where: { userId: userId } });
         await tx.buildVote.deleteMany({ where: { userId: userId } });
-        await tx.session.deleteMany({ where: { userId: userId } });
-        await tx.account.deleteMany({ where: { userId: userId } });
-        await tx.verificationToken.deleteMany({ where: { identifier: sessionUserEmail } });
+        await tx.authSession.deleteMany({ where: { userId: userId } });
+        await tx.authAccount.deleteMany({ where: { userId: userId } });
+        await tx.authVerification.deleteMany({ where: { identifier: sessionUserEmail } });
         await tx.user.delete({ where: { id: userId } });
       });
       logger.info("Prisma user and all related data deleted successfully");
     } else {
       logger.warn("User not found in Prisma, proceeding with Better Auth deletion");
 
-      await prisma.verificationToken.deleteMany({
+      await prisma.authVerification.deleteMany({
         where: { identifier: sessionUserEmail },
       });
 
       try {
         await prisma.build.deleteMany({ where: { userId: sessionUserId } });
         await prisma.buildVote.deleteMany({ where: { userId: sessionUserId } });
-        await prisma.session.deleteMany({ where: { userId: sessionUserId } });
-        await prisma.account.deleteMany({ where: { userId: sessionUserId } });
+        await prisma.authSession.deleteMany({ where: { userId: sessionUserId } });
+        await prisma.authAccount.deleteMany({ where: { userId: sessionUserId } });
       } catch (orphanError) {
         logger.warn("Error cleaning orphaned data", { error: orphanError });
       }

@@ -28,7 +28,35 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return handler.GET(request);
+  // Handle verify-email: let Better Auth process it, then redirect nicely
+  if (url.pathname.includes("/verify-email")) {
+    try {
+      const response = await handler.GET(request);
+
+      // If verification succeeded (redirect response), redirect to signin with success message
+      if (response.status === 302 || response.status === 301) {
+        const baseURL = url.origin;
+        return NextResponse.redirect(`${baseURL}/auth/signin?verified=true`);
+      }
+
+      return response;
+    } catch (error: any) {
+      console.error("[Auth API] Error during email verification:", error?.message || error);
+      // Redirect to signin with error message
+      const baseURL = url.origin;
+      return NextResponse.redirect(`${baseURL}/auth/signin?error=verification-failed`);
+    }
+  }
+
+  try {
+    return await handler.GET(request);
+  } catch (error: any) {
+    console.error("[Auth API] GET error:", error?.message || error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {

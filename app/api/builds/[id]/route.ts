@@ -76,20 +76,12 @@ export async function PUT(request: Request, { params }: RouteParams) {
     }
 
     const { id } = await params;
-    const { name, description, code, author, authorTwitchUrl, authorYoutubeUrl, isPublic } = await request.json();
+    const { name, code, author, authorTwitchUrl, authorYoutubeUrl, isPublic } = await request.json();
 
     // Validate name
     if (name !== undefined && name !== null && name.trim() && !isValidEnglishAlphabet(name.trim())) {
       return NextResponse.json(
         { error: "Build name can only contain English alphabet characters, numbers, and spaces" },
-        { status: 400 }
-      );
-    }
-
-    // Validate description
-    if (description !== undefined && description !== null && description.trim() && !isValidEnglishAlphabet(description.trim())) {
-      return NextResponse.json(
-        { error: "Build description can only contain English alphabet characters, numbers, and spaces" },
         { status: 400 }
       );
     }
@@ -147,7 +139,6 @@ export async function PUT(request: Request, { params }: RouteParams) {
       where: { id },
       data: {
         name: name || existingBuild.name,
-        description: description || existingBuild.description,
         code: code || existingBuild.code,
         author: author || existingBuild.author,
         authorTwitchUrl: authorTwitchUrl !== undefined ? authorTwitchUrl : existingBuild.authorTwitchUrl,
@@ -158,6 +149,8 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
     // Invalidate caches
     revalidateTag(`builds-${session.user.id}`);
+
+    // Invalidate public builds cache when public/private status changes
     if (isPublic !== undefined && isPublic !== existingBuild.isPublic) {
       revalidateTag("public-builds");
     }
@@ -209,6 +202,9 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     // Invalidate caches
     revalidateTag(`builds-${session.user.id}`);
+    revalidateTag(`builds-count-${session.user.id}`);
+
+    // Invalidate public builds cache if the deleted build was public
     if (wasPublic) {
       revalidateTag("public-builds");
     }

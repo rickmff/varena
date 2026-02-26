@@ -149,6 +149,17 @@ export default async function ProfilePage() {
                   </Link>
                 </Button>
 
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full justify-start bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] text-white"
+                >
+                  <Link href="/spells/tier-list" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    My Spell Tier List
+                  </Link>
+                </Button>
+
                 <div className="pt-4 border-t border-[#5865F2]/30 space-y-2">
                   <SendPasswordResetButton email={user.email || ""} />
                   <LogoutButton />

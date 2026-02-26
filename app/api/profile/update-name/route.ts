@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { createPool } from "mysql2/promise";
 import { rateLimit, getRateLimitHeaders } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
+import { revalidateTag } from "next/cache";
 
 // Rate limit: 10 name changes per hour
 const PROFILE_RATE_LIMIT = {
@@ -87,6 +88,35 @@ export async function PUT(request: Request) {
       );
     }
 
+    // Get current user to check old name
+    const currentUser = await prisma.user.findUnique({
+      where: { email: session.user.email || "" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
+
+    // If name is being changed (not empty and different from current), check if it already exists
+    if (trimmedName && trimmedName !== (currentUser?.name || "")) {
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          name: trimmedName,
+          id: { not: session.user.id },
+        },
+      });
+
+      if (existingUser) {
+        return NextResponse.json(
+          { error: "This name is already taken. Please choose a different name." },
+          { status: 400 }
+        );
+      }
+    }
+
+    const oldName = currentUser?.name || null;
+
     // Update Prisma user
     const updatedPrismaUser = await prisma.user.upsert({
       where: { email: session.user.email || "" },
@@ -106,6 +136,22 @@ export async function PUT(request: Request) {
         email: true,
       },
     });
+
+    // Update all builds where author matches the old name and userId matches current user
+    if (oldName && trimmedName && oldName !== trimmedName) {
+      await prisma.build.updateMany({
+        where: {
+          userId: session.user.id,
+          author: oldName,
+        },
+        data: {
+          author: trimmedName,
+        },
+      });
+
+      // Invalidate public builds cache so author names update immediately
+      revalidateTag("public-builds");
+    }
 
     // Also update Better Auth user table
     try {

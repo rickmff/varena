@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useBuilder } from "../BuildProvider";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { arenaCode } from "@/components/machines/converter";
@@ -26,7 +25,6 @@ const SaveBuild: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -68,7 +66,6 @@ const SaveBuild: React.FC = () => {
               if (foundBuild) {
                 // Build found in localStorage - user owns it
                 setName(foundBuild.name || "Build 1");
-                setDescription(foundBuild.description || "");
                 setIsPublic(false);
                 if (foundBuild.id) {
                   setBuildId(foundBuild.id);
@@ -91,7 +88,6 @@ const SaveBuild: React.FC = () => {
           const build = await response.json();
           if (build && build.name) {
             setName(build.name);
-            setDescription(build.description || "");
             setIsPublic(build.isPublic || false);
             setBuildUpvotes(build.upvotes || 0);
             setBuildDownvotes(build.downvotes || 0);
@@ -115,12 +111,9 @@ const SaveBuild: React.FC = () => {
                       if (localBuild.id) {
                         setBuildId(localBuild.id);
                       }
-                      // Use local name and description if available
+                    // Use local name if available
                       if (localBuild.name) {
                         setName(localBuild.name);
-                      }
-                      if (localBuild.description !== undefined) {
-                        setDescription(localBuild.description || "");
                       }
                     }
                   }
@@ -165,7 +158,6 @@ const SaveBuild: React.FC = () => {
               const foundBuild = parsed.find((b: any) => b.code === buildCode);
               if (foundBuild) {
                 setName(foundBuild.name || "Build 1");
-                setDescription(foundBuild.description || "");
                 // Unauthenticated users can't have public builds
                 setIsPublic(false);
                 // Set buildId from localStorage if it exists
@@ -278,13 +270,13 @@ const SaveBuild: React.FC = () => {
     return `${currentUrl}${buildQuery}`;
   };
 
-  const saveToLocalStorage = (buildName: string, buildCode: string, buildDescription: string, localBuildId?: string | null) => {
+  const saveToLocalStorage = (buildName: string, buildCode: string, localBuildId?: string | null) => {
     if (typeof window === "undefined") return false;
 
     try {
       // Get existing builds from localStorage
       const existingBuildsData = localStorage.getItem("vbuilds");
-      let existingBuilds: Array<{ id?: string; code: string; timestamp?: string; name: string; description?: string }> = [];
+      let existingBuilds: Array<{ id?: string; code: string; timestamp?: string; name: string }> = [];
 
       if (existingBuildsData) {
         try {
@@ -325,7 +317,6 @@ const SaveBuild: React.FC = () => {
           id: buildIdToUse,
           code: buildCode,
           name: buildName,
-          description: buildDescription,
           timestamp: new Date().toISOString(),
         };
       } else {
@@ -334,7 +325,6 @@ const SaveBuild: React.FC = () => {
           id: buildIdToUse,
           code: buildCode,
           name: buildName,
-          description: buildDescription,
           timestamp: new Date().toISOString(),
         });
       }
@@ -393,17 +383,10 @@ const SaveBuild: React.FC = () => {
         setIsPublic(false);
       }
 
-      // Validate description contains only English alphabet characters
-      const buildDescription = description.trim();
-      if (buildDescription && !isValidEnglishAlphabet(buildDescription)) {
-        toast.error("Build description can only contain English alphabet characters, numbers, and spaces");
-        return;
-      }
-
       // Save to localStorage for non-authenticated users
       // Use buildId if it's a local build ID, otherwise use null to generate new one
       const localBuildId = buildId && buildId.startsWith("local-") ? buildId : null;
-      const saved = saveToLocalStorage(buildName, buildCode, buildDescription, localBuildId);
+      const saved = saveToLocalStorage(buildName, buildCode, localBuildId);
       if (saved) {
         toast.success("Build saved locally! Sign in to sync across devices.", {
           duration: 4000,
@@ -441,14 +424,6 @@ const SaveBuild: React.FC = () => {
       const url = buildId ? `/api/builds/${buildId}` : "/api/builds";
       const method = buildId ? "PUT" : "POST";
 
-      // Validate description contains only English alphabet characters
-      const buildDescription = description.trim();
-      if (buildDescription && !isValidEnglishAlphabet(buildDescription)) {
-        toast.error("Build description can only contain English alphabet characters, numbers, and spaces");
-        setLoading(false);
-        return;
-      }
-
       const response = await fetch(url, {
         method,
         headers: {
@@ -456,7 +431,6 @@ const SaveBuild: React.FC = () => {
         },
         body: JSON.stringify({
           name: buildName,
-          description: buildDescription,
           code: buildCode,
           isPublic: isPublic,
         }),
@@ -548,15 +522,15 @@ const SaveBuild: React.FC = () => {
       }
     }
 
-    // Validate cloned name length (minimum 3 characters and max 42)
+    // Validate cloned name length (minimum 3 characters and max 30)
     if (clonedName.length < 3) {
       toast.error("Build name must be at least 3 characters long");
       return;
     }
 
-    if (clonedName.length > 42) {
+    if (clonedName.length > 30) {
       // If name is too long, truncate base name and add version
-      const maxBaseLength = 42 - 4; // Reserve space for " v2" (4 chars)
+      const maxBaseLength = 30 - 4; // Reserve space for " v2" (4 chars)
       const baseName = buildName.replace(/\s+v(\d+)$/i, "").trim();
       const truncatedBase = baseName.substring(0, maxBaseLength).trim();
       const versionPattern = /\s+v(\d+)$/i;
@@ -584,8 +558,7 @@ const SaveBuild: React.FC = () => {
 
     // If not authenticated, save to localStorage
     if (!isAuthenticated) {
-      const buildDescription = description.trim() ? filterEnglishAlphabet(description.trim()) : "";
-      const saved = saveToLocalStorage(clonedName, buildCode, buildDescription, null);
+      const saved = saveToLocalStorage(clonedName, buildCode, null);
       if (saved) {
         toast.success("Build cloned locally! Sign in to sync across devices.", {
           duration: 4000,
@@ -613,7 +586,6 @@ const SaveBuild: React.FC = () => {
         },
         body: JSON.stringify({
           name: clonedName,
-          description: description.trim() ? filterEnglishAlphabet(description.trim()) : "",
           code: buildCode,
           isPublic: false, // Cloned builds start as private
         }),
@@ -666,7 +638,7 @@ const SaveBuild: React.FC = () => {
             }}
             placeholder="Build name"
             disabled={loading}
-            maxLength={42}
+            maxLength={30}
           />
           {!isOwner && (
             <Button
@@ -697,23 +669,6 @@ const SaveBuild: React.FC = () => {
               </Button>
             </>
           )}
-        </div>
-        <div>
-          <Input
-            className="text-base bg-black/50 px-4 py-2 rounded-md border text-gray-400 w-full resize-none"
-            value={description}
-            onChange={(e) => {
-              // Filter out non-English alphabet characters
-              const filteredValue = filterEnglishAlphabet(e.target.value);
-              setDescription(filteredValue);
-            }}
-            placeholder="Build description (optional)"
-            disabled={loading}
-            maxLength={50}
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            {description.length}/50 characters
-          </p>
         </div>
       </div>
 

@@ -71,6 +71,7 @@ if (!resendApiKey) {
   logger.warn("RESEND_API_KEY is not set. Email verification will not work.");
 }
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
+const emailVerificationConfigured = !!resend;
 
 export const auth = betterAuth({
   database: pool,
@@ -86,10 +87,10 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: true,
+    requireEmailVerification: emailVerificationConfigured,
     sendResetPassword: async ({ user, url }) => {
       if (!resend) {
-        const errorMsg = "Resend API key is not configured. Please set RESEND_API_KEY in your .env file.";
+        const errorMsg = "Resend API key is not configured. Password reset email cannot be sent.";
         logger.error(errorMsg);
         throw new Error(errorMsg);
       }
@@ -160,9 +161,9 @@ export const auth = betterAuth({
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
       if (!resend) {
-        const errorMsg = "Resend API key is not configured. Please set RESEND_API_KEY in your .env file.";
-        logger.error(errorMsg);
-        throw new Error(errorMsg);
+        const errorMsg = "Resend API key is not configured. Skipping verification email send.";
+        logger.warn(errorMsg);
+        return;
       }
 
       const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
@@ -211,8 +212,8 @@ export const auth = betterAuth({
         throw error;
       }
     },
-    sendOnSignUp: true,
-    sendOnSignIn: true,
+    sendOnSignUp: emailVerificationConfigured,
+    sendOnSignIn: emailVerificationConfigured,
     autoSignInAfterVerification: true,
   },
   trustedOrigins: [
@@ -240,7 +241,6 @@ export const auth = betterAuth({
               name: user.name || null,
               image: user.image || null,
               emailVerified: user.emailVerified ? new Date() : null,
-              password: null,
             },
           });
           logger.auth("User synced successfully", { email: user.email });

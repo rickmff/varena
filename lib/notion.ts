@@ -124,7 +124,7 @@ export async function getNotionPages(id: string): Promise<PageDetails[]> {
         let iconUrl: string | null = null;
 
         if (pageDetails.icon && pageDetails.icon.type === "file") {
-          iconUrl = pageDetails.icon.file?.url ?? null;
+          iconUrl = optimizeNotionImageUrl(pageDetails.icon.file?.url ?? null);
         }
 
         // Get the publicUrl from the page details
@@ -160,17 +160,58 @@ let newsCache: {
 const CACHE_DURATION = 3600000; // 1 hour in milliseconds
 const MAX_ITEMS = 3; // Maximum number of items to fetch for homepage
 
-// Helper function to optimize Notion image URLs
+// Allowed Notion hostnames
+const NOTION_HOSTNAMES = [
+  'prod-files-secure.s3.us-west-2.amazonaws.com',
+  's3.us-west-2.amazonaws.com',
+  'notion.so',
+  'www.notion.so'
+];
+
+/**
+ * Create a stable hash from a URL pathname for caching purposes
+ * This creates a consistent identifier regardless of changing query parameters
+ */
+function createStableImageId(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    // Use pathname only - this is stable and doesn't include expiring tokens
+    const stablePart = urlObj.pathname;
+
+    // Create a simple hash for shorter URLs
+    let hash = 0;
+    for (let i = 0; i < stablePart.length; i++) {
+      const char = stablePart.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+
+    // Return absolute value as hex string
+    return Math.abs(hash).toString(16);
+  } catch {
+    // Fallback: use base64 of full URL
+    return Buffer.from(url).toString('base64url').slice(0, 32);
+  }
+}
+
+/**
+ * Helper function to optimize Notion image URLs
+ * Creates stable proxy URLs that can be cached by CDN
+ */
 function optimizeNotionImageUrl(url: string | null): string | null {
   if (!url) return null;
 
   try {
     const urlObj = new URL(url);
 
-    // Check if it's a Notion URL
-    if (urlObj.hostname === 'prod-files-secure.s3.us-west-2.amazonaws.com') {
-      // Use our proxy endpoint
-      return `/api/image?url=${encodeURIComponent(url)}`;
+    // Check if it's a Notion URL (various domains)
+    if (NOTION_HOSTNAMES.some(hostname => urlObj.hostname === hostname || urlObj.hostname.endsWith('.' + hostname))) {
+      // Create a stable ID from the URL pathname (excludes changing tokens)
+      const stableId = createStableImageId(url);
+
+      // Use stable ID in the URL for better CDN caching
+      // The full URL is still passed for fetching, but the stable ID helps with cache keys
+      return `/api/image?id=${stableId}&url=${encodeURIComponent(url)}`;
     }
 
     return url;
@@ -385,16 +426,16 @@ export async function getNewsPostContent(pageId: string): Promise<NewsPost | nul
       if (pageDetails.icon.type === "emoji" && pageDetails.icon.emoji) {
         icon = pageDetails.icon.emoji;
       } else if (pageDetails.icon.type === "file" && pageDetails.icon.file) {
-        iconUrl = pageDetails.icon.file.url;
+        iconUrl = optimizeNotionImageUrl(pageDetails.icon.file.url);
       }
     }
 
     // Get cover image from the page details
     if (pageDetails.cover) {
       if (pageDetails.cover.type === "file" && pageDetails.cover.file) {
-        coverImageUrl = pageDetails.cover.file.url;
+        coverImageUrl = optimizeNotionImageUrl(pageDetails.cover.file.url);
       } else if (pageDetails.cover.type === "external" && pageDetails.cover.external) {
-        coverImageUrl = pageDetails.cover.external.url;
+        coverImageUrl = optimizeNotionImageUrl(pageDetails.cover.external.url);
       }
     }
 
@@ -434,10 +475,32 @@ async function getBlocksContent(blockId: string): Promise<NewsBlock[]> {
     for (const block of blocks.results) {
       const blockObj = block as BlockObjectResponse;
 
+      const blockContent = (blockObj as any)[blockObj.type];
+
+      // Optimize image URLs in blocks
+      if (blockObj.type === 'image' && blockContent) {
+        if (blockContent.file?.url) {
+          blockContent.file.url = optimizeNotionImageUrl(blockContent.file.url) || blockContent.file.url;
+        }
+        if (blockContent.external?.url) {
+          blockContent.external.url = optimizeNotionImageUrl(blockContent.external.url) || blockContent.external.url;
+        }
+      }
+
+      // Optimize video URLs in blocks
+      if (blockObj.type === 'video' && blockContent) {
+        if (blockContent.file?.url) {
+          blockContent.file.url = optimizeNotionImageUrl(blockContent.file.url) || blockContent.file.url;
+        }
+        if (blockContent.external?.url) {
+          blockContent.external.url = optimizeNotionImageUrl(blockContent.external.url) || blockContent.external.url;
+        }
+      }
+
       const newsBlock: NewsBlock = {
         id: blockObj.id,
         type: blockObj.type,
-        content: (blockObj as any)[blockObj.type],
+        content: blockContent,
       };
 
       // If block has children, recursively get them

@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import { authClient } from "@/lib/better-auth/client";
 import { migrateLocalBuilds } from "@/lib/migrate-local-builds";
+import { migrateLocalTierLists } from "@/lib/migrate-local-tier-lists";
 
 interface AuthContextType {
   user: any;
@@ -152,14 +153,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     migrationAttemptedRef.current = true;
 
     // Run migration asynchronously without blocking
-    migrateLocalBuilds()
-      .then((result) => {
-        if (result.migrated > 0) {
-          console.log(`[Session Provider] Migrated ${result.migrated} build(s) from localStorage`);
+    Promise.all([
+      migrateLocalBuilds(),
+      migrateLocalTierLists(),
+    ])
+      .then(([buildsResult, tierListsResult]) => {
+        if (buildsResult.migrated > 0) {
+          console.log(`[Session Provider] Migrated ${buildsResult.migrated} build(s) from localStorage`);
+        }
+        if (tierListsResult.migrated > 0) {
+          console.log(`[Session Provider] Migrated ${tierListsResult.migrated} tier list(s) from localStorage`);
         }
       })
       .catch((error) => {
-        console.error("[Session Provider] Error during build migration:", error);
+        console.error("[Session Provider] Error during migration:", error);
         // Reset flag on error so it can retry on next session establishment
         migrationAttemptedRef.current = false;
       });

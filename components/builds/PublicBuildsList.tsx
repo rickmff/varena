@@ -25,12 +25,15 @@ import "@/components/vbuilds/styles.css";
 import { VoteButtons } from "./VoteButtons";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { AuthorBadge } from "@/components/AuthorBadge";
+import { useUserBadges } from "@/hooks/use-author-badges";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 type Build = {
   id?: string;
   name: string;
   code: string;
-  description?: string;
   author?: string;
   userId?: string | null;
   isPublic?: boolean;
@@ -87,12 +90,12 @@ const SpellSchoolsGrid = ({
   };
 
   return (
-    <div className="grid grid-cols-3 gap-2 p-2 bg-black/80 backdrop-blur-sm">
+    <div className="grid grid-cols-3 gap-2 p-2">
       {spellSchools.map((school) => (
         <DropdownMenuItem
           key={school}
           onSelect={(e) => handleSchoolClick(e, school)}
-          className="h-20 flex items-center justify-center cursor-pointer hover:bg-purple-900/30 focus:bg-purple-900/30 p-0 overflow-hidden relative"
+          className="h-20 flex items-center justify-center cursor-pointer bg-zinc-900 border-2 border-zinc-700 hover:border-red-500 focus:border-red-500 rounded-md transition-all duration-100 p-0 overflow-hidden relative"
         >
           <img
             src={`/images/vbuilds/spellschools/${school}.webp`}
@@ -157,7 +160,7 @@ const SpellsList = ({
             <DropdownMenuItem
               key={spell.id}
               onSelect={(e) => handleSpellSelect(e, spell.id)}
-              className={`h-20 flex items-center justify-center cursor-pointer hover:bg-purple-900/30 focus:bg-purple-900/30 p-0 overflow-hidden relative ${selectedSpellId === spell.id ? "bg-purple-900/20" : ""
+              className={`h-20 flex items-center justify-center cursor-pointer bg-zinc-900 border-2 hover:border-red-500 focus:border-red-500 rounded-md transition-all duration-100 p-0 overflow-hidden relative ${selectedSpellId === spell.id ? "border-red-500" : "border-zinc-700"
                 }`}
             >
               <img
@@ -186,7 +189,7 @@ const SpellDropdownSelect = ({
   onChange: (spellId: string) => void;
   onClear: () => void;
   excludeSpellId?: string | null;
-  placeholder: string;
+  placeholder: React.ReactNode;
   slotNumber: number;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -230,29 +233,26 @@ const SpellDropdownSelect = ({
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className={`w-full h-20 justify-between bg-black/50 border-white/10 text-white hover:border-purple-900/50 ${value ? "border-purple-900/50 bg-purple-900/10" : ""
+            className={`w-20 h-20 p-0 justify-center bg-zinc-900 border-2 border-zinc-700 text-gray-200 hover:border-red-500 transition-all duration-100 ${value ? "border-red-500" : ""
               }`}
+            style={{ backgroundColor: 'rgb(24 24 27)' }}
           >
             {selectedSpell ? (
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <img
-                  src={selectedSpell.img}
-                  alt={selectedSpell.name}
-                  className="w-10 h-10 rounded flex-shrink-0"
-                />
-                <span className="text-sm truncate">{selectedSpell.name}</span>
-              </div>
+              <img
+                src={selectedSpell.img}
+                alt={selectedSpell.name}
+                className="w-full h-full object-cover rounded-sm pointer-events-none"
+              />
             ) : (
-              <span className="text-gray-400">{placeholder}</span>
+              placeholder
             )}
-            {!value && <ChevronDown className="w-4 h-4 ml-2 flex-shrink-0" />}
           </Button>
         </DropdownMenuTrigger>
         {value && (
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-purple-900/30 z-20"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-red-900/30 z-20"
             aria-label="Clear selection"
           >
             <X className="w-4 h-4" />
@@ -279,13 +279,63 @@ const SpellDropdownSelect = ({
   );
 };
 
+// Author Suggestions Dropdown Component with Badges
+const AuthorSuggestionsDropdown = ({
+  suggestions,
+  authorToUserIdMap,
+  onSelect,
+}: {
+  suggestions: string[];
+  authorToUserIdMap: Map<string, string | null>;
+  onSelect: (author: string) => void;
+}) => {
+  // Get all userIds from the suggestions
+  const userIds = suggestions
+    .map((author) => authorToUserIdMap.get(author))
+    .filter((id): id is string => id !== null && id !== undefined);
+
+  // Fetch badges for all users
+  const { badges } = useUserBadges(userIds);
+
+  return (
+    <div className="absolute z-10 w-full top-full mt-1 bg-black/95 border border-red-900/30 rounded-md shadow-lg max-h-48 overflow-y-auto">
+      {suggestions.map((author) => {
+        const userId = authorToUserIdMap.get(author);
+        const badge = userId ? badges[userId] : null;
+
+        return (
+          <button
+            key={author}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              onSelect(author);
+            }}
+            className="w-full px-4 py-2 text-left text-white hover:bg-red-900/50 flex items-center gap-2 transition-colors"
+          >
+            <User className="w-3 h-3 text-gray-400 flex-shrink-0" />
+            <span className="flex items-center gap-1.5 flex-1 min-w-0">
+              <span className="truncate">{author}</span>
+              {badge && (
+                <AuthorBadge
+                  badgeType={badge.badgeType}
+                  description={badge.description}
+                />
+              )}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
 export default function PublicBuildsList() {
   const [builds, setBuilds] = useState<DecodedBuild[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState<"popular" | "newest" | "oldest">("popular");
   const fetchingRef = useRef(false);
-  const { isAdmin } = useAuth();
+  const { isAdmin, isAuthenticated, user } = useAuth();
 
   // Filter states
   const [armourFilter, setArmourFilter] = useState<string | null>(null);
@@ -298,6 +348,7 @@ export default function PublicBuildsList() {
   const [authorFilter, setAuthorFilter] = useState<string>("");
   const [authorSuggestions, setAuthorSuggestions] = useState<string[]>([]);
   const [showAuthorDropdown, setShowAuthorDropdown] = useState(false);
+  const [authorToUserIdMap, setAuthorToUserIdMap] = useState<Map<string, string | null>>(new Map());
 
   const fetchBuilds = async () => {
     // Prevent duplicate fetches
@@ -320,7 +371,6 @@ export default function PublicBuildsList() {
         id: build.id,
         name: build.name,
         code: build.code,
-        description: build.description || "",
         author: build.author,
         userId: build.userId || null,
         isPublic: build.isPublic || false,
@@ -332,11 +382,20 @@ export default function PublicBuildsList() {
 
       setBuilds(buildsArray);
 
-      // Extract unique authors for dropdown
+      // Extract unique authors for dropdown and create author -> userId mapping
       const authors = Array.from(
         new Set(buildsArray.map((b) => b.author).filter(Boolean))
       ) as string[];
       setAuthorSuggestions(authors.sort());
+
+      // Create mapping of author name to userId (take first userId found for each author)
+      const authorMap = new Map<string, string | null>();
+      buildsArray.forEach((build) => {
+        if (build.author && !authorMap.has(build.author)) {
+          authorMap.set(build.author, build.userId || null);
+        }
+      });
+      setAuthorToUserIdMap(authorMap);
     } catch (error) {
       console.error("Failed to load public builds:", error);
       setBuilds([]);
@@ -470,6 +529,81 @@ export default function PublicBuildsList() {
     setAuthorFilter("");
   };
 
+  // Clone handler
+  const handleClone = async (event: React.MouseEvent, buildId: string, code: string, name: string) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    // If user is not authenticated, clone to localStorage
+    if (!isAuthenticated) {
+      try {
+        if (typeof window !== "undefined") {
+          const clonedName = `${name} (Copy)`;
+          const localBuildsData = localStorage.getItem("vbuilds");
+          const existingBuilds = localBuildsData ? JSON.parse(localBuildsData) : [];
+
+          // Add cloned build to localStorage
+          existingBuilds.push({
+            name: clonedName,
+            code: code,
+          });
+
+          localStorage.setItem("vbuilds", JSON.stringify(existingBuilds));
+          toast.success("Build cloned to local storage!");
+        }
+      } catch (error) {
+        console.error("Error cloning build to localStorage:", error);
+        toast.error("Failed to clone build");
+      }
+      return;
+    }
+
+    // If authenticated, clone via API
+    if (!buildId) {
+      toast.error("Build ID not found");
+      return;
+    }
+
+    try {
+      // Generate a cloned name
+      const clonedName = `${name} (Copy)`;
+
+      const response = await fetch("/api/builds", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: clonedName,
+          code: code,
+          isPublic: false, // Cloned builds start as private
+        }),
+      });
+
+      if (response.status === 401) {
+        toast.error("Please sign in to clone builds");
+        return;
+      }
+
+      if (!response.ok) {
+        const error = await response.json();
+        const errorMessage = error.error || "Failed to clone build";
+        toast.error(errorMessage);
+        return;
+      }
+
+      toast.success("Build cloned successfully! Redirecting to your builds...");
+
+      // Redirect to builds page after a short delay
+      setTimeout(() => {
+        window.location.href = "/builds";
+      }, 1000);
+    } catch (error) {
+      console.error("Error cloning build:", error);
+      toast.error("Failed to clone build");
+    }
+  };
+
   // Admin delete handler
   const handleAdminDelete = async (event: React.MouseEvent, buildId: string) => {
     event.preventDefault();
@@ -511,6 +645,15 @@ export default function PublicBuildsList() {
     primaryBloodFilter ||
     secondaryBloodFilter ||
     authorFilter;
+
+  // Collect user IDs for batch fetching badges for the visible builds
+  const userIds = Array.from(new Set(filteredBuilds
+    .map((build) => build.userId)
+    .filter((id): id is string => Boolean(id))));
+
+  // Fetch badges for visible builds
+  // We alias the result to avoid conflict with badges from AuthorSuggestionsDropdown if any (actually AuthorSuggestionsDropdown has its own scope so it is fine, but wait, AuthorSuggestionsDropdown is a separate component in this file, so no conflict variable name wise)
+  const { badges: buildBadges } = useUserBadges(userIds);
 
   const scaleIn = {
     hidden: { opacity: 0, scale: 0.9 },
@@ -602,10 +745,10 @@ export default function PublicBuildsList() {
 
 
         {/* Spell Slot 1 Filter */}
-        <div className="flex-1 p-3">
+        <div className="p-3">
           <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="w-3 h-3 text-purple-400" />
-            <label className="text-xs font-semibold text-purple-400">Spell 1</label>
+            <Sparkles className="w-3 h-3 text-red-400" />
+            <label className="text-xs font-semibold text-red-400">Spell 1</label>
           </div>
           <SpellDropdownSelect
             value={spellSlot1Spell}
@@ -621,16 +764,21 @@ export default function PublicBuildsList() {
               setSpellSlot1School(null);
             }}
             excludeSpellId={spellSlot2Spell}
-            placeholder="Select Spell 1"
+            placeholder={
+              <DropdownSelectPlaceholder
+                image="/images/vbuilds/spells/spell-blood-blood_rage.webp"
+                text="Spell 1"
+              />
+            }
             slotNumber={1}
           />
         </div>
 
         {/* Spell Slot 2 Filter */}
-        <div className="flex-1 p-3">
+        <div className="p-3">
           <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="w-3 h-3 text-purple-400" />
-            <label className="text-xs font-semibold text-purple-400">Spell 2</label>
+            <Sparkles className="w-3 h-3 text-red-400" />
+            <label className="text-xs font-semibold text-red-400">Spell 2</label>
           </div>
           <SpellDropdownSelect
             value={spellSlot2Spell}
@@ -646,7 +794,12 @@ export default function PublicBuildsList() {
               setSpellSlot2School(null);
             }}
             excludeSpellId={spellSlot1Spell}
-            placeholder="Select Spell 2"
+            placeholder={
+              <DropdownSelectPlaceholder
+                image="/images/vbuilds/spells/spell-blood-blood_rite.webp"
+                text="Spell 2"
+              />
+            }
             slotNumber={2}
           />
         </div>
@@ -674,8 +827,9 @@ export default function PublicBuildsList() {
               onBlur={() => {
                 setTimeout(() => setShowAuthorDropdown(false), 200);
               }}
-              className={`bg-black/50 h-20 border-white/10 text-white placeholder:text-gray-500 hover:border-red-900/50 focus:border-red-900/50 ${authorFilter ? "border-red-900/50 bg-red-900/10" : ""
+              className={`h-20 bg-zinc-900 border-2 border-zinc-700 text-gray-200 placeholder:text-gray-400 hover:border-red-500 focus:border-red-500 rounded-md transition-all duration-100 ${authorFilter ? "border-red-500" : ""
                 }`}
+              style={{ backgroundColor: 'rgb(24 24 27)' }}
             />
             {authorFilter && (
               <Button
@@ -688,28 +842,16 @@ export default function PublicBuildsList() {
               </Button>
             )}
             {showAuthorDropdown && authorSuggestions.length > 0 && (
-              <div className="absolute z-10 w-full top-full mt-1 bg-black/95 border border-red-900/30 rounded-md shadow-lg max-h-48 overflow-y-auto">
-                {authorSuggestions
-                  .filter((author) =>
-                    author
-                      .toLowerCase()
-                      .includes(authorFilter.toLowerCase())
-                  )
-                  .map((author) => (
-                    <button
-                      key={author}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        setAuthorFilter(author);
-                        setShowAuthorDropdown(false);
-                      }}
-                      className="w-full px-4 py-2 text-left text-white hover:bg-red-900/50 flex items-center gap-2 transition-colors"
-                    >
-                      <User className="w-3 h-3 text-gray-400" />
-                      {author}
-                    </button>
-                  ))}
-              </div>
+              <AuthorSuggestionsDropdown
+                suggestions={authorSuggestions.filter((author) =>
+                  author.toLowerCase().includes(authorFilter.toLowerCase())
+                )}
+                authorToUserIdMap={authorToUserIdMap}
+                onSelect={(author) => {
+                  setAuthorFilter(author);
+                  setShowAuthorDropdown(false);
+                }}
+              />
             )}
           </div>
         </div>
@@ -782,8 +924,77 @@ export default function PublicBuildsList() {
       {/* Builds Grid */}
       {
         loading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="text-gray-400">Loading public builds...</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Array.from({ length: 11 }).map((_, index) => (
+              <Card key={index} className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-zinc-800/50 h-full flex flex-col">
+                <CardHeader className="relative">
+                  <Skeleton className="h-6 w-3/4 mb-2" />
+                  <Skeleton className="h-4 w-1/2" />
+                </CardHeader>
+                <CardContent className="relative space-y-6">
+                  {/* Top Row - Armor, Buffs, Blood */}
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Skeleton className="h-3 w-16" />
+                      <div className="flex gap-1">
+                        <Skeleton className="w-8 h-8 rounded" />
+                        <Skeleton className="w-8 h-8 rounded" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-3 w-12" />
+                      <div className="flex gap-1">
+                        <Skeleton className="w-8 h-8 rounded" />
+                        <Skeleton className="w-8 h-8 rounded" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-3 w-12" />
+                      <div className="flex gap-1">
+                        <Skeleton className="w-8 h-8 rounded" />
+                        <Skeleton className="w-8 h-8 rounded" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Middle Row - Spells and Passives */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Skeleton className="h-3 w-16" />
+                      <div className="flex gap-1">
+                        <Skeleton className="w-8 h-8 rounded" />
+                        <Skeleton className="w-8 h-8 rounded" />
+                        <Skeleton className="w-8 h-8 rounded" />
+                        <Skeleton className="w-8 h-8 rounded" />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-3 w-20" />
+                      <div className="flex gap-1 flex-wrap">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Skeleton key={i} className="w-8 h-8 rounded" />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom Row - Weapons */}
+                  <div className="space-y-2">
+                    <Skeleton className="h-3 w-20" />
+                    <div className="flex gap-1 flex-wrap">
+                      {Array.from({ length: 8 }).map((_, i) => (
+                        <Skeleton key={i} className="w-8 h-8 rounded" />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Arena Code */}
+                  <div className="mt-4">
+                    <Skeleton className="h-8 w-full" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         ) : filteredBuilds.length === 0 ? (
           <div className="flex flex-col justify-center items-center py-20">
@@ -816,9 +1027,9 @@ export default function PublicBuildsList() {
                   <BuildContent
                     code={build.code}
                     name={build.name}
-                    description={build.description}
                     author={build.author}
                     userId={build.userId}
+                    userBadge={build.userId ? buildBadges[build.userId] : null}
                     isPublic={build.isPublic}
                     showPublicToggle={false}
                     upvotes={build.upvotes}
@@ -841,6 +1052,8 @@ export default function PublicBuildsList() {
                         : undefined
                     }
                     buildLink={`/builds/create?build=${encodeURIComponent(build.code)}`}
+                    onClone={handleClone}
+                    currentUserId={user?.id || null}
                   />
                 </Link>
               </motion.div>

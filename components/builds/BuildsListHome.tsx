@@ -16,7 +16,6 @@ import { BuildContent } from "./BuildsList";
 import { useAuth } from "@/hooks/use-auth";
 
 type Build = {
-  description: string | undefined;
   id?: string;
   name: string;
   code: string;
@@ -102,7 +101,6 @@ export default function BuildsListHome({
                     id: `local-${index}-${build.name}`, // Generate temporary ID
                     name: build.name || `Build ${index + 1}`,
                     code: build.code || "",
-                    description: build.description || "",
                     isPublic: false, // LocalStorage builds are always private
                   }));
                   setBuilds(buildsArray);
@@ -149,14 +147,12 @@ export default function BuildsListHome({
             id: build.id,
             name: build.name,
             code: build.code,
-            description: build.description || "",
             isPublic: build.isPublic || false,
           }))
           : (data.builds || []).map((build: any) => ({
             id: build.id,
             name: build.name,
             code: build.code,
-            description: build.description || "",
             isPublic: build.isPublic || false,
           }));
 
@@ -208,7 +204,6 @@ export default function BuildsListHome({
                       id: `local-${idx}-${build.name}`,
                       name: build.name || `Build ${idx + 1}`,
                       code: build.code || "",
-                      description: build.description || "",
                       isPublic: false,
                     }));
                     setBuilds(buildsArray);
@@ -317,7 +312,7 @@ export default function BuildsListHome({
           <div className="flex items-center gap-3 mb-6">
             <div className="w-1 h-6 bg-gradient-to-b from-red-400 to-red-600 rounded-full" />
             <h3 className="text-xl font-bold text-grey-100 tracking-wide">
-              MAKE YOUR OWN
+              MY BUILDS
             </h3>
             <div className="flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
           </div>
@@ -361,7 +356,6 @@ export default function BuildsListHome({
                 <BuildContent
                   code={build.code}
                   name={build.name}
-                  description={build.description}
                   handleDeleteBuild={(event: React.MouseEvent) =>
                     handleDelete(event, build.id || "", index)
                   }

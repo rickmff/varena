@@ -6,11 +6,11 @@ import { logger } from "@/lib/logger";
 
 interface RouteParams {
   params: Promise<{
-    userId: string;
+    authorName: string;
   }>;
 }
 
-// DELETE /api/admin/badges/[userId] - Remove a badge from a user
+// DELETE /api/admin/badges/[authorName] - Remove a badge from a user
 export async function DELETE(request: Request, { params }: RouteParams) {
   try {
     const session = await getServerSession();
@@ -29,7 +29,7 @@ export async function DELETE(request: Request, { params }: RouteParams) {
       );
     }
 
-    const { userId } = await params;
+    const { authorName: userId } = await params;
 
     const badge = await prisma.userBadge.findUnique({
       where: { userId },

@@ -14,6 +14,16 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get("limit") || "50");
     const skip = (page - 1) * limit;
 
+    // Get session if user is authenticated (optional)
+    let session: any = null;
+    try {
+      session = await getServerSession();
+    } catch (error) {
+      // Session fetch failed, continue without session
+    }
+    const userId = session?.user?.id;
+
+
     // Cache key based on sort and author filter
     const cacheKey = `public-builds-${sortBy}-${authorFilter || "all"}`;
 
@@ -44,7 +54,6 @@ export async function GET(request: Request) {
             select: {
               id: true,
               name: true,
-              description: true,
               code: true,
               author: true,
               isPublic: true,
@@ -76,7 +85,6 @@ export async function GET(request: Request) {
               select: {
                 id: true,
                 name: true,
-                description: true,
                 code: true,
                 author: true,
                 isPublic: true,

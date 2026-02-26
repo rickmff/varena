@@ -27,10 +27,13 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get("limit") || "100");
     const offset = parseInt(searchParams.get("offset") || "0");
 
-    const recentSessions = await prisma.session.findMany({
+    // Get recent sessions (logins)
+    const recentSessions = await prisma.authSession.findMany({
       take: limit,
       skip: offset,
-      orderBy: { expires: "desc" },
+      orderBy: {
+        expiresAt: "desc",
+      },
       include: {
         user: {
           select: {
@@ -108,7 +111,7 @@ export async function GET(request: Request) {
         userName: session.user?.name || null,
         userEmail: session.user?.email || null,
         details: "User logged in",
-        timestamp: session.expires,
+        timestamp: session.expiresAt,
         metadata: { sessionId: session.id },
       })),
       ...recentBadges.map((badge) => ({

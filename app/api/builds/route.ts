@@ -84,7 +84,16 @@ function isBuildComplete(code: string): boolean {
 // Create a new build
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession();
+    let session: any = null;
+    try {
+      session = await getServerSession();
+    } catch (error) {
+      console.error("[Builds API] Session error:", error);
+      return NextResponse.json(
+        { error: "Failed to get session" },
+        { status: 401 }
+      );
+    }
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -93,7 +102,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, description, code, author, authorTwitchUrl, authorYoutubeUrl, isPublic } = await request.json();
+    const { name, code, author, authorTwitchUrl, authorYoutubeUrl, isPublic } = await request.json();
 
     // Only name and code are required
     if (!name || !code) {
@@ -107,14 +116,6 @@ export async function POST(request: Request) {
     if (!isValidEnglishAlphabet(name.trim())) {
       return NextResponse.json(
         { error: "Build name can only contain English alphabet characters, numbers, and spaces" },
-        { status: 400 }
-      );
-    }
-
-    // Validate description contains only English alphabet characters if provided
-    if (description && description.trim() && !isValidEnglishAlphabet(description.trim())) {
-      return NextResponse.json(
-        { error: "Build description can only contain English alphabet characters, numbers, and spaces" },
         { status: 400 }
       );
     }
@@ -142,12 +143,12 @@ export async function POST(request: Request) {
       });
 
       // Migrate accounts and sessions if they exist
-      await prisma.account.updateMany({
+      await prisma.authAccount.updateMany({
         where: { userId: user.id },
         data: { userId: session.user.id },
       });
 
-      await prisma.session.updateMany({
+      await prisma.authSession.updateMany({
         where: { userId: user.id },
         data: { userId: session.user.id },
       });
@@ -194,7 +195,6 @@ export async function POST(request: Request) {
 
     // Derive author from session user if not provided
     const buildAuthor = author || session.user.name || session.user.email || "Anonymous";
-    const buildDescription = description || "";
 
     // Check if a build with the same name already exists for this user
     const existingBuild = await prisma.build.findFirst({
@@ -207,6 +207,20 @@ export async function POST(request: Request) {
     if (existingBuild) {
       return NextResponse.json(
         { error: "A build with this name already exists" },
+        { status: 400 }
+      );
+    }
+
+    // Check total build limit (33 per user)
+    const totalBuildCount = await prisma.build.count({
+      where: {
+        userId: userIdToUse,
+      },
+    });
+
+    if (totalBuildCount >= 33) {
+      return NextResponse.json(
+        { error: "You can only have 33 builds. Please delete a build first." },
         { status: 400 }
       );
     }
@@ -247,7 +261,6 @@ export async function POST(request: Request) {
     const build = await prisma.build.create({
       data: {
         name,
-        description: buildDescription,
         code,
         author: buildAuthor,
         authorTwitchUrl: authorTwitchUrl || null,
@@ -259,6 +272,7 @@ export async function POST(request: Request) {
 
     // Invalidate cache for this user's builds
     revalidateTag(`builds-${userIdToUse}`);
+    revalidateTag(`builds-count-${userIdToUse}`);
 
     // Invalidate public builds cache if the new build is public
     if (isPublic === true) {
@@ -280,7 +294,14 @@ export async function POST(request: Request) {
 // List user builds
 export async function GET(request: Request) {
   try {
-    const session = await getServerSession();
+    // Get current user session if available
+    let session: any = null;
+    try {
+      session = await getServerSession();
+    } catch (error) {
+      // Session fetch failed, continue without session
+    }
+
     const { searchParams } = new URL(request.url);
     const code = searchParams.get("code");
 
@@ -299,7 +320,6 @@ export async function GET(request: Request) {
           select: {
             id: true,
             name: true,
-            description: true,
             code: true,
             isPublic: true,
             userId: true,
@@ -328,7 +348,6 @@ export async function GET(request: Request) {
           select: {
             id: true,
             name: true,
-            description: true,
             code: true,
             isPublic: true,
             userId: true,
@@ -359,13 +378,28 @@ export async function GET(request: Request) {
     }
 
     const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "100"); // Default 100, max reasonable for user builds
+    const limit = parseInt(searchParams.get("limit") || "11"); // Default 11 builds per page for better performance
     const skip = (page - 1) * limit;
 
-    // Cache builds for 5 minutes (300 seconds), keyed by user ID
-    // Reduced from 1 week to improve freshness while still benefiting from cache
-    const getCachedBuilds = unstable_cache(
+    // Get total count for pagination (cached)
+    const getCachedTotalCount = unstable_cache(
       async (userId: string) => {
+        return await prisma.build.count({
+          where: {
+            userId,
+          },
+        });
+      },
+      [`builds-count-${session.user.id}`],
+      {
+        tags: [`builds-${session.user.id}`],
+        revalidate: 300, // 5 minutes in seconds
+      }
+    );
+
+    // Get paginated builds with database-level pagination for better performance
+    const getCachedBuilds = unstable_cache(
+      async (userId: string, pageLimit: number, pageSkip: number) => {
         return await prisma.build.findMany({
           where: {
             userId,
@@ -373,37 +407,39 @@ export async function GET(request: Request) {
           select: {
             id: true,
             name: true,
-            description: true,
             code: true,
             isPublic: true,
+            author: true,
+            userId: true,
             createdAt: true,
             updatedAt: true,
-            // Exclude fields not needed for list view: author, authorTwitchUrl, authorYoutubeUrl
+            // Exclude fields not needed for list view: authorTwitchUrl, authorYoutubeUrl
           },
           orderBy: {
             createdAt: "desc",
           },
+          take: pageLimit,
+          skip: pageSkip,
         });
       },
-      [`builds-${session.user.id}`],
+      [`builds-${session.user.id}-page-${page}`],
       {
         tags: [`builds-${session.user.id}`],
         revalidate: 300, // 5 minutes in seconds
       }
     );
 
-    const builds = await getCachedBuilds(session.user.id);
-
-    // Apply pagination in memory (since we're caching the full list)
-    // For better performance with large datasets, consider paginating at DB level
-    const paginatedBuilds = builds.slice(skip, skip + limit);
+    const [total, builds] = await Promise.all([
+      getCachedTotalCount(session.user.id),
+      getCachedBuilds(session.user.id, limit, skip),
+    ]);
 
     return NextResponse.json({
-      builds: paginatedBuilds,
-      total: builds.length,
+      builds,
+      total,
       page,
       limit,
-      totalPages: Math.ceil(builds.length / limit),
+      totalPages: Math.ceil(total / limit),
     });
   } catch (error: unknown) {
     logger.error("Error fetching builds", error);
