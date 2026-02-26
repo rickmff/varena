@@ -1,5 +1,4 @@
 import { setup, assign, sendParent, sendTo, log, raise } from 'xstate';
-import { toast } from 'sonner';
 
 export interface WeaponBuilderContext {
     weapon: Weapon | null; // ID of the selected weapon

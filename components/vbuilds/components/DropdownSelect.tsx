@@ -17,7 +17,7 @@ const string1 =
 const string2 =
   "border-red-900/50 bg-gradient-to-b to-red-900/20 from-transparent";
 const string3 =
-  "bg-zinc-900 border-2 border hover:border-purple-500 transition-all duration-100";
+  "bg-zinc-900/100 border-2 border-zinc-700 hover:border-purple-500 transition-all duration-100";
 
 const DropdownItem = ({
   option,
@@ -27,7 +27,7 @@ const DropdownItem = ({
   onClick: () => void;
 }) => (
   <DropdownMenuItem
-    className={`w-20 h-20 text-gray-200 rounded-md flex items-center justify-center ${string3}`}
+    className={`w-full md:w-20 h-20 text-gray-200 rounded-md flex items-center justify-center ${string3}`}
     onClick={onClick}
   >
     {option.label ? (
@@ -113,7 +113,8 @@ export const DropdownSelect: React.FC<{
         <HoverInfoCard isVisible={hoverIsVisible} description={hoverDescription}>
           <DropdownMenuTrigger
             onFocus={() => null}
-            className={`w-20 h-20 text-gray-200 rounded-md flex items-center justify-center ${string3}`}
+            className="w-20 h-20 text-gray-200 rounded-md flex items-center justify-center !bg-zinc-900 border-2 border-zinc-700 hover:border-purple-500 transition-all duration-100"
+            style={{ backgroundColor: 'rgb(24 24 27)' }}
           >
             {selected ? (
               <img
@@ -126,8 +127,8 @@ export const DropdownSelect: React.FC<{
             )}
           </DropdownMenuTrigger>
         </HoverInfoCard>
-        <DropdownMenuContent className="p-0 min-w-0 space-y-1 overflow-auto">
-          <div className="flex flex-wrap gap-2 p-2">
+        <DropdownMenuContent className="p-0 min-w-0 md:min-w-[8rem] w-full md:w-auto space-y-1 overflow-auto">
+          <div className="flex flex-col md:flex-row md:flex-wrap gap-2 p-2">
             {options
               .filter((option) => option.id !== selected)
               .map((option) => (

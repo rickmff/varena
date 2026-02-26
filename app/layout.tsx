@@ -1,10 +1,12 @@
 import type React from "react"
 import "@/app/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import { AuthProvider } from "@/components/providers/session-provider"
 import type { Metadata, Viewport } from "next"
 import { Toaster } from 'sonner'
 import { Inter, Junge } from 'next/font/google'
-import { Analytics } from "@vercel/analytics/next"
+import CookieConsentBanner from "@/components/gdpr/CookieConsentBanner"
+import AnalyticsWrapper from "@/components/gdpr/AnalyticsWrapper"
 
 const inter = Inter({ subsets: ['latin'] })
 const junge = Junge({
@@ -93,8 +95,11 @@ export default function RootLayout({
         className={`${inter.className} ${junge.variable} antialiased tracking-tight`}
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          {children}
-          <Analytics />
+          <AuthProvider>
+            {children}
+            <AnalyticsWrapper />
+            <CookieConsentBanner />
+          </AuthProvider>
         </ThemeProvider>
         <Toaster richColors />
       </body>

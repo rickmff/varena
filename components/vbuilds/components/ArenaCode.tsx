@@ -82,7 +82,7 @@ export const ArenaCodeOutsideBuilder: React.FC<{
           e.stopPropagation();
         }}
         readOnly
-        className="text-base bg-black/50 px-4 py-2 rounded-md border w-3/4 text-center text-gray-400"
+        className="text-base bg-black/50 px-4 py-2 rounded-md w-3/4 text-center text-gray-500"
         value={exportCommand}
       />
       <Button

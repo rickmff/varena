@@ -59,25 +59,50 @@ export const AdvancedCoatingsSwitch = () => {
 
   const result = hasAdvancedCoatings(chars);
 
-  const isDisabled = result.advanced && !result.value;
-
   return (
-    <div className="flex items-center gap-2">
+    <div
+      className="flex items-center gap-3 py-2.5 rounded-lg transition-all duration-300"
+    >
       <Switch
-        disabled={isDisabled}
-        className="data-[state=unchecked]:bg-zinc-800"
+        className="data-[state=unchecked]:bg-zinc-800 data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-orange-500 data-[state=checked]:to-orange-600 transition-all duration-300"
         checked={advancedCoatings}
-        onCheckedChange={() => {
+        onCheckedChange={(checked) => {
+          // If disabling advanced coatings (turning off), restore all coatings to slot 1 type
+          if (advancedCoatings && !checked) {
+            // Get coating from slot 1, or first available coating
+            const slot1Coating = coatings.get(1);
+            const coatingToApply = slot1Coating || coatingsArray[0];
+
+            if (coatingToApply) {
+              // Apply the coating to all slots
+              builder.send({ type: "ADD_ALL_COATINGS", coating: coatingToApply });
+            }
+          }
+
           builder.send({ type: "TOGGLE_ADVANCED_COATINGS" });
-          if (result.advanced && result.value) {
+
+          // If enabling advanced coatings and there's a single coating type, apply it to all
+          if (!advancedCoatings && checked && result.advanced && result.value) {
             const coating = coatingsArray.find(
               (c) => c.arenaCode === result.value
             );
-            builder.send({ type: "ADD_ALL_COATINGS", coating });
+            if (coating) {
+              builder.send({ type: "ADD_ALL_COATINGS", coating });
+            }
           }
         }}
       />
-      Advanced Coatings
+      <span
+        className={`
+          text-sm font-medium transition-all duration-300
+          ${advancedCoatings
+            ? "text-orange-400 font-semibold tracking-wide"
+            : "text-gray-400"
+          }
+        `}
+      >
+        Advanced Coatings
+      </span>
     </div>
   );
 };
