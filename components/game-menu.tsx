@@ -2,10 +2,9 @@
 
 import { motion, AnimatePresence } from "framer-motion"
 import Link from "next/link"
-import { X, LogIn } from "lucide-react"
+import { X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { menuItems } from "@/components/NavBar"
-import { useAuth } from "@/hooks/use-auth"
 
 interface GameMenuProps {
   isOpen: boolean
@@ -13,8 +12,6 @@ interface GameMenuProps {
 }
 
 export default function GameMenu({ isOpen, onClose }: GameMenuProps) {
-  const { isAuthenticated, isLoading } = useAuth();
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -82,46 +79,21 @@ export default function GameMenu({ isOpen, onClose }: GameMenuProps) {
               </nav>
 
               {/* Bottom Section */}
-              <div className="mt-auto space-y-3">
-                {!isLoading && !isAuthenticated && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    <Button
-                      asChild
-                      variant="outline"
-                      size="lg"
-                      className="w-full gap-4 relative overflow-hidden group border-2 border-purple-900
-                               bg-gradient-to-r from-purple-950/50 to-black hover:from-purple-900 hover:to-purple-950"
-                    >
-                      <Link href="/auth/signin" onClick={onClose}>
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-transparent
-                                    opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <LogIn className="relative z-10 h-5 w-5" />
-                        <span className="relative z-10 font-bold tracking-wider">SIGN IN</span>
-                      </Link>
-                    </Button>
-                  </motion.div>
-                )}
+              <div className="mt-auto">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                 >
                   <Button
-                    asChild
                     variant="outline"
                     size="lg"
                     className="w-full gap-4 relative overflow-hidden group border-2 border-purple-900
                              bg-gradient-to-r from-purple-950/50 to-black hover:from-purple-900 hover:to-purple-950"
                   >
-                    <Link href="https://discord.gg/varena" target="_blank" onClick={onClose}>
-                      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-transparent
-                                  opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <span className="relative z-10 font-bold tracking-wider">JOIN DISCORD</span>
-                    </Link>
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 to-transparent
+                                opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="relative z-10 font-bold tracking-wider">JOIN DISCORD</span>
                   </Button>
                 </motion.div>
               </div>

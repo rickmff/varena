@@ -4,33 +4,14 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { Button, type ButtonProps } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
 import GameMenu from "./game-menu";
-import { useAuth } from "@/hooks/use-auth";
-import { authClient } from "@/lib/better-auth/client";
-import { LogIn, User, LogOut, Hammer, Shield } from "lucide-react";
-import { toast } from "sonner";
-import { AuthorBadge } from "@/components/AuthorBadge";
-import { useUserBadges } from "@/hooks/use-author-badges";
 
 export const menuItems = [
   { name: "HOME", href: "/" },
+  { name: "FEATURES", href: "/#features" },
   { name: "BUILDS", href: "/builds" },
-  { name: "TIER LIST", href: "/tier-list" },
-  { name: "COMMANDS", href: "/commands" },
-  { name: "NEWS", href: "/news" },
-];
+  { name: "COMMANDS", href: "/commands" },];
 
 export const DiscordButton = ({
   size = "sm",
@@ -110,38 +91,9 @@ export const DiscordButton = ({
 export default function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
-  const router = useRouter();
-  const { isAuthenticated, isLoading, user, refetch, isAdmin } = useAuth();
-  const { badges } = useUserBadges(user?.id ? [user.id] : []);
-
-  const handleLogout = async () => {
-    try {
-      await authClient.signOut();
-      toast.success("Signed out successfully!");
-      refetch(); // Update session state
-      router.push("/");
-    } catch (error) {
-      console.error("Error logging out:", error);
-      toast.error("Error signing out");
-    }
-  };
-
-  const getUserInitials = (name?: string | null, email?: string | null) => {
-    if (name) {
-      const parts = name.trim().split(" ");
-      if (parts.length >= 2) {
-        return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
-      }
-      return name[0].toUpperCase();
-    }
-    if (email) {
-      return email[0].toUpperCase();
-    }
-    return "U";
-  };
 
   useEffect(() => {
-    let scrollContainer: HTMLElement | Window | null;
+    let scrollContainer: HTMLElement | Window;
 
     const element = document.getElementById("builder-page");
 
@@ -212,7 +164,7 @@ export default function NavBar() {
               />
             </motion.div>
           </Link>
-          <nav className="hidden md:flex items-center gap-6 relative z-50 ml-36">
+          <nav className="hidden md:flex items-center gap-6 relative z-50 ml-14">
             {menuItems.map(
               (item: { name: string; href: string }, i: number) => (
                 <motion.div
@@ -248,157 +200,31 @@ export default function NavBar() {
               )
             )}
           </nav>
-          <div className="flex items-center gap-3 relative z-50">
-            {isLoading ? (
-              <Skeleton className="h-10 w-10 rounded-full hidden md:block" />
-            ) : isAuthenticated && user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="hidden md:flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-[#5865F2] focus:ring-offset-2 focus:ring-offset-black"
-                  >
-                    <Avatar className="h-10 w-10 border-2 border-[#5865F2]/50 hover:border-[#4752C4] transition-colors">
-                      <AvatarImage src={user.image || undefined} alt={user.name || user.email || "User"} />
-                      <AvatarFallback className="bg-[#0f0a47] text-white font-semibold">
-                        {getUserInitials(user.name, user.email)}
-                      </AvatarFallback>
-                    </Avatar>
-                  </motion.button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-black border-[#5865F2]/30">
-                  <DropdownMenuLabel className="text-white">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium flex items-center gap-2">
-                        {user.id && badges[user.id] && (
-                          <AuthorBadge
-                            badgeType={badges[user.id].badgeType}
-                            description={badges[user.id].description}
-                          />
-                        )}
-                        {user.name || "User"}
-                      </p>
-                      <p className="text-xs text-gray-400">{user.email}</p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-[#5865F2]/30" />
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile" className="cursor-pointer text-white hover:bg-[#0f0a47]">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>My Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link href="/builds" className="cursor-pointer text-white hover:bg-[#0f0a47]">
-                      <Hammer className="mr-2 h-4 w-4" />
-                      <span>My Builds</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  {isAdmin && (
-                    <>
-                      <DropdownMenuSeparator className="bg-[#5865F2]/30" />
-                      <DropdownMenuItem asChild>
-                        <Link href="/capybara" className="cursor-pointer text-yellow-400 hover:bg-yellow-950/20">
-                          <Shield className="mr-2 h-4 w-4" />
-                          <span>Admin Dashboard</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                  <DropdownMenuSeparator className="bg-[#5865F2]/30" />
-                  <DropdownMenuItem
-                    onClick={handleLogout}
-                    className="cursor-pointer text-red-400 hover:bg-red-950/20 hover:text-red-300"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sign Out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <motion.div
-                animate={{
-                  scale: [1, 1.08, 1],
-                }}
-                transition={{
-                  duration: 1.0,
-                  repeat: Infinity,
-                  repeatDelay: 2.5,
-                  ease: [0.68, -0.55, 0.265, 1.55],
-                }}
-              >
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="hidden md:flex text-xs font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 relative overflow-hidden"
-                >
-                  <Link href="/auth/signin" className="flex items-center gap-2">
-                    <div className="flex items-center justify-center gap-2 relative z-10">
-                      <LogIn className="h-4 w-4" />
-                      <span>SIGN IN</span>
-                    </div>
-
-                    {/* Diagonal flash effect */}
-                    <motion.div
-                      className="absolute inset-0 pointer-events-none"
-                      initial={{ x: "100%" }}
-                      animate={{ x: "-100%" }}
-                      transition={{
-                        duration: 0.4,
-                        repeat: Infinity,
-                        repeatDelay: 2.5,
-                        ease: [0.76, 0, 0.24, 1],
-                      }}
-                    >
-                      <div className="absolute inset-0 w-8 h-full bg-gradient-to-r from-transparent via-white/25 to-transparent transform rotate-45 translate-x-4 -translate-y-2" />
-                    </motion.div>
-
-                    {/* Second diagonal flash following behind */}
-                    <motion.div
-                      className="absolute inset-0 pointer-events-none"
-                      initial={{ x: "100%" }}
-                      animate={{ x: "-100%" }}
-                      transition={{
-                        duration: 0.6,
-                        repeat: Infinity,
-                        repeatDelay: 2.2,
-                        ease: [0.87, 0, 0.13, 1],
-                        delay: 0.2,
-                      }}
-                    >
-                      <div className="absolute inset-0 w-6 h-full bg-gradient-to-r from-transparent via-blue-200/15 to-transparent transform rotate-45 translate-x-2 -translate-y-1" />
-                    </motion.div>
-                  </Link>
-                </Button>
-              </motion.div>
-            )}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative z-50"
+          >
             <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              initial={{
+                borderColor: "rgba(255, 255, 255, 0.3)",
+                backgroundColor: "rgba(127, 29, 29, 0)",
+              }}
+              animate={{
+                borderColor:
+                  scrollY > 50 ? "rgb(127 29 29)" : "rgba(255, 255, 255, 0.3)",
+                backgroundColor:
+                  scrollY > 50 ? "rgba(127, 29, 29, 0.1)" : "rgba(127, 29, 29, 0)",
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 100,
+                damping: 20,
+              }}
             >
-              <motion.div
-                initial={{
-                  borderColor: "rgba(255, 255, 255, 0.3)",
-                  backgroundColor: "rgba(127, 29, 29, 0)",
-                }}
-                animate={{
-                  borderColor:
-                    scrollY > 50 ? "rgb(127 29 29)" : "rgba(255, 255, 255, 0.3)",
-                  backgroundColor:
-                    scrollY > 50 ? "rgba(127, 29, 29, 0.1)" : "rgba(127, 29, 29, 0)",
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 100,
-                  damping: 20,
-                }}
-              >
-                <DiscordButton />
-              </motion.div>
+              <DiscordButton />
             </motion.div>
-          </div>
+          </motion.div>
           <Button
             variant="ghost"
             size="icon"

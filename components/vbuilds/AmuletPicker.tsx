@@ -35,7 +35,7 @@ const AmuletDescription = ({ amulet }: { amulet: Amulet }) => {
       <HoverCardTitle>{amulet.name}</HoverCardTitle>
       <div className="space-y-2 text-sm">
         {amulet.attributes.map((attr) => (
-          <HoverCardDescription key={`${attr.stat}-${attr.value}-${attr.unit}`}>
+          <HoverCardDescription>
             {`- ${attr.stat} by +${attr.value}${
               attr.unit === "percent" ? "%" : ""
             }`}

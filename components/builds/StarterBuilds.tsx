@@ -134,3 +134,67 @@ const premadeBuilds = [
     hoverGlow: "from-green-900/20",
   },
 ];
+
+export const StarterBuilds = () => {
+  return (
+    <motion.div
+      className="mb-12"
+      variants={premadeBuildsContainer}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+    >
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-1 h-6 bg-gradient-to-b from-red-400 to-red-600 rounded-full" />
+        <h3 className="text-xl font-bold text-grey-100 tracking-wide">
+          STARTER TEMPLATES
+        </h3>
+        <div className="flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
+      </div>
+
+      <div className="grid grid-cols-4 gap-4">
+        {premadeBuilds.map((build, index) => (
+          <motion.div
+            key={build.name}
+            variants={getPremadeBuildVariant(index)}
+            className="relative group cursor-pointer"
+          >
+            <Link
+              href={`/builds/create?build=${encodeURIComponent(build.code)}`}
+            >
+              <div
+                className={`relative aspect-video rounded-lg overflow-hidden border-2 ${build.baseBorder} ${build.hoverBorder} transition-all duration-300`}
+              >
+                {/* Background Image */}
+                <Image
+                  src={build.background}
+                  alt={build.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+
+                {/* Dark overlay */}
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300" />
+
+                {/* Text overlay */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-white font-bold text-sm md:text-base lg:text-lg font-junge tracking-widest drop-shadow-lg">
+                    {build.name}
+                  </span>
+                </div>
+
+                {/* Glow effect on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-r ${build.hoverGlow} to-transparent`}
+                  />
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+};

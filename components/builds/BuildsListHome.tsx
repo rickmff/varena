@@ -1,25 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { Plus, Swords } from "lucide-react";
+import { ClipboardCopyIcon, Plus, Swords, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { convertStringToBuild } from "../machines/converter";
+import bloodData from "@/data/vbuilds/bloodtypes.json";
+import { Button } from "@/components/ui/button";
+import { ArenaCodeOutsideBuilder } from "../vbuilds/components/ArenaCode";
+import epicWeaponData from "@/data/vbuilds/epic-weapons.json";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
   TooltipProvider,
 } from "@/components/ui/tooltip";
 import React from "react";
+import Image from "next/image";
 import "@/components/vbuilds/styles.css";
+import { StarterBuilds } from "./StarterBuilds";
 import { BuildContent } from "./BuildsList";
-import { useAuth } from "@/hooks/use-auth";
 
 type Build = {
-  id?: string;
   name: string;
   code: string;
-  isPublic?: boolean;
 };
 
 interface BuildsListProps {
@@ -45,6 +52,55 @@ const Img = ({
       className="w-6 h-6 grayscale brightness-50 pointer-events-none opacity-60"
     />
   );
+};
+
+function findMostFrequentSpellSchool(words: any[]): string {
+  // Filter out undefined values
+  const validWords = words.filter((word) => word !== undefined);
+
+  // Return early if no valid words
+  if (validWords.length === 0) return "";
+
+  // Create a frequency map
+  const frequency: Record<string, number> = {};
+
+  // Count occurrences of each word
+  for (const word of validWords) {
+    frequency[word] = (frequency[word] || 0) + 1;
+  }
+
+  // Find the word with the highest frequency
+  let mostFrequentWord = "";
+  let highestFrequency = 0;
+
+  for (const word in frequency) {
+    if (frequency[word] > highestFrequency) {
+      mostFrequentWord = word;
+      highestFrequency = frequency[word];
+    }
+  }
+
+  return mostFrequentWord;
+}
+
+const fromVariants: Record<string, string> = {
+  empty: "from-spellSchool-empty/30",
+  storm: "from-spellSchool-storm/5",
+  blood: "from-spellSchool-blood/5",
+  chaos: "from-spellSchool-chaos/5",
+  arcane: "from-spellSchool-unholy/5",
+  frost: "from-spellSchool-frost/5",
+  illusion: "from-spellSchool-illusion/5",
+};
+
+const toVariants: Record<string, string> = {
+  empty: "to-spellSchool-empty/5",
+  storm: "to-spellSchool-storm/5",
+  blood: "to-spellSchool-blood/5",
+  chaos: "to-spellSchool-chaos/5",
+  arcane: "to-spellSchool-unholy/5",
+  frost: "to-spellSchool-frost/5",
+  illusion: "to-spellSchool-illusion/5",
 };
 
 const borderVariants: Record<string, string> = {
@@ -73,105 +129,76 @@ const Item = ({
   );
 };
 
+const premadeBuilds = [
+  {
+    name: "CASTER",
+    background: "/images/templates/caster.webp",
+    code: "722222222bcg9af3456g2456413656o6479n218700000000000000000000000000000033333961",
+    baseBorder: "border-purple-500/30",
+    hoverBorder: "hover:border-purple-500",
+    hoverGlow: "from-purple-900/20",
+  },
+  {
+    name: "ASSASSIN",
+    background: "/images/templates/assassin.webp",
+    code: "622222222bcn8721367j1245523642d03824083200000000000000000000000000000014444751",
+    baseBorder: "border-orange-500/30",
+    hoverBorder: "hover:border-orange-500",
+    hoverGlow: "from-orange-900/20",
+  },
+  {
+    name: "BRAWLER",
+    background: "/images/templates/brawler.webp",
+    code: "822222222bc1k42136734563223565103E8n218700000000000000000000000000000052222751",
+    baseBorder: "border-red-500/30",
+    hoverBorder: "hover:border-red-500",
+    hoverGlow: "from-red-900/20",
+  },
+  {
+    name: "SUPPORT",
+    background: "/images/templates/support.webp",
+    code: "222222222bcaoif3462l3452412461c07B9b0B7900000000000000000000000000000041111643",
+    baseBorder: "border-green-500/30",
+    hoverBorder: "hover:border-green-500",
+    hoverGlow: "from-green-900/20",
+  },
+];
+
 export default function BuildsListHome({
   maxBuilds = 3,
   onBuildsLoaded,
 }: BuildsListProps = {}) {
   const [builds, setBuilds] = useState<Build[]>([]);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
-    const fetchBuilds = async () => {
-      if (authLoading) return;
-
-      if (!isAuthenticated) {
-        // Load builds from localStorage for non-authenticated users
-        setLoading(true);
-        try {
-          if (typeof window !== "undefined") {
-            const localBuildsData = localStorage.getItem("vbuilds");
-            if (localBuildsData) {
-              try {
-                const parsed = JSON.parse(localBuildsData);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                  // Convert localStorage format to Build format
-                  const buildsArray = parsed.map((build: any, index: number) => ({
-                    id: `local-${index}-${build.name}`, // Generate temporary ID
-                    name: build.name || `Build ${index + 1}`,
-                    code: build.code || "",
-                    isPublic: false, // LocalStorage builds are always private
-                  }));
-                  setBuilds(buildsArray);
-                  onBuildsLoaded?.(buildsArray.length > 0);
-                  setLoading(false);
-                  return;
-                }
-              } catch (error) {
-                console.error("Failed to parse local builds:", error);
-              }
-            }
-          }
-          setBuilds([]);
-          onBuildsLoaded?.(false);
-        } catch (error) {
-          console.error("Failed to load local builds:", error);
-          setBuilds([]);
-          onBuildsLoaded?.(false);
-        } finally {
-          setLoading(false);
-        }
-        return;
-      }
-
-      setLoading(true);
+    // Fetch builds from localStorage
+    const fetchBuilds = () => {
       try {
-        const response = await fetch("/api/builds?limit=100");
-
-        if (response.status === 401) {
-          setBuilds([]);
-          setLoading(false);
+        const storedBuilds = localStorage.getItem("vbuilds");
+        if (storedBuilds) {
+          const parsedBuilds = JSON.parse(storedBuilds);
+          const buildsArray = Array.isArray(parsedBuilds) ? parsedBuilds : [];
+          setBuilds(buildsArray);
+          onBuildsLoaded?.(buildsArray.length > 0);
+        } else {
           onBuildsLoaded?.(false);
-          return;
         }
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch builds");
-        }
-
-        const data = await response.json();
-        // Handle both old format (array) and new format (object with builds array)
-        const buildsArray = Array.isArray(data)
-          ? data.map((build: any) => ({
-            id: build.id,
-            name: build.name,
-            code: build.code,
-            isPublic: build.isPublic || false,
-          }))
-          : (data.builds || []).map((build: any) => ({
-            id: build.id,
-            name: build.name,
-            code: build.code,
-            isPublic: build.isPublic || false,
-          }));
-
-        setBuilds(buildsArray);
-        onBuildsLoaded?.(buildsArray.length > 0);
       } catch (error) {
-        console.error("Failed to load builds:", error);
+        console.error("Failed to load builds from localStorage:", error);
         setBuilds([]);
         onBuildsLoaded?.(false);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchBuilds();
-  }, [isAuthenticated, authLoading, onBuildsLoaded]);
+  }, [onBuildsLoaded]);
 
+  const handleBuildClick = (code: string) => {
+    router.push(`/builds/create?build=${encodeURIComponent(code)}`);
+  };
 
-  const handleDelete = async (event: React.MouseEvent, buildId: string, index: number) => {
+  const handleDelete = (event: React.MouseEvent, index: number) => {
     // Prevent the card click event from triggering
     event.preventDefault();
     event.stopPropagation();
@@ -181,63 +208,15 @@ export default function BuildsListHome({
       actionButtonStyle: { backgroundColor: "#f87171" },
       action: {
         label: "Delete",
-        onClick: async () => {
-          if (!buildId) {
-            toast.error("Build ID not found");
-            return;
-          }
-
-          // Check if this is a localStorage build
-          if (buildId.startsWith("local-")) {
-            try {
-              if (typeof window !== "undefined") {
-                const localBuildsData = localStorage.getItem("vbuilds");
-                if (localBuildsData) {
-                  const parsed = JSON.parse(localBuildsData);
-                  if (Array.isArray(parsed)) {
-                    // Remove the build at the specified index
-                    const updatedBuilds = parsed.filter((_, i) => i !== index);
-                    localStorage.setItem("vbuilds", JSON.stringify(updatedBuilds));
-
-                    // Update state
-                    const buildsArray = updatedBuilds.map((build: any, idx: number) => ({
-                      id: `local-${idx}-${build.name}`,
-                      name: build.name || `Build ${idx + 1}`,
-                      code: build.code || "",
-                      isPublic: false,
-                    }));
-                    setBuilds(buildsArray);
-                    onBuildsLoaded?.(buildsArray.length > 0);
-                    toast.success("Build deleted successfully");
-                    return;
-                  }
-                }
-              }
-              toast.error("Failed to delete build from local storage");
-            } catch (error) {
-              console.error("Failed to delete local build:", error);
-              toast.error("Failed to delete build");
-            }
-            return;
-          }
-
-          // Delete from API for authenticated users
+        onClick: () => {
+          const updatedBuilds = [...builds];
+          updatedBuilds.splice(index, 1);
+          // Update state and localStorage
+          setBuilds(updatedBuilds);
           try {
-            const response = await fetch(`/api/builds/${buildId}`, {
-              method: "DELETE",
-            });
-
-            if (!response.ok) {
-              throw new Error("Failed to delete build");
-            }
-
-            const updatedBuilds = builds.filter((_, i) => i !== index);
-            setBuilds(updatedBuilds);
-            onBuildsLoaded?.(updatedBuilds.length > 0);
-            toast.success("Build deleted successfully");
+            localStorage.setItem("vbuilds", JSON.stringify(updatedBuilds));
           } catch (error) {
-            console.error("Failed to delete build:", error);
-            toast.error("Failed to delete build");
+            console.error("Failed to update localStorage:", error);
           }
         },
       },
@@ -293,6 +272,77 @@ export default function BuildsListHome({
     },
   };
 
+  // Custom animation variants for premade builds
+  const slideInFromLeft = {
+    hidden: { opacity: 0, x: -400, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      transition: {
+        duration: 0.8,
+        ease: [0.25, 0.46, 0.45, 0.94], // Custom ease with deceleration
+      },
+    },
+  };
+
+  const slideInFromRight = {
+    hidden: { opacity: 0, x: 400, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      transition: {
+        duration: 0.8,
+        ease: [0.25, 0.46, 0.45, 0.94], // Custom ease with deceleration
+      },
+    },
+  };
+
+  const slideInFromLeftDelayed = {
+    hidden: { opacity: 0, x: -500, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      transition: {
+        duration: 0.8,
+        delay: 0.2, // Edge delay for closing in effect
+        ease: [0.25, 0.46, 0.45, 0.94],
+      },
+    },
+  };
+
+  const slideInFromRightDelayed = {
+    hidden: { opacity: 0, x: 500, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      transition: {
+        duration: 0.8,
+        delay: 0.2, // Edge delay for closing in effect
+        ease: [0.25, 0.46, 0.45, 0.94],
+      },
+    },
+  };
+
+  // Function to get the appropriate animation variant for each premade build
+  const getPremadeBuildVariant = (index: number) => {
+    switch (index) {
+      case 0:
+        return slideInFromLeftDelayed; // CASTER - leftmost edge, delayed
+      case 1:
+        return slideInFromLeft; // ASSASSIN - from left
+      case 2:
+        return slideInFromRight; // BRAWLER - from right
+      case 3:
+        return slideInFromRightDelayed; // HYBRID - rightmost edge, delayed
+      default:
+        return scaleIn;
+    }
+  };
+
   const staggerContainer = {
     hidden: { opacity: 0 },
     visible: {
@@ -303,16 +353,28 @@ export default function BuildsListHome({
     },
   };
 
+  // Custom container for premade builds without stagger delay
+  const premadeBuildsContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0, // No stagger, let individual animations handle timing
+      },
+    },
+  };
 
   return (
     <TooltipProvider>
       <div className="pb-16">
+        {/* Premade Starter Builds Section */}
+        <StarterBuilds />
         {/* User's Personal Builds Section */}
         {builds.length > 0 && (
           <div className="flex items-center gap-3 mb-6">
             <div className="w-1 h-6 bg-gradient-to-b from-red-400 to-red-600 rounded-full" />
             <h3 className="text-xl font-bold text-grey-100 tracking-wide">
-              MY BUILDS
+              MAKE YOUR OWN
             </h3>
             <div className="flex-1 h-px bg-gradient-to-r from-grey-600 to-transparent" />
           </div>
@@ -349,7 +411,7 @@ export default function BuildsListHome({
             </Link>
           )}
           {buildsToShow.map((build, index) => (
-            <motion.div key={build.id || index} variants={scaleIn}>
+            <motion.div key={index} variants={scaleIn}>
               <Link
                 href={`/builds/create?build=${encodeURIComponent(build.code)}`}
               >
@@ -357,10 +419,8 @@ export default function BuildsListHome({
                   code={build.code}
                   name={build.name}
                   handleDeleteBuild={(event: React.MouseEvent) =>
-                    handleDelete(event, build.id || "", index)
+                    handleDelete(event, index)
                   }
-                  isPublic={build.isPublic}
-                  showPublicToggle={false}
                 />
               </Link>
             </motion.div>
@@ -397,7 +457,7 @@ export default function BuildsListHome({
           )}
         </motion.div>
 
-        {!loading && builds.length === 0 && (
+        {builds.length === 0 && (
           <motion.div
             className="flex justify-center gap-4 mb-8"
             initial="hidden"
@@ -406,23 +466,13 @@ export default function BuildsListHome({
             variants={staggerContainer}
           >
             <motion.div>
-              {isAuthenticated ? (
-                <Link
-                  href="/builds/create"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
-                >
-                  <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
-                  CREATE YOUR FIRST BUILD
-                </Link>
-              ) : (
-                <Link
-                  href="/builds/create"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
-                >
-                  <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
-                  CREATE YOUR FIRST BUILD
-                </Link>
-              )}
+              <Link
+                href="/builds/create"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-red-900/50 border border-red-900/50 text-white font-medium rounded-lg hover:bg-red-900/70 hover:border-red-500 transition-all duration-200 group"
+              >
+                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+                CREATE YOUR FIRST BUILD
+              </Link>
             </motion.div>
           </motion.div>
         )}

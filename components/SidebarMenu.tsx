@@ -23,6 +23,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSidebarContext } from '@/app/contexts/SidebarContext';
 import Image from 'next/image';
+import { signOut } from 'firebase/auth';
 const routes = [
   {
     label: 'Overview',

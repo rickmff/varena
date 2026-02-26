@@ -26,6 +26,18 @@
     "entertainment",
     "community"
   ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home-screen.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "/screenshots/features.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg"
+    }
+  ],
   "related_applications": [
     {
       "platform": "web",
@@ -46,9 +58,8 @@
       "url": "/#generate-commands",
       "icons": [
         {
-          "src": "/web-app-manifest-192x192.png",
-          "sizes": "192x192",
-          "type": "image/png"
+          "src": "/icons/command-icon.png",
+          "sizes": "192x192"
         }
       ]
     },
@@ -59,9 +70,8 @@
       "url": "https://discord.gg/varena",
       "icons": [
         {
-          "src": "/web-app-manifest-192x192.png",
-          "sizes": "192x192",
-          "type": "image/png"
+          "src": "/icons/discord-icon.png",
+          "sizes": "192x192"
         }
       ]
     }
