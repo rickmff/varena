@@ -104,15 +104,15 @@ export async function GET(request: Request) {
         timestamp: user.createdAt,
         metadata: { userId: user.id },
       })),
-      ...recentSessions.map((session) => ({
-        id: `session-${session.id}`,
+      ...recentSessions.map((loginSession: { id: string; userId: string; expiresAt: Date; user?: { name: string | null; email: string | null } | null }) => ({
+        id: `session-${loginSession.id}`,
         type: "login" as const,
-        userId: session.userId,
-        userName: session.user?.name || null,
-        userEmail: session.user?.email || null,
+        userId: loginSession.userId,
+        userName: loginSession.user?.name || null,
+        userEmail: loginSession.user?.email || null,
         details: "User logged in",
-        timestamp: session.expiresAt,
-        metadata: { sessionId: session.id },
+        timestamp: loginSession.expiresAt,
+        metadata: { sessionId: loginSession.id },
       })),
       ...recentBadges.map((badge) => ({
         id: `badge-${badge.id}`,
