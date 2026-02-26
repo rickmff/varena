@@ -20,10 +20,20 @@ function SignInForm() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [resendingEmail, setResendingEmail] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const toastShownRef = useRef<{ registered?: boolean; reset?: boolean; verify?: boolean; verified?: boolean }>({});
+
+  // Cooldown timer for resend button
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   // Redirect authenticated users away from signin page
   useEffect(() => {
@@ -159,6 +169,7 @@ function SignInForm() {
       toast.error("Please enter your email address first");
       return;
     }
+    if (resendCooldown > 0 || resendingEmail) return;
 
     const emailToResend = unverifiedEmail || formData.email;
     setResendingEmail(true);
@@ -173,9 +184,15 @@ function SignInForm() {
       } else {
         toast.success("Verification email sent! Please check your inbox.");
         setUnverifiedEmail(emailToResend);
+        setResendCooldown(60);
       }
     } catch (error: any) {
-      toast.error(error.message || "Failed to resend verification email");
+      if (error?.status === 429) {
+        toast.error("Too many attempts. Please try again later.");
+        setResendCooldown(60);
+      } else {
+        toast.error(error.message || "Failed to resend verification email");
+      }
       console.error("Resend verification email error:", error);
     } finally {
       setResendingEmail(false);
@@ -272,7 +289,7 @@ function SignInForm() {
                     <Button
                       type="button"
                       onClick={handleResendVerificationEmail}
-                      disabled={resendingEmail}
+                      disabled={resendingEmail || resendCooldown > 0}
                       variant="outline"
                       className="w-full text-sm border-2 border-yellow-500/30 rounded-md hover:bg-yellow-500/10 hover:text-yellow-500"
                     >
@@ -281,6 +298,8 @@ function SignInForm() {
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Sending...
                         </>
+                      ) : resendCooldown > 0 ? (
+                        `Resend in ${resendCooldown}s`
                       ) : (
                         <>
                           <Mail className="mr-2 h-4 w-4" />

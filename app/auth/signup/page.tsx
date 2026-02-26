@@ -191,14 +191,9 @@ function SignUpForm() {
       // Show success message about verification email
       toast.success("Account created! Please check your email to verify your account.");
 
-      // Redirect to signin with verification message
-      const callbackUrl = searchParams.get("callbackUrl");
+      // Redirect to verify-email page
       setTimeout(() => {
-        if (callbackUrl) {
-          router.push(`/auth/signin?verify=email-sent&callbackUrl=${encodeURIComponent(callbackUrl)}`);
-        } else {
-          router.push("/auth/signin?verify=email-sent");
-        }
+        router.push(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`);
       }, 1500);
     } catch (error: any) {
       console.error("Signup catch error:", error);

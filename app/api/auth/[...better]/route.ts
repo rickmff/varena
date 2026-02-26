@@ -12,6 +12,12 @@ const rateLimitOptions = {
   maxRequests: 5, // 5 attempts per window
 };
 
+// Stricter rate limiting for resend verification email
+const resendRateLimitOptions = {
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 3, // 3 attempts per window
+};
+
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
 
@@ -62,13 +68,16 @@ export async function POST(request: NextRequest) {
   try {
     // Apply rate limiting only for sensitive routes
     const url = new URL(request.url);
+    const isResendVerification = url.pathname.includes("/send-verification-email");
     const isAuthAction = url.pathname.includes("/sign-in") ||
       url.pathname.includes("/sign-up") ||
-      url.pathname.includes("/reset-password");
+      url.pathname.includes("/reset-password") ||
+      isResendVerification;
 
     if (isAuthAction) {
       const identifier = getRequestIdentifier(request);
-      const result = rateLimit(identifier, rateLimitOptions);
+      const options = isResendVerification ? resendRateLimitOptions : rateLimitOptions;
+      const result = rateLimit(identifier, options);
 
       if (!result.allowed) {
         const resetDate = new Date(result.resetTime);
@@ -81,7 +90,7 @@ export async function POST(request: NextRequest) {
             status: 429,
             headers: {
               "Retry-After": Math.ceil((result.resetTime - Date.now()) / 1000).toString(),
-              "X-RateLimit-Limit": rateLimitOptions.maxRequests.toString(),
+              "X-RateLimit-Limit": options.maxRequests.toString(),
               "X-RateLimit-Remaining": result.remaining.toString(),
               "X-RateLimit-Reset": result.resetTime.toString(),
             },
@@ -111,7 +120,7 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        response.headers.set("X-RateLimit-Limit", rateLimitOptions.maxRequests.toString());
+        response.headers.set("X-RateLimit-Limit", options.maxRequests.toString());
         response.headers.set("X-RateLimit-Remaining", result.remaining.toString());
         response.headers.set("X-RateLimit-Reset", result.resetTime.toString());
         return response;
