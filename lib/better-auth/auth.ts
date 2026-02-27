@@ -75,6 +75,7 @@ if (!resendApiKey) {
 }
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 const emailVerificationConfigured = !!resend;
+console.log("[Better Auth] Email verification configured:", emailVerificationConfigured, "| requireEmailVerification:", emailVerificationConfigured);
 
 export const auth = betterAuth({
   database: pool,
@@ -99,7 +100,8 @@ export const auth = betterAuth({
         throw new Error(errorMsg);
       }
 
-      const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+      const rawFromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+      const fromEmail = rawFromEmail.includes("<") ? rawFromEmail : `V Arena <${rawFromEmail}>`;
 
       // Extract token from Better Auth URL and generate a link to our custom page
       // Default format: http://localhost:3000/api/auth/reset-password/<token>?callbackURL=...
@@ -183,8 +185,9 @@ export const auth = betterAuth({
         return;
       }
 
-      const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
-      const isTestEmail = fromEmail === "onboarding@resend.dev";
+      const rawFromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+      const fromEmail = rawFromEmail.includes("<") ? rawFromEmail : `V Arena <${rawFromEmail}>`;
+      const isTestEmail = rawFromEmail === "onboarding@resend.dev";
 
       // In development, warn about Resend test email limitations
       if (process.env.NODE_ENV === "development" && isTestEmail) {
@@ -193,6 +196,30 @@ export const auth = betterAuth({
         console.warn("   1. Send to your Resend account email (check Resend dashboard)");
         console.warn("   2. Verify a domain at https://resend.com/domains");
         console.warn("   3. Use a service like Mailtrap for local testing");
+      }
+
+      // Extract token from Better Auth URL and generate a link to our custom verify page
+      // This avoids hitting the API endpoint directly (which can cause 500 errors)
+      let verifyUrl = url;
+      try {
+        const urlObj = new URL(url);
+        const token = urlObj.searchParams.get("token");
+        if (token) {
+          const baseURL =
+            process.env.NEXTAUTH_URL ||
+            process.env.NEXT_PUBLIC_APP_URL ||
+            "http://localhost:3000";
+          verifyUrl = `${baseURL}/auth/verify/${encodeURIComponent(token)}`;
+          console.log("[Better Auth] Custom verify URL:", {
+            original: url,
+            tokenLength: token.length,
+            verifyUrl,
+          });
+        } else {
+          console.warn("[Better Auth] Could not extract token from verify URL, using original URL");
+        }
+      } catch (error) {
+        console.warn("[Better Auth] Could not parse verify URL, using original:", error);
       }
 
       try {
@@ -210,7 +237,7 @@ export const auth = betterAuth({
                 Thank you for signing up! Please verify your email address by clicking the button below:
               </p>
               <div style="text-align: center; margin: 30px 0;">
-                <a href="${url}" style="background-color: #5865F2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+                <a href="${verifyUrl}" style="background-color: #5865F2; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
                   Verify Email Address
                 </a>
               </div>
@@ -218,14 +245,14 @@ export const auth = betterAuth({
                 Or copy and paste this link into your browser:
               </p>
               <p style="color: #666; line-height: 1.6; font-size: 14px; word-break: break-all;">
-                ${url}
+                ${verifyUrl}
               </p>
               <p style="color: #666; line-height: 1.6; font-size: 14px; margin-top: 30px;">
                 If you didn't create an account, you can safely ignore this email.
               </p>
             </div>
           `,
-          text: `Hi ${user.name || "there"},\n\nThank you for signing up! Please verify your email address by clicking this link:\n\n${url}\n\nIf you didn't create an account, you can safely ignore this email.`,
+          text: `Hi ${user.name || "there"},\n\nThank you for signing up! Please verify your email address by clicking this link:\n\n${verifyUrl}\n\nIf you didn't create an account, you can safely ignore this email.`,
         });
 
         console.log("✅ [Better Auth] Verification email sent successfully");

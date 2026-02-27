@@ -27,23 +27,32 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Handle verify-email: let Better Auth process it, then redirect nicely
+  // Handle verify-email
   if (url.pathname.includes("/verify-email")) {
-    try {
-      const response = await handler.GET(request);
+    const baseURL = url.origin;
+    const acceptHeader = request.headers.get("accept") || "";
+    // Direct browser navigation sends Accept: text/html; fetch/AJAX does not
+    const isBrowserNavigation = acceptHeader.includes("text/html");
 
-      // If verification succeeded (redirect response), redirect to signin with success message
-      if (response.status === 302 || response.status === 301) {
-        const baseURL = url.origin;
-        return NextResponse.redirect(`${baseURL}/auth/signin?verified=true`);
+    if (isBrowserNavigation) {
+      // For direct browser navigation (e.g. old email links hitting the API endpoint),
+      // redirect to our custom verify page which has proper UI and error handling
+      const token = url.searchParams.get("token");
+      if (token) {
+        return NextResponse.redirect(`${baseURL}/auth/verify/${encodeURIComponent(token)}`);
       }
+      return NextResponse.redirect(`${baseURL}/auth/signin?error=verification-failed`);
+    }
 
-      return response;
+    // For API/fetch calls (from our custom verify page), pass through to Better Auth
+    try {
+      return await handler.GET(request);
     } catch (error: any) {
       console.error("[Auth API] Error during email verification:", error?.message || error);
-      // Redirect to signin with error message
-      const baseURL = url.origin;
-      return NextResponse.redirect(`${baseURL}/auth/signin?error=verification-failed`);
+      return NextResponse.json(
+        { error: "Verification failed", message: error?.message },
+        { status: 500 }
+      );
     }
   }
 

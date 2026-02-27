@@ -188,6 +188,14 @@ function SignUpForm() {
         throw new Error(errorMessage);
       }
 
+      // Sign out immediately to prevent auto-login before email verification
+      // Better Auth creates a session on signup even when requireEmailVerification is true
+      try {
+        await authClient.signOut();
+      } catch {
+        // Ignore signout errors - user may not have a session
+      }
+
       // Show success message about verification email
       toast.success("Account created! Please check your email to verify your account.");
 
