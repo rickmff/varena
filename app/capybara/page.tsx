@@ -49,6 +49,16 @@ type Build = {
   userId: string | null;
 };
 
+type TierList = {
+  id: string;
+  name: string;
+  author: string;
+  upvotes: number;
+  downvotes: number;
+  createdAt: string;
+  userId: string | null;
+};
+
 type UserBadgeType = {
   id: string;
   userId: string;
@@ -100,6 +110,12 @@ export default function AdminPage() {
   const [userSortDirection, setUserSortDirection] = useState<"asc" | "desc">("asc");
   const [buildSortField, setBuildSortField] = useState<string | null>(null);
   const [buildSortDirection, setBuildSortDirection] = useState<"asc" | "desc">("asc");
+  const [tierLists, setTierLists] = useState<TierList[]>([]);
+  const [tierListsLoading, setTierListsLoading] = useState(true);
+  const [tierListSortField, setTierListSortField] = useState<string | null>(null);
+  const [tierListSortDirection, setTierListSortDirection] = useState<"asc" | "desc">("asc");
+  const [logSearch, setLogSearch] = useState("");
+  const [logTypeFilter, setLogTypeFilter] = useState<string>("all");
 
   useEffect(() => {
     if (!authLoading && !isAdmin) {
@@ -111,6 +127,7 @@ export default function AdminPage() {
     if (isAdmin) {
       fetchUsers();
       fetchBuilds();
+      fetchTierLists();
       fetchBadges();
       fetchLogs();
     }
@@ -147,6 +164,33 @@ export default function AdminPage() {
       toast.error("Failed to load builds");
     } finally {
       setBuildsLoading(false);
+    }
+  };
+
+  const fetchTierLists = async () => {
+    setTierListsLoading(true);
+    try {
+      const response = await fetch("/api/tier-lists?public=true&limit=200");
+      if (!response.ok) {
+        throw new Error("Failed to fetch tier lists");
+      }
+      const data = await response.json();
+      setTierLists(
+        (data.tierLists || []).map((t: any) => ({
+          id: t.id,
+          name: t.name,
+          author: t.author || "Anonymous",
+          upvotes: t.upvotes,
+          downvotes: t.downvotes,
+          createdAt: t.createdAt,
+          userId: t.userId,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching tier lists:", error);
+      toast.error("Failed to load tier lists");
+    } finally {
+      setTierListsLoading(false);
     }
   };
 
@@ -201,6 +245,15 @@ export default function AdminPage() {
     } else {
       setBuildSortField(field);
       setBuildSortDirection("asc");
+    }
+  };
+
+  const handleTierListSort = (field: string) => {
+    if (tierListSortField === field) {
+      setTierListSortDirection(tierListSortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setTierListSortField(field);
+      setTierListSortDirection("asc");
     }
   };
 
@@ -295,6 +348,43 @@ export default function AdminPage() {
     return 0;
   });
 
+  const sortedTierLists = [...tierLists].sort((a, b) => {
+    if (!tierListSortField) return 0;
+
+    let aValue: any = (a as any)[tierListSortField];
+    let bValue: any = (b as any)[tierListSortField];
+
+    if (aValue === null || aValue === undefined) aValue = "";
+    if (bValue === null || bValue === undefined) bValue = "";
+
+    if (tierListSortField === "createdAt") {
+      aValue = new Date(aValue).getTime();
+      bValue = new Date(bValue).getTime();
+    }
+
+    if (typeof aValue === "string") {
+      aValue = aValue.toLowerCase();
+      bValue = bValue.toLowerCase();
+    }
+
+    if (aValue < bValue) return tierListSortDirection === "asc" ? -1 : 1;
+    if (aValue > bValue) return tierListSortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  const filteredLogs = logs.filter((log) => {
+    if (logTypeFilter !== "all" && log.type !== logTypeFilter) return false;
+    if (logSearch) {
+      const s = logSearch.toLowerCase();
+      return (
+        log.userName?.toLowerCase().includes(s) ||
+        log.userEmail?.toLowerCase().includes(s) ||
+        log.details?.toLowerCase().includes(s)
+      );
+    }
+    return true;
+  });
+
   const handleBanUser = async (userId: string, currentlyBanned: boolean) => {
     const action = currentlyBanned ? "unban" : "ban";
     const confirmed = window.confirm(
@@ -384,6 +474,32 @@ export default function AdminPage() {
     } catch (error) {
       console.error("Error deleting build:", error);
       toast.error("Failed to delete build");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteTierList = async (tierListId: string, tierListName: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to DELETE tier list "${tierListName}"? This action cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    setActionLoading(tierListId);
+    try {
+      const response = await fetch(`/api/admin/tier-lists/${tierListId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete tier list");
+      }
+
+      setTierLists((prev) => prev.filter((tl) => tl.id !== tierListId));
+      toast.success("Tier list deleted successfully");
+    } catch (error) {
+      console.error("Error deleting tier list:", error);
+      toast.error("Failed to delete tier list");
     } finally {
       setActionLoading(null);
     }
@@ -484,6 +600,9 @@ export default function AdminPage() {
           </TabsTrigger>
           <TabsTrigger value="builds" className="data-[state=active]:bg-red-900/50">
             Public Builds
+          </TabsTrigger>
+          <TabsTrigger value="tierlists" className="data-[state=active]:bg-red-900/50">
+            Tier Lists
           </TabsTrigger>
           <TabsTrigger value="logs" className="data-[state=active]:bg-red-900/50">
             System Logs
@@ -868,6 +987,148 @@ export default function AdminPage() {
           </Card>
         </TabsContent>
 
+        <TabsContent value="tierlists">
+          <Card className="bg-black/80 border-white/10">
+            <CardHeader>
+              <CardTitle className="text-white">Tier Lists Management</CardTitle>
+              <CardDescription className="text-gray-400">
+                View and manage all public tier lists, delete inappropriate content
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {tierListsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-red-500" />
+                </div>
+              ) : tierLists.length === 0 ? (
+                <p className="text-gray-400 text-center py-8">No public tier lists found</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-white/10 hover:bg-white/5">
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleTierListSort("name")}
+                        >
+                          <div className="flex items-center">
+                            Tier List Name
+                            {getSortIcon("name", tierListSortField, tierListSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleTierListSort("author")}
+                        >
+                          <div className="flex items-center">
+                            Author
+                            {getSortIcon("author", tierListSortField, tierListSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleTierListSort("upvotes")}
+                        >
+                          <div className="flex items-center">
+                            Upvotes
+                            {getSortIcon("upvotes", tierListSortField, tierListSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleTierListSort("downvotes")}
+                        >
+                          <div className="flex items-center">
+                            Downvotes
+                            {getSortIcon("downvotes", tierListSortField, tierListSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-gray-300">Score</TableHead>
+                        <TableHead
+                          className="text-gray-300 cursor-pointer hover:text-white"
+                          onClick={() => handleTierListSort("createdAt")}
+                        >
+                          <div className="flex items-center">
+                            Created
+                            {getSortIcon("createdAt", tierListSortField, tierListSortDirection)}
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-gray-300 text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {sortedTierLists.map((tierList) => {
+                        const score = tierList.upvotes - tierList.downvotes;
+                        return (
+                          <TableRow
+                            key={tierList.id}
+                            className="border-white/10 hover:bg-white/5"
+                          >
+                            <TableCell className="text-white font-medium">
+                              {tierList.name}
+                            </TableCell>
+                            <TableCell className="text-gray-300">
+                              <div className="flex items-center gap-2">
+                                {tierList.author}
+                                {tierList.userId && badges[tierList.userId] && (
+                                  <AuthorBadge
+                                    badgeType={badges[tierList.userId].badgeType}
+                                    description={badges[tierList.userId].description}
+                                  />
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-green-400">
+                              {tierList.upvotes}
+                            </TableCell>
+                            <TableCell className="text-red-400">
+                              {tierList.downvotes}
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                variant={score >= 0 ? "default" : "destructive"}
+                                className={
+                                  score >= 0
+                                    ? "bg-green-900/50"
+                                    : "bg-red-900/50"
+                                }
+                              >
+                                {score >= 0 ? "+" : ""}
+                                {score}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-gray-300">
+                              {new Date(tierList.createdAt).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDeleteTierList(tierList.id, tierList.name)}
+                                disabled={actionLoading === tierList.id}
+                                className="bg-red-900/20 border-red-900/50 text-red-400 hover:bg-red-900/30"
+                              >
+                                {actionLoading === tierList.id ? (
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <>
+                                    <Trash2 className="w-4 h-4 mr-1" />
+                                    Delete
+                                  </>
+                                )}
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="logs">
           <Card className="bg-black/80 border-white/10">
             <CardHeader>
@@ -876,15 +1137,50 @@ export default function AdminPage() {
                 System Logs
               </CardTitle>
               <CardDescription className="text-gray-400">
-                View system activity: signups, logins, badges assigned, votes, and account deletions
+                View system activity: signups, logins, badges assigned, votes, and build publish/unpublish
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <div className="mb-4 space-y-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Search by name, email, or details..."
+                    value={logSearch}
+                    onChange={(e) => setLogSearch(e.target.value)}
+                    className="pl-10 bg-black/50 border-white/10 text-white placeholder:text-gray-500"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { value: "all", label: "All", color: "bg-white/10 hover:bg-white/20" },
+                    { value: "signup", label: "Signup", color: "bg-purple-900/50 hover:bg-purple-900/70" },
+                    { value: "login", label: "Login", color: "bg-blue-900/50 hover:bg-blue-900/70" },
+                    { value: "badge", label: "Badge", color: "bg-yellow-900/50 hover:bg-yellow-900/70" },
+                    { value: "vote", label: "Vote", color: "bg-green-900/50 hover:bg-green-900/70" },
+                    { value: "publish", label: "Publish", color: "bg-cyan-900/50 hover:bg-cyan-900/70" },
+                    { value: "unpublish", label: "Unpublish", color: "bg-orange-900/50 hover:bg-orange-900/70" },
+                  ].map((filter) => (
+                    <button
+                      key={filter.value}
+                      onClick={() => setLogTypeFilter(filter.value)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        logTypeFilter === filter.value
+                          ? `${filter.color} text-white ring-1 ring-white/30`
+                          : "bg-white/5 text-gray-400 hover:bg-white/10"
+                      }`}
+                    >
+                      {filter.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
               {logsLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="w-6 h-6 animate-spin text-red-500" />
                 </div>
-              ) : logs.length === 0 ? (
+              ) : filteredLogs.length === 0 ? (
                 <p className="text-gray-400 text-center py-8">No logs found</p>
               ) : (
                 <div className="overflow-x-auto">
@@ -898,7 +1194,7 @@ export default function AdminPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {logs.map((log) => (
+                      {filteredLogs.map((log) => (
                         <TableRow
                           key={log.id}
                           className="border-white/10 hover:bg-white/5"
@@ -914,7 +1210,11 @@ export default function AdminPage() {
                                       ? "bg-yellow-900/50"
                                       : log.type === "vote"
                                         ? "bg-green-900/50"
-                                        : "bg-gray-900/50"
+                                        : log.type === "publish"
+                                          ? "bg-cyan-900/50"
+                                          : log.type === "unpublish"
+                                            ? "bg-orange-900/50"
+                                            : "bg-gray-900/50"
                               }
                             >
                               {log.type === "signup"
@@ -925,7 +1225,11 @@ export default function AdminPage() {
                                     ? "Badge"
                                     : log.type === "vote"
                                       ? "Vote"
-                                      : "Other"}
+                                      : log.type === "publish"
+                                        ? "Publish"
+                                        : log.type === "unpublish"
+                                          ? "Unpublish"
+                                          : "Other"}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-white">

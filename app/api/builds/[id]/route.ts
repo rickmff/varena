@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/better-auth/server";
 import prisma from "@/lib/prisma";
 import { revalidateTag } from "next/cache";
-import { isValidEnglishAlphabet } from "@/lib/utils";
+import { isValidEnglishAlphabet, containsProfanity } from "@/lib/utils";
 
 // Helper function to check if a build code is empty (all zeros)
 function isEmptyBuild(code: string): boolean {
@@ -106,6 +106,14 @@ export async function PUT(request: Request, { params }: RouteParams) {
       );
     }
 
+    // Validate name does not contain profanity if provided
+    if (name && containsProfanity(name.trim())) {
+      return NextResponse.json(
+        { error: "Build name contains inappropriate language" },
+        { status: 400 }
+      );
+    }
+
     // Verificar se a build pertence ao usuário
     const existingBuild = await prisma.build.findFirst({
       where: {
@@ -119,6 +127,21 @@ export async function PUT(request: Request, { params }: RouteParams) {
         { error: "Build não encontrada ou não autorizado" },
         { status: 404 }
       );
+    }
+
+    // Prevent banned users from making builds public
+    if (isPublic === true && !existingBuild.isPublic) {
+      const currentUser = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { banned: true },
+      });
+
+      if (currentUser?.banned) {
+        return NextResponse.json(
+          { error: "Your account is banned. You cannot make builds public." },
+          { status: 403 }
+        );
+      }
     }
 
     // Check public build limit when changing from private to public
@@ -143,6 +166,14 @@ export async function PUT(request: Request, { params }: RouteParams) {
         );
       }
 
+      // Check if user has a badge that grants higher public build limit
+      const userBadge = await prisma.userBadge.findUnique({
+        where: { userId: session.user.id },
+      });
+
+      const hasBadgeBonus = userBadge && ["veteran", "champion", "verified"].includes(userBadge.badgeType);
+      const maxPublicBuilds = hasBadgeBonus ? 10 : 5;
+
       const publicBuildCount = await prisma.build.count({
         where: {
           userId: session.user.id,
@@ -150,9 +181,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
         },
       });
 
-      if (publicBuildCount >= 5) {
+      if (publicBuildCount >= maxPublicBuilds) {
         return NextResponse.json(
-          { error: "You can only have 5 public builds. Please make another build private or delete a public build first." },
+          { error: `You can only have ${maxPublicBuilds} public builds. Please make another build private or delete a public build first.` },
           { status: 400 }
         );
       }
@@ -179,6 +210,18 @@ export async function PUT(request: Request, { params }: RouteParams) {
     // This ensures public builds list is updated immediately when a build becomes public/private
     if (isPublic !== undefined && isPublic !== existingBuild.isPublic) {
       revalidateTag("public-builds");
+
+      // Log publish/unpublish activity
+      await prisma.activityLog.create({
+        data: {
+          type: isPublic ? "publish" : "unpublish",
+          userId: session.user.id,
+          details: isPublic
+            ? `Build "${build.name}" published`
+            : `Build "${build.name}" unpublished`,
+          metadata: JSON.stringify({ buildId: build.id, buildName: build.name }),
+        },
+      });
     }
 
     return NextResponse.json(build);

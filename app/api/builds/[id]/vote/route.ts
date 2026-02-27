@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "@/lib/better-auth/server";
+import { revalidateTag } from "next/cache";
 import prisma from "@/lib/prisma";
 
 interface RouteParams {
@@ -195,6 +196,9 @@ export async function POST(request: Request, { params }: RouteParams) {
       }
       throw error;
     }
+
+    // Invalidate public-builds cache so fresh data is served on next request
+    revalidateTag("public-builds");
 
     return NextResponse.json({
       upvotes: updatedBuild.upvotes,

@@ -3,7 +3,7 @@ import { getServerSession } from "@/lib/better-auth/server";
 import prisma from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
 import { revalidateTag } from "next/cache";
-import { isValidEnglishAlphabet } from "@/lib/utils";
+import { isValidEnglishAlphabet, containsProfanity } from "@/lib/utils";
 
 // Helper function to check if a build code is empty (all zeros)
 function isEmptyBuild(code: string): boolean {
@@ -119,6 +119,14 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate name does not contain profanity
+    if (containsProfanity(name.trim())) {
+      return NextResponse.json(
+        { error: "Build name contains inappropriate language" },
+        { status: 400 }
+      );
+    }
+
     // Ensure user exists in Prisma (sync with Better Auth)
     // This handles cases where the user was created in Better Auth but sync hook failed
     if (!session.user.email) {
@@ -224,6 +232,14 @@ export async function POST(request: Request) {
       );
     }
 
+    // Prevent banned users from making builds public
+    if (isPublic === true && user.banned) {
+      return NextResponse.json(
+        { error: "Your account is banned. You cannot make builds public." },
+        { status: 403 }
+      );
+    }
+
     // Check public build limit (5 per user) and validate empty/incomplete builds
     if (isPublic === true) {
       // Prevent making empty builds public
@@ -242,6 +258,14 @@ export async function POST(request: Request) {
         );
       }
 
+      // Check if user has a badge that grants higher public build limit
+      const userBadge = await prisma.userBadge.findUnique({
+        where: { userId: userIdToUse },
+      });
+
+      const hasBadgeBonus = userBadge && ["veteran", "champion", "verified"].includes(userBadge.badgeType);
+      const maxPublicBuilds = hasBadgeBonus ? 10 : 5;
+
       const publicBuildCount = await prisma.build.count({
         where: {
           userId: userIdToUse,
@@ -249,9 +273,9 @@ export async function POST(request: Request) {
         },
       });
 
-      if (publicBuildCount >= 5) {
+      if (publicBuildCount >= maxPublicBuilds) {
         return NextResponse.json(
-          { error: "You can only have 5 public builds. Please make another build private or delete a public build first." },
+          { error: `You can only have ${maxPublicBuilds} public builds. Please make another build private or delete a public build first.` },
           { status: 400 }
         );
       }

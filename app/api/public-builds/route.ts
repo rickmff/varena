@@ -3,6 +3,9 @@ import prisma from "@/lib/prisma";
 import { getServerSession } from "@/lib/better-auth/server";
 import { unstable_cache } from "next/cache";
 
+// Ensure this route is always dynamic (never cached at the response level)
+export const dynamic = "force-dynamic";
+
 // Get all public builds (no authentication required, but session used for vote status)
 export async function GET(request: Request) {
   try {
@@ -45,6 +48,9 @@ export async function GET(request: Request) {
           builds = await prisma.build.findMany({
             where: {
               isPublic: true,
+              user: {
+                banned: false,
+              },
               ...(author && {
                 author: {
                   contains: author,
@@ -79,6 +85,9 @@ export async function GET(request: Request) {
             builds = await prisma.build.findMany({
               where: {
                 isPublic: true,
+                user: {
+                  banned: false,
+                },
                 ...(author && {
                   author: {
                     contains: author,
@@ -171,13 +180,20 @@ export async function GET(request: Request) {
       userVote: userVotes[build.id] || null,
     }));
 
-    return NextResponse.json({
-      builds: buildsWithVotes,
-      total: builds.length,
-      page,
-      limit,
-      totalPages: Math.ceil(builds.length / limit),
-    });
+    return NextResponse.json(
+      {
+        builds: buildsWithVotes,
+        total: builds.length,
+        page,
+        limit,
+        totalPages: Math.ceil(builds.length / limit),
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+        },
+      }
+    );
   } catch (error: any) {
     console.error("Error fetching public builds:", error);
     return NextResponse.json(

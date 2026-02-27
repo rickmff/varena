@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { arenaCode } from "@/components/machines/converter";
-import { isValidEnglishAlphabet, filterEnglishAlphabet } from "@/lib/utils";
+import { isValidEnglishAlphabet, filterEnglishAlphabet, containsProfanity } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -363,6 +363,12 @@ const SaveBuild: React.FC = () => {
       return;
     }
 
+    // Validate build name does not contain profanity
+    if (containsProfanity(buildName)) {
+      toast.error("Build name contains inappropriate language. Please choose a different name.");
+      return;
+    }
+
     const buildCode = arenaCode(state.context);
 
     if (!buildCode) {
@@ -447,7 +453,7 @@ const SaveBuild: React.FC = () => {
         const errorMessage = error.error || "Failed to save build";
 
         // Show specific error message with longer duration for important errors
-        if (response.status === 400 && (errorMessage.includes("empty build") || errorMessage.includes("incomplete build") || errorMessage.includes("5 public builds"))) {
+        if (response.status === 400 && (errorMessage.includes("empty build") || errorMessage.includes("incomplete build") || errorMessage.includes("public builds"))) {
           toast.error(errorMessage, {
             duration: 5000,
           });

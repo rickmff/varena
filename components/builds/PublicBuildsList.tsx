@@ -357,7 +357,9 @@ export default function PublicBuildsList() {
     fetchingRef.current = true;
     setLoading(true);
     try {
-      const response = await fetch(`/api/public-builds?sort=${sortBy}&limit=50`);
+      const response = await fetch(`/api/public-builds?sort=${sortBy}&limit=50`, {
+        cache: "no-store",
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch public builds");
       }

@@ -88,6 +88,24 @@ export async function GET(request: Request) {
       },
     });
 
+    // Get recent activity logs (publish/unpublish)
+    const recentActivities = await prisma.activityLog.findMany({
+      take: limit,
+      skip: offset,
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        },
+      },
+    });
+
     // Get recent user signups (users ordered by createdAt)
     const recentSignups = await prisma.user.findMany({
       take: limit,
@@ -159,6 +177,17 @@ export async function GET(request: Request) {
           buildId: vote.buildId,
           buildName: vote.build.name,
         },
+      })),
+      // Activity logs (publish/unpublish)
+      ...recentActivities.map((activity) => ({
+        id: `activity-${activity.id}`,
+        type: activity.type as string,
+        userId: activity.userId,
+        userName: activity.user?.name || null,
+        userEmail: activity.user?.email || null,
+        details: activity.details,
+        timestamp: activity.createdAt,
+        metadata: activity.metadata ? JSON.parse(activity.metadata) : {},
       })),
     ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 

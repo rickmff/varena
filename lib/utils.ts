@@ -26,3 +26,26 @@ export function filterEnglishAlphabet(value: string): string {
   // Remove all characters that are not English alphabet, numbers, or spaces
   return value.replace(/[^a-zA-Z0-9\s]/g, "");
 }
+
+const PROFANITY_LIST = [
+  "ass", "asshole", "bastard", "bitch", "bollocks", "bullshit",
+  "cock", "crap", "cunt", "damn", "dick", "dickhead",
+  "fag", "faggot", "fuck", "fucker", "fucking", "goddamn",
+  "hell", "motherfucker", "nigger", "nigga", "penis", "piss",
+  "prick", "pussy", "retard", "retarded", "shit", "shitty",
+  "slut", "twat", "vagina", "whore", "wanker",
+];
+
+const profanityRegexes = PROFANITY_LIST.map(
+  (word) => new RegExp(`\\b${word}\\b`, "i")
+);
+
+/**
+ * Checks if a string contains profanity using word boundary matching
+ * @param value - The string to check
+ * @returns true if the string contains profanity, false otherwise
+ */
+export function containsProfanity(value: string): boolean {
+  if (!value || typeof value !== "string") return false;
+  return profanityRegexes.some((regex) => regex.test(value));
+}

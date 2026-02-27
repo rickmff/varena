@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/better-auth/server";
 import { isAdmin } from "@/lib/utils/admin";
@@ -135,7 +136,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Update user banned status
+    // Update user banned status and remove builds from public if banning
     const updatedUser = await prisma.user.update({
       where: { id },
       data: { banned },
@@ -153,6 +154,15 @@ export async function PUT(request: Request, { params }: RouteParams) {
         },
       },
     });
+
+    // When banning, set all user's builds to non-public
+    if (banned) {
+      await prisma.build.updateMany({
+        where: { userId: id, isPublic: true },
+        data: { isPublic: false },
+      });
+      revalidateTag("public-builds");
+    }
 
     return NextResponse.json(updatedUser);
   } catch (error: any) {

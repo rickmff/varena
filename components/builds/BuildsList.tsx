@@ -1404,9 +1404,12 @@ export default function BuildsList({
       }
 
       const publicBuildCount = builds.filter(b => b.isPublic).length;
-      if (publicBuildCount >= 5) {
+      const currentUserBadge = user?.id ? badges[user.id] : null;
+      const hasBadgeBonus = currentUserBadge && ["veteran", "champion", "verified"].includes(currentUserBadge.badgeType);
+      const maxPublicBuilds = hasBadgeBonus ? 10 : 5;
+      if (publicBuildCount >= maxPublicBuilds) {
         toast.error(
-          "You can only have 5 public builds. Please make another build private or delete a public build first.",
+          `You can only have ${maxPublicBuilds} public builds. Please make another build private or delete a public build first.`,
           {
             duration: 5000,
           }
@@ -1431,7 +1434,7 @@ export default function BuildsList({
         const errorMessage = errorData.error || "Failed to update build visibility";
 
         // Show specific error message if it's about the limit, empty build, or incomplete build
-        if (response.status === 400 && (errorMessage.includes("5 public builds") || errorMessage.includes("empty build") || errorMessage.includes("incomplete build"))) {
+        if (response.status === 400 && (errorMessage.includes("public builds") || errorMessage.includes("empty build") || errorMessage.includes("incomplete build"))) {
           toast.error(errorMessage, {
             duration: 5000,
           });
