@@ -4,18 +4,190 @@ generator client {
 }
 
 datasource db {
-  provider          = "mysql"
-  url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// BETTER AUTH TABLES
+// These models map to lowercase tables used internally by Better Auth.
+// Do NOT use these directly in your app code; Better Auth manages them.
+// =============================================================================
+
+/// @map("user") - Better Auth internal user table
+model AuthUser {
+  id            String        @id @default(uuid())
+  email         String        @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  password      String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  sessions AuthSession[]
+  accounts AuthAccount[]
+
+  @@map("user")
+}
+
+/// @map("session") - Better Auth internal session table
+model AuthSession {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+/// @map("account") - Better Auth internal account table (for OAuth providers)
+model AuthAccount {
+  id                    String    @id @default(uuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?   @db.Text
+  refreshToken          String?   @db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  idToken               String?   @db.Text
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user AuthUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map("account")
+}
+
+/// @map("verification") - Better Auth internal verification tokens table
+model AuthVerification {
+  id         String   @id @default(uuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// =============================================================================
+// APPLICATION DOMAIN MODELS
+// These are your business models. The `User` here is synced from Better Auth
+// via hooks (see lib/better-auth/auth.ts) and used for app-specific data.
+// =============================================================================
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  emailVerified DateTime?
+  banned        Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Application relationships
+  builds             Build[]
+  votes              BuildVote[]
+  badge              UserBadge?
+  spellTierLists     SpellTierList[]
+  spellTierListVotes SpellTierListVote[]
 }
 
 model Build {
   id               String   @id @default(uuid())
-  name             String   @unique
-  description      String
-  code             String
+  name             String
+  code             String   @db.Text
   author           String
-  authorTwitchUrl  String
-  authorYoutubeUrl String
+  authorTwitchUrl  String?
+  authorYoutubeUrl String?
+  isPublic         Boolean  @default(false)
+  upvotes          Int      @default(0)
+  downvotes        Int      @default(0)
   createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  userId String?
+  user   User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  votes  BuildVote[]
+
+  @@unique([name, userId])
+  @@index([userId])
+  @@index([isPublic])
+}
+
+model BuildVote {
+  id        String   @id @default(uuid())
+  buildId   String
+  userId    String
+  voteType  String   // "upvote" or "downvote"
+  createdAt DateTime @default(now())
+
+  build Build @relation(fields: [buildId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([buildId, userId])
+  @@index([buildId])
+  @@index([userId])
+}
+
+model UserBadge {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  badgeType   String   @default("verified")
+  description String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model SpellTierList {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  isPublic  Boolean  @default(false)
+  tiersJson Json
+  upvotes   Int      @default(0)
+  downvotes Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  votes SpellTierListVote[]
+
+  @@unique([name, userId])
+  @@index([userId])
+  @@index([isPublic])
+}
+
+model SpellTierListVote {
+  id          String   @id @default(uuid())
+  tierListId  String
+  userId      String
+  voteType    String   // "upvote" or "downvote"
+  createdAt   DateTime @default(now())
+
+  tierList SpellTierList @relation(fields: [tierListId], references: [id], onDelete: Cascade)
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tierListId, userId])
+  @@index([tierListId])
+  @@index([userId])
 }
