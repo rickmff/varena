@@ -97,25 +97,6 @@ const nextConfig = {
           },
         ],
       },
-      // News API - moderate caching with revalidation
-      {
-        source: '/api/news',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, s-maxage=3600, max-age=3600, stale-while-revalidate=86400',
-          },
-        ],
-      },
-      {
-        source: '/api/news/:path*',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, s-maxage=3600, max-age=3600, stale-while-revalidate=86400',
-          },
-        ],
-      },
       // Site manifest and favicon
       {
         source: '/site.webmanifest',

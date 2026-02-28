@@ -29,7 +29,6 @@ export const menuItems = [
   { name: "BUILDS", href: "/builds" },
   { name: "TIER LIST", href: "/tier-list" },
   { name: "COMMANDS", href: "/commands" },
-  { name: "NEWS", href: "/news" },
 ];
 
 export const DiscordButton = ({

@@ -41,7 +41,7 @@ export default function TermsOfServicePage() {
                   <li>Public and private build sharing</li>
                   <li>Build voting and rating system</li>
                   <li>User accounts and profiles</li>
-                  <li>Community news and updates</li>
+                  <li>Community features and updates</li>
                 </ul>
               </div>
 
