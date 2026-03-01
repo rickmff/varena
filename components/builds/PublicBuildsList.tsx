@@ -1123,6 +1123,7 @@ export default function PublicBuildsList() {
                       onClone={handleClone}
                       isCloning={cloningBuildId === build.id}
                       currentUserId={user?.id || null}
+                      onActionPopup={showActionPopup}
                     />
                   </Link>
                 </motion.div>

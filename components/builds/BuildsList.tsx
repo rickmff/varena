@@ -1035,7 +1035,10 @@ export const BuildContent = ({
         </div>
         <div className="flex gap-4 justify-between">
           <div className="mt-4">
-            <ArenaCodeOutsideBuilder code={code} />
+            <ArenaCodeOutsideBuilder
+              code={code}
+              onCopySuccess={onActionPopup ? () => onActionPopup("copy", "Paste in-game chat to import.") : undefined}
+            />
           </div>
         </div>
       </CardContent>

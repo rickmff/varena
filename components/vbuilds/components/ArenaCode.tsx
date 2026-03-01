@@ -57,7 +57,8 @@ const ArenaCode: React.FC = () => {
 
 export const ArenaCodeOutsideBuilder: React.FC<{
   code: string;
-}> = ({ code }) => {
+  onCopySuccess?: () => void;
+}> = ({ code, onCopySuccess }) => {
   const exportCommand = `.import-build ${code}`;
 
   const copyBuildCommand = async (e: MouseEvent<HTMLButtonElement>) => {
@@ -65,10 +66,14 @@ export const ArenaCodeOutsideBuilder: React.FC<{
     e.stopPropagation();
     try {
       await navigator.clipboard.writeText(exportCommand);
-      toast("Build Command Copied", {
-        className: "bg-black text-white",
-        description: "Paste in-game chat to import.",
-      });
+      if (onCopySuccess) {
+        onCopySuccess();
+      } else {
+        toast("Build Command Copied", {
+          className: "bg-black text-white",
+          description: "Paste in-game chat to import.",
+        });
+      }
     } catch (error) {
       toast.error("Failed to copy command");
     }

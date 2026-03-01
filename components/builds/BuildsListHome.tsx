@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { Plus, Swords } from "lucide-react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import {
   TooltipProvider,
@@ -13,6 +13,7 @@ import {
 import React from "react";
 import "@/components/vbuilds/styles.css";
 import { BuildContent } from "./BuildsList";
+import { ActionPopup, ActionPopupType } from "./ActionPopup";
 import { useAuth } from "@/hooks/use-auth";
 
 type Build = {
@@ -79,8 +80,14 @@ export default function BuildsListHome({
 }: BuildsListProps = {}) {
   const [builds, setBuilds] = useState<Build[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionPopup, setActionPopup] = useState<{ type: ActionPopupType; message: string } | null>(null);
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+  const showActionPopup = (type: ActionPopupType, message: string) => {
+    setActionPopup({ type, message });
+    setTimeout(() => setActionPopup(null), 3000);
+  };
 
   useEffect(() => {
     const fetchBuilds = async () => {
@@ -361,6 +368,7 @@ export default function BuildsListHome({
                   }
                   isPublic={build.isPublic}
                   showPublicToggle={false}
+                  onActionPopup={showActionPopup}
                 />
               </Link>
             </motion.div>
@@ -427,6 +435,16 @@ export default function BuildsListHome({
           </motion.div>
         )}
       </div>
+
+      <AnimatePresence>
+        {actionPopup && (
+          <ActionPopup
+            type={actionPopup.type}
+            message={actionPopup.message}
+            onClose={() => setActionPopup(null)}
+          />
+        )}
+      </AnimatePresence>
     </TooltipProvider>
   );
 }
