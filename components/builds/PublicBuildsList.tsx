@@ -600,7 +600,7 @@ export default function PublicBuildsList() {
     if (!isAuthenticated) {
       try {
         if (typeof window !== "undefined") {
-          const clonedName = `${name}`;
+          const clonedName = `${name} Copy`;
           const localBuildsData = localStorage.getItem("vbuilds");
           const existingBuilds = localBuildsData ? JSON.parse(localBuildsData) : [];
 
@@ -628,7 +628,7 @@ export default function PublicBuildsList() {
     setCloningBuildId(buildId);
 
     try {
-      const clonedName = `${name}`;
+      const clonedName = `${name} Copy`;
 
       const response = await fetch("/api/builds", {
         method: "POST",

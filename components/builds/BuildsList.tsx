@@ -1540,7 +1540,7 @@ export default function BuildsList({
     if (!isAuthenticated) {
       try {
         if (typeof window !== "undefined") {
-          const clonedName = `${name}`;
+          const clonedName = `${name} Copy`;
           const localBuildsData = localStorage.getItem("vbuilds");
           const existingBuilds = localBuildsData ? JSON.parse(localBuildsData) : [];
 
@@ -1577,7 +1577,7 @@ export default function BuildsList({
     if (!buildId || buildId.startsWith("local-")) {
       // Clone local build to API
       try {
-        const clonedName = `${name}`;
+        const clonedName = `${name} Copy`;
         const response = await fetch("/api/builds", {
           method: "POST",
           headers: {
@@ -1608,7 +1608,7 @@ export default function BuildsList({
 
     try {
       // Generate a cloned name
-      const clonedName = `${name}`;
+      const clonedName = `${name} Copy`;
 
       const response = await fetch("/api/builds", {
         method: "POST",
