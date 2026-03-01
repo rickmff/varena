@@ -97,7 +97,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { userId, badgeType = "verified", description = "Verified by V Arena staff" } = body;
+    const { userId, badgeType = "verified", description = "Verified" } = body;
 
     // Validate userId
     if (!userId || typeof userId !== "string" || userId.trim().length === 0) {

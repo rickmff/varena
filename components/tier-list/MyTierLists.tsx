@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Loader2, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,6 +17,7 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ActionPopup, ActionPopupType, ConfirmPopup } from "@/components/builds/ActionPopup";
 
 type TierKey = "S" | "A" | "B" | "C" | "D" | "Unranked";
 
@@ -60,6 +61,13 @@ export function MyTierLists() {
   const [tierLists, setTierLists] = useState<TierList[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const [actionPopup, setActionPopup] = useState<{ type: ActionPopupType; message: string } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+
+  const showActionPopup = (type: ActionPopupType, message: string) => {
+    setActionPopup({ type, message });
+    setTimeout(() => setActionPopup(null), 3000);
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -185,8 +193,12 @@ export function MyTierLists() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this tier list?")) return;
+  const handleDelete = (id: string) => {
+    setConfirmDelete(id);
+  };
+
+  const executeDelete = async (id: string) => {
+    setConfirmDelete(null);
 
     try {
       if (!isAuthenticated && id.startsWith("local-")) {
@@ -200,7 +212,7 @@ export function MyTierLists() {
                 const filtered = localTierLists.filter((t: any) => t.id !== id);
                 localStorage.setItem("vtierlists", JSON.stringify(filtered));
                 setTierLists((prev) => prev.filter((t) => t.id !== id));
-                toast.success("Tier list deleted");
+                showActionPopup("delete", "Tier list has been removed.");
                 return;
               }
             } catch (error) {
@@ -219,7 +231,7 @@ export function MyTierLists() {
       if (!response.ok) throw new Error("Failed to delete tier list");
 
       setTierLists((prev) => prev.filter((t) => t.id !== id));
-      toast.success("Tier list deleted");
+      showActionPopup("delete", "Tier list has been removed.");
     } catch (error) {
       toast.error("Failed to delete tier list");
     }
@@ -242,7 +254,7 @@ export function MyTierLists() {
                 setTierLists((prev) =>
                   prev.map((t) => (t.id === id ? { ...t, isPublic: false } : t))
                 );
-                toast.success("Tier list is now private");
+                showActionPopup("unpublish", "Tier list is now private.");
                 return;
               }
             } catch (error) {
@@ -254,19 +266,36 @@ export function MyTierLists() {
         return;
       }
 
+      // Optimistic update: update state and show popup immediately
+      const previousTierLists = [...tierLists];
+      setTierLists((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, isPublic } : t))
+      );
+      if (isPublic) {
+        showActionPopup("publish", "Tier list is now visible to the community.");
+      } else {
+        showActionPopup("unpublish", "Tier list is now private.");
+      }
+
       const response = await fetch(`/api/tier-lists/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isPublic }),
       });
 
-      if (!response.ok) throw new Error("Failed to update tier list");
-
-      setTierLists((prev) =>
-        prev.map((t) => (t.id === id ? { ...t, isPublic } : t))
-      );
-      toast.success(isPublic ? "Tier list is now public" : "Tier list is now private");
+      if (!response.ok) {
+        // Revert optimistic update
+        setTierLists(previousTierLists);
+        toast.error("Failed to update tier list");
+      }
     } catch (error) {
+      // Revert optimistic update on network error
+      setTierLists((prev) =>
+        prev.map((t) => {
+          const original = tierLists.find((o) => o.id === t.id);
+          return original ? original : t;
+        })
+      );
       toast.error("Failed to update tier list");
     }
   };
@@ -426,6 +455,28 @@ export function MyTierLists() {
           </motion.div>
         )}
       </div>
+      {/* Confirm delete popup */}
+      <AnimatePresence>
+        {confirmDelete && (
+          <ConfirmPopup
+            title="Delete Tier List"
+            message="Are you sure you want to delete this tier list? This action cannot be undone."
+            confirmLabel="Delete"
+            onConfirm={() => executeDelete(confirmDelete)}
+            onCancel={() => setConfirmDelete(null)}
+          />
+        )}
+      </AnimatePresence>
+      {/* Action popup */}
+      <AnimatePresence>
+        {actionPopup && (
+          <ActionPopup
+            type={actionPopup.type}
+            message={actionPopup.message}
+            onClose={() => setActionPopup(null)}
+          />
+        )}
+      </AnimatePresence>
     </TooltipProvider>
   );
 }

@@ -101,7 +101,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, code, author, authorTwitchUrl, authorYoutubeUrl, isPublic } = await request.json();
+    const { name, code, author, authorTwitchUrl, authorYoutubeUrl, isPublic, sortPosition } = await request.json();
 
     // Only name and code are required
     if (!name || !code) {
@@ -210,16 +210,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check total build limit (33 per user)
+    // Check total build limit (100 per user)
     const totalBuildCount = await prisma.build.count({
       where: {
         userId: userIdToUse,
       },
     });
 
-    if (totalBuildCount >= 33) {
+    if (totalBuildCount >= 100) {
       return NextResponse.json(
-        { error: "You can only have 33 builds. Please delete a build first." },
+        { error: "You can only have 100 builds. Please delete a build first." },
         { status: 400 }
       );
     }
@@ -257,6 +257,24 @@ export async function POST(request: Request) {
       }
     }
 
+    // Determine sortOrder based on sortPosition
+    let nextSortOrder: number;
+    if (sortPosition === "top") {
+      // Place at the top of the list
+      const minSortOrder = await prisma.build.aggregate({
+        where: { userId: userIdToUse },
+        _min: { sortOrder: true },
+      });
+      nextSortOrder = (minSortOrder._min.sortOrder ?? 1) - 1;
+    } else {
+      // Place at the end of the list (default)
+      const maxSortOrder = await prisma.build.aggregate({
+        where: { userId: userIdToUse },
+        _max: { sortOrder: true },
+      });
+      nextSortOrder = (maxSortOrder._max.sortOrder ?? -1) + 1;
+    }
+
     const build = await prisma.build.create({
       data: {
         name,
@@ -266,6 +284,7 @@ export async function POST(request: Request) {
         authorYoutubeUrl: authorYoutubeUrl || null,
         isPublic: isPublic === true,
         userId: userIdToUse,
+        sortOrder: nextSortOrder,
       },
     });
 
@@ -380,7 +399,7 @@ export async function GET(request: Request) {
     }
 
     const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "11"); // Default 11 builds per page for better performance
+    const limit = parseInt(searchParams.get("limit") || "25");
     const skip = (page - 1) * limit;
 
     // Get total count for pagination (cached)
@@ -413,12 +432,12 @@ export async function GET(request: Request) {
             isPublic: true,
             author: true,
             userId: true,
+            sortOrder: true,
             createdAt: true,
             updatedAt: true,
-            // Exclude fields not needed for list view: authorTwitchUrl, authorYoutubeUrl
           },
           orderBy: {
-            createdAt: "desc",
+            sortOrder: "asc",
           },
           take: pageLimit,
           skip: pageSkip,

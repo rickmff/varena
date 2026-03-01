@@ -6,6 +6,8 @@ import NavBar from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { AnimatePresence } from "framer-motion";
+import { ActionPopup, ActionPopupType } from "@/components/builds/ActionPopup";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
@@ -65,6 +67,12 @@ export default function TierListEditPage({ params }: PageProps) {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [actionPopup, setActionPopup] = useState<{ type: ActionPopupType; message: string } | null>(null);
+
+  const showActionPopup = (type: ActionPopupType, message: string) => {
+    setActionPopup({ type, message });
+    setTimeout(() => setActionPopup(null), 3000);
+  };
   const [tierListData, setTierListData] = useState<{
     id: string;
     name: string;
@@ -303,12 +311,10 @@ export default function TierListEditPage({ params }: PageProps) {
         // Save to localStorage for non-authenticated users
         const saved = saveToLocalStorage(name, tiers, id);
         if (saved) {
-          toast.success("Tier list saved locally! Sign in to sync across devices.", {
-            duration: 4000,
-          });
+          showActionPopup("success", "Tier list saved locally! Sign in to sync across devices.");
           setTimeout(() => {
             router.push("/tier-list");
-          }, 500);
+          }, 1500);
         } else {
           toast.error("Failed to save tier list locally");
         }
@@ -331,9 +337,11 @@ export default function TierListEditPage({ params }: PageProps) {
         throw new Error(data.error || "Failed to save tier list");
       }
 
-      toast.success("Tier list saved!");
+      showActionPopup("success", "Tier list saved!");
       // Redirect to tier list page after saving
-      router.push("/tier-list");
+      setTimeout(() => {
+        router.push("/tier-list");
+      }, 1500);
     } catch (error: any) {
       toast.error(error.message || "Failed to save tier list");
     } finally {
@@ -386,7 +394,7 @@ export default function TierListEditPage({ params }: PageProps) {
     const url = window.location.href;
     try {
       await navigator.clipboard.writeText(url);
-      toast.success("Link copied to clipboard!");
+      showActionPopup("copy", "Link copied to clipboard!");
     } catch {
       toast.error("Failed to copy link");
     }
@@ -462,12 +470,10 @@ export default function TierListEditPage({ params }: PageProps) {
         localTierLists.push(newTierList);
         localStorage.setItem("vtierlists", JSON.stringify(localTierLists));
 
-        toast.success("Tier list cloned locally! Sign in to sync across devices.", {
-          duration: 4000,
-        });
+        showActionPopup("clone", "Tier list cloned locally! Sign in to sync across devices.");
         setTimeout(() => {
           router.push(`/tier-list/${newTierList.id}`);
-        }, 500);
+        }, 1500);
       }
       return;
     }
@@ -494,10 +500,10 @@ export default function TierListEditPage({ params }: PageProps) {
       }
 
       const clonedTierList = await response.json();
-      toast.success("Tier list cloned successfully!");
+      showActionPopup("clone", "Tier list cloned successfully!");
       setTimeout(() => {
         router.push(`/tier-list/${clonedTierList.id}`);
-      }, 500);
+      }, 1500);
     } catch (error) {
       console.error("Error cloning tier list:", error);
       toast.error("Failed to clone tier list");
@@ -714,6 +720,16 @@ export default function TierListEditPage({ params }: PageProps) {
           </div>
         </section>
       </div>
+      {/* Action popup */}
+      <AnimatePresence>
+        {actionPopup && (
+          <ActionPopup
+            type={actionPopup.type}
+            message={actionPopup.message}
+            onClose={() => setActionPopup(null)}
+          />
+        )}
+      </AnimatePresence>
     </TooltipProvider>
   );
 }

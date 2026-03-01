@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import BuildsList from "@/components/builds/BuildsList";
@@ -12,17 +12,41 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { LogIn, Globe, Cloud, ThumbsUp, Hammer, Users } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function Builds() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState("mine");
+  return (
+    <Suspense>
+      <BuildsContent />
+    </Suspense>
+  );
+}
 
-  // Set default tab to "community" for unauthenticated users
+function BuildsContent() {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const tabFromUrl = searchParams.get("tab");
+  const validTabs = ["mine", "community"];
+  const initialTab = tabFromUrl && validTabs.includes(tabFromUrl) ? tabFromUrl : "mine";
+
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  // Sync tab state when URL changes
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      setActiveTab("mine");
+    if (tabFromUrl && validTabs.includes(tabFromUrl) && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
     }
-  }, [isAuthenticated, authLoading]);
+  }, [tabFromUrl]);
+
+  // Update URL when tab changes
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    router.replace(`/builds?${params.toString()}`, { scroll: false });
+  };
 
   return (
     <div
@@ -55,7 +79,7 @@ export default function Builds() {
       {/* Builds Section */}
       <section className="bg-black relative -mt-20 pb-20">
         <div className="container mx-auto px-4 relative z-10">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <div className="flex justify-center mb-8">
               <TabsList className="grid grid-cols-2 bg-black/60 backdrop-blur-sm border border-white/10 rounded-lg p-1.5 shadow-lg h-fit gap-2 w-full max-w-md mx-auto">
                 <TabsTrigger

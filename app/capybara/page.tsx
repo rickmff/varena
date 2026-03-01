@@ -67,19 +67,20 @@ type UserBadgeType = {
 const BADGE_TYPES = {
   veteran: {
     label: "Veteran",
-    description: "Veteran player recognized by V Arena staff",
+    description: "Veteran player",
     color: "blue",
   },
   champion: {
     label: "Arena Champion",
-    description: "Arena Champion recognized by V Arena staff",
+    description: "Arena Champion",
     color: "yellow",
   },
   verified: {
     label: "Verified",
-    description: "Verified by V Arena staff",
+    description: "Verified",
     color: "green",
   },
+  
 } as const;
 
 type BadgeTypeKey = keyof typeof BADGE_TYPES;

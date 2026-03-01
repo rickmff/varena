@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { convertStringToBuild } from "../machines/converter";
 import { BuildContent } from "./BuildsList";
@@ -29,6 +29,7 @@ import { AuthorBadge } from "@/components/AuthorBadge";
 import { useUserBadges } from "@/hooks/use-author-badges";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { ActionPopup, ActionPopupType } from "./ActionPopup";
 
 type Build = {
   id?: string;
@@ -332,10 +333,17 @@ const AuthorSuggestionsDropdown = ({
 export default function PublicBuildsList() {
   const [builds, setBuilds] = useState<DecodedBuild[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState<"popular" | "newest" | "oldest">("popular");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalBuilds, setTotalBuilds] = useState(0);
   const fetchingRef = useRef(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const { isAdmin, isAuthenticated, user } = useAuth();
+
+  const BUILDS_PER_PAGE = 25;
 
   // Filter states
   const [armourFilter, setArmourFilter] = useState<string | null>(null);
@@ -349,24 +357,35 @@ export default function PublicBuildsList() {
   const [authorSuggestions, setAuthorSuggestions] = useState<string[]>([]);
   const [showAuthorDropdown, setShowAuthorDropdown] = useState(false);
   const [authorToUserIdMap, setAuthorToUserIdMap] = useState<Map<string, string | null>>(new Map());
+  const [cloningBuildId, setCloningBuildId] = useState<string | null>(null);
+  const [actionPopup, setActionPopup] = useState<{ type: ActionPopupType; message: string } | null>(null);
 
-  const fetchBuilds = async () => {
-    // Prevent duplicate fetches
+  const showActionPopup = (type: ActionPopupType, message: string) => {
+    setActionPopup({ type, message });
+    setTimeout(() => setActionPopup(null), 3000);
+  };
+
+  const fetchBuilds = useCallback(async (pageNum: number, reset: boolean = false) => {
     if (fetchingRef.current) return;
 
     fetchingRef.current = true;
-    setLoading(true);
+    if (reset) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
+
     try {
-      const response = await fetch(`/api/public-builds?sort=${sortBy}&limit=50`);
+      const response = await fetch(`/api/public-builds?sort=${sortBy}&limit=${BUILDS_PER_PAGE}&page=${pageNum}`);
       if (!response.ok) {
         throw new Error("Failed to fetch public builds");
       }
 
       const data = await response.json();
-      // Handle both old format (array) and new format (object with builds array)
       const buildsData = Array.isArray(data) ? data : (data.builds || []);
+      const total = data.total || buildsData.length;
+      const totalPages = data.totalPages || 1;
 
-      // Don't decode builds immediately - decode lazily when needed for filtering
       const buildsArray: DecodedBuild[] = buildsData.map((build: any) => ({
         id: build.id,
         name: build.name,
@@ -377,45 +396,70 @@ export default function PublicBuildsList() {
         upvotes: build.upvotes || 0,
         downvotes: build.downvotes || 0,
         userVote: build.userVote || null,
-        decoded: undefined, // Will be decoded lazily when needed
+        decoded: undefined,
       }));
 
-      setBuilds(buildsArray);
+      setTotalBuilds(total);
+      setHasMore(pageNum < totalPages);
+      setPage(pageNum);
 
-      // Extract unique authors for dropdown and create author -> userId mapping
-      const authors = Array.from(
-        new Set(buildsArray.map((b) => b.author).filter(Boolean))
-      ) as string[];
-      setAuthorSuggestions(authors.sort());
+      if (reset) {
+        setBuilds(buildsArray);
+      } else {
+        setBuilds((prev) => [...prev, ...buildsArray]);
+      }
 
-      // Create mapping of author name to userId (take first userId found for each author)
-      const authorMap = new Map<string, string | null>();
-      buildsArray.forEach((build) => {
-        if (build.author && !authorMap.has(build.author)) {
-          authorMap.set(build.author, build.userId || null);
-        }
-      });
-      setAuthorToUserIdMap(authorMap);
+      // Update author suggestions from all loaded builds
+      const updateAuthors = (allBuilds: DecodedBuild[]) => {
+        const authors = Array.from(
+          new Set(allBuilds.map((b) => b.author).filter(Boolean))
+        ) as string[];
+        setAuthorSuggestions(authors.sort());
+
+        const authorMap = new Map<string, string | null>();
+        allBuilds.forEach((build) => {
+          if (build.author && !authorMap.has(build.author)) {
+            authorMap.set(build.author, build.userId || null);
+          }
+        });
+        setAuthorToUserIdMap(authorMap);
+      };
+
+      if (reset) {
+        updateAuthors(buildsArray);
+      } else {
+        setBuilds((prev) => {
+          updateAuthors(prev);
+          return prev;
+        });
+      }
     } catch (error) {
       console.error("Failed to load public builds:", error);
-      setBuilds([]);
+      if (reset) setBuilds([]);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
       fetchingRef.current = false;
     }
-  };
-
-  useEffect(() => {
-    fetchBuilds();
   }, [sortBy]);
+
+  // Initial fetch and reset when sort changes
+  useEffect(() => {
+    setBuilds([]);
+    setPage(1);
+    setHasMore(true);
+    fetchBuilds(1, true);
+  }, [sortBy, fetchBuilds]);
 
   // Refetch when page becomes visible (user switches back to tab/window)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
-        // Reset fetching ref to allow refetch
         fetchingRef.current = false;
-        fetchBuilds();
+        setBuilds([]);
+        setPage(1);
+        setHasMore(true);
+        fetchBuilds(1, true);
       }
     };
 
@@ -423,7 +467,25 @@ export default function PublicBuildsList() {
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [sortBy]);
+  }, [sortBy, fetchBuilds]);
+
+  // Infinite scroll: observe sentinel element
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore) {
+          fetchBuilds(page + 1);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, loading, loadingMore, page, fetchBuilds]);
 
   // Check if we need to decode builds for filtering
   const needsDecoding = armourFilter || spellSlot1Spell || spellSlot2Spell || primaryBloodFilter || secondaryBloodFilter;
@@ -538,18 +600,17 @@ export default function PublicBuildsList() {
     if (!isAuthenticated) {
       try {
         if (typeof window !== "undefined") {
-          const clonedName = `${name} (Copy)`;
+          const clonedName = `${name}`;
           const localBuildsData = localStorage.getItem("vbuilds");
           const existingBuilds = localBuildsData ? JSON.parse(localBuildsData) : [];
 
-          // Add cloned build to localStorage
           existingBuilds.push({
             name: clonedName,
             code: code,
           });
 
           localStorage.setItem("vbuilds", JSON.stringify(existingBuilds));
-          toast.success("Build cloned to local storage!");
+          showActionPopup("clone", `"${clonedName}" is now in your My Builds tab.`);
         }
       } catch (error) {
         console.error("Error cloning build to localStorage:", error);
@@ -564,9 +625,10 @@ export default function PublicBuildsList() {
       return;
     }
 
+    setCloningBuildId(buildId);
+
     try {
-      // Generate a cloned name
-      const clonedName = `${name} (Copy)`;
+      const clonedName = `${name}`;
 
       const response = await fetch("/api/builds", {
         method: "POST",
@@ -576,7 +638,8 @@ export default function PublicBuildsList() {
         body: JSON.stringify({
           name: clonedName,
           code: code,
-          isPublic: false, // Cloned builds start as private
+          isPublic: false,
+          sortPosition: "top",
         }),
       });
 
@@ -592,15 +655,12 @@ export default function PublicBuildsList() {
         return;
       }
 
-      toast.success("Build cloned successfully! Redirecting to your builds...");
-
-      // Redirect to builds page after a short delay
-      setTimeout(() => {
-        window.location.href = "/builds";
-      }, 1000);
+      showActionPopup("clone", `"${clonedName}" is now in your My Builds tab.`);
     } catch (error) {
       console.error("Error cloning build:", error);
       toast.error("Failed to clone build");
+    } finally {
+      setCloningBuildId(null);
     }
   };
 
@@ -860,12 +920,19 @@ export default function PublicBuildsList() {
       {/* Build Count and Sort */}
       <div className="mb-6 flex items-center justify-between" >
         <div className="text-sm text-gray-300">
-          <span className="font-semibold text-white">{filteredBuilds.length}</span> of{" "}
-          <span className="font-semibold text-white">{builds.length}</span> public builds
-          {hasActiveFilters && (
-            <span className="ml-2 text-xs text-red-400 bg-red-900/20 px-2 py-1 rounded-full">
-              Filtered
-            </span>
+          {hasActiveFilters ? (
+            <>
+              <span className="font-semibold text-white">{filteredBuilds.length}</span> of{" "}
+              <span className="font-semibold text-white">{builds.length}</span> loaded builds
+              <span className="ml-2 text-xs text-red-400 bg-red-900/20 px-2 py-1 rounded-full">
+                Filtered
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="font-semibold text-white">{builds.length}</span> of{" "}
+              <span className="font-semibold text-white">{totalBuilds}</span> public builds
+            </>
           )}
         </div>
         <div className="flex items-center gap-3">
@@ -925,7 +992,7 @@ export default function PublicBuildsList() {
       {
         loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Array.from({ length: 11 }).map((_, index) => (
+            {Array.from({ length: 6 }).map((_, index) => (
               <Card key={index} className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-zinc-800/50 h-full flex flex-col">
                 <CardHeader className="relative">
                   <Skeleton className="h-6 w-3/4 mb-2" />
@@ -1014,53 +1081,87 @@ export default function PublicBuildsList() {
             )}
           </div>
         ) : (
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            viewport={{ once: true }}
-          >
-            {filteredBuilds.map((build, index) => (
-              <motion.div key={build.id || index} variants={scaleIn} className="relative">
-                <Link href={`/builds/create?build=${encodeURIComponent(build.code)}`}>
-                  <BuildContent
-                    code={build.code}
-                    name={build.name}
-                    author={build.author}
-                    userId={build.userId}
-                    userBadge={build.userId ? buildBadges[build.userId] : null}
-                    isPublic={build.isPublic}
-                    showPublicToggle={false}
-                    upvotes={build.upvotes}
-                    downvotes={build.downvotes}
-                    userVote={build.userVote}
-                    buildId={build.id}
-                    onVoteChange={(upvotes, downvotes, userVote) => {
-                      setBuilds((prev) =>
-                        prev.map((b) =>
-                          b.id === build.id
-                            ? { ...b, upvotes, downvotes, userVote }
-                            : b
-                        )
-                      );
-                    }}
-                    isAdmin={isAdmin}
-                    onAdminDelete={
-                      isAdmin && build.id
-                        ? (event: React.MouseEvent) => handleAdminDelete(event, build.id!)
-                        : undefined
-                    }
-                    buildLink={`/builds/create?build=${encodeURIComponent(build.code)}`}
-                    onClone={handleClone}
-                    currentUserId={user?.id || null}
-                  />
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
+          <>
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              viewport={{ once: true }}
+            >
+              {filteredBuilds.map((build, index) => (
+                <motion.div key={build.id || index} variants={scaleIn} className="relative">
+                  <Link href={`/builds/create?build=${encodeURIComponent(build.code)}`}>
+                    <BuildContent
+                      code={build.code}
+                      name={build.name}
+                      author={build.author}
+                      userId={build.userId}
+                      userBadge={build.userId ? buildBadges[build.userId] : null}
+                      isPublic={build.isPublic}
+                      showPublicToggle={false}
+                      upvotes={build.upvotes}
+                      downvotes={build.downvotes}
+                      userVote={build.userVote}
+                      buildId={build.id}
+                      onVoteChange={(upvotes, downvotes, userVote) => {
+                        setBuilds((prev) =>
+                          prev.map((b) =>
+                            b.id === build.id
+                              ? { ...b, upvotes, downvotes, userVote }
+                              : b
+                          )
+                        );
+                      }}
+                      isAdmin={isAdmin}
+                      onAdminDelete={
+                        isAdmin && build.id
+                          ? (event: React.MouseEvent) => handleAdminDelete(event, build.id!)
+                          : undefined
+                      }
+                      buildLink={`/builds/create?build=${encodeURIComponent(build.code)}`}
+                      onClone={handleClone}
+                      isCloning={cloningBuildId === build.id}
+                      currentUserId={user?.id || null}
+                    />
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Sentinel for infinite scroll */}
+            <div ref={sentinelRef} className="h-1" />
+
+            {loadingMore && (
+              <div className="flex flex-col items-center gap-3 py-10">
+                <div className="relative flex items-center justify-center">
+                  <div className="h-10 w-10 animate-spin rounded-full border-2 border-red-500/30 border-t-red-500" />
+                  <div className="absolute h-6 w-6 animate-spin rounded-full border-2 border-red-400/20 border-b-red-400" style={{ animationDirection: "reverse", animationDuration: "0.8s" }} />
+                </div>
+                <span className="text-sm text-gray-500 animate-pulse">Loading more builds...</span>
+              </div>
+            )}
+
+            {!hasMore && builds.length > 0 && (
+              <div className="flex items-center justify-center gap-3 py-10">
+                <div className="h-px w-16 bg-gradient-to-r from-transparent to-red-900/40" />
+                <span className="text-sm text-gray-500">All builds loaded</span>
+                <div className="h-px w-16 bg-gradient-to-l from-transparent to-red-900/40" />
+              </div>
+            )}
+          </>
         )
       }
+      {/* Action popup */}
+      <AnimatePresence>
+        {actionPopup && (
+          <ActionPopup
+            type={actionPopup.type}
+            message={actionPopup.message}
+            onClose={() => setActionPopup(null)}
+          />
+        )}
+      </AnimatePresence>
     </div >
   );
 }

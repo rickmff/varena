@@ -31,7 +31,7 @@ const BADGE_CONFIG: Record<string, { color: string; icon: React.ComponentType<{ 
 
 export function AuthorBadge({
   badgeType = "verified",
-  description = "Verified by V Arena staff",
+  description = "Verified",
   className = "",
 }: AuthorBadgeProps) {
   const config = BADGE_CONFIG[badgeType || "verified"];
@@ -61,7 +61,7 @@ export function AuthorBadge({
             className="bg-black/95 border-white/10 text-white text-xs"
             side="top"
           >
-            <p>{description}</p>
+            <span>{description}</span>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
@@ -90,7 +90,7 @@ export function AuthorBadge({
           className="bg-black/95 border-white/10 text-white text-xs"
           side="top"
         >
-          <p>{description}</p>
+          <span>{description}</span>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

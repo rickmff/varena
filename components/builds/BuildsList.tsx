@@ -1,19 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { Plus, Lock, Globe2, Trash2, User, Copy, Pencil } from "lucide-react";
+import { Plus, Lock, Globe2, Trash2, User, Copy, Pencil, Loader2, Shield, Sparkles, Droplet, X, ChevronsDown } from "lucide-react";
 import { VoteButtons } from "./VoteButtons";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { ActionPopup, ActionPopupType, ConfirmPopup } from "./ActionPopup";
 import Link from "next/link";
 import { convertStringToBuild } from "../machines/converter";
 import bloodData from "@/data/vbuilds/bloodtypes.json";
 import { Button } from "@/components/ui/button";
 import { ArenaCodeOutsideBuilder } from "../vbuilds/components/ArenaCode";
 import epicWeaponData from "@/data/vbuilds/epic-weapons.json";
-import { Switch } from "@/components/ui/switch";
 import React from "react";
 import "@/components/vbuilds/styles.css";
 import { useAuth } from "@/hooks/use-auth";
@@ -21,16 +21,34 @@ import { AuthorBadge } from "@/components/AuthorBadge";
 import { useUserBadges, UserBadgeType } from "@/hooks/use-author-badges";
 import { Input } from "@/components/ui/input";
 import { isValidEnglishAlphabet } from "@/lib/utils";
+import { armourOptions } from "../vbuilds/ArmourPicker";
+import spellsData from "@/data/vbuilds/spells.json";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationEllipsis,
-} from "@/components/ui/pagination";
+  DropdownSelect,
+  DropdownSelectPlaceholder,
+} from "../vbuilds/components/DropdownSelect";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 type Build = {
   id?: string;
@@ -46,6 +64,238 @@ interface BuildsListProps {
   showViewAllButton?: boolean; // Whether to show the "View All" button
   onBuildsLoaded?: (hasBuilds: boolean) => void; // Callback when builds are loaded
 }
+
+const spellSchools = Array.from(
+  new Set(Object.values(spellsData).map((spell) => spell.spellSchool))
+);
+
+const bloodList = Object.values(bloodData);
+
+type BloodType = {
+  id: string;
+  name: string;
+  image: string;
+  arenaCode: string;
+  effects: {
+    [key: string]: {
+      description: string;
+      modifiers: Array<{
+        stat: string;
+        value: number;
+        unit: string;
+        calculate: boolean;
+      }>;
+    };
+  };
+};
+
+type SpellOption = {
+  id: string;
+  name: string;
+  img: string;
+  spellSchool: string;
+  category: string;
+};
+
+// Spell Schools Grid Component
+const SpellSchoolsGrid = ({
+  onSchoolSelect,
+}: {
+  onSchoolSelect: (school: string) => void;
+}) => {
+  const handleSchoolClick = (e: Event, school: string) => {
+    e.preventDefault();
+    onSchoolSelect(school);
+  };
+
+  return (
+    <div className="grid grid-cols-3 gap-2 p-2">
+      {spellSchools.map((school) => (
+        <DropdownMenuItem
+          key={school}
+          onSelect={(e) => handleSchoolClick(e, school)}
+          className="h-20 flex items-center justify-center cursor-pointer bg-zinc-900 border-2 border-zinc-700 hover:border-red-500 focus:border-red-500 rounded-md transition-all duration-100 p-0 overflow-hidden relative"
+        >
+          <img
+            src={`/images/vbuilds/spellschools/${school}.webp`}
+            className={`spellSchool spellSchool-${school} w-12 h-12 pointer-events-none`}
+            alt={school}
+          />
+        </DropdownMenuItem>
+      ))}
+    </div>
+  );
+};
+
+// Spells List Component
+const SpellsList = ({
+  school,
+  selectedSpellId,
+  excludeSpellId,
+  onSpellSelect,
+  onBack,
+}: {
+  school: string;
+  selectedSpellId: string | null;
+  excludeSpellId?: string | null;
+  onSpellSelect: (spellId: string) => void;
+  onBack: () => void;
+}) => {
+  const getSpellsForSchool = (school: string): SpellOption[] => {
+    return Object.values(spellsData)
+      .filter((spell: any) => spell.spellSchool === school && spell.category === "spell")
+      .filter((spell: any) => spell.id !== excludeSpellId);
+  };
+
+  const handleSpellSelect = (e: Event, spellId: string) => {
+    e.preventDefault();
+    onSpellSelect(spellId);
+  };
+
+  const handleBackClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onBack();
+  };
+
+  const spells = getSpellsForSchool(school);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between p-2 border-b border-white/10">
+        <span className="text-sm text-gray-300">Select Spell</span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBackClick}
+          className="h-6 text-xs"
+        >
+          ← Back
+        </Button>
+      </div>
+      <div className="max-h-72 overflow-y-auto p-2">
+        <div className="grid grid-cols-3 gap-2">
+          {spells.map((spell) => (
+            <DropdownMenuItem
+              key={spell.id}
+              onSelect={(e) => handleSpellSelect(e, spell.id)}
+              className={`h-20 flex items-center justify-center cursor-pointer bg-zinc-900 border-2 hover:border-red-500 focus:border-red-500 rounded-md transition-all duration-100 p-0 overflow-hidden relative ${selectedSpellId === spell.id ? "border-red-500" : "border-zinc-700"
+                }`}
+            >
+              <img
+                src={spell.img}
+                className="w-12 h-12 rounded pointer-events-none"
+                alt={spell.name}
+              />
+            </DropdownMenuItem>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Spell Dropdown Select Component
+const SpellDropdownSelect = ({
+  value,
+  onChange,
+  onClear,
+  excludeSpellId,
+  placeholder,
+  slotNumber,
+}: {
+  value: string | null;
+  onChange: (spellId: string) => void;
+  onClear: () => void;
+  excludeSpellId?: string | null;
+  placeholder: React.ReactNode;
+  slotNumber: number;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedSchool, setSelectedSchool] = useState<string | null>(null);
+
+  const selectedSpell = value ? (spellsData as any)[value] : null;
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      setSelectedSchool(null);
+    }
+  };
+
+  const handleClear = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClear();
+    setSelectedSchool(null);
+    setIsOpen(false);
+  };
+
+  const handleSchoolSelect = (school: string) => {
+    setSelectedSchool(school);
+  };
+
+  const handleSpellSelect = (spellId: string) => {
+    onChange(spellId);
+    setSelectedSchool(null);
+    setIsOpen(false);
+  };
+
+  const handleBack = () => {
+    setSelectedSchool(null);
+  };
+
+  return (
+    <div className="relative w-full">
+      <DropdownMenu open={isOpen} onOpenChange={handleOpenChange}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            className={`w-20 h-20 p-0 justify-center bg-zinc-900 border-2 border-zinc-700 text-gray-200 hover:border-red-500 transition-all duration-100 ${value ? "border-red-500" : ""
+              }`}
+            style={{ backgroundColor: 'rgb(24 24 27)' }}
+          >
+            {selectedSpell ? (
+              <img
+                src={selectedSpell.img}
+                alt={selectedSpell.name}
+                className="w-full h-full object-cover rounded-sm pointer-events-none"
+              />
+            ) : (
+              placeholder
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        {value && (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-red-900/30 z-20"
+            aria-label="Clear selection"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+        <DropdownMenuContent
+          className="w-80 max-h-96 overflow-y-auto"
+          onCloseAutoFocus={(e) => e.preventDefault()}
+        >
+          {!selectedSchool ? (
+            <SpellSchoolsGrid onSchoolSelect={handleSchoolSelect} />
+          ) : (
+            <SpellsList
+              school={selectedSchool}
+              selectedSpellId={value}
+              excludeSpellId={excludeSpellId}
+              onSpellSelect={handleSpellSelect}
+              onBack={handleBack}
+            />
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+};
 
 const Img = ({
   src,
@@ -157,7 +407,7 @@ const Item = ({
 
 const AuthorNameWithBadge = ({ authorName, badge }: { authorName?: string; badge?: UserBadgeType | null }) => {
   return (
-    <p className="text-sm text-gray-400 mt-1 flex items-center gap-1.5">
+    <div className="text-sm text-gray-400 mt-1 flex items-center gap-1.5">
       <User className="w-3 h-3" />
       <span className="flex items-center gap-1.5">
         {authorName || "Unknown"}
@@ -168,7 +418,7 @@ const AuthorNameWithBadge = ({ authorName, badge }: { authorName?: string; badge
           />
         )}
       </span>
-    </p>
+    </div>
   );
 };
 
@@ -191,11 +441,13 @@ export const BuildContent = ({
   onAdminDelete,
   buildLink,
   onClone,
+  isCloning,
   onRename,
   currentUserId,
   onNameUpdated,
   isMineTab,
   userBadge,
+  onActionPopup,
 }: {
   code: string;
   name: string;
@@ -215,11 +467,13 @@ export const BuildContent = ({
   onAdminDelete?: (event: React.MouseEvent) => void;
   buildLink?: string;
   onClone?: (event: React.MouseEvent, buildId: string, code: string, name: string) => void;
+  isCloning?: boolean;
   onRename?: (event: React.MouseEvent, buildId: string, currentName: string) => void;
   currentUserId?: string | null;
   onNameUpdated?: (buildId: string, newName: string) => void;
   isMineTab?: boolean;
   userBadge?: UserBadgeType | null;
+  onActionPopup?: (type: ActionPopupType, message: string) => void;
 }) => {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editingName, setEditingName] = useState(name);
@@ -355,7 +609,7 @@ export const BuildContent = ({
           .then(() => {
             setIsEditingName(false);
             setEditingName(trimmedName);
-            toast.success("Build renamed successfully!");
+            onActionPopup?.("rename", `Build renamed to "${trimmedName}".`);
             // Notify parent component to update the name
             if (onNameUpdated && buildId) {
               onNameUpdated(buildId, trimmedName);
@@ -396,6 +650,8 @@ export const BuildContent = ({
         : "border-zinc-800/50"
         } transition-all duration-300 overflow-hidden group cursor-pointer h-full relative build-spellSchool build-spellSchool-${school || "empty"
         }`}
+      onClick={isEditingName ? (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); } : undefined}
+      onMouseDown={isEditingName ? (e: React.MouseEvent) => { e.stopPropagation(); } : undefined}
     >
       {/* Glow effect on hover */}
       <div className="pointer-events-none absolute -inset-1 rounded-[14px] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -438,7 +694,8 @@ export const BuildContent = ({
         {onClone && (
           <button
             type="button"
-            className="bg-blue-600/80 hover:bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-blue-500/50 opacity-0 group-hover:opacity-100"
+            disabled={isCloning}
+            className="bg-blue-600/80 hover:bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 backdrop-blur-sm border border-blue-500/50 opacity-0 group-hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -446,7 +703,11 @@ export const BuildContent = ({
             }}
             aria-label="Clone build"
           >
-            <Copy className="w-4 h-4" />
+            {isCloning ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Copy className="w-4 h-4" />
+            )}
           </button>
         )}
         {/* Vote buttons */}
@@ -509,6 +770,8 @@ export const BuildContent = ({
               className="text-xl font-bold bg-black/50 border-white/10 text-white placeholder:text-gray-500 h-auto py-1 px-2"
               autoFocus
               onClick={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+              onDragStart={(e) => e.preventDefault()}
             />
           ) : (
             <>
@@ -533,6 +796,7 @@ export const BuildContent = ({
                   type="button"
                   className="text-gray-400 hover:text-white transition-colors opacity-0 group-hover:opacity-100 p-1"
                   onClick={handleStartEdit}
+                  onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
                   aria-label="Rename build"
                 >
                   <Pencil className="w-4 h-4" />
@@ -779,141 +1043,351 @@ export const BuildContent = ({
   );
 };
 
+const SortableBuildCard = ({
+  id,
+  children,
+}: {
+  id: string;
+  children: React.ReactNode;
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 1000 : undefined,
+    opacity: isDragging ? 0.5 : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {children}
+    </div>
+  );
+};
+
+const BUILDS_PER_PAGE = 25;
+
 export default function BuildsList({
   maxBuilds,
   onBuildsLoaded,
 }: BuildsListProps = {}) {
   const [builds, setBuilds] = useState<Build[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [totalBuilds, setTotalBuilds] = useState(0);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const fetchingRef = useRef(false);
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+
+  // Filter states
+  const [armourFilter, setArmourFilter] = useState<string | null>(null);
+  const [spellSlot1School, setSpellSlot1School] = useState<string | null>(null);
+  const [spellSlot1Spell, setSpellSlot1Spell] = useState<string | null>(null);
+  const [spellSlot2School, setSpellSlot2School] = useState<string | null>(null);
+  const [spellSlot2Spell, setSpellSlot2Spell] = useState<string | null>(null);
+  const [primaryBloodFilter, setPrimaryBloodFilter] = useState<string | null>(null);
+  const [secondaryBloodFilter, setSecondaryBloodFilter] = useState<string | null>(null);
 
   // Get the builds to display (limited by maxBuilds if specified)
   const buildsToShow = maxBuilds ? builds.slice(0, maxBuilds) : builds;
 
+  // Check if any filters are active
+  const hasActiveFilters = armourFilter || spellSlot1Spell || spellSlot2Spell || primaryBloodFilter || secondaryBloodFilter;
+
+  // Filter logic with lazy decoding
+  const filteredBuilds = useMemo(() => {
+    if (!hasActiveFilters) return buildsToShow;
+
+    return buildsToShow.filter((build) => {
+      let decoded;
+      try {
+        decoded = convertStringToBuild(build.code);
+      } catch (error) {
+        console.error("Failed to decode build:", build.id, error);
+        return false;
+      }
+
+      // Armour filter
+      if (armourFilter && decoded.armour?.id !== armourFilter) {
+        return false;
+      }
+
+      // Spell filters - position independent matching
+      if (spellSlot1Spell) {
+        const spell1Id = decoded.spells.spell1?.id;
+        const spell2Id = decoded.spells.spell2?.id;
+        if (spell1Id !== spellSlot1Spell && spell2Id !== spellSlot1Spell) {
+          return false;
+        }
+      }
+
+      if (spellSlot2Spell) {
+        const spell1Id = decoded.spells.spell1?.id;
+        const spell2Id = decoded.spells.spell2?.id;
+        if (spellSlot2Spell === spellSlot1Spell) {
+          return false;
+        }
+        if (spell1Id !== spellSlot2Spell && spell2Id !== spellSlot2Spell) {
+          return false;
+        }
+      }
+
+      // Blood filters
+      if (primaryBloodFilter && decoded.blood?.primary !== primaryBloodFilter) {
+        return false;
+      }
+
+      if (secondaryBloodFilter && decoded.blood?.secondary !== secondaryBloodFilter) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [buildsToShow, hasActiveFilters, armourFilter, spellSlot1Spell, spellSlot2Spell, primaryBloodFilter, secondaryBloodFilter]);
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setArmourFilter(null);
+    setSpellSlot1School(null);
+    setSpellSlot1Spell(null);
+    setSpellSlot2School(null);
+    setSpellSlot2Spell(null);
+    setPrimaryBloodFilter(null);
+    setSecondaryBloodFilter(null);
+  };
+
+  // Use filteredBuilds for display
+  const displayBuilds = hasActiveFilters ? filteredBuilds : buildsToShow;
+
   // Collect user IDs for batch fetching badges
-  const userIds = Array.from(new Set(buildsToShow
+  const userIds = Array.from(new Set(displayBuilds
     .map((build) => build.userId)
     .filter((id): id is string => Boolean(id))));
 
   const { badges } = useUserBadges(userIds);
 
-  useEffect(() => {
-    const fetchBuilds = async () => {
-      if (authLoading) return;
+  // Drag-and-drop sensors (only for authenticated, non-homepage view)
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
-      if (!isAuthenticated) {
-        // Load builds from localStorage for non-authenticated users
-        setLoading(true);
-        try {
-          if (typeof window !== "undefined") {
-            const localBuildsData = localStorage.getItem("vbuilds");
-            if (localBuildsData) {
-              try {
-                const parsed = JSON.parse(localBuildsData);
-                if (Array.isArray(parsed) && parsed.length > 0) {
-                  // Convert localStorage format to Build format
-                  const buildsArray = parsed.map((build: any, index: number) => ({
-                    id: `local-${index}-${build.name}`, // Generate temporary ID
-                    name: build.name || `Build ${index + 1}`,
-                    code: build.code || "",
-                    isPublic: false, // LocalStorage builds are always private
-                    author: "You", // Fallback for localStorage builds
-                    userId: null,
-                  }));
-                  setBuilds(buildsArray);
-                  onBuildsLoaded?.(buildsArray.length > 0);
-                  setLoading(false);
-                  return;
-                }
-              } catch (error) {
-                console.error("Failed to parse local builds:", error);
-              }
-            }
-          }
-          setBuilds([]);
-          onBuildsLoaded?.(false);
-        } catch (error) {
-          console.error("Failed to load local builds:", error);
-          setBuilds([]);
-          onBuildsLoaded?.(false);
-        } finally {
-          setLoading(false);
-        }
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
+  const [actionPopup, setActionPopup] = useState<{ type: ActionPopupType; message: string } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ buildId: string; index: number } | null>(null);
+
+  const showActionPopup = (type: ActionPopupType, message: string) => {
+    setActionPopup({ type, message });
+    setTimeout(() => setActionPopup(null), 3000);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveDragId(null);
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = buildsToShow.findIndex((b) => b.id === active.id);
+    const newIndex = buildsToShow.findIndex((b) => b.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const reordered = arrayMove(buildsToShow, oldIndex, newIndex);
+
+    // Update local state immediately for responsive feel
+    if (maxBuilds) {
+      // Homepage: only showing a subset
+      setBuilds((prev) => {
+        const rest = prev.slice(maxBuilds);
+        return [...reordered, ...rest];
+      });
+    } else {
+      setBuilds(reordered);
+    }
+
+    // Persist to server
+    const buildIds = reordered.map((b) => b.id).filter(Boolean) as string[];
+    if (buildIds.length > 0 && isAuthenticated) {
+      try {
+        await fetch("/api/builds/reorder", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ buildIds, pageOffset: 0 }),
+        });
+      } catch (error) {
+        console.error("Failed to persist build order:", error);
+      }
+    }
+  };
+
+  const parseBuildData = (data: any) => {
+    return Array.isArray(data)
+      ? data.map((build: any) => ({
+        id: build.id,
+        name: build.name,
+        code: build.code,
+        isPublic: build.isPublic || false,
+        author: build.author || "You",
+        userId: build.userId || null,
+      }))
+      : (data.builds || []).map((build: any) => ({
+        id: build.id,
+        name: build.name,
+        code: build.code,
+        isPublic: build.isPublic || false,
+        author: build.author || "You",
+        userId: build.userId || null,
+      }));
+  };
+
+  const fetchBuilds = useCallback(async (pageNum: number) => {
+    if (fetchingRef.current) return;
+    fetchingRef.current = true;
+
+    if (pageNum === 1) {
+      setLoading(true);
+    } else {
+      setLoadingMore(true);
+    }
+
+    try {
+      const limit = maxBuilds || BUILDS_PER_PAGE;
+      const response = await fetch(`/api/builds?page=${pageNum}&limit=${limit}`);
+
+      if (response.status === 401) {
+        setBuilds([]);
+        setLoading(false);
+        setLoadingMore(false);
+        onBuildsLoaded?.(false);
+        fetchingRef.current = false;
         return;
       }
 
+      if (!response.ok) {
+        throw new Error("Failed to fetch builds");
+      }
+
+      const data = await response.json();
+      const buildsArray = parseBuildData(data);
+
+      if (pageNum === 1) {
+        setBuilds(buildsArray);
+      } else {
+        setBuilds(prev => [...prev, ...buildsArray]);
+      }
+
+      if (data.total !== undefined) {
+        setTotalBuilds(data.total);
+        const totalPages = data.totalPages || 1;
+        setHasMore(pageNum < totalPages);
+      } else {
+        setHasMore(false);
+      }
+
+      setPage(pageNum);
+      onBuildsLoaded?.(pageNum === 1 ? buildsArray.length > 0 : true);
+    } catch (error) {
+      console.error("Failed to load builds:", error);
+      if (pageNum === 1) {
+        setBuilds([]);
+        onBuildsLoaded?.(false);
+      }
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+      fetchingRef.current = false;
+    }
+  }, [maxBuilds, onBuildsLoaded]);
+
+  const resetAndRefetch = useCallback(() => {
+    setPage(1);
+    setHasMore(true);
+    fetchBuilds(1);
+  }, [fetchBuilds]);
+
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!isAuthenticated) {
+      // Load builds from localStorage for non-authenticated users
       setLoading(true);
       try {
-        // Use pagination: 11 builds per page
-        const page = maxBuilds ? 1 : currentPage; // If maxBuilds is set (homepage), always fetch page 1
-        const limit = maxBuilds || 11; // Use maxBuilds if set, otherwise 11 per page
-        const response = await fetch(`/api/builds?page=${page}&limit=${limit}`);
-
-        if (response.status === 401) {
-          setBuilds([]);
-          setLoading(false);
-          onBuildsLoaded?.(false);
-          return;
+        if (typeof window !== "undefined") {
+          const localBuildsData = localStorage.getItem("vbuilds");
+          if (localBuildsData) {
+            try {
+              const parsed = JSON.parse(localBuildsData);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                const buildsArray = parsed.map((build: any, index: number) => ({
+                  id: `local-${index}-${build.name}`,
+                  name: build.name || `Build ${index + 1}`,
+                  code: build.code || "",
+                  isPublic: false,
+                  author: "You",
+                  userId: null,
+                }));
+                setBuilds(buildsArray);
+                onBuildsLoaded?.(buildsArray.length > 0);
+                setLoading(false);
+                return;
+              }
+            } catch (error) {
+              console.error("Failed to parse local builds:", error);
+            }
+          }
         }
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch builds");
-        }
-
-        const data = await response.json();
-        // Handle both old format (array) and new format (object with builds array)
-        const buildsArray = Array.isArray(data)
-          ? data.map((build: any) => ({
-            id: build.id,
-            name: build.name,
-            code: build.code,
-            isPublic: build.isPublic || false,
-            author: build.author || "You", // Fallback to "You" if author is missing
-            userId: build.userId || null,
-          }))
-          : (data.builds || []).map((build: any) => ({
-            id: build.id,
-            name: build.name,
-            code: build.code,
-            isPublic: build.isPublic || false,
-            author: build.author || "You", // Fallback to "You" if author is missing
-            userId: build.userId || null,
-          }));
-
-        // Sort builds: public builds first, then private builds
-        const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
-          if (a.isPublic && !b.isPublic) return -1;
-          if (!a.isPublic && b.isPublic) return 1;
-          return 0;
-        });
-
-        setBuilds(sortedBuilds);
-
-        // Update pagination info if available
-        if (data.total !== undefined) {
-          setTotalBuilds(data.total);
-          setTotalPages(data.totalPages || 1);
-        }
-
-        onBuildsLoaded?.(sortedBuilds.length > 0);
+        setBuilds([]);
+        onBuildsLoaded?.(false);
       } catch (error) {
-        console.error("Failed to load builds:", error);
+        console.error("Failed to load local builds:", error);
         setBuilds([]);
         onBuildsLoaded?.(false);
       } finally {
         setLoading(false);
       }
+      return;
+    }
+
+    fetchBuilds(1);
+  }, [isAuthenticated, authLoading, fetchBuilds]);
+
+  // Infinite scroll observer - only for full builds page (not homepage widget)
+  useEffect(() => {
+    if (maxBuilds || !isAuthenticated) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore) {
+          fetchBuilds(page + 1);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(sentinel);
+
+    return () => {
+      observer.disconnect();
     };
+  }, [hasMore, loading, loadingMore, page, maxBuilds, isAuthenticated, fetchBuilds]);
 
-    fetchBuilds();
-  }, [isAuthenticated, authLoading, onBuildsLoaded, currentPage, maxBuilds]);
-
-  const handleDelete = async (event: React.MouseEvent, buildId: string, index: number) => {
-    // Prevent the card click event from triggering
+  const handleDelete = (event: React.MouseEvent, buildId: string, index: number) => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -922,8 +1396,11 @@ export default function BuildsList({
       return;
     }
 
-    const confirmed = window.confirm("Are you sure you want to delete this build?");
-    if (!confirmed) return;
+    setConfirmDelete({ buildId, index });
+  };
+
+  const executeDelete = async (buildId: string, index: number) => {
+    setConfirmDelete(null);
 
     // Check if this is a localStorage build
     if (buildId.startsWith("local-")) {
@@ -946,7 +1423,7 @@ export default function BuildsList({
               }));
               setBuilds(buildsArray);
               onBuildsLoaded?.(buildsArray.length > 0);
-              toast.success("Build deleted successfully");
+              showActionPopup("delete", "Your build has been removed.");
               return;
             }
           }
@@ -969,57 +1446,11 @@ export default function BuildsList({
         throw new Error("Failed to delete build");
       }
 
-      // Refresh builds list after deletion
-      // If this was the last item on the page and not page 1, go to previous page
-      const shouldGoToPreviousPage = !maxBuilds && builds.length === 1 && currentPage > 1;
-      const page = maxBuilds ? 1 : (shouldGoToPreviousPage ? currentPage - 1 : currentPage);
-      const limit = maxBuilds || 11;
-
-      if (shouldGoToPreviousPage) {
-        setCurrentPage(page);
-      }
-
-      const refreshResponse = await fetch(`/api/builds?page=${page}&limit=${limit}`);
-      if (refreshResponse.ok) {
-        const refreshData = await refreshResponse.json();
-        const buildsArray = Array.isArray(refreshData)
-          ? refreshData.map((build: any) => ({
-            id: build.id,
-            name: build.name,
-            code: build.code,
-            isPublic: build.isPublic || false,
-            author: build.author || "You", // Fallback to "You" if author is missing
-            userId: build.userId || null,
-          }))
-          : (refreshData.builds || []).map((build: any) => ({
-            id: build.id,
-            name: build.name,
-            code: build.code,
-            isPublic: build.isPublic || false,
-            author: build.author || "You", // Fallback to "You" if author is missing
-            userId: build.userId || null,
-          }));
-        const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
-          if (a.isPublic && !b.isPublic) return -1;
-          if (!a.isPublic && b.isPublic) return 1;
-          return 0;
-        });
-        setBuilds(sortedBuilds);
-
-        // Update pagination info if available
-        if (refreshData.total !== undefined) {
-          setTotalBuilds(refreshData.total);
-          setTotalPages(refreshData.totalPages || 1);
-        }
-
-        onBuildsLoaded?.(sortedBuilds.length > 0);
-      } else {
-        // Fallback: remove from current list
-        const updatedBuilds = builds.filter((_, i) => i !== index);
-        setBuilds(updatedBuilds);
-        onBuildsLoaded?.(updatedBuilds.length > 0);
-      }
-      toast.success("Build deleted successfully");
+      // Remove from local state
+      setBuilds(prev => prev.filter(b => b.id !== buildId));
+      setTotalBuilds(prev => prev - 1);
+      onBuildsLoaded?.(builds.length > 1);
+      showActionPopup("delete", "Your build has been removed.");
     } catch (error) {
       console.error("Failed to delete build:", error);
       toast.error("Failed to delete build");
@@ -1032,10 +1463,7 @@ export default function BuildsList({
 
     try {
       await navigator.clipboard.writeText(command);
-      toast("Build Command Copied", {
-        className: "bg-black text-white",
-        description: "Paste in-game chat to import.",
-      });
+      showActionPopup("copy", "Paste in-game chat to import.");
     } catch (error) {
       toast.error("Failed to copy command");
     }
@@ -1112,7 +1540,7 @@ export default function BuildsList({
     if (!isAuthenticated) {
       try {
         if (typeof window !== "undefined") {
-          const clonedName = `${name} (Copy)`;
+          const clonedName = `${name}`;
           const localBuildsData = localStorage.getItem("vbuilds");
           const existingBuilds = localBuildsData ? JSON.parse(localBuildsData) : [];
 
@@ -1136,7 +1564,7 @@ export default function BuildsList({
           setBuilds(buildsArray);
           onBuildsLoaded?.(buildsArray.length > 0);
 
-          toast.success("Build cloned to local storage!");
+          showActionPopup("clone", "Build cloned to local storage.");
         }
       } catch (error) {
         console.error("Error cloning build to localStorage:", error);
@@ -1149,7 +1577,7 @@ export default function BuildsList({
     if (!buildId || buildId.startsWith("local-")) {
       // Clone local build to API
       try {
-        const clonedName = `${name} (Copy)`;
+        const clonedName = `${name}`;
         const response = await fetch("/api/builds", {
           method: "POST",
           headers: {
@@ -1169,45 +1597,8 @@ export default function BuildsList({
           return;
         }
 
-        toast.success("Build cloned successfully!");
-
-        // Refresh builds list
-        const page = maxBuilds ? 1 : currentPage;
-        const limit = maxBuilds || 11;
-        const refreshResponse = await fetch(`/api/builds?page=${page}&limit=${limit}`);
-        if (refreshResponse.ok) {
-          const refreshData = await refreshResponse.json();
-          const buildsArray = Array.isArray(refreshData)
-            ? refreshData.map((build: any) => ({
-              id: build.id,
-              name: build.name,
-              code: build.code,
-              isPublic: build.isPublic || false,
-              author: build.author || "You",
-              userId: build.userId || null,
-            }))
-            : (refreshData.builds || []).map((build: any) => ({
-              id: build.id,
-              name: build.name,
-              code: build.code,
-              isPublic: build.isPublic || false,
-              author: build.author || "You",
-              userId: build.userId || null,
-            }));
-          const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
-            if (a.isPublic && !b.isPublic) return -1;
-            if (!a.isPublic && b.isPublic) return 1;
-            return 0;
-          });
-          setBuilds(sortedBuilds);
-
-          if (refreshData.total !== undefined) {
-            setTotalBuilds(refreshData.total);
-            setTotalPages(refreshData.totalPages || 1);
-          }
-
-          onBuildsLoaded?.(sortedBuilds.length > 0);
-        }
+        showActionPopup("clone", "Build cloned successfully.");
+        resetAndRefetch();
       } catch (error) {
         console.error("Error cloning build:", error);
         toast.error("Failed to clone build");
@@ -1217,7 +1608,7 @@ export default function BuildsList({
 
     try {
       // Generate a cloned name
-      const clonedName = `${name} (Copy)`;
+      const clonedName = `${name}`;
 
       const response = await fetch("/api/builds", {
         method: "POST",
@@ -1243,46 +1634,8 @@ export default function BuildsList({
         return;
       }
 
-      toast.success("Build cloned successfully!");
-
-      // Refresh builds list
-      const page = maxBuilds ? 1 : currentPage;
-      const limit = maxBuilds || 11;
-      const refreshResponse = await fetch(`/api/builds?page=${page}&limit=${limit}`);
-      if (refreshResponse.ok) {
-        const refreshData = await refreshResponse.json();
-        const buildsArray = Array.isArray(refreshData)
-          ? refreshData.map((build: any) => ({
-            id: build.id,
-            name: build.name,
-            code: build.code,
-            isPublic: build.isPublic || false,
-            author: build.author || "You", // Fallback to "You" if author is missing
-            userId: build.userId || null,
-          }))
-          : (refreshData.builds || []).map((build: any) => ({
-            id: build.id,
-            name: build.name,
-            code: build.code,
-            isPublic: build.isPublic || false,
-            author: build.author || "You", // Fallback to "You" if author is missing
-            userId: build.userId || null,
-          }));
-        const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
-          if (a.isPublic && !b.isPublic) return -1;
-          if (!a.isPublic && b.isPublic) return 1;
-          return 0;
-        });
-        setBuilds(sortedBuilds);
-
-        // Update pagination info if available
-        if (refreshData.total !== undefined) {
-          setTotalBuilds(refreshData.total);
-          setTotalPages(refreshData.totalPages || 1);
-        }
-
-        onBuildsLoaded?.(sortedBuilds.length > 0);
-      }
+      showActionPopup("clone", "Build cloned successfully.");
+      resetAndRefetch();
     } catch (error) {
       console.error("Error cloning build:", error);
       toast.error("Failed to clone build");
@@ -1326,46 +1679,10 @@ export default function BuildsList({
         return;
       }
 
-      toast.success("Build renamed successfully!");
+      showActionPopup("rename", "Build renamed successfully.");
 
-      // Refresh builds list
-      const page = maxBuilds ? 1 : currentPage;
-      const limit = maxBuilds || 11;
-      const refreshResponse = await fetch(`/api/builds?page=${page}&limit=${limit}`);
-      if (refreshResponse.ok) {
-        const refreshData = await refreshResponse.json();
-        const buildsArray = Array.isArray(refreshData)
-          ? refreshData.map((build: any) => ({
-            id: build.id,
-            name: build.name,
-            code: build.code,
-            isPublic: build.isPublic || false,
-            author: build.author || "You", // Fallback to "You" if author is missing
-            userId: build.userId || null,
-          }))
-          : (refreshData.builds || []).map((build: any) => ({
-            id: build.id,
-            name: build.name,
-            code: build.code,
-            isPublic: build.isPublic || false,
-            author: build.author || "You", // Fallback to "You" if author is missing
-            userId: build.userId || null,
-          }));
-        const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
-          if (a.isPublic && !b.isPublic) return -1;
-          if (!a.isPublic && b.isPublic) return 1;
-          return 0;
-        });
-        setBuilds(sortedBuilds);
-
-        // Update pagination info if available
-        if (refreshData.total !== undefined) {
-          setTotalBuilds(refreshData.total);
-          setTotalPages(refreshData.totalPages || 1);
-        }
-
-        onBuildsLoaded?.(sortedBuilds.length > 0);
-      }
+      // Update local state
+      setBuilds(prev => prev.map(b => b.id === buildId ? { ...b, name: newName.trim() } : b));
     } catch (error) {
       console.error("Error renaming build:", error);
       toast.error("Failed to rename build");
@@ -1415,6 +1732,16 @@ export default function BuildsList({
       }
     }
 
+    // Optimistic update: update state and show popup immediately
+    const previousBuilds = [...builds];
+    setBuilds(prev => prev.map(b => b.id === buildId ? { ...b, isPublic: !currentIsPublic } : b));
+
+    if (!currentIsPublic) {
+      showActionPopup("publish", "Your build is now visible to the community.");
+    } else {
+      showActionPopup("unpublish", "Your build is now private.");
+    }
+
     try {
       const response = await fetch(`/api/builds/${buildId}`, {
         method: "PUT",
@@ -1427,10 +1754,11 @@ export default function BuildsList({
       });
 
       if (!response.ok) {
+        // Revert optimistic update
+        setBuilds(previousBuilds);
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData.error || "Failed to update build visibility";
 
-        // Show specific error message if it's about the limit, empty build, or incomplete build
         if (response.status === 400 && (errorMessage.includes("5 public builds") || errorMessage.includes("empty build") || errorMessage.includes("incomplete build"))) {
           toast.error(errorMessage, {
             duration: 5000,
@@ -1440,48 +1768,9 @@ export default function BuildsList({
         }
         return;
       }
-
-      // Refresh builds list to get updated data
-      const page = maxBuilds ? 1 : currentPage;
-      const limit = maxBuilds || 11;
-      const refreshResponse = await fetch(`/api/builds?page=${page}&limit=${limit}`);
-      if (refreshResponse.ok) {
-        const refreshData = await refreshResponse.json();
-        const buildsArray = Array.isArray(refreshData)
-          ? refreshData.map((build: any) => ({
-            id: build.id,
-            name: build.name,
-            code: build.code,
-            isPublic: build.isPublic || false,
-            author: build.author || "You", // Fallback to "You" if author is missing
-            userId: build.userId || null,
-          }))
-          : (refreshData.builds || []).map((build: any) => ({
-            id: build.id,
-            name: build.name,
-            code: build.code,
-            isPublic: build.isPublic || false,
-            author: build.author || "You", // Fallback to "You" if author is missing
-            userId: build.userId || null,
-          }));
-        const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
-          if (a.isPublic && !b.isPublic) return -1;
-          if (!a.isPublic && b.isPublic) return 1;
-          return 0;
-        });
-        setBuilds(sortedBuilds);
-
-        // Update pagination info if available
-        if (refreshData.total !== undefined) {
-          setTotalBuilds(refreshData.total);
-          setTotalPages(refreshData.totalPages || 1);
-        }
-      }
-
-      toast.success(
-        `Build ${!currentIsPublic ? "made public" : "made private"}`
-      );
     } catch (error) {
+      // Revert optimistic update on network error
+      setBuilds(previousBuilds);
       console.error("Failed to toggle build visibility:", error);
       toast.error("Failed to update build visibility");
     }
@@ -1490,7 +1779,7 @@ export default function BuildsList({
 
   // // Calculate button span based on grid layout and number of builds
   const getButtonSpanClass = () => {
-    const buildCount = buildsToShow.length;
+    const buildCount = displayBuilds.length;
 
     // For mobile (1 column): always full width
     // For md (2 columns): if odd number of builds, span 2, if even span 1
@@ -1674,42 +1963,7 @@ export default function BuildsList({
         localStorage.removeItem("vbuilds");
         setHasLocalBuilds(false);
 
-        // Refresh builds list
-        const page = maxBuilds ? 1 : currentPage;
-        const limit = maxBuilds || 11;
-        const response = await fetch(`/api/builds?page=${page}&limit=${limit}`);
-        if (response.ok) {
-          const data = await response.json();
-          // Handle both old format (array) and new format (object with builds array)
-          const buildsArray = Array.isArray(data)
-            ? data.map((build: any) => ({
-              id: build.id,
-              name: build.name,
-              code: build.code,
-              isPublic: build.isPublic || false,
-            }))
-            : (data.builds || []).map((build: any) => ({
-              id: build.id,
-              name: build.name,
-              code: build.code,
-              isPublic: build.isPublic || false,
-            }));
-          // Sort builds: public builds first, then private builds
-          const sortedBuilds = buildsArray.sort((a: { isPublic: boolean; }, b: { isPublic: boolean; }) => {
-            if (a.isPublic && !b.isPublic) return -1;
-            if (!a.isPublic && b.isPublic) return 1;
-            return 0;
-          });
-          setBuilds(sortedBuilds);
-
-          // Update pagination info if available
-          if (data.total !== undefined) {
-            setTotalBuilds(data.total);
-            setTotalPages(data.totalPages || 1);
-          }
-
-          onBuildsLoaded?.(sortedBuilds.length > 0);
-        }
+        resetAndRefetch();
 
         toast.success(
           `Imported ${imported} build${imported !== 1 ? "s" : ""}${failed > 0 ? `, ${failed} failed` : ""}`
@@ -1752,196 +2006,312 @@ export default function BuildsList({
         </motion.div>
       )}
 
+      {/* Filters - only show on full builds page, not homepage widget */}
+      {!maxBuilds && (
+        <div className="flex flex-wrap gap-3 mb-6 w-full border border-white/10 rounded-lg">
+          {/* Armour Filter */}
+          <div className="p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Shield className="w-3 h-3 text-red-400" />
+              <label className="text-xs font-semibold text-red-400">Armour</label>
+            </div>
+            <DropdownSelect
+              selected={armourFilter || ""}
+              clear={() => setArmourFilter(null)}
+              onSelect={(id: string) => setArmourFilter(id)}
+              options={[...armourOptions]}
+              defaultValue={null}
+              placeholder={
+                <DropdownSelectPlaceholder
+                  image="/images/vbuilds/armour/armour-draculas_shadow_chestguard.webp"
+                  text="Armour"
+                />
+              }
+            />
+          </div>
+
+          {/* Primary Blood Filter */}
+          <div className="p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Droplet className="w-3 h-3 text-red-400" />
+              <label className="text-xs font-semibold text-red-400">Blood 1</label>
+            </div>
+            <DropdownSelect
+              selected={primaryBloodFilter || ""}
+              clear={() => setPrimaryBloodFilter(null)}
+              onSelect={(id: string) => setPrimaryBloodFilter(id)}
+              options={bloodList as BloodType[]}
+              defaultValue={null}
+              placeholder={
+                <DropdownSelectPlaceholder
+                  image="/images/vbuilds/blood/rogue-blood.webp"
+                  text="Blood 1"
+                />
+              }
+            />
+          </div>
+
+          {/* Secondary Blood Filter */}
+          <div className="p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Droplet className="w-3 h-3 text-red-400" />
+              <label className="text-xs font-semibold text-red-400">Blood 2</label>
+            </div>
+            <DropdownSelect
+              selected={secondaryBloodFilter || ""}
+              clear={() => setSecondaryBloodFilter(null)}
+              onSelect={(id: string) => setSecondaryBloodFilter(id)}
+              options={bloodList as BloodType[]}
+              defaultValue={null}
+              placeholder={
+                <DropdownSelectPlaceholder
+                  image="/images/vbuilds/blood/rogue-blood.webp"
+                  text="Blood 2"
+                />
+              }
+            />
+          </div>
+
+          {/* Spell Slot 1 Filter */}
+          <div className="p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-3 h-3 text-red-400" />
+              <label className="text-xs font-semibold text-red-400">Spell 1</label>
+            </div>
+            <SpellDropdownSelect
+              value={spellSlot1Spell}
+              onChange={(spellId) => {
+                setSpellSlot1Spell(spellId);
+                const spell = (spellsData as any)[spellId];
+                if (spell) {
+                  setSpellSlot1School(spell.spellSchool);
+                }
+              }}
+              onClear={() => {
+                setSpellSlot1Spell(null);
+                setSpellSlot1School(null);
+              }}
+              excludeSpellId={spellSlot2Spell}
+              placeholder={
+                <DropdownSelectPlaceholder
+                  image="/images/vbuilds/spells/spell-blood-blood_rage.webp"
+                  text="Spell 1"
+                />
+              }
+              slotNumber={1}
+            />
+          </div>
+
+          {/* Spell Slot 2 Filter */}
+          <div className="p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-3 h-3 text-red-400" />
+              <label className="text-xs font-semibold text-red-400">Spell 2</label>
+            </div>
+            <SpellDropdownSelect
+              value={spellSlot2Spell}
+              onChange={(spellId) => {
+                setSpellSlot2Spell(spellId);
+                const spell = (spellsData as any)[spellId];
+                if (spell) {
+                  setSpellSlot2School(spell.spellSchool);
+                }
+              }}
+              onClear={() => {
+                setSpellSlot2Spell(null);
+                setSpellSlot2School(null);
+              }}
+              excludeSpellId={spellSlot1Spell}
+              placeholder={
+                <DropdownSelectPlaceholder
+                  image="/images/vbuilds/spells/spell-blood-blood_rite.webp"
+                  text="Spell 2"
+                />
+              }
+              slotNumber={2}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Filter count info */}
+      {!maxBuilds && hasActiveFilters && (
+        <div className="mb-6 flex items-center justify-between">
+          <div className="text-sm text-gray-300">
+            <span className="font-semibold text-white">{filteredBuilds.length}</span> of{" "}
+            <span className="font-semibold text-white">{buildsToShow.length}</span> builds
+            <span className="ml-2 text-xs text-red-400 bg-red-900/20 px-2 py-1 rounded-full">
+              Filtered
+            </span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearAllFilters}
+            className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+          >
+            <X className="w-4 h-4 mr-1" />
+            Clear filters
+          </Button>
+        </div>
+      )}
+
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {Array.from({ length: 11 }).map((_, index) => (
+          {Array.from({ length: 6 }).map((_, index) => (
             <BuildCardSkeleton key={index} />
           ))}
         </div>
       ) : (
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          viewport={{ once: true }}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={(event) => setActiveDragId(String(event.active.id))}
+          onDragEnd={handleDragEnd}
+          onDragCancel={() => setActiveDragId(null)}
+          id="builds-list-dnd"
         >
-          {buildsToShow.length !== 0 && (
-            <motion.div variants={scaleIn}>
-              <Link href="/builds/create">
-                <Card className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-dashed border-white/30 hover:border-white/60 transition-all duration-300 overflow-hidden group cursor-pointer h-full relative flex items-center justify-center min-h-[400px]">
-                  {/* Glow effect on hover */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/10" />
-                  </div>
-
-                  <div className="flex flex-col items-center justify-center gap-4 p-8 relative z-10">
-                    {/* Plus icon in circle */}
-                    <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/40 flex items-center justify-center group-hover:border-white/60 transition-colors duration-300">
-                      <Plus className="w-8 h-8 text-white/60 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
-                    </div>
-
-                    {/* Text */}
-                    <span className="text-white/60 group-hover:text-white font-bold text-lg tracking-wide transition-colors duration-300">
-                      CREATE A NEW BUILD
-                    </span>
-                  </div>
-                </Card>
-              </Link>
-            </motion.div>
-          )}
-          {buildsToShow.map((build, index) => (
+          <SortableContext
+            items={displayBuilds.map((b) => b.id || "").filter(Boolean)}
+            strategy={rectSortingStrategy}
+          >
             <motion.div
-              key={build.id || index}
-              variants={scaleIn}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              viewport={{ once: true }}
             >
-              <Link
-                href={`/builds/create?build=${encodeURIComponent(build.code)}`}
-              >
-                <BuildContent
-                  code={build.code}
-                  name={build.name}
-                  author={build.author}
-                  userId={build.userId}
-                  handleDeleteBuild={(event: React.MouseEvent) =>
-                    handleDelete(event, build.id || "", index)
-                  }
-                  isPublic={build.isPublic}
-                  isAuthenticated={isAuthenticated}
-                  onTogglePublic={(checked) => {
-                    if (build.id && !build.id.startsWith("local-")) {
-                      handleTogglePublic(build.id, build.isPublic || false);
-                    }
-                  }}
-                  showPublicToggle={true}
-                  buildId={build.id}
-                  onClone={handleClone}
-                  onRename={build.id && !build.id.startsWith("local-") ? handleRename : undefined}
-                  currentUserId={user?.id || null}
-                  onNameUpdated={(buildId, newName) => {
-                    // Update the build name in the local state
-                    setBuilds((prev) =>
-                      prev.map((b) =>
-                        b.id === buildId ? { ...b, name: newName } : b
-                      )
-                    );
-                  }}
-                  isMineTab={true}
-                  userBadge={build.userId ? badges[build.userId] : null}
-                />
-              </Link>
-            </motion.div>
-          ))}
-        </motion.div>
-      )}
+              {displayBuilds.length !== 0 && (
+                <motion.div variants={scaleIn}>
+                  <Link href="/builds/create">
+                    <Card className="bg-black/80 backdrop-blur-sm rounded-lg border-2 border-dashed border-white/30 hover:border-white/60 transition-all duration-300 overflow-hidden group cursor-pointer h-full relative flex items-center justify-center min-h-[400px]">
+                      {/* Glow effect on hover */}
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-white/10" />
+                      </div>
 
-      {/* Pagination Controls - Only show when there are 11+ builds and not using maxBuilds (homepage) */}
-      {!maxBuilds && totalBuilds >= 11 && totalPages > 1 && (
-        <div className="mt-8 flex justify-center">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (currentPage > 1) {
-                      setCurrentPage(currentPage - 1);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }
-                  }}
-                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                />
-              </PaginationItem>
+                      <div className="flex flex-col items-center justify-center gap-4 p-8 relative z-10">
+                        {/* Plus icon in circle */}
+                        <div className="w-16 h-16 rounded-full border-2 border-dashed border-white/40 flex items-center justify-center group-hover:border-white/60 transition-colors duration-300">
+                          <Plus className="w-8 h-8 text-white/60 group-hover:text-white group-hover:rotate-90 transition-all duration-300" />
+                        </div>
 
-              {/* Page numbers */}
-              {(() => {
-                const pagesToShow: (number | 'ellipsis')[] = [];
-
-                if (totalPages <= 7) {
-                  // Show all pages if 7 or fewer
-                  for (let i = 1; i <= totalPages; i++) {
-                    pagesToShow.push(i);
-                  }
-                } else {
-                  // Show first page
-                  pagesToShow.push(1);
-
-                  if (currentPage <= 4) {
-                    // Show pages 2-7
-                    for (let i = 2; i <= 7; i++) {
-                      pagesToShow.push(i);
-                    }
-                    pagesToShow.push('ellipsis');
-                    pagesToShow.push(totalPages);
-                  } else if (currentPage >= totalPages - 3) {
-                    // Show last 7 pages
-                    pagesToShow.push('ellipsis');
-                    for (let i = totalPages - 6; i <= totalPages; i++) {
-                      pagesToShow.push(i);
-                    }
-                  } else {
-                    // Show pages around current page
-                    pagesToShow.push('ellipsis');
-                    for (let i = currentPage - 2; i <= currentPage + 2; i++) {
-                      pagesToShow.push(i);
-                    }
-                    pagesToShow.push('ellipsis');
-                    pagesToShow.push(totalPages);
-                  }
-                }
-
-                return pagesToShow.map((item, idx) => {
-                  if (item === 'ellipsis') {
-                    return (
-                      <PaginationItem key={`ellipsis-${idx}`}>
-                        <PaginationEllipsis />
-                      </PaginationItem>
-                    );
-                  }
-                  return (
-                    <PaginationItem key={item}>
-                      <PaginationLink
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCurrentPage(item);
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                        isActive={currentPage === item}
-                        className="cursor-pointer"
+                        {/* Text */}
+                        <span className="text-white/60 group-hover:text-white font-bold text-lg tracking-wide transition-colors duration-300">
+                          CREATE A NEW BUILD
+                        </span>
+                      </div>
+                    </Card>
+                  </Link>
+                </motion.div>
+              )}
+              {displayBuilds.map((build, index) => (
+                <motion.div
+                  key={build.id || index}
+                  variants={scaleIn}
+                >
+                  {build.id && !build.id.startsWith("local-") && isAuthenticated && !maxBuilds && !hasActiveFilters ? (
+                    <SortableBuildCard id={build.id}>
+                      <div
+                        onClick={() => router.push(`/builds/create?build=${encodeURIComponent(build.code)}`)}
                       >
-                        {item}
-                      </PaginationLink>
-                    </PaginationItem>
-                  );
-                });
-              })()}
-
-              <PaginationItem>
-                <PaginationNext
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (currentPage < totalPages) {
-                      setCurrentPage(currentPage + 1);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }
-                  }}
-                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+                        <BuildContent
+                          code={build.code}
+                          name={build.name}
+                          author={build.author}
+                          userId={build.userId}
+                          handleDeleteBuild={(event: React.MouseEvent) =>
+                            handleDelete(event, build.id || "", index)
+                          }
+                          isPublic={build.isPublic}
+                          isAuthenticated={isAuthenticated}
+                          onTogglePublic={(checked) => {
+                            if (build.id && !build.id.startsWith("local-")) {
+                              handleTogglePublic(build.id, build.isPublic || false);
+                            }
+                          }}
+                          showPublicToggle={true}
+                          buildId={build.id}
+                          onClone={handleClone}
+                          onRename={build.id && !build.id.startsWith("local-") ? handleRename : undefined}
+                          currentUserId={user?.id || null}
+                          onNameUpdated={(buildId, newName) => {
+                            setBuilds((prev) =>
+                              prev.map((b) =>
+                                b.id === buildId ? { ...b, name: newName } : b
+                              )
+                            );
+                          }}
+                          isMineTab={true}
+                          userBadge={build.userId ? badges[build.userId] : null}
+                          onActionPopup={showActionPopup}
+                        />
+                      </div>
+                    </SortableBuildCard>
+                  ) : (
+                    <div
+                      onClick={() => router.push(`/builds/create?build=${encodeURIComponent(build.code)}`)}
+                    >
+                      <BuildContent
+                        code={build.code}
+                        name={build.name}
+                        author={build.author}
+                        userId={build.userId}
+                        handleDeleteBuild={(event: React.MouseEvent) =>
+                          handleDelete(event, build.id || "", index)
+                        }
+                        isPublic={build.isPublic}
+                        isAuthenticated={isAuthenticated}
+                        onTogglePublic={(checked) => {
+                          if (build.id && !build.id.startsWith("local-")) {
+                            handleTogglePublic(build.id, build.isPublic || false);
+                          }
+                        }}
+                        showPublicToggle={true}
+                        buildId={build.id}
+                        onClone={handleClone}
+                        onRename={build.id && !build.id.startsWith("local-") ? handleRename : undefined}
+                        currentUserId={user?.id || null}
+                        onNameUpdated={(buildId, newName) => {
+                          setBuilds((prev) =>
+                            prev.map((b) =>
+                              b.id === buildId ? { ...b, name: newName } : b
+                            )
+                          );
+                        }}
+                        isMineTab={true}
+                        userBadge={build.userId ? badges[build.userId] : null}
+                        onActionPopup={showActionPopup}
+                      />
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </motion.div>
+          </SortableContext>
+        </DndContext>
       )}
 
-      {/* Build count info */}
-      {!maxBuilds && totalBuilds > 0 && (
-        <div className="mt-4 text-center text-sm text-gray-400">
-          Showing {((currentPage - 1) * 11) + 1} - {Math.min(currentPage * 11, totalBuilds)} of {totalBuilds} builds
-        </div>
+      {/* Infinite scroll sentinel & loading indicator */}
+      {!maxBuilds && isAuthenticated && (
+        <>
+          <div ref={sentinelRef} className="h-1" />
+          {loadingMore && (
+            <div className="mt-8 flex justify-center">
+              <div className="flex items-center gap-2 text-gray-400">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span className="text-sm">Loading more builds...</span>
+              </div>
+            </div>
+          )}
+          {!hasMore && builds.length > 0 && (
+            <div className="mt-4 text-center text-sm text-gray-400">
+              Showing {builds.length} of {totalBuilds} builds
+            </div>
+          )}
+        </>
       )}
 
       {!loading && builds.length === 0 && (
@@ -1975,6 +2345,28 @@ export default function BuildsList({
           </Link>
         </motion.div>
       )}
+      {/* Confirm delete popup */}
+      <AnimatePresence>
+        {confirmDelete && (
+          <ConfirmPopup
+            title="Delete Build"
+            message="Are you sure you want to delete this build? This action cannot be undone."
+            confirmLabel="Delete"
+            onConfirm={() => executeDelete(confirmDelete.buildId, confirmDelete.index)}
+            onCancel={() => setConfirmDelete(null)}
+          />
+        )}
+      </AnimatePresence>
+      {/* Action popup */}
+      <AnimatePresence>
+        {actionPopup && (
+          <ActionPopup
+            type={actionPopup.type}
+            message={actionPopup.message}
+            onClose={() => setActionPopup(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

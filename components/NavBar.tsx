@@ -184,8 +184,10 @@ export default function NavBar() {
             initial={false}
             animate={{
               backgroundColor:
-                scrollY > 50 ? "rgba(0, 0, 0, 0.8)" : "rgba(0, 0, 0, 0)",
-              backdropFilter: scrollY > 50 ? "blur(12px)" : "blur(0px)",
+                scrollY > 50 ? "rgba(0, 0, 0, 1)" : "rgba(0, 0, 0, 0)",
+              borderBottomWidth: scrollY > 50 ? "1px" : "0px",
+              borderBottomColor:
+                scrollY > 50 ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0)",
             }}
             transition={{
               type: "spring",
@@ -195,6 +197,7 @@ export default function NavBar() {
               duration: 0.5,
             }}
             className="absolute inset-0"
+            style={{ borderBottomStyle: "solid" }}
           />
 
           <Link href="/" className="flex items-center gap-2 z-50">
