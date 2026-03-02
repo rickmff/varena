@@ -28,6 +28,7 @@ export const menuItems = [
   { name: "HOME", href: "/" },
   { name: "BUILDS", href: "/builds" },
   { name: "TIER LIST", href: "/tier-list" },
+  { name: "RANKED", href: "/ranked" },
   { name: "COMMANDS", href: "/commands" },
 ];
 
@@ -173,32 +174,15 @@ export default function NavBar() {
     <>
       <GameMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      <header className="fixed top-0 left-0 right-0 z-50">
+      <header
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out bg-black/45 backdrop-blur-xl backdrop-saturate-[1.8]"
+      >
         <motion.div
           className="container mx-auto px-4 py-4 flex items-center justify-between"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <motion.div
-            initial={false}
-            animate={{
-              backgroundColor:
-                scrollY > 50 ? "rgba(0, 0, 0, 1)" : "rgba(0, 0, 0, 0)",
-              borderBottomWidth: scrollY > 50 ? "1px" : "0px",
-              borderBottomColor:
-                scrollY > 50 ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0)",
-            }}
-            transition={{
-              type: "spring",
-              stiffness: 100,
-              damping: 20,
-              mass: 1,
-              duration: 0.5,
-            }}
-            className="absolute inset-0"
-            style={{ borderBottomStyle: "solid" }}
-          />
 
           <Link href="/" className="flex items-center gap-2 z-50">
             <motion.div

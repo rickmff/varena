@@ -365,6 +365,16 @@ export default function PublicBuildsList() {
     setTimeout(() => setActionPopup(null), 3000);
   };
 
+  // Debounce author filter to avoid refetching on every keystroke
+  const [debouncedAuthorFilter, setDebouncedAuthorFilter] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedAuthorFilter(authorFilter), 300);
+    return () => clearTimeout(timer);
+  }, [authorFilter]);
+
+  // When any filter is active, fetch all builds so client-side filtering works on the full dataset
+  const hasAnyFilter = !!(armourFilter || spellSlot1Spell || spellSlot2Spell || primaryBloodFilter || secondaryBloodFilter || debouncedAuthorFilter);
+
   const fetchBuilds = useCallback(async (pageNum: number, reset: boolean = false) => {
     if (fetchingRef.current) return;
 
@@ -376,7 +386,8 @@ export default function PublicBuildsList() {
     }
 
     try {
-      const response = await fetch(`/api/public-builds?sort=${sortBy}&limit=${BUILDS_PER_PAGE}&page=${pageNum}`);
+      const effectiveLimit = hasAnyFilter ? 9999 : BUILDS_PER_PAGE;
+      const response = await fetch(`/api/public-builds?sort=${sortBy}&limit=${effectiveLimit}&page=${pageNum}`);
       if (!response.ok) {
         throw new Error("Failed to fetch public builds");
       }
@@ -441,10 +452,11 @@ export default function PublicBuildsList() {
       setLoadingMore(false);
       fetchingRef.current = false;
     }
-  }, [sortBy]);
+  }, [sortBy, hasAnyFilter]);
 
-  // Initial fetch and reset when sort changes
+  // Initial fetch and reset when sort or filters change
   useEffect(() => {
+    fetchingRef.current = false;
     setBuilds([]);
     setPage(1);
     setHasMore(true);
