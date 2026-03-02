@@ -28,8 +28,8 @@ export const menuItems = [
   { name: "HOME", href: "/" },
   { name: "BUILDS", href: "/builds" },
   { name: "TIER LIST", href: "/tier-list" },
-  { name: "RANKED", href: "/ranked" },
-  { name: "COMMANDS", href: "/commands" },
+/*   { name: "RANKED", href: "/ranked" },
+ */  { name: "COMMANDS", href: "/commands" },
 ];
 
 export const DiscordButton = ({
