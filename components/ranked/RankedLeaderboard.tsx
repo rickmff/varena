@@ -27,8 +27,6 @@ import {
   Target,
   Clock,
   ChevronDown,
-  Flame,
-  Shield,
   Loader2,
   Calendar,
 } from "lucide-react";
@@ -55,6 +53,7 @@ interface Opponent {
   score: number;
   damageDone: number;
   damageReceived: number;
+  mmr: number | null;
 }
 
 interface MatchHistory {
@@ -148,30 +147,15 @@ function formatDuration(seconds: number): string {
   return `${m}m ${s.toString().padStart(2, "0")}s`;
 }
 
-// ─── Build display helpers ───────────────────────────────────────────────────
-
-function findMostFrequentSpellSchool(words: (string | undefined)[]): string {
-  const valid = words.filter((w): w is string => w !== undefined);
-  if (valid.length === 0) return "empty";
-  const freq: Record<string, number> = {};
-  for (const w of valid) freq[w] = (freq[w] || 0) + 1;
-  let best = "";
-  let max = 0;
-  for (const w in freq) {
-    if (freq[w] > max) { best = w; max = freq[w]; }
-  }
-  return best;
+function formatMatchDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
 }
 
-const spellBorderVariants: Record<string, string> = {
-  empty: "border-spellSchool-empty/30",
-  storm: "border-spellSchool-storm/30",
-  blood: "border-spellSchool-blood/30",
-  chaos: "border-spellSchool-chaos/30",
-  arcane: "border-spellSchool-unholy/30",
-  frost: "border-spellSchool-frost/30",
-  illusion: "border-spellSchool-illusion/30",
-};
+// ─── Build display helpers ───────────────────────────────────────────────────
 
 function MatchBuildIcons({ code }: { code: string }) {
   if (!code || code.length < 30) return null;
@@ -184,14 +168,6 @@ function MatchBuildIcons({ code }: { code: string }) {
   }
 
   const spells = build.spells;
-  const school = findMostFrequentSpellSchool([
-    spells.dash?.spellSchool,
-    spells.spell1?.spellSchool,
-    spells.spell2?.spellSchool,
-    spells.ultimate?.spellSchool,
-  ]);
-  const border = spellBorderVariants[school] || spellBorderVariants.empty;
-
   const spellIcons = [
     spells.dash?.img,
     spells.spell1?.img,
@@ -200,11 +176,16 @@ function MatchBuildIcons({ code }: { code: string }) {
   ];
 
   return (
-    <div className="flex items-center gap-0.5">
+    <a
+      href={`/builds/create?build=${encodeURIComponent(code)}`}
+      onClick={(e) => e.stopPropagation()}
+      className="flex items-center gap-0.5 hover:opacity-75 transition-opacity"
+      title="View build"
+    >
       {spellIcons.map((img, i) => (
         <div
           key={i}
-          className={`relative w-8 h-8 bg-zinc-900/50 rounded border ${border} flex items-center justify-center overflow-hidden`}
+          className="relative w-8 h-8 bg-zinc-900/50 rounded border border-stone-700/50 flex items-center justify-center overflow-hidden"
         >
           {img ? (
             <img src={img} className="w-7 h-7" alt="" />
@@ -213,6 +194,15 @@ function MatchBuildIcons({ code }: { code: string }) {
           )}
         </div>
       ))}
+    </a>
+  );
+}
+
+function StatCol({ value, label }: { value: string | number; label: string }) {
+  return (
+    <div className="flex flex-col items-center min-w-[36px]">
+      <span className="text-xs font-semibold text-stone-300 tabular-nums leading-none">{value}</span>
+      <span className="text-[9px] text-stone-600 uppercase tracking-wider leading-none mt-0.5">{label}</span>
     </div>
   );
 }
@@ -277,16 +267,16 @@ const BUILD_D = "722222222bcg9af3456g2456413656o6479n218700000000000000000000000
 const BUILD_E = "522222222icbj6i1256r1246312458c08B7b07B8g628Ef028En379Dr528Ei64B9o128E41111623";
 
 const MOCK_MATCHES: MatchHistory[] = [
-  { matchId: 2010, team: 1, build: BUILD_A, mmrDiff: 28,  damageDone: 5200, damageReceived: 1900, score: 2, kills: 9,  deaths: 2, matchDate: new Date(Date.now() - 1000 * 60 * 20).toISOString(),           matchDuration: 680,  opponents: [{ steamId: "76561198000000002", name: "Hunter",       build: BUILD_B, score: 0, damageDone: 1900, damageReceived: 5200 }] },
-  { matchId: 2009, team: 2, build: BUILD_C, mmrDiff: -22, damageDone: 3100, damageReceived: 4800, score: 1, kills: 3,  deaths: 7, matchDate: new Date(Date.now() - 1000 * 60 * 95).toISOString(),           matchDuration: 540,  opponents: [{ steamId: "76561198000000003", name: "Hunter",    build: BUILD_D, score: 2, damageDone: 4800, damageReceived: 3100 }] },
-  { matchId: 2008, team: 1, build: BUILD_E, mmrDiff: 31,  damageDone: 6100, damageReceived: 2200, score: 2, kills: 11, deaths: 1, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(),       matchDuration: 710,  opponents: [{ steamId: "76561198000000004", name: "Hunter",    build: BUILD_A, score: 0, damageDone: 2200, damageReceived: 6100 }] },
-  { matchId: 2007, team: 2, build: BUILD_B, mmrDiff: -19, damageDone: 2900, damageReceived: 3600, score: 1, kills: 4,  deaths: 6, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 9).toISOString(),       matchDuration: 890,  opponents: [{ steamId: "76561198000000005", name: "Hunter",    build: BUILD_C, score: 2, damageDone: 3600, damageReceived: 2900 }] },
-  { matchId: 2006, team: 1, build: BUILD_D, mmrDiff: 25,  damageDone: 4700, damageReceived: 2500, score: 2, kills: 8,  deaths: 3, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),      matchDuration: 620,  opponents: [{ steamId: "76561198000000006", name: "Hunter",    build: BUILD_E, score: 1, damageDone: 2500, damageReceived: 4700 }] },
-  { matchId: 2005, team: 1, build: BUILD_A, mmrDiff: 20,  damageDone: 4300, damageReceived: 3000, score: 2, kills: 7,  deaths: 4, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 50).toISOString(),      matchDuration: 810,  opponents: [{ steamId: "76561198000000007", name: "Hunter",    build: BUILD_D, score: 0, damageDone: 3000, damageReceived: 4300 }] },
-  { matchId: 2004, team: 2, build: BUILD_C, mmrDiff: -14, damageDone: 2600, damageReceived: 3300, score: 0, kills: 2,  deaths: 5, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 75).toISOString(),      matchDuration: 460,  opponents: [{ steamId: "76561198000000008", name: "Hunter", build: BUILD_B, score: 2, damageDone: 3300, damageReceived: 2600 }] },
-  { matchId: 2003, team: 1, build: BUILD_E, mmrDiff: 18,  damageDone: 3900, damageReceived: 2800, score: 2, kills: 6,  deaths: 3, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(),  matchDuration: 590,  opponents: [{ steamId: "76561198000000009", name: "Hunter", build: BUILD_A, score: 1, damageDone: 2800, damageReceived: 3900 }] },
-  { matchId: 2002, team: 2, build: BUILD_B, mmrDiff: -10, damageDone: 2400, damageReceived: 2900, score: 1, kills: 3,  deaths: 4, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(),  matchDuration: 505,  opponents: [{ steamId: "76561198000000010", name: "Hunter",     build: BUILD_C, score: 2, damageDone: 2900, damageReceived: 2400 }] },
-  { matchId: 2001, team: 1, build: BUILD_D, mmrDiff: 15,  damageDone: 3500, damageReceived: 2100, score: 2, kills: 5,  deaths: 2, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 9).toISOString(),  matchDuration: 740,  opponents: [{ steamId: "76561198000000011", name: null,        build: BUILD_E, score: 0, damageDone: 2100, damageReceived: 3500 }] },
+  { matchId: 2010, team: 1, build: BUILD_A, mmrDiff: 28,  damageDone: 5200, damageReceived: 1900, score: 2, kills: 9,  deaths: 2, matchDate: new Date(Date.now() - 1000 * 60 * 20).toISOString(),           matchDuration: 680,  opponents: [{ steamId: "76561198000000002", name: "Hunter",       build: BUILD_B, score: 0, damageDone: 1900, damageReceived: 5200, mmr: 1850 }] },
+  { matchId: 2009, team: 2, build: BUILD_C, mmrDiff: -22, damageDone: 3100, damageReceived: 4800, score: 1, kills: 3,  deaths: 7, matchDate: new Date(Date.now() - 1000 * 60 * 95).toISOString(),           matchDuration: 540,  opponents: [{ steamId: "76561198000000003", name: "Hunter",    build: BUILD_D, score: 2, damageDone: 4800, damageReceived: 3100, mmr: 2100 }] },
+  { matchId: 2008, team: 1, build: BUILD_E, mmrDiff: 31,  damageDone: 6100, damageReceived: 2200, score: 2, kills: 11, deaths: 1, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(),       matchDuration: 710,  opponents: [{ steamId: "76561198000000004", name: "Hunter",    build: BUILD_A, score: 0, damageDone: 2200, damageReceived: 6100, mmr: 1970 }] },
+  { matchId: 2007, team: 2, build: BUILD_B, mmrDiff: -19, damageDone: 2900, damageReceived: 3600, score: 1, kills: 4,  deaths: 6, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 9).toISOString(),       matchDuration: 890,  opponents: [{ steamId: "76561198000000005", name: "Hunter",    build: BUILD_C, score: 2, damageDone: 3600, damageReceived: 2900, mmr: 2240 }] },
+  { matchId: 2006, team: 1, build: BUILD_D, mmrDiff: 25,  damageDone: 4700, damageReceived: 2500, score: 2, kills: 8,  deaths: 3, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),      matchDuration: 620,  opponents: [{ steamId: "76561198000000006", name: "Hunter",    build: BUILD_E, score: 1, damageDone: 2500, damageReceived: 4700, mmr: 1730 }] },
+  { matchId: 2005, team: 1, build: BUILD_A, mmrDiff: 20,  damageDone: 4300, damageReceived: 3000, score: 2, kills: 7,  deaths: 4, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 50).toISOString(),      matchDuration: 810,  opponents: [{ steamId: "76561198000000007", name: "Hunter",    build: BUILD_D, score: 0, damageDone: 3000, damageReceived: 4300, mmr: 1900 }] },
+  { matchId: 2004, team: 2, build: BUILD_C, mmrDiff: -14, damageDone: 2600, damageReceived: 3300, score: 0, kills: 2,  deaths: 5, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 75).toISOString(),      matchDuration: 460,  opponents: [{ steamId: "76561198000000008", name: "Hunter", build: BUILD_B, score: 2, damageDone: 3300, damageReceived: 2600, mmr: 2050 }] },
+  { matchId: 2003, team: 1, build: BUILD_E, mmrDiff: 18,  damageDone: 3900, damageReceived: 2800, score: 2, kills: 6,  deaths: 3, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(),  matchDuration: 590,  opponents: [{ steamId: "76561198000000009", name: "Hunter", build: BUILD_A, score: 1, damageDone: 2800, damageReceived: 3900, mmr: 1780 }] },
+  { matchId: 2002, team: 2, build: BUILD_B, mmrDiff: -10, damageDone: 2400, damageReceived: 2900, score: 1, kills: 3,  deaths: 4, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(),  matchDuration: 505,  opponents: [{ steamId: "76561198000000010", name: "Hunter",     build: BUILD_C, score: 2, damageDone: 2900, damageReceived: 2400, mmr: 2160 }] },
+  { matchId: 2001, team: 1, build: BUILD_D, mmrDiff: 15,  damageDone: 3500, damageReceived: 2100, score: 2, kills: 5,  deaths: 2, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 9).toISOString(),  matchDuration: 740,  opponents: [{ steamId: "76561198000000011", name: null,        build: BUILD_E, score: 0, damageDone: 2100, damageReceived: 3500, mmr: null }] },
 ];
 
 function MatchHistoryPanel({
@@ -434,15 +424,15 @@ function MatchHistoryPanel({
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.04, duration: 0.2 }}
-                          className={`relative flex rounded border transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-1px_0_rgba(0,0,0,0.3)] ${
+                          className={`relative flex rounded border transition-all duration-200 overflow-hidden ${
                             won
                               ? "bg-gradient-to-r from-emerald-950/40 via-emerald-950/20 to-stone-900/60 border-emerald-800/30 hover:border-emerald-700/40"
                               : "bg-gradient-to-r from-red-950/40 via-red-950/20 to-stone-900/60 border-red-800/30 hover:border-red-700/40"
                           }`}
                         >
-                          {/* Column 1: Result — full height */}
-                          <div className="flex flex-col items-center justify-center text-center gap-0.5 px-6 py-3 shrink-0 border-r border-stone-800/50 min-w-[62px]">
-                            <span className={`text-sm font-bold uppercase tracking-widest ${won ? "text-emerald-400" : "text-red-400"}`}>
+                          {/* Result col — full height, no bottom bar */}
+                          <div className="flex flex-col items-center justify-center text-center gap-0 px-4 shrink-0 border-r border-stone-800/50 min-w-[56px] self-stretch">
+                            <span className={`text-xs font-bold uppercase tracking-widest ${won ? "text-emerald-400" : "text-red-400"}`}>
                               {won ? "WIN" : "LOSS"}
                             </span>
                             <span className={`text-sm font-bold tabular-nums ${
@@ -452,66 +442,62 @@ function MatchHistoryPanel({
                             </span>
                           </div>
 
-                          {/* Column 2: match info + stats */}
+                          {/* Content col: players row + bottom info */}
                           <div className="flex flex-col flex-1 min-w-0">
-                            {/* Row 1: player | score | opponent */}
-                            <div className="flex items-stretch">
-                              {/* Player side */}
-                              <div className="flex items-center justify-end gap-3 px-3 py-3 flex-1 min-w-0">
-                                <div className="flex gap-3 items-center min-w-0">
-                                  <MatchBuildIcons code={match.build} />
-                                  <span className="text-sm text-stone-300 tracking-wide truncate max-w-[110px]">
-                                    {playerName ?? steamId.slice(-8)}
-                                  </span>
+                            {/* Players row */}
+                            <div className="flex items-center">
+                              {/* Player side: stats → build → name (name nearest center) */}
+                              <div className="flex items-center justify-end gap-3 px-4 py-2.5 flex-1 min-w-0">
+                                <div className="flex items-center gap-4">
+                                  <StatCol value={match.mmrAfter} label="MMR" />
+                                  <StatCol value={formatNumber(match.damageDone)} label="DMG" />
+                                  <StatCol value={formatNumber(match.damageReceived)} label="REC" />
                                 </div>
+                                <MatchBuildIcons code={match.build} />
+                                <span className="text-sm font-medium text-white truncate max-w-[100px] shrink-0">
+                                  {playerName ?? steamId.slice(-8)}
+                                </span>
                               </div>
 
-                              {/* Center: Score */}
-                              <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0 border-x border-stone-800/50">
-                                <div className="flex items-center gap-1.5">
-                                  <span className={`text-xl font-bold tabular-nums ${won ? "text-emerald-500" : "text-red-500"}`}>{match.score}</span>
-                                  <span className="text-stone-600 text-xs font-medium">vs</span>
-                                  {match.opponents.length > 0 && (
-                                    <span className={`text-xl font-bold tabular-nums ${won ? "text-red-500" : "text-emerald-500"}`}>{match.opponents[0].score}</span>
-                                  )}
-                                </div>
+                              {/* Score */}
+                              <div className="flex items-center gap-1.5 px-5 py-2.5 shrink-0 border-x border-stone-800/50">
+                                <span className={`text-xl font-bold tabular-nums ${won ? "text-emerald-400" : "text-red-400"}`}>{match.score}</span>
+                                <span className="text-stone-600 text-xs font-medium">vs</span>
+                                {match.opponents.length > 0 && (
+                                  <span className={`text-xl font-bold tabular-nums ${won ? "text-red-400" : "text-emerald-400"}`}>{match.opponents[0].score}</span>
+                                )}
                               </div>
 
-                              {/* Opponent side */}
+                              {/* Opponent side: name → build → stats (name nearest center) */}
                               {match.opponents.length > 0 && (
-                                <div className="flex items-center px-3 py-3 flex-1 min-w-0 justify-start">
-                                  <div className="flex gap-3 items-center min-w-0">
-                                    <span className="text-sm text-stone-300 tracking-wide truncate max-w-[110px]">
-                                      {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
-                                    </span>
-                                    <MatchBuildIcons code={match.opponents[0].build} />
+                                <div className="flex items-center gap-3 px-4 py-2.5 flex-1 min-w-0">
+                                  <span className="text-sm font-medium text-white truncate max-w-[100px] shrink-0">
+                                    {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
+                                  </span>
+                                  <MatchBuildIcons code={match.opponents[0].build} />
+                                  <div className="flex items-center gap-4">
+                                    {match.opponents[0].mmr != null && (
+                                      <StatCol value={match.opponents[0].mmr} label="MMR" />
+                                    )}
+                                    <StatCol value={formatNumber(match.opponents[0].damageDone)} label="DMG" />
+                                    <StatCol value={formatNumber(match.opponents[0].damageReceived)} label="REC" />
                                   </div>
                                 </div>
                               )}
                             </div>
 
-                            {/* Row 2: stats */}
-                            <div className="flex items-center justify-center gap-6 px-4 py-1 border-t border-stone-800/40 bg-black/20 text-xs rounded-br">
+                            {/* Bottom info row — only under content col */}
+                            <div className="flex items-center justify-center gap-5 px-4 py-1 border-t border-stone-800/30 bg-black/15 text-xs">
                               {match.matchDuration != null && (
                                 <div className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-stone-500 shrink-0" />
-                                  <span className="tabular-nums text-stone-400">{formatDuration(match.matchDuration)}</span>
+                                  <Clock className="w-3 h-3 text-stone-600 shrink-0" />
+                                  <span className="tabular-nums text-stone-500">{formatDuration(match.matchDuration)}</span>
                                 </div>
                               )}
-                              <div className="flex items-center gap-1">
-                                <Flame className="w-3 h-3 text-stone-500 shrink-0" />
-                                <span className="text-stone-600">DMG</span>
-                                <span className="tabular-nums text-stone-400">{formatNumber(match.damageDone)}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Shield className="w-3 h-3 text-stone-500 shrink-0" />
-                                <span className="text-stone-600">REC</span>
-                                <span className="tabular-nums text-stone-400">{formatNumber(match.damageReceived)}</span>
-                              </div>
                               {match.matchDate && (
                                 <div className="flex items-center gap-1">
-                                  <Calendar className="w-3 h-3 text-stone-500 shrink-0" />
-                                  <span className="tabular-nums text-stone-400">{timeAgo(match.matchDate)}</span>
+                                  <Calendar className="w-3 h-3 text-stone-600 shrink-0" />
+                                  <span className="tabular-nums text-stone-500">{timeAgo(match.matchDate)}</span>
                                 </div>
                               )}
                             </div>
