@@ -30,9 +30,11 @@ import {
   Flame,
   Shield,
   Loader2,
+  Calendar,
 } from "lucide-react";
 import { convertStringToBuild } from "@/components/machines/converter";
 import "@/components/vbuilds/styles.css";
+import { EU, US, AU, BR, SG } from "country-flag-icons/react/3x2";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -71,6 +73,15 @@ interface MatchHistory {
 }
 
 type SortOption = "mmr" | "wins" | "winrate";
+type Region = "eu" | "na" | "oce" | "br" | "sea";
+
+const REGIONS: { value: Region; label: string; Flag: React.ComponentType<{ className?: string }> }[] = [
+  { value: "eu",  label: "EU",  Flag: EU },
+  { value: "na",  label: "NA",  Flag: US },
+  { value: "oce", label: "OCE", Flag: AU },
+  { value: "br",  label: "BR",  Flag: BR },
+  { value: "sea", label: "SEA", Flag: SG },
+];
 
 const sortLabels: Record<SortOption, string> = {
   mmr: "MMR",
@@ -257,7 +268,7 @@ function MmrDisplay({ mmr, rank }: { mmr: number; rank: number }) {
 }
 
 // Set to true to use mock data for UI testing
-const USE_MOCK_DATA = true;
+const USE_MOCK_DATA = false;
 
 const BUILD_A = "222222222bcaoif3462l3452412461c07B9b0B7900000000000000000000000000000041111643";
 const BUILD_B = "622222222bcn8721367j1245523642d03824083200000000000000000000000000000014444751";
@@ -283,17 +294,35 @@ function MatchHistoryPanel({
   playerName,
   isOpen,
   currentMmr,
+  region,
 }: {
   steamId: string;
   playerName: string | null;
   isOpen: boolean;
   currentMmr: number;
+  region: Region;
 }) {
   const PAGE_SIZE = 5;
+  const MAX_RETRIES = 3;
   const [allMatches, setAllMatches] = useState<MatchHistory[]>([]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(false);
   const [fetched, setFetched] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [hasError, setHasError] = useState(false);
+
+  // Reset when region changes so fresh data is fetched on next open
+  const prevRegion = React.useRef(region);
+  useEffect(() => {
+    if (prevRegion.current !== region) {
+      prevRegion.current = region;
+      setAllMatches([]);
+      setFetched(false);
+      setVisibleCount(PAGE_SIZE);
+      setRetryCount(0);
+      setHasError(false);
+    }
+  }, [region]);
 
   // Reconstruct MMR at each match by walking backwards from current MMR
   const allMatchesWithMmr = React.useMemo(() => {
@@ -317,23 +346,41 @@ function MatchHistoryPanel({
       return;
     }
 
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+
     async function fetchMatches() {
       setLoading(true);
+      setHasError(false);
       try {
-        const res = await fetch(`/api/ranked/${steamId}`);
+        const res = await fetch(`/api/ranked/${steamId}?region=${region}`);
         const data = await res.json();
-        if (data.success) {
+        if (data.success && data.matches.length > 0) {
           setAllMatches(data.matches);
+          setFetched(true);
+        } else if (data.success && data.matches.length === 0 && retryCount < MAX_RETRIES) {
+          // Empty response — retry in case the server wasn't ready
+          retryTimer = setTimeout(() => setRetryCount((c) => c + 1), 2000);
+        } else if (data.success) {
+          // Still empty after all retries — accept it
+          setFetched(true);
+        } else {
+          throw new Error(data.error || "Unknown error");
         }
       } catch (err) {
         console.error("Failed to fetch match history:", err);
+        if (retryCount < MAX_RETRIES) {
+          retryTimer = setTimeout(() => setRetryCount((c) => c + 1), 2000);
+        } else {
+          setHasError(true);
+          setFetched(true);
+        }
       } finally {
         setLoading(false);
-        setFetched(true);
       }
     }
     fetchMatches();
-  }, [isOpen, steamId, fetched]);
+    return () => { if (retryTimer) clearTimeout(retryTimer); };
+  }, [isOpen, steamId, fetched, region, retryCount]);
 
   return (
     <AnimatePresence>
@@ -355,7 +402,21 @@ function MatchHistoryPanel({
                 {loading ? (
                   <div className="flex items-center justify-center py-8 gap-2 text-stone-500">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span className="text-sm">Loading matches...</span>
+                    <span className="text-sm">
+                      {retryCount > 0
+                        ? `Retrying... (${retryCount}/${MAX_RETRIES})`
+                        : "Loading matches..."}
+                    </span>
+                  </div>
+                ) : hasError ? (
+                  <div className="flex flex-col items-center justify-center py-8 gap-3 text-stone-500">
+                    <span className="text-sm">Failed to load match history.</span>
+                    <button
+                      onClick={() => { setFetched(false); setRetryCount(0); setHasError(false); }}
+                      className="text-xs px-3 py-1 rounded border border-stone-700 hover:border-stone-500 hover:text-stone-300 transition-colors"
+                    >
+                      Try again
+                    </button>
                   </div>
                 ) : matches.length === 0 ? (
                   <p className="text-center py-6 text-sm text-stone-500">
@@ -373,15 +434,15 @@ function MatchHistoryPanel({
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: i * 0.04, duration: 0.2 }}
-                          className={`relative flex items-stretch rounded border transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-1px_0_rgba(0,0,0,0.3)] ${
+                          className={`relative flex rounded border transition-all duration-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-1px_0_rgba(0,0,0,0.3)] ${
                             won
                               ? "bg-gradient-to-r from-emerald-950/40 via-emerald-950/20 to-stone-900/60 border-emerald-800/30 hover:border-emerald-700/40"
                               : "bg-gradient-to-r from-red-950/40 via-red-950/20 to-stone-900/60 border-red-800/30 hover:border-red-700/40"
                           }`}
                         >
-                          {/* Column 1: Result */}
-                          <div className="flex flex-col items-center justify-center gap-0.5 px-3 py-3 shrink-0 border-r border-stone-800/50 min-w-[62px]">
-                            <span className={`text-[11px] font-bold uppercase tracking-widest ${won ? "text-emerald-400" : "text-red-400"}`}>
+                          {/* Column 1: Result — full height */}
+                          <div className="flex flex-col items-center justify-center text-center gap-0.5 px-6 py-3 shrink-0 border-r border-stone-800/50 min-w-[62px]">
+                            <span className={`text-sm font-bold uppercase tracking-widest ${won ? "text-emerald-400" : "text-red-400"}`}>
                               {won ? "WIN" : "LOSS"}
                             </span>
                             <span className={`text-sm font-bold tabular-nums ${
@@ -389,46 +450,72 @@ function MatchHistoryPanel({
                             }`}>
                               {match.mmrDiff > 0 ? "+" : ""}{match.mmrDiff}
                             </span>
-                            {match.matchDuration !== null && (
-                              <span className="text-[10px] text-stone-500 tabular-nums mt-0.5">{formatDuration(match.matchDuration)}</span>
-                            )}
                           </div>
 
-                          {/* Player side */}
-                          <div className="flex items-center justify-end gap-3 px-3 py-3 flex-1 min-w-0">
-                            <div className="flex flex-col gap-1 items-end min-w-0">
-                              <span className="text-sm font-semibold text-stone-300 tracking-wide truncate max-w-[110px]">
-                                {playerName ?? steamId.slice(-8)}
-                              </span>
-                              <MatchBuildIcons code={match.build} />
-                            </div>
-                          </div>
+                          {/* Column 2: match info + stats */}
+                          <div className="flex flex-col flex-1 min-w-0">
+                            {/* Row 1: player | score | opponent */}
+                            <div className="flex items-stretch">
+                              {/* Player side */}
+                              <div className="flex items-center justify-end gap-3 px-3 py-3 flex-1 min-w-0">
+                                <div className="flex gap-3 items-center min-w-0">
+                                  <MatchBuildIcons code={match.build} />
+                                  <span className="text-sm text-stone-300 tracking-wide truncate max-w-[110px]">
+                                    {playerName ?? steamId.slice(-8)}
+                                  </span>
+                                </div>
+                              </div>
 
-                          {/* Center: Score + time */}
-                          <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0 border-x border-stone-800/50">
-                            <div className="flex items-center gap-1.5">
-                              <span className={`text-lg font-bold tabular-nums ${won ? "text-emerald-500" : "text-red-500"}`}>{match.score}</span>
-                              <span className="text-stone-600 text-xs font-medium">vs</span>
+                              {/* Center: Score */}
+                              <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0 border-x border-stone-800/50">
+                                <div className="flex items-center gap-1.5">
+                                  <span className={`text-xl font-bold tabular-nums ${won ? "text-emerald-500" : "text-red-500"}`}>{match.score}</span>
+                                  <span className="text-stone-600 text-xs font-medium">vs</span>
+                                  {match.opponents.length > 0 && (
+                                    <span className={`text-xl font-bold tabular-nums ${won ? "text-red-500" : "text-emerald-500"}`}>{match.opponents[0].score}</span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Opponent side */}
                               {match.opponents.length > 0 && (
-                                <span className={`text-lg font-bold tabular-nums ${won ? "text-red-500" : "text-emerald-500"}`}>{match.opponents[0].score}</span>
+                                <div className="flex items-center px-3 py-3 flex-1 min-w-0 justify-start">
+                                  <div className="flex gap-3 items-center min-w-0">
+                                    <span className="text-sm text-stone-300 tracking-wide truncate max-w-[110px]">
+                                      {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
+                                    </span>
+                                    <MatchBuildIcons code={match.opponents[0].build} />
+                                  </div>
+                                </div>
                               )}
                             </div>
-                            {match.matchDate && (
-                              <span className="text-[10px] text-stone-500 mt-0.5 tabular-nums">{timeAgo(match.matchDate)}</span>
-                            )}
-                          </div>
 
-                          {/* Opponent side */}
-                          {match.opponents.length > 0 && (
-                            <div className="flex items-center gap-3 px-3 py-3 flex-1 min-w-0 justify-start">
-                              <div className="flex flex-col gap-1 items-start min-w-0">
-                              <span className="text-sm font-semibold text-stone-300 tracking-wide truncate max-w-[110px]">
-                                  {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
-                                </span>
-                                <MatchBuildIcons code={match.opponents[0].build} />
+                            {/* Row 2: stats */}
+                            <div className="flex items-center justify-center gap-6 px-4 py-1 border-t border-stone-800/40 bg-black/20 text-xs rounded-br">
+                              {match.matchDuration != null && (
+                                <div className="flex items-center gap-1">
+                                  <Clock className="w-3 h-3 text-stone-500 shrink-0" />
+                                  <span className="tabular-nums text-stone-400">{formatDuration(match.matchDuration)}</span>
+                                </div>
+                              )}
+                              <div className="flex items-center gap-1">
+                                <Flame className="w-3 h-3 text-stone-500 shrink-0" />
+                                <span className="text-stone-600">DMG</span>
+                                <span className="tabular-nums text-stone-400">{formatNumber(match.damageDone)}</span>
                               </div>
+                              <div className="flex items-center gap-1">
+                                <Shield className="w-3 h-3 text-stone-500 shrink-0" />
+                                <span className="text-stone-600">REC</span>
+                                <span className="tabular-nums text-stone-400">{formatNumber(match.damageReceived)}</span>
+                              </div>
+                              {match.matchDate && (
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3 text-stone-500 shrink-0" />
+                                  <span className="tabular-nums text-stone-400">{timeAgo(match.matchDate)}</span>
+                                </div>
+                              )}
                             </div>
-                          )}
+                          </div>
                         </motion.div>
                       );
                     })}
@@ -508,6 +595,7 @@ export default function RankedLeaderboard() {
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
+  const [region, setRegion] = useState<Region>("eu");
 
   useEffect(() => {
     const timer = setTimeout(() => setSearch(searchInput), 300);
@@ -529,7 +617,7 @@ export default function RankedLeaderboard() {
     async function fetchData() {
       setLoading(true);
       try {
-        const params = new URLSearchParams({ sort: sortBy });
+        const params = new URLSearchParams({ sort: sortBy, region });
         if (search) params.set("search", search);
 
         const res = await fetch(`/api/ranked?${params}`);
@@ -545,7 +633,12 @@ export default function RankedLeaderboard() {
       }
     }
     fetchData();
-  }, [sortBy, search]);
+  }, [sortBy, search, region]);
+
+  // Collapse any open panel when switching regions
+  useEffect(() => {
+    setExpandedPlayer(null);
+  }, [region]);
 
   const toggleExpanded = useCallback((steamId: string) => {
     setExpandedPlayer((prev) => (prev === steamId ? null : steamId));
@@ -554,6 +647,28 @@ export default function RankedLeaderboard() {
   return (
     <div className="space-y-6">
       {/* Controls */}
+      <div className="flex flex-col gap-4">
+        {/* Region selector */}
+        <div className="flex items-center gap-1 p-1 rounded-lg bg-white/[0.03] border border-white/[0.06] w-fit">
+          {REGIONS.map((r) => {
+            const active = region === r.value;
+            return (
+              <button
+                key={r.value}
+                onClick={() => setRegion(r.value)}
+                className={`relative flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-widest transition-all duration-200 ${
+                  active
+                    ? "bg-white/[0.08] text-white shadow-[0_1px_0_rgba(255,255,255,0.06),0_-1px_0_rgba(0,0,0,0.3)]"
+                    : "text-stone-500 hover:text-stone-300 hover:bg-white/[0.04]"
+                }`}
+              >
+                <r.Flag className={`w-4 h-auto rounded-[2px] transition-opacity duration-200 ${active ? "opacity-100" : "opacity-50"}`} />
+                {r.label}
+              </button>
+            );
+          })}
+        </div>
+
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
@@ -608,6 +723,7 @@ export default function RankedLeaderboard() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+      </div>
       </div>
 
       {/* Stats Summary */}
@@ -700,9 +816,9 @@ export default function RankedLeaderboard() {
                         transition-colors duration-200 cursor-pointer select-none
                         ${
                           isDracula
-                            ? "border-l-2 border-l-red-700/60 border-b border-red-900/30 bg-gradient-to-r from-red-950/50 via-red-900/20 to-transparent hover:from-red-950/60 hover:via-red-900/25"
+                            ? "border-l-2 border-l-red-700/60 border-b border-red-900/30 bg-gradient-to-r from-red-950/50 from-0% via-red-900/15 via-25% to-transparent to-50% hover:from-red-950/60 hover:via-red-900/20"
                             : isTop5
-                            ? "border-l-2 border-l-amber-700/30 border-b border-amber-900/20 bg-gradient-to-r from-amber-950/20 via-yellow-950/10 to-transparent hover:from-amber-950/35 hover:via-yellow-950/25"
+                            ? "border-l-2 border-l-yellow-500/50 border-b border-yellow-800/20 bg-gradient-to-r from-yellow-800/25 from-0% via-yellow-700/8 via-25% to-transparent to-50% hover:from-yellow-800/35 hover:via-yellow-700/12"
                             : "border-white/5 hover:bg-white/[0.03]"
                         }
                         ${isExpanded ? "bg-white/[0.04]" : ""}
@@ -718,8 +834,8 @@ export default function RankedLeaderboard() {
                         <div className="flex items-center gap-2">
                           <div className="flex flex-col min-w-0">
                             {isDracula && (
-                              <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-red-800 mb-0.5">
-                                Dracula
+                              <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-red-600 mb-0.5">
+                                High-Lord
                               </span>
                             )}
                             {player.name && isDracula && (
@@ -732,7 +848,7 @@ export default function RankedLeaderboard() {
                             )}
                             {player.name && !isDracula && (
                               <span className={`font-semibold truncate ${
-                                isTop5 ? "text-sm text-amber-200" : "text-sm text-gray-400"
+                                isTop5 ? "text-sm text-yellow-300" : "text-sm text-gray-400"
                               }`}>
                                 {player.name}
                               </span>
@@ -786,6 +902,7 @@ export default function RankedLeaderboard() {
                       playerName={player.name}
                       isOpen={isExpanded}
                       currentMmr={player.mmr}
+                      region={region}
                     />
                   </React.Fragment>
                 );

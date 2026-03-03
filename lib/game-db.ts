@@ -1,14 +1,31 @@
 import { createPool, type Pool } from "mysql2/promise";
 
-const globalForGameDb = globalThis as unknown as {
-  gameDbPool: Pool | undefined;
+export type Region = "eu" | "na" | "oce" | "br" | "sea";
+
+export const REGIONS: { value: Region; label: string }[] = [
+  { value: "eu",  label: "EU"  },
+  { value: "na",  label: "NA"  },
+  { value: "oce", label: "OCE" },
+  { value: "br",  label: "BR"  },
+  { value: "sea", label: "SEA" },
+];
+
+export function isValidRegion(r: unknown): r is Region {
+  return typeof r === "string" && ["eu", "na", "oce", "br", "sea"].includes(r);
+}
+
+const globalForDbs = globalThis as unknown as {
+  regionPools: Partial<Record<Region, Pool>>;
 };
 
-function createGamePool(): Pool {
-  const url = process.env.GAME_DATABASE_URL;
-  if (!url) {
-    throw new Error("GAME_DATABASE_URL is not defined");
-  }
+if (!globalForDbs.regionPools) {
+  globalForDbs.regionPools = {};
+}
+
+function createRegionPool(region: Region): Pool {
+  const envKey = `GAME_DATABASE_URL_${region.toUpperCase()}`;
+  const url = process.env[envKey];
+  if (!url) throw new Error(`${envKey} is not defined`);
 
   const parsed = new URL(url);
 
@@ -27,9 +44,9 @@ function createGamePool(): Pool {
   });
 }
 
-export const gameDb =
-  globalForGameDb.gameDbPool ?? createGamePool();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForGameDb.gameDbPool = gameDb;
+export function getRegionDb(region: Region): Pool {
+  if (!globalForDbs.regionPools[region]) {
+    globalForDbs.regionPools[region] = createRegionPool(region);
+  }
+  return globalForDbs.regionPools[region]!;
 }

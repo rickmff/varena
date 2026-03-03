@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { gameDb } from "@/lib/game-db";
+import { getRegionDb, isValidRegion } from "@/lib/game-db";
 import type { RowDataPacket } from "mysql2";
 
 interface MatchHistoryRow extends RowDataPacket {
-  SteamID: string; // bigNumberStrings returns BIGINT as string
+  SteamID: string;
   MatchID: number;
   MatchmakingTeam: number;
   Build: string;
@@ -18,7 +18,7 @@ interface MatchHistoryRow extends RowDataPacket {
 }
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ steamId: string }> }
 ) {
   try {
@@ -31,8 +31,13 @@ export async function GET(
       );
     }
 
-    // SteamID is BIGINT — pass as raw number string to avoid type mismatch
-    const [rows] = await gameDb.query<MatchHistoryRow[]>(
+    const { searchParams } = new URL(request.url);
+    const regionParam = searchParams.get("region") || "eu";
+    const region = isValidRegion(regionParam) ? regionParam : "eu";
+
+    const db = getRegionDb(region);
+
+    const [rows] = await db.query<MatchHistoryRow[]>(
       `SELECT p.SteamID, p.MatchID, p.MatchmakingTeam, p.Build, p.MmrDiff,
               p.DamageDone, p.DamageReceived, p.Score, p.Kills, p.Deaths,
               m.MatchDate, m.MatchDuration
@@ -43,21 +48,18 @@ export async function GET(
       [steamId]
     );
 
-    // Collect match IDs to fetch opponents
     const matchIds = rows.map((r) => Number(r.MatchID));
 
-    // Build a map of player's team per match
     const playerTeamByMatch = new Map<number, number>();
     for (const row of rows) {
       playerTeamByMatch.set(Number(row.MatchID), Number(row.MatchmakingTeam));
     }
 
-    // Batch-fetch all other players in those matches (include Build and Name for opponent display)
     let opponentsByMatch = new Map<number, { steamId: string; name: string | null; build: string; score: number; damageDone: number; damageReceived: number }[]>();
 
     if (matchIds.length > 0) {
       const placeholders = matchIds.map(() => "?").join(",");
-      const [opponentRows] = await gameDb.query<(MatchHistoryRow & { Name: string | null })[]>(
+      const [opponentRows] = await db.query<(MatchHistoryRow & { Name: string | null })[]>(
         `SELECT p.SteamID, p.MatchID, p.MatchmakingTeam, p.Build, p.Score, p.DamageDone, p.DamageReceived, n.Name
          FROM PlayerMatchHistoryData p
          LEFT JOIN PlayerNamesData n ON p.SteamID = n.SteamID
@@ -71,7 +73,6 @@ export async function GET(
         const oppTeam = Number(opp.MatchmakingTeam);
         const playerTeam = playerTeamByMatch.get(mId);
 
-        // Only include opponents (different team)
         if (playerTeam !== undefined && oppTeam !== playerTeam) {
           if (!opponentsByMatch.has(mId)) opponentsByMatch.set(mId, []);
           opponentsByMatch.get(mId)!.push({

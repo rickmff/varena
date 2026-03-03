@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { gameDb } from "@/lib/game-db";
+import { getRegionDb, isValidRegion } from "@/lib/game-db";
 import type { RowDataPacket } from "mysql2";
 
 interface PlayerMatchmakingRow extends RowDataPacket {
-  SteamID: string; // bigNumberStrings returns BIGINT as string
+  SteamID: string;
   Wins: number;
   Losses: number;
   MMR: number;
@@ -34,6 +34,10 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const sortBy = searchParams.get("sort") || "mmr";
     const search = searchParams.get("search") || "";
+    const regionParam = searchParams.get("region") || "eu";
+    const region = isValidRegion(regionParam) ? regionParam : "eu";
+
+    const db = getRegionDb(region);
 
     let orderClause: string;
     switch (sortBy) {
@@ -52,7 +56,7 @@ export async function GET(request: Request) {
     let rows: PlayerMatchmakingRow[];
 
     if (search.trim()) {
-      const [results] = await gameDb.execute<PlayerMatchmakingRow[]>(
+      const [results] = await db.execute<PlayerMatchmakingRow[]>(
         `SELECT p.SteamID, p.Wins, p.Losses, p.MMR, p.LastMatchDate, n.Name
          FROM PlayerMatchmakingData p
          LEFT JOIN PlayerNamesData n ON p.SteamID = n.SteamID
@@ -62,7 +66,7 @@ export async function GET(request: Request) {
       );
       rows = results;
     } else {
-      const [results] = await gameDb.execute<PlayerMatchmakingRow[]>(
+      const [results] = await db.execute<PlayerMatchmakingRow[]>(
         `SELECT p.SteamID, p.Wins, p.Losses, p.MMR, p.LastMatchDate, n.Name
          FROM PlayerMatchmakingData p
          LEFT JOIN PlayerNamesData n ON p.SteamID = n.SteamID
