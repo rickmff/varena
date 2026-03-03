@@ -386,7 +386,7 @@ function MatchHistoryPanel({
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="overflow-hidden"
             >
-              <div className="px-4 py-5 border-t border-stone-700/50">
+              <div className="px-4 py-5 border-t border-stone-700/50 w-full">
                 <h4 className="text-xs font-semibold text-stone-500 uppercase tracking-[0.2em] mb-4">
                   Match History
                 </h4>
