@@ -397,7 +397,7 @@ function MatchHistoryPanel({
                           {/* Player side */}
                           <div className="flex items-center justify-end gap-3 px-3 py-3 flex-1 min-w-0">
                             <div className="flex flex-col gap-1 items-end min-w-0">
-                              <span className="text-xs font-semibold text-stone-300 truncate max-w-[110px]">
+                              <span className="text-sm font-semibold text-stone-300 tracking-wide truncate max-w-[110px]">
                                 {playerName ?? steamId.slice(-8)}
                               </span>
                               <MatchBuildIcons code={match.build} />
@@ -407,10 +407,10 @@ function MatchHistoryPanel({
                           {/* Center: Score + time */}
                           <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0 border-x border-stone-800/50">
                             <div className="flex items-center gap-1.5">
-                              <span className={`text-base font-bold tabular-nums ${won ? "text-emerald-400" : "text-red-400"}`}>{match.score}</span>
+                              <span className={`text-lg font-bold tabular-nums ${won ? "text-emerald-500" : "text-red-500"}`}>{match.score}</span>
                               <span className="text-stone-600 text-xs font-medium">vs</span>
                               {match.opponents.length > 0 && (
-                                <span className={`text-base font-bold tabular-nums ${won ? "text-red-400/60" : "text-emerald-400/60"}`}>{match.opponents[0].score}</span>
+                                <span className={`text-lg font-bold tabular-nums ${won ? "text-red-500" : "text-emerald-500"}`}>{match.opponents[0].score}</span>
                               )}
                             </div>
                             {match.matchDate && (
@@ -422,7 +422,7 @@ function MatchHistoryPanel({
                           {match.opponents.length > 0 && (
                             <div className="flex items-center gap-3 px-3 py-3 flex-1 min-w-0 justify-start">
                               <div className="flex flex-col gap-1 items-start min-w-0">
-                                <span className="text-xs font-semibold text-stone-300 truncate max-w-[110px]">
+                              <span className="text-sm font-semibold text-stone-300 tracking-wide truncate max-w-[110px]">
                                   {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
                                 </span>
                                 <MatchBuildIcons code={match.opponents[0].build} />
