@@ -55,12 +55,12 @@ export async function GET(
       playerTeamByMatch.set(Number(row.MatchID), Number(row.MatchmakingTeam));
     }
 
-    let opponentsByMatch = new Map<number, { steamId: string; name: string | null; build: string; score: number; damageDone: number; damageReceived: number; mmr: number | null }[]>();
+    let opponentsByMatch = new Map<number, { steamId: string; name: string | null; build: string; score: number; damageDone: number; damageReceived: number; mmr: number | null; mmrDiff: number }[]>();
 
     if (matchIds.length > 0) {
       const placeholders = matchIds.map(() => "?").join(",");
       const [opponentRows] = await db.query<(MatchHistoryRow & { Name: string | null; MMR: number | null })[]>(
-        `SELECT p.SteamID, p.MatchID, p.MatchmakingTeam, p.Build, p.Score, p.DamageDone, p.DamageReceived, n.Name, pm.MMR
+        `SELECT p.SteamID, p.MatchID, p.MatchmakingTeam, p.Build, p.Score, p.DamageDone, p.DamageReceived, p.MmrDiff, n.Name, pm.MMR
          FROM PlayerMatchHistoryData p
          LEFT JOIN PlayerNamesData n ON p.SteamID = n.SteamID
          LEFT JOIN PlayerMatchmakingData pm ON p.SteamID = pm.SteamID
@@ -84,6 +84,7 @@ export async function GET(
             damageDone: Math.round(Number(opp.DamageDone)),
             damageReceived: Math.round(Number(opp.DamageReceived)),
             mmr: opp.MMR != null ? Number(opp.MMR) : null,
+            mmrDiff: Number(opp.MmrDiff),
           });
         }
       }

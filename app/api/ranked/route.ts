@@ -9,6 +9,7 @@ interface PlayerMatchmakingRow extends RowDataPacket {
   MMR: number;
   LastMatchDate: Date;
   Name: string | null;
+  MmrRank: number;
 }
 
 function serializePlayer(row: PlayerMatchmakingRow) {
@@ -26,6 +27,7 @@ function serializePlayer(row: PlayerMatchmakingRow) {
       row.LastMatchDate instanceof Date
         ? row.LastMatchDate.toISOString()
         : String(row.LastMatchDate),
+    rank: Number(row.MmrRank),
   };
 }
 
@@ -57,17 +59,22 @@ export async function GET(request: Request) {
 
     if (search.trim()) {
       const [results] = await db.execute<PlayerMatchmakingRow[]>(
-        `SELECT p.SteamID, p.Wins, p.Losses, p.MMR, p.LastMatchDate, n.Name
-         FROM PlayerMatchmakingData p
-         LEFT JOIN PlayerNamesData n ON p.SteamID = n.SteamID
-         WHERE CAST(p.SteamID AS CHAR) LIKE ? OR n.Name LIKE ?
+        `SELECT SteamID, Wins, Losses, MMR, LastMatchDate, Name, MmrRank
+         FROM (
+           SELECT p.SteamID, p.Wins, p.Losses, p.MMR, p.LastMatchDate, n.Name,
+                  ROW_NUMBER() OVER (ORDER BY p.MMR DESC, p.Wins DESC) AS MmrRank
+           FROM PlayerMatchmakingData p
+           LEFT JOIN PlayerNamesData n ON p.SteamID = n.SteamID
+         ) ranked
+         WHERE CAST(SteamID AS CHAR) LIKE ? OR Name LIKE ?
          ORDER BY ${orderClause}`,
         [`%${search.trim()}%`, `%${search.trim()}%`]
       );
       rows = results;
     } else {
       const [results] = await db.execute<PlayerMatchmakingRow[]>(
-        `SELECT p.SteamID, p.Wins, p.Losses, p.MMR, p.LastMatchDate, n.Name
+        `SELECT p.SteamID, p.Wins, p.Losses, p.MMR, p.LastMatchDate, n.Name,
+                ROW_NUMBER() OVER (ORDER BY p.MMR DESC, p.Wins DESC) AS MmrRank
          FROM PlayerMatchmakingData p
          LEFT JOIN PlayerNamesData n ON p.SteamID = n.SteamID
          ORDER BY ${orderClause}`
