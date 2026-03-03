@@ -100,21 +100,14 @@ interface TierConfig {
 }
 
 const TIERS: (TierConfig & { minMmr: number })[] = [
-  { name: "Copper",      minMmr: 0,    image: "/images/elos/t1.png", textColor: "text-orange-400", glowColor: "rgba(251,146,60,0.75)"   },
-  { name: "Iron",        minMmr: 1700, image: "/images/elos/t2.png", textColor: "text-slate-300",  glowColor: "rgba(203,213,225,0.7)"  },
-  { name: "Dark Silver", minMmr: 1900, image: "/images/elos/t3.png", textColor: "text-violet-300", glowColor: "rgba(216,180,254,0.75)"  },
-  { name: "Legendary",   minMmr: 2100, image: "/images/elos/t4.png", textColor: "text-amber-400",  glowColor: "rgba(251,191,36,0.8)"    },
+  { name: "Bone",        minMmr: 0,    image: "/images/elos/Bone.png", textColor: "text-orange-400", glowColor: "rgba(251,146,60,0.75)"   },
+  { name: "Copper",      minMmr: 1475, image: "/images/elos/Copper.png", textColor: "text-slate-300",  glowColor: "rgba(203,213,225,0.7)"  },
+  { name: "Iron",        minMmr: 1525, image: "/images/elos/Iron.png", textColor: "text-violet-300", glowColor: "rgba(216,180,254,0.75)"  },
+  { name: "Dark Silver", minMmr: 1600, image: "/images/elos/Sanguine.png", textColor: "text-amber-400",  glowColor: "rgba(251,191,36,0.8)"    },
+  { name: "Sanguine",    minMmr: 1700, image: "/images/elos/Dracula.png", textColor: "text-red-500",    glowColor: "rgba(185,28,28,0.95)"    },
 ];
 
-const DRACULA_TIER: TierConfig = {
-  name: "Dracula",
-  image: "/images/elos/t5.png",
-  textColor: "text-red-500",
-  glowColor: "rgba(185,28,28,0.95)",
-};
-
-function getRankTier(mmr: number, rank: number): TierConfig {
-  if (rank === 1 && mmr >= 2100) return DRACULA_TIER;
+function getRankTier(mmr: number, _rank: number): TierConfig {
   for (let i = TIERS.length - 1; i >= 0; i--) {
     if (mmr >= TIERS[i].minMmr) return TIERS[i];
   }
