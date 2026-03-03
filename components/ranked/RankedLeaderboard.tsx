@@ -31,6 +31,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { convertStringToBuild } from "@/components/machines/converter";
+import bloodData from "@/data/vbuilds/bloodtypes.json";
 import "@/components/vbuilds/styles.css";
 import { EU, US, AU, BR, SG } from "country-flag-icons/react/3x2";
 
@@ -74,13 +75,13 @@ interface MatchHistory {
 }
 
 type SortOption = "mmr" | "wins" | "winrate";
-type Region = "eu" | "na" | "oce" | "br" | "sea";
+type Region = "eu" | "na" | "br" | "oce" | "sea";
 
 const REGIONS: { value: Region; label: string; Flag: React.ComponentType<{ className?: string }> }[] = [
   { value: "eu",  label: "EU",  Flag: EU },
   { value: "na",  label: "NA",  Flag: US },
-  { value: "oce", label: "OCE", Flag: AU },
   { value: "br",  label: "BR",  Flag: BR },
+  { value: "oce", label: "OCE", Flag: AU },
   { value: "sea", label: "SEA", Flag: SG },
 ];
 
@@ -97,17 +98,26 @@ interface TierConfig {
   image: string;
   textColor: string;
   glowColor: string;
+  rowOpacity?: number;
 }
 
 const TIERS: (TierConfig & { minMmr: number })[] = [
-  { name: "Bone",        minMmr: 0,    image: "/images/elos/Bone.png", textColor: "text-orange-400", glowColor: "rgba(251,146,60,0.75)"   },
-  { name: "Copper",      minMmr: 1475, image: "/images/elos/Copper.png", textColor: "text-slate-300",  glowColor: "rgba(203,213,225,0.7)"  },
-  { name: "Iron",        minMmr: 1525, image: "/images/elos/Iron.png", textColor: "text-violet-300", glowColor: "rgba(216,180,254,0.75)"  },
-  { name: "Dark Silver", minMmr: 1600, image: "/images/elos/Sanguine.png", textColor: "text-amber-400",  glowColor: "rgba(251,191,36,0.8)"    },
-  { name: "Sanguine",    minMmr: 1700, image: "/images/elos/Dracula.png", textColor: "text-red-500",    glowColor: "rgba(185,28,28,0.95)"    },
+  { name: "Bone",        minMmr: 0,    image: "/images/elos/Bone.png",        textColor: "text-orange-200/70", glowColor: "rgba(251,146,60,0.75)"   },
+  { name: "Copper",      minMmr: 1475, image: "/images/elos/Copper.png",      textColor: "text-amber-500/70",  glowColor: "rgba(203,213,225,0.7)"   },
+  { name: "Iron",        minMmr: 1525, image: "/images/elos/Iron.png",        textColor: "text-blue-200/70",   glowColor: "rgba(216,180,254,0.75)"  },
+  { name: "Dark Silver", minMmr: 1600, image: "/images/elos/DarkSilver.png",  textColor: "text-violet-400/70", glowColor: "rgba(251,191,36,0.8)"    },
+  { name: "Sanguine",    minMmr: 1700, image: "/images/elos/Sanguine.png",    textColor: "text-red-500/70",    glowColor: "rgba(239,68,68,0.85)",   rowOpacity: 0.10 },
 ];
 
-function getRankTier(mmr: number, _rank: number): TierConfig {
+const DRACULA_TIER: TierConfig = {
+  name: "Dracula",
+  image: "/images/elos/Dracula.png",
+  textColor: "text-red-500",
+  glowColor: "rgba(185,28,28,0.95)",
+};
+
+function getRankTier(mmr: number, rank: number): TierConfig {
+  if (rank === 1 && mmr >= 1700) return DRACULA_TIER;
   for (let i = TIERS.length - 1; i >= 0; i--) {
     if (mmr >= TIERS[i].minMmr) return TIERS[i];
   }
@@ -142,19 +152,13 @@ function formatDuration(seconds: number): string {
   return `${m}m ${s.toString().padStart(2, "0")}s`;
 }
 
-function formatMatchDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-  });
-}
-
 // ─── Build display helpers ───────────────────────────────────────────────────
 
-function MatchBuildIcons({ code, small }: { code: string; small?: boolean }) {
+// Combined blood + spell icons inside one clickable link.
+// bloodFirst=true  → [blood][blood][spell][spell][spell][spell]  (player side)
+// bloodFirst=false → [spell][spell][spell][spell][blood][blood]  (opponent side)
+function MatchIcons({ code, small, bloodFirst }: { code: string; small?: boolean; bloodFirst?: boolean }) {
   if (!code || code.length < 30) return null;
-
   let build;
   try {
     build = convertStringToBuild(code);
@@ -163,15 +167,35 @@ function MatchBuildIcons({ code, small }: { code: string; small?: boolean }) {
   }
 
   const spells = build.spells;
-  const spellIcons = [
-    spells.dash?.img,
-    spells.spell1?.img,
-    spells.spell2?.img,
-    spells.ultimate?.img,
-  ];
+  const spellIcons = [spells.dash?.img, spells.spell1?.img, spells.spell2?.img, spells.ultimate?.img];
+
+  const primaryKey = build.blood?.primary as keyof typeof bloodData | undefined;
+  const secondaryKey = build.blood?.secondary as keyof typeof bloodData | undefined;
+  const bloods = [primaryKey, secondaryKey]
+    .map((k) => (k ? bloodData[k] : null))
+    .filter(Boolean) as (typeof bloodData)[keyof typeof bloodData][];
 
   const outer = small ? "w-6 h-6" : "w-8 h-8";
   const inner = small ? "w-5 h-5" : "w-7 h-7";
+
+  const bloodEls = bloods.map((blood, i) => (
+    <div
+      key={`b${i}`}
+      className={`relative ${outer} rounded border border-red-900/40 flex items-center justify-center overflow-hidden`}
+      title={blood.name}
+    >
+      <img src={blood.image} className={`${inner} object-contain`} alt={blood.name} />
+    </div>
+  ));
+
+  const spellEls = spellIcons.map((img, i) => (
+    <div
+      key={`s${i}`}
+      className={`relative ${outer} bg-zinc-900/50 rounded border border-stone-700/50 flex items-center justify-center overflow-hidden`}
+    >
+      {img ? <img src={img} className={inner} alt="" /> : <div className={`${inner} bg-stone-800/50 rounded-sm`} />}
+    </div>
+  ));
 
   return (
     <a
@@ -180,19 +204,20 @@ function MatchBuildIcons({ code, small }: { code: string; small?: boolean }) {
       className="flex items-center gap-0.5 hover:opacity-75 transition-opacity shrink-0"
       title="View build"
     >
-      {spellIcons.map((img, i) => (
-        <div
-          key={i}
-          className={`relative ${outer} bg-zinc-900/50 rounded border border-stone-700/50 flex items-center justify-center overflow-hidden`}
-        >
-          {img ? (
-            <img src={img} className={inner} alt="" />
-          ) : (
-            <div className={`${inner} bg-stone-800/50 rounded-sm`} />
-          )}
-        </div>
-      ))}
+      {bloodFirst ? [...bloodEls, ...spellEls] : [...spellEls, ...bloodEls]}
     </a>
+  );
+}
+
+function MiniTierIcon({ mmr }: { mmr: number }) {
+  const tier = getRankTier(mmr, 2); // rank=2 avoids Dracula special case
+  return (
+    <img
+      src={tier.image}
+      alt={tier.name}
+      title={tier.name}
+      className="w-5 h-5 object-contain shrink-0"
+    />
   );
 }
 
@@ -360,7 +385,7 @@ function MatchHistoryPanel({
     <AnimatePresence>
       {isOpen && (
         <motion.tr>
-          <td colSpan={6} className="p-0">
+          <td colSpan={7} className="p-0">
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
@@ -431,18 +456,20 @@ function MatchHistoryPanel({
 
                             {/* ── Desktop layout (md+): mirrored horizontal ── */}
                             <div className="hidden md:flex items-center">
-                              {/* Player side: stats → build → name */}
+                              {/* Player side: stats → blood → build → name */}
                               <div className="flex items-center justify-end gap-3 px-4 py-2.5 flex-1 min-w-0">
                                 <div className="flex items-center gap-4">
                                   <StatCol value={formatNumber(match.damageReceived)} label="REC" />
                                   <StatCol value={formatNumber(match.damageDone)} label="DMG" />
-                                  <StatCol value={`${match.kills}/${match.deaths}`} label="K/D" />
                                   <StatCol value={match.mmrAfter - match.mmrDiff} label="MMR" />
                                 </div>
-                                <MatchBuildIcons code={match.build} />
-                                <span className="text-sm font-medium text-white truncate max-w-[100px] shrink-0">
-                                  {playerName ?? steamId.slice(-8)}
-                                </span>
+                                <MatchIcons code={match.build} bloodFirst />
+                                <div className="flex items-center gap-1.5 shrink-0 max-w-[120px]">
+                                  <MiniTierIcon mmr={match.mmrAfter - match.mmrDiff} />
+                                  <span className="text-sm font-medium text-white truncate">
+                                    {playerName ?? steamId.slice(-8)}
+                                  </span>
+                                </div>
                               </div>
 
                               {/* Score */}
@@ -454,18 +481,22 @@ function MatchHistoryPanel({
                                 )}
                               </div>
 
-                              {/* Opponent side: name → build → stats */}
+                              {/* Opponent side: name → build → blood → stats */}
                               {match.opponents.length > 0 && (
                                 <div className="flex items-center gap-3 px-4 py-2.5 flex-1 min-w-0">
-                                  <span className="text-sm font-medium text-white truncate max-w-[100px] shrink-0">
-                                    {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
-                                  </span>
-                                  <MatchBuildIcons code={match.opponents[0].build} />
+                                  <div className="flex items-center gap-1.5 shrink-0 max-w-[120px]">
+                                    {match.opponents[0].mmr != null && (
+                                      <MiniTierIcon mmr={match.opponents[0].mmr - match.opponents[0].mmrDiff} />
+                                    )}
+                                    <span className="text-sm font-medium text-white truncate">
+                                      {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
+                                    </span>
+                                  </div>
+                                  <MatchIcons code={match.opponents[0].build} />
                                   <div className="flex items-center gap-4">
                                     {match.opponents[0].mmr != null && (
                                       <StatCol value={match.opponents[0].mmr - match.opponents[0].mmrDiff} label="MMR" />
                                     )}
-                                    <StatCol value={`${match.deaths}/${match.kills}`} label="K/D" />
                                     <StatCol value={formatNumber(match.opponents[0].damageDone)} label="DMG" />
                                     <StatCol value={formatNumber(match.opponents[0].damageReceived)} label="REC" />
                                   </div>
@@ -477,12 +508,13 @@ function MatchHistoryPanel({
                             <div className="flex md:hidden flex-col">
                               {/* Player row */}
                               <div className="flex items-center gap-2 px-3 py-2">
-                                <div className="flex flex-col min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                  <MiniTierIcon mmr={match.mmrAfter - match.mmrDiff} />
                                   <span className="text-sm font-medium text-white truncate">
                                     {playerName ?? steamId.slice(-8)}
                                   </span>
                                 </div>
-                                <MatchBuildIcons code={match.build} small />
+                                <MatchIcons code={match.build} small bloodFirst />
                               </div>
 
                               {/* Score divider */}
@@ -499,12 +531,15 @@ function MatchHistoryPanel({
                               {/* Opponent row */}
                               {match.opponents.length > 0 && (
                                 <div className="flex items-center gap-2 px-3 py-2">
-                                  <div className="flex flex-col min-w-0 flex-1">
+                                  <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                    {match.opponents[0].mmr != null && (
+                                      <MiniTierIcon mmr={match.opponents[0].mmr - match.opponents[0].mmrDiff} />
+                                    )}
                                     <span className="text-sm font-medium text-white truncate">
                                       {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
                                     </span>
                                   </div>
-                                  <MatchBuildIcons code={match.opponents[0].build} small />
+                                  <MatchIcons code={match.opponents[0].build} small />
                                 </div>
                               )}
                             </div>
@@ -561,19 +596,77 @@ function MatchHistoryPanel({
   );
 }
 
+const NAME_WIDTHS = [28, 20, 24, 16, 32, 18, 22, 26, 20, 14, 28, 18];
+
 function LoadingSkeleton() {
   return (
-    <div className="space-y-3">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="flex items-center gap-4 p-4">
-          <Skeleton className="w-10 h-10 rounded-full" />
-          <Skeleton className="h-4 w-40" />
-          <Skeleton className="h-4 w-16 ml-auto" />
-          <Skeleton className="h-4 w-16" />
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-4 w-20" />
+    <div className="space-y-4">
+      {/* Stats summary skeleton */}
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-1.5">
+          <Skeleton className="h-3.5 w-8" />
+          <Skeleton className="h-3 w-20" />
         </div>
-      ))}
+        <div className="flex items-center gap-1.5">
+          <Skeleton className="h-3.5 w-10" />
+          <Skeleton className="h-3 w-24" />
+        </div>
+      </div>
+
+      {/* Table skeleton */}
+      <div className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden">
+        {/* Header row */}
+        <div className="flex items-center gap-4 px-4 py-3 border-b border-white/10 bg-white/[0.03]">
+          <Skeleton className="h-3 w-10 shrink-0" />
+          <Skeleton className="h-3 w-12" />
+          <Skeleton className="hidden sm:block h-3 w-8" />
+          <Skeleton className="h-3 w-14 ml-auto" />
+          <Skeleton className="hidden sm:block h-3 w-8" />
+          <Skeleton className="h-3 w-10" />
+          <Skeleton className="hidden md:block h-3 w-18" />
+        </div>
+
+        {/* Body rows */}
+        {Array.from({ length: 12 }).map((_, i) => {
+          const nameW = NAME_WIDTHS[i % NAME_WIDTHS.length];
+          const isTop3 = i < 3;
+          return (
+            <div
+              key={i}
+              className="flex items-center gap-4 px-4 py-3 border-b border-white/5"
+              style={{ opacity: 1 - i * 0.055 }}
+            >
+              {/* Rank — top 3 get a slightly taller badge shape */}
+              {isTop3 ? (
+                <Skeleton className="h-5 w-5 rounded shrink-0" />
+              ) : (
+                <Skeleton className="h-3.5 w-6 shrink-0" />
+              )}
+
+              {/* Player name */}
+              <Skeleton className={`h-3.5 shrink-0`} style={{ width: `${nameW * 4}px` }} />
+
+              {/* Elo badge + label */}
+              <div className="hidden sm:flex items-center gap-2 shrink-0">
+                <Skeleton className="w-7 h-7 rounded shrink-0" />
+                <Skeleton className="h-3 w-14" />
+              </div>
+
+              {/* Win Rate */}
+              <Skeleton className="h-3.5 w-10 ml-auto shrink-0" />
+
+              {/* W/L */}
+              <Skeleton className="hidden sm:block h-3 w-12 shrink-0" />
+
+              {/* MMR */}
+              <Skeleton className="h-3.5 w-12 shrink-0" />
+
+              {/* Last Match */}
+              <Skeleton className="hidden md:block h-3 w-16 shrink-0" />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -599,11 +692,13 @@ const MOCK_PLAYERS: Player[] = [
 
 export default function RankedLeaderboard() {
   const [players, setPlayers] = useState<Player[]>([]);
+  const [totalMatches, setTotalMatches] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<SortOption>("mmr");
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
+  const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
   const [region, setRegion] = useState<Region>("eu");
 
   useEffect(() => {
@@ -634,6 +729,7 @@ export default function RankedLeaderboard() {
 
         if (data.success) {
           setPlayers(data.players);
+          if (data.totalMatches != null) setTotalMatches(data.totalMatches);
         }
       } catch (err) {
         console.error("Failed to fetch ranked data:", err);
@@ -656,8 +752,9 @@ export default function RankedLeaderboard() {
   return (
     <div className="space-y-6">
       {/* Controls */}
-      <div className="flex flex-col gap-4">
-        {/* Region selector */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+
+                {/* Region selector */}
         <div className="flex items-center gap-1 p-1 rounded-lg bg-white/[0.03] border border-white/[0.06] w-fit">
           {REGIONS.map((r) => {
             const active = region === r.value;
@@ -676,17 +773,6 @@ export default function RankedLeaderboard() {
               </button>
             );
           })}
-        </div>
-
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-          <Input
-            placeholder="Search by name or Steam ID..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-red-600/50 focus:ring-red-600/20"
-          />
         </div>
 
         <div className="flex items-center gap-3">
@@ -731,8 +817,16 @@ export default function RankedLeaderboard() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+                  <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <Input
+            placeholder="Search by name or Steam ID..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-red-600/50 focus:ring-red-600/20"
+          />
         </div>
-      </div>
+        </div>
       </div>
 
       {/* Stats Summary */}
@@ -746,6 +840,12 @@ export default function RankedLeaderboard() {
             <span className="text-white font-semibold mr-1">{players.length}</span>
             players ranked
           </span>
+          {totalMatches != null && (
+            <span>
+              <span className="text-white font-semibold mr-1">{totalMatches.toLocaleString()}</span>
+              matches played
+            </span>
+          )}
         </motion.div>
       )}
 
@@ -777,8 +877,8 @@ export default function RankedLeaderboard() {
                 <TableHead className="text-gray-400 w-20 text-center">
                   Rank
                 </TableHead>
-                <TableHead className="text-gray-400 hidden sm:table-cell">Elo</TableHead>
                 <TableHead className="text-gray-400">Player</TableHead>
+                <TableHead className="text-gray-400 hidden sm:table-cell">Elo</TableHead>
                 <TableHead className="text-gray-400 text-center">
                   <div className="flex items-center justify-center gap-1.5">
                     <Target className="w-3.5 h-3.5" />
@@ -823,14 +923,19 @@ export default function RankedLeaderboard() {
                         delay: Math.min(index * 0.05, 1),
                       }}
                       onClick={() => toggleExpanded(player.steamId)}
+                      onMouseEnter={() => !isTop5 && setHoveredPlayer(player.steamId)}
+                      onMouseLeave={() => !isTop5 && setHoveredPlayer(null)}
+                      style={!isTop5 ? {
+                        background: `linear-gradient(to right, ${tier.glowColor.replace(/[\d.]+\)$/, `${hoveredPlayer === player.steamId ? (tier.rowOpacity ?? 0.07) * 1.8 : tier.rowOpacity ?? 0.07})`)}, transparent 45%)`,
+                      } : undefined}
                       className={`
-                        transition-colors duration-200 cursor-pointer select-none
+                        border-white/20 border-t border-b
+                        transition-all duration-200 cursor-pointer select-none
                         ${
                           isTop5
                             ? `border-l-2 border-b ${isDracula ? "border-l-red-700/60 border-b-red-900/30" : "border-l-yellow-500/50 border-b-yellow-800/20"} bg-gradient-to-r from-yellow-800/25 from-0% via-yellow-700/8 via-25% to-transparent to-50% hover:from-yellow-800/35 hover:via-yellow-700/12`
-                            : "border-white/5 hover:bg-white/[0.03]"
+                            : "border-white/5"
                         }
-                        ${isExpanded ? "bg-white/[0.04]" : ""}
                       `}
                     >
                       <TableCell className="text-center">
@@ -839,15 +944,6 @@ export default function RankedLeaderboard() {
                         }`}>
                           {rank}
                         </span>
-                      </TableCell>
-
-                      <TableCell className="hidden sm:table-cell">
-                        <div className="flex items-center gap-2">
-                          <TierBadge mmr={player.mmr} rank={rank} />
-                          <span className={`text-xs font-semibold uppercase tracking-wider ${tier.textColor}`}>
-                            {tier.name}
-                          </span>
-                        </div>
                       </TableCell>
 
                       <TableCell>
@@ -867,13 +963,22 @@ export default function RankedLeaderboard() {
                               </span>
                             )}
                             {player.name && !isDracula && (
-                              <span className={`font-semibold truncate ${
+                              <span className={`font-semibold truncate tracking-[0.05em] w-full ${
                                 isTop5 ? "text-sm text-yellow-300" : "text-sm text-gray-400"
                               }`}>
                                 {player.name}
                               </span>
                             )}
                           </div>
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="hidden sm:table-cell">
+                        <div className="flex items-center gap-2">
+                          <TierBadge mmr={player.mmr} rank={rank} />
+                          <span className={`text-xs font-semibold uppercase tracking-wider ${tier.textColor}`}>
+                            {tier.name}
+                          </span>
                         </div>
                       </TableCell>
 

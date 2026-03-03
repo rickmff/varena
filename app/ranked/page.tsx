@@ -27,7 +27,6 @@ export default function RankedPage() {
           <SectionHeader
             title="Ranked Arena"
             subtitle="Leaderboard"
-            description="Top ranked players from the V Arena matchmaking system"
           />
         </div>
       </section>

@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { getRegionDb, isValidRegion } from "@/lib/game-db";
 import type { RowDataPacket } from "mysql2";
 
+interface CountRow extends RowDataPacket {
+  total: number;
+}
+
 interface PlayerMatchmakingRow extends RowDataPacket {
   SteamID: string;
   Wins: number;
@@ -84,7 +88,12 @@ export async function GET(request: Request) {
 
     const players = rows.map(serializePlayer);
 
-    return NextResponse.json({ success: true, players });
+    const [[countRow]] = await db.execute<CountRow[]>(
+      `SELECT COUNT(*) AS total FROM MatchData`
+    );
+    const totalMatches = Number(countRow?.total ?? 0);
+
+    return NextResponse.json({ success: true, players, totalMatches });
   } catch (error: any) {
     console.error("Ranked API error:", error);
     return NextResponse.json(
