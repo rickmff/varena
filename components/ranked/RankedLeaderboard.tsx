@@ -227,17 +227,6 @@ function TierBadge({ mmr, rank }: { mmr: number; rank: number }) {
       title={`${tier.name}${isDracula ? " (#1 Overall)" : isTop5 ? " (Top 5)" : ""}`}
       className={`relative flex items-center justify-center shrink-0 ${isDracula ? "w-12 h-12" : "w-10 h-10"}`}
     >
-      {/* glow behind the image */}
-      <div
-        className={`absolute inset-0 rounded-full ${isDracula ? "blur-lg animate-pulse" : isTop5 ? "blur-md animate-pulse" : "blur-md"}`}
-        style={{ background: tier.glowColor, animationDuration: isDracula ? "3.5s" : "4s" }}
-      />
-      {isDracula && (
-        <div
-          className="absolute inset-0 rounded-full blur-xl animate-pulse opacity-60"
-          style={{ background: "rgba(220,38,38,0.5)", transform: "scale(1.4)", animationDuration: "3.5s" }}
-        />
-      )}
       <img
         src={tier.image}
         alt={tier.name}
