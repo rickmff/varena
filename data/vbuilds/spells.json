@@ -1,4 +1,13 @@
 {
+  "veil_of_shadow": {
+    "name": "Veil of Shadow",
+    "id": "veil_of_shadow",
+    "img": "/images/spells/veilofshadow.webp",
+    "spellSchool": "shadow",
+    "category": "veil",
+    "arenaCode": "1",
+    "effects": []
+  },
   "veil_of_blood": {
     "name": "Veil of Blood",
     "id": "veil_of_blood",

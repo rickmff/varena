@@ -8,8 +8,15 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { AnimatePresence } from "framer-motion";
 import { ActionPopup, ActionPopupType } from "@/components/builds/ActionPopup";
-import { DndContext, DragEndEvent } from "@dnd-kit/core";
-import { useDraggable, useDroppable } from "@dnd-kit/core";
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
+  closestCenter,
+} from "@dnd-kit/core";
+import { useDroppable } from "@dnd-kit/core";
+import { SortableContext, useSortable, arrayMove, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
   Tooltip,
@@ -67,6 +74,7 @@ export default function TierListEditPage({ params }: PageProps) {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [activeSpell, setActiveSpell] = useState<SpellEntry | null>(null);
   const [actionPopup, setActionPopup] = useState<{ type: ActionPopupType; message: string } | null>(null);
 
   const showActionPopup = (type: ActionPopupType, message: string) => {
@@ -229,32 +237,53 @@ export default function TierListEditPage({ params }: PageProps) {
 
   const getSpell = (spellId: string) => allSpells.find((s) => s.id === spellId);
 
+  const handleDragStart = (event: DragStartEvent) => {
+    const spell = getSpell(event.active.id as string);
+    setActiveSpell(spell ?? null);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
+    setActiveSpell(null);
     if (!tierListData?.isOwner && !(!isAuthenticated && id.startsWith("local-"))) return;
 
     const { active, over } = event;
     if (!over) return;
 
-    const spellId = active.id as string;
-    const targetTier = over.data.current?.tierKey as TierKey | undefined;
+    const activeId = active.id as string;
+    const overId = over.id as string;
 
-    if (!targetTier || !spellId) return;
+    // Source tier: find which tier currently holds the dragged spell
+    const sourceTier = (Object.keys(tiers) as TierKey[]).find((k) =>
+      tiers[k].includes(activeId)
+    );
+    if (!sourceTier) return;
+
+    // Target tier: either from a droppable container or from a sortable spell's data
+    const targetTier = over.data.current?.tierKey as TierKey | undefined;
+    if (!targetTier) return;
 
     setTiers((prev) => {
-      const next: TierState = {
-        S: [],
-        A: [],
-        B: [],
-        C: [],
-        D: [],
-        Unranked: [],
-      };
+      const next: TierState = { S: [...prev.S], A: [...prev.A], B: [...prev.B], C: [...prev.C], D: [...prev.D], Unranked: [...prev.Unranked] };
 
-      (Object.keys(prev) as TierKey[]).forEach((tierKey) => {
-        next[tierKey] = prev[tierKey].filter((i) => i !== spellId);
-      });
-
-      next[targetTier] = [...next[targetTier], spellId];
+      if (sourceTier === targetTier) {
+        // Reorder within same tier
+        const oldIndex = prev[sourceTier].indexOf(activeId);
+        const overIndex = prev[targetTier].indexOf(overId);
+        if (oldIndex !== -1 && overIndex !== -1 && oldIndex !== overIndex) {
+          next[sourceTier] = arrayMove(prev[sourceTier], oldIndex, overIndex);
+        }
+      } else {
+        // Move between tiers: remove from source, insert at target position
+        next[sourceTier] = prev[sourceTier].filter((i) => i !== activeId);
+        const overIndex = prev[targetTier].indexOf(overId);
+        if (overIndex !== -1) {
+          const arr = [...prev[targetTier]];
+          arr.splice(overIndex, 0, activeId);
+          next[targetTier] = arr;
+        } else {
+          next[targetTier] = [...prev[targetTier], activeId];
+        }
+      }
 
       return next;
     });
@@ -702,7 +731,11 @@ export default function TierListEditPage({ params }: PageProps) {
             </div>
 
             {/* Tier Board */}
-            <DndContext onDragEnd={handleDragEnd}>
+            <DndContext
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+            >
               <div className="space-y-2" ref={boardRef}>
                 {tierLabels.map((tier) => (
                   <TierRow
@@ -716,6 +749,17 @@ export default function TierListEditPage({ params }: PageProps) {
                   />
                 ))}
               </div>
+              <DragOverlay>
+                {activeSpell ? (
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-md overflow-hidden border border-white/30 shadow-xl shadow-black/80 bg-black/80 opacity-90 rotate-3 scale-110">
+                    <img
+                      src={activeSpell.img}
+                      alt={activeSpell.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : null}
+              </DragOverlay>
             </DndContext>
           </div>
         </section>
@@ -779,11 +823,13 @@ function TierRow({
               : "Drag spells here to place them in this tier."}
           </span>
         )}
-        {spellIds.map((spellId) => {
-          const spell = getSpell(spellId);
-          if (!spell) return null;
-          return <SpellIcon key={spell.id} spell={spell} disabled={readOnly} />;
-        })}
+        <SortableContext items={spellIds} strategy={rectSortingStrategy}>
+          {spellIds.map((spellId) => {
+            const spell = getSpell(spellId);
+            if (!spell) return null;
+            return <SpellIcon key={spell.id} spell={spell} tierKey={tierKey} disabled={readOnly} />;
+          })}
+        </SortableContext>
       </div>
     </div>
   );
@@ -791,18 +837,28 @@ function TierRow({
 
 interface SpellIconProps {
   spell: SpellEntry;
+  tierKey: TierKey;
   disabled?: boolean;
 }
 
-function SpellIcon({ spell, disabled }: SpellIconProps) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: spell.id,
-      disabled,
-    });
+function SpellIcon({ spell, tierKey, disabled }: SpellIconProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: spell.id,
+    data: { tierKey },
+    disabled,
+  });
 
   const style = {
-    transform: transform ? CSS.Translate.toString(transform) : undefined,
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.35 : 1,
     zIndex: isDragging ? 20 : 1,
   };
 
