@@ -667,7 +667,7 @@ export const BuildContent = ({
 
       {/* Top right corner - Vote buttons and Action buttons */}
       <div
-        className="absolute top-2 right-1 flex gap-2 z-10"
+        className="absolute top-3 right-2 flex gap-2 z-10"
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
