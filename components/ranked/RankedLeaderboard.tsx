@@ -27,6 +27,8 @@ import {
   Target,
   Clock,
   ChevronDown,
+  Flame,
+  Shield,
   Loader2,
 } from "lucide-react";
 import { convertStringToBuild } from "@/components/machines/converter";
@@ -363,8 +365,7 @@ function MatchHistoryPanel({
                   <div className="grid gap-1.5">
                     {matches.map((match, i) => {
                       const won = match.score === 2;
-                      const opp = match.opponents[0] ?? null;
-                      const oppScore = opp?.score ?? null;
+
 
                       return (
                         <motion.div
@@ -421,41 +422,42 @@ function MatchHistoryPanel({
                             </div>
                           </div>
 
-                          {/* Center: Score + time */}
-                          <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0 border-x border-stone-800/50">
+                          {/* Column 3: Stats */}
+                          <div className="flex flex-col gap-1.5 px-4 py-3 shrink-0 border-l border-stone-800/50 text-[11px] justify-center min-w-[110px]">
                             <div className="flex items-center gap-1.5">
-                              <span className={`text-base font-bold tabular-nums ${won ? "text-emerald-400" : "text-red-400"}`}>{match.score}</span>
-                              <span className="text-stone-600 text-xs font-medium">vs</span>
-                              {oppScore !== null && (
-                                <span className={`text-base font-bold tabular-nums ${won ? "text-red-400/60" : "text-emerald-400/60"}`}>{oppScore}</span>
-                              )}
+                              <Swords className="w-3 h-3 text-stone-600 shrink-0" />
+                              <span className="text-stone-600 uppercase tracking-wider w-7">K/D</span>
+                              <span className="tabular-nums">
+                                <span className="text-emerald-400/70">{match.kills}</span>
+                                <span className="text-stone-700"> / </span>
+                                <span className="text-red-400/70">{match.deaths}</span>
+                              </span>
                             </div>
-                            {match.matchDate && (
-                              <span className="text-[10px] text-stone-500 mt-0.5 tabular-nums">{timeAgo(match.matchDate)}</span>
-                            )}
+                            <div className="flex items-center gap-1.5">
+                              <Flame className="w-3 h-3 text-orange-500/60 shrink-0" />
+                              <span className="text-stone-600 uppercase tracking-wider w-7">Dmg</span>
+                              <span className="text-orange-300/70 tabular-nums">{formatNumber(match.damageDone)}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <Shield className="w-3 h-3 text-stone-600 shrink-0" />
+                              <span className="text-stone-600 uppercase tracking-wider w-7">Rcv</span>
+                              <span className="text-stone-400/60 tabular-nums">{formatNumber(match.damageReceived)}</span>
+                            </div>
                           </div>
 
-                          {/* Opponent side */}
-                          {opp && (
-                            <div className="flex items-center gap-3 px-3 py-3 flex-1 min-w-0 justify-end">
-                              <div className="flex items-center gap-2 mr-1 shrink-0">
-                                <div className="flex flex-col items-center">
-                                  <span className="text-xs font-bold tabular-nums text-stone-400/70">{formatNumber(opp.damageReceived)}</span>
-                                  <span className="text-[9px] text-stone-600 uppercase tracking-wider">RCV</span>
-                                </div>
-                                <div className="flex flex-col items-center">
-                                  <span className="text-xs font-bold tabular-nums text-orange-300/80">{formatNumber(opp.damageDone)}</span>
-                                  <span className="text-[9px] text-stone-600 uppercase tracking-wider">DMG</span>
-                                </div>
+                          {/* Column 4: Metadata */}
+                          <div className="flex flex-col gap-1.5 px-4 py-3 shrink-0 border-l border-stone-800/50 text-[11px] text-stone-500 justify-center min-w-[100px]">
+                            <span className="font-mono text-stone-600">#{match.matchId}</span>
+                            {match.matchDate && (
+                              <span>{timeAgo(match.matchDate)}</span>
+                            )}
+                            {match.matchDuration !== null && (
+                              <div className="flex items-center gap-1">
+                                <Clock className="w-3 h-3 shrink-0" />
+                                <span className="tabular-nums">{formatDuration(match.matchDuration)}</span>
                               </div>
-                              <div className="flex flex-col gap-1 items-end min-w-0">
-                                <span className="text-xs font-semibold text-stone-300 truncate max-w-[110px]">
-                                  {opp.name ?? opp.steamId.slice(-8)}
-                                </span>
-                                <MatchBuildIcons code={opp.build} />
-                              </div>
-                            </div>
-                          )}
+                            )}
+                          </div>
                         </motion.div>
                       );
                     })}
