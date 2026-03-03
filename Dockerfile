@@ -16,6 +16,7 @@ ENV BETTER_AUTH_SECRET="build-placeholder"
 ENV BETTER_AUTH_URL="https://www.v-arena.com"
 ENV NEXTAUTH_URL="https://www.v-arena.com"
 ENV RESEND_API_KEY="re_placeholder"
+ENV GAME_DATABASE_URL="mysql://build:build@localhost:3306/build"
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 RUN npx prisma generate && yarn build
