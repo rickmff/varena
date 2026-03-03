@@ -432,7 +432,6 @@ export const BuildContent = ({
   showPublicToggle = true,
   isAuthenticated = true,
   upvotes,
-  downvotes,
   userVote,
   buildId,
   userId,
@@ -458,11 +457,10 @@ export const BuildContent = ({
   showPublicToggle?: boolean;
   isAuthenticated?: boolean;
   upvotes?: number;
-  downvotes?: number;
-  userVote?: "upvote" | "downvote" | null;
+  userVote?: "upvote" | null;
   buildId?: string;
   userId?: string | null;
-  onVoteChange?: (upvotes: number, downvotes: number, userVote: "upvote" | "downvote" | null) => void;
+  onVoteChange?: (upvotes: number, userVote: "upvote" | null) => void;
   isAdmin?: boolean;
   onAdminDelete?: (event: React.MouseEvent) => void;
   buildLink?: string;
@@ -715,7 +713,6 @@ export const BuildContent = ({
           <VoteButtons
             buildId={buildId}
             initialUpvotes={upvotes || 0}
-            initialDownvotes={downvotes || 0}
             initialUserVote={userVote || null}
             onVoteChange={onVoteChange}
           />
@@ -776,7 +773,7 @@ export const BuildContent = ({
           ) : (
             <>
               <CardTitle
-                className={`text-xl font-bold text-white ${isMineTab ? "group-hover:truncate group-hover:max-w-[10ch] group-hover:overflow-hidden group-hover:text-ellipsis" : ""}`}
+                className={`text-xl font-bold text-white ${isMineTab ? "group-hover:truncate group-hover:max-w-[10ch] group-hover:overflow-hidden group-hover:text-ellipsis" : "truncate"}`}
                 title={name || "Unnamed Build"}
               >
                 {isMineTab ? (

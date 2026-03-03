@@ -429,43 +429,6 @@ function MatchHistoryPanel({
                               </div>
                             </div>
                           )}
-
-                          {/* Column 3: Stats */}
-                          <div className="flex flex-col gap-1.5 px-4 py-3 shrink-0 border-l border-stone-800/50 text-[11px] justify-center min-w-[110px]">
-                            <div className="flex items-center gap-1.5">
-                              <Swords className="w-3 h-3 text-stone-600 shrink-0" />
-                              <span className="text-stone-600 uppercase tracking-wider w-7">K/D</span>
-                              <span className="tabular-nums">
-                                <span className="text-emerald-400/70">{match.kills}</span>
-                                <span className="text-stone-700"> / </span>
-                                <span className="text-red-400/70">{match.deaths}</span>
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <Flame className="w-3 h-3 text-orange-500/60 shrink-0" />
-                              <span className="text-stone-600 uppercase tracking-wider w-7">Dmg</span>
-                              <span className="text-orange-300/70 tabular-nums">{formatNumber(match.damageDone)}</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <Shield className="w-3 h-3 text-stone-600 shrink-0" />
-                              <span className="text-stone-600 uppercase tracking-wider w-7">Rcv</span>
-                              <span className="text-stone-400/60 tabular-nums">{formatNumber(match.damageReceived)}</span>
-                            </div>
-                          </div>
-
-                          {/* Column 4: Metadata */}
-                          <div className="flex flex-col gap-1.5 px-4 py-3 shrink-0 border-l border-stone-800/50 text-[11px] text-stone-500 justify-center min-w-[100px]">
-                            <span className="font-mono text-stone-600">#{match.matchId}</span>
-                            {match.matchDate && (
-                              <span>{timeAgo(match.matchDate)}</span>
-                            )}
-                            {match.matchDuration !== null && (
-                              <div className="flex items-center gap-1">
-                                <Clock className="w-3 h-3 shrink-0" />
-                                <span className="tabular-nums">{formatDuration(match.matchDuration)}</span>
-                              </div>
-                            )}
-                          </div>
                         </motion.div>
                       );
                     })}

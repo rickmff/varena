@@ -39,8 +39,7 @@ type Build = {
   userId?: string | null;
   isPublic?: boolean;
   upvotes?: number;
-  downvotes?: number;
-  userVote?: "upvote" | "downvote" | null;
+  userVote?: "upvote" | null;
 };
 
 type DecodedBuild = Build & {
@@ -48,7 +47,11 @@ type DecodedBuild = Build & {
 };
 
 const spellSchools = Array.from(
-  new Set(Object.values(spellsData).map((spell) => spell.spellSchool))
+  new Set(
+    Object.values(spellsData)
+      .filter((spell) => spell.category === "spell")
+      .map((spell) => spell.spellSchool)
+  )
 );
 
 const bloodList = Object.values(bloodData);
@@ -405,7 +408,6 @@ export default function PublicBuildsList() {
         userId: build.userId || null,
         isPublic: build.isPublic || false,
         upvotes: build.upvotes || 0,
-        downvotes: build.downvotes || 0,
         userVote: build.userVote || null,
         decoded: undefined,
       }));
@@ -1113,14 +1115,13 @@ export default function PublicBuildsList() {
                       isPublic={build.isPublic}
                       showPublicToggle={false}
                       upvotes={build.upvotes}
-                      downvotes={build.downvotes}
                       userVote={build.userVote}
                       buildId={build.id}
-                      onVoteChange={(upvotes, downvotes, userVote) => {
+                      onVoteChange={(upvotes, userVote) => {
                         setBuilds((prev) =>
                           prev.map((b) =>
                             b.id === build.id
-                              ? { ...b, upvotes, downvotes, userVote }
+                              ? { ...b, upvotes, userVote }
                               : b
                           )
                         );

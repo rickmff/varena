@@ -108,13 +108,9 @@ export async function GET(request: Request) {
           }
         }
 
-        // Sort by popularity if requested (upvotes - downvotes)
+        // Sort by popularity if requested (upvotes only)
         if (sort === "popular") {
-          builds = [...builds].sort((a, b) => {
-            const scoreA = a.upvotes - a.downvotes;
-            const scoreB = b.upvotes - b.downvotes;
-            return scoreB - scoreA; // Descending order
-          });
+          builds = [...builds].sort((a, b) => b.upvotes - a.upvotes);
         }
 
         return builds;

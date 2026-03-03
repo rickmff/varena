@@ -23,9 +23,9 @@ export async function POST(request: Request, { params }: RouteParams) {
     const { id: buildId } = await params;
     const { voteType } = await request.json(); // "upvote", "downvote", or "remove"
 
-    if (!voteType || !["upvote", "downvote", "remove"].includes(voteType)) {
+    if (!voteType || !["upvote", "remove"].includes(voteType)) {
       return NextResponse.json(
-        { error: "Invalid voteType. Must be 'upvote', 'downvote', or 'remove'" },
+        { error: "Invalid voteType. Must be 'upvote' or 'remove'" },
         { status: 400 }
       );
     }
@@ -82,17 +82,12 @@ export async function POST(request: Request, { params }: RouteParams) {
 
     // Handle vote logic
     let upvoteDelta = 0;
-    let downvoteDelta = 0;
-    let userVote: "upvote" | "downvote" | null = null;
+    let userVote: "upvote" | null = null;
 
     if (voteType === "remove") {
-      // Remove existing vote
+      // Remove existing upvote
       if (existingVote) {
-        if (existingVote.voteType === "upvote") {
-          upvoteDelta = -1;
-        } else {
-          downvoteDelta = -1;
-        }
+        upvoteDelta = -1;
         await prisma.buildVote.delete({
           where: {
             buildId_userId: {
@@ -103,64 +98,33 @@ export async function POST(request: Request, { params }: RouteParams) {
         });
       }
     } else {
-      // Add or change vote
+      // Add or toggle off upvote
       if (existingVote) {
-        if (existingVote.voteType === voteType) {
-          // Same vote type - remove it (toggle off)
-          if (voteType === "upvote") {
-            upvoteDelta = -1;
-          } else {
-            downvoteDelta = -1;
-          }
-          await prisma.buildVote.delete({
-            where: {
-              buildId_userId: {
-                buildId,
-                userId: session.user.id,
-              },
+        // Already upvoted - toggle off
+        upvoteDelta = -1;
+        await prisma.buildVote.delete({
+          where: {
+            buildId_userId: {
+              buildId,
+              userId: session.user.id,
             },
-          });
-        } else {
-          // Different vote type - change it
-          if (existingVote.voteType === "upvote") {
-            upvoteDelta = -1;
-            downvoteDelta = 1;
-          } else {
-            upvoteDelta = 1;
-            downvoteDelta = -1;
-          }
-          await prisma.buildVote.update({
-            where: {
-              buildId_userId: {
-                buildId,
-                userId: session.user.id,
-              },
-            },
-            data: {
-              voteType,
-            },
-          });
-          userVote = voteType as "upvote" | "downvote";
-        }
+          },
+        });
       } else {
-        // New vote
-        if (voteType === "upvote") {
-          upvoteDelta = 1;
-        } else {
-          downvoteDelta = 1;
-        }
+        // New upvote
+        upvoteDelta = 1;
         await prisma.buildVote.create({
           data: {
             buildId,
             userId: session.user.id,
-            voteType,
+            voteType: "upvote",
           },
         });
-        userVote = voteType as "upvote" | "downvote";
+        userVote = "upvote";
       }
     }
 
-    // Update denormalized counts on Build
+    // Update denormalized upvote count on Build
     let updatedBuild;
     try {
       updatedBuild = await prisma.build.update({
@@ -169,22 +133,17 @@ export async function POST(request: Request, { params }: RouteParams) {
           upvotes: {
             increment: upvoteDelta,
           },
-          downvotes: {
-            increment: downvoteDelta,
-          },
         },
         select: {
           id: true,
           upvotes: true,
-          downvotes: true,
         },
       });
     } catch (error: any) {
-      // If upvotes/downvotes columns don't exist, return error
+      // If upvotes column doesn't exist, return error
       const errorMessage = error.message || error.toString() || "";
       if (
         errorMessage.includes("upvotes") ||
-        errorMessage.includes("downvotes") ||
         errorMessage.includes("Unknown column") ||
         error.code === "P2009"
       ) {
@@ -198,7 +157,6 @@ export async function POST(request: Request, { params }: RouteParams) {
 
     return NextResponse.json({
       upvotes: updatedBuild.upvotes,
-      downvotes: updatedBuild.downvotes,
       userVote,
     });
   } catch (error: any) {

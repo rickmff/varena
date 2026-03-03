@@ -9,9 +9,8 @@ import { useAuth } from "@/hooks/use-auth";
 interface VoteButtonsProps {
   buildId: string;
   initialUpvotes: number;
-  initialDownvotes: number;
-  initialUserVote: "upvote" | "downvote" | null;
-  onVoteChange?: (upvotes: number, downvotes: number, userVote: "upvote" | "downvote" | null) => void;
+  initialUserVote: "upvote" | null;
+  onVoteChange?: (upvotes: number, userVote: "upvote" | null) => void;
 }
 
 function VoteParticles({ trigger }: { trigger: number }) {
@@ -58,14 +57,12 @@ function VoteParticles({ trigger }: { trigger: number }) {
 export function VoteButtons({
   buildId,
   initialUpvotes,
-  initialDownvotes,
   initialUserVote,
   onVoteChange,
 }: VoteButtonsProps) {
   const { user } = useAuth();
   const [upvotes, setUpvotes] = useState(initialUpvotes);
-  const [downvotes, setDownvotes] = useState(initialDownvotes);
-  const [userVote, setUserVote] = useState<"upvote" | "downvote" | null>(initialUserVote);
+  const [userVote, setUserVote] = useState<"upvote" | null>(initialUserVote);
   const [isLoading, setIsLoading] = useState(false);
   const [upBounce, setUpBounce] = useState(false);
   const [scoreDirection, setScoreDirection] = useState<"up" | "down" | null>(null);
@@ -113,24 +110,10 @@ export function VoteButtons({
     }
 
     const previousUpvotes = upvotes;
-    const previousDownvotes = downvotes;
     const previousUserVote = userVote;
 
-    let newUpvotes = upvotes;
-    let newUserVote: "upvote" | "downvote" | null = userVote;
-
-    if (voteType === "remove") {
-      newUpvotes = upvotes - 1;
-      newUserVote = null;
-    } else {
-      if (previousUserVote === "upvote") {
-        newUpvotes = upvotes - 1;
-        newUserVote = null;
-      } else {
-        newUpvotes = upvotes + 1;
-        newUserVote = "upvote";
-      }
-    }
+    const newUpvotes = previousUserVote === "upvote" ? upvotes - 1 : upvotes + 1;
+    const newUserVote: "upvote" | null = previousUserVote === "upvote" ? null : "upvote";
 
     setUpvotes(newUpvotes);
     setUserVote(newUserVote);
@@ -151,16 +134,14 @@ export function VoteButtons({
 
       const data = await response.json();
       setUpvotes(data.upvotes);
-      setDownvotes(data.downvotes);
       setUserVote(data.userVote);
       prevScoreRef.current = data.upvotes;
 
       if (onVoteChange) {
-        onVoteChange(data.upvotes, data.downvotes, data.userVote);
+        onVoteChange(data.upvotes, data.userVote);
       }
     } catch (error: any) {
       setUpvotes(previousUpvotes);
-      setDownvotes(previousDownvotes);
       setUserVote(previousUserVote);
       prevScoreRef.current = previousUpvotes;
 

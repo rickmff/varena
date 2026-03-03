@@ -19,7 +19,11 @@ export const veilSpells = Object.values(spellsData).filter((spell) =>
 );
 
 const spellSchools = Array.from(
-  new Set(Object.values(spellsData).map((spell) => spell.spellSchool))
+  new Set(
+    Object.values(spellsData)
+      .filter((spell) => spell.category === "spell")
+      .map((spell) => spell.spellSchool)
+  )
 );
 
 const SpellTabs = ({
