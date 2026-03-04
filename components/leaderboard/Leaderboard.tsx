@@ -680,7 +680,7 @@ const MOCK_PLAYERS: Player[] = [
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 
-export default function RankedLeaderboard() {
+export default function Leaderboard() {
   const [rawPlayers, setRawPlayers] = useState<Player[]>([]);
   const [totalMatches, setTotalMatches] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);

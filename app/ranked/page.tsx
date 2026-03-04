@@ -3,7 +3,7 @@
 import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import SectionHeader from "@/app/components/ui/SectionHeader";
-import RankedLeaderboard from "@/components/ranked/RankedLeaderboard";
+import Leaderboard from "@/components/leaderboard/Leaderboard";
 
 export default function RankedPage() {
   return (
@@ -34,7 +34,7 @@ export default function RankedPage() {
       {/* Leaderboard Section */}
       <section className="bg-black relative -mt-20 pb-20">
         <div className="container mx-auto px-4 relative z-10">
-          <RankedLeaderboard />
+          <Leaderboard />
         </div>
       </section>
     </div>
