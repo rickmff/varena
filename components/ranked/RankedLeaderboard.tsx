@@ -930,7 +930,7 @@ export default function RankedLeaderboard() {
                           <div className="flex flex-col min-w-0">
                             {isDracula && (
                               <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-red-600 mb-0.5">
-                                Imortal King
+                                Immortal King
                               </span>
                             )}
                             {player.name && isDracula && (
