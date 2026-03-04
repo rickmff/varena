@@ -26,7 +26,7 @@ export default function LeaderboardPage() {
         <div className="container mx-auto px-4 relative z-10">
           <SectionHeader
             title="Leaderboard"
-            subtitle="V Arena Rankeds"
+            subtitle="Rankeds"
           />
         </div>
       </section>
