@@ -938,14 +938,14 @@ export default function Leaderboard() {
                                 className="text-base font-bold tracking-widest uppercase bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
                                 style={{ textShadow: "0 0 12px rgba(220,38,38,0.4)" }}
                               >
-                                <span className="line-through decoration-2">{player.name}</span> Skiiw
+                                {player.name}
                               </span>
                             )}
                             {player.name && !isDracula && (
                               <span className={`font-semibold truncate tracking-[0.05em] w-full ${
                                 isTop5 ? "text-sm text-yellow-300" : "text-sm text-white/90"
                               }`}>
-                                {player.name}
+                                {player.name === "ChipSa" ? "Washed ChipSa" : player.name}
                               </span>
                             )}
                           </div>
