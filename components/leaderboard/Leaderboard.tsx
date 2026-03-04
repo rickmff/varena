@@ -414,7 +414,7 @@ function MatchHistoryPanel({
                 ) : (
                   <div className="grid gap-1.5">
                     {matches.map((match, i) => {
-                      const won = match.score === 2;
+                      const won = match.score === 2 || (match.score === 0 && match.opponents[0]?.score === 0 && match.mmrDiff > 0);
 
 
                       return (
