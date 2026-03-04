@@ -99,7 +99,7 @@ export async function GET(request: Request) {
     return NextResponse.json(
       {
         success: false,
-        error: "Failed to fetch ranked data",
+        error: "Failed to fetch leaderboard data",
         details:
           process.env.NODE_ENV === "development" ? error.message : undefined,
       },

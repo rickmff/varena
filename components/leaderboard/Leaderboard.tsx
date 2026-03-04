@@ -341,7 +341,7 @@ function MatchHistoryPanel({
       setLoading(true);
       setHasError(false);
       try {
-        const res = await fetch(`/api/ranked/${steamId}?region=${region}`);
+        const res = await fetch(`/api/leaderboard/${steamId}?region=${region}`);
         const data = await res.json();
         if (data.success && data.matches.length > 0) {
           setAllMatches(data.matches);
@@ -730,7 +730,7 @@ export default function Leaderboard() {
         const params = new URLSearchParams({ region });
         if (search) params.set("search", search);
 
-        const res = await fetch(`/api/ranked?${params}`);
+        const res = await fetch(`/api/leaderboard?${params}`);
         const data = await res.json();
 
         if (data.success) {
@@ -738,7 +738,7 @@ export default function Leaderboard() {
           if (data.totalMatches != null) setTotalMatches(data.totalMatches);
         }
       } catch (err) {
-        console.error("Failed to fetch ranked data:", err);
+        console.error("Failed to fetch leaderboard data:", err);
       } finally {
         setLoading(false);
       }
@@ -801,7 +801,7 @@ export default function Leaderboard() {
         >
           <span>
             <span className="text-white font-semibold mr-1">{players.length}</span>
-            players ranked
+            players leaderboard
           </span>
           {totalMatches != null && (
             <span>

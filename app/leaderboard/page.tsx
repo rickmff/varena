@@ -25,8 +25,8 @@ export default function RankedPage() {
 
         <div className="container mx-auto px-4 relative z-10">
           <SectionHeader
-            title="Ranked Arena"
-            subtitle="Leaderboard"
+            title="Leaderboard"
+            subtitle="V Arena Rankeds"
           />
         </div>
       </section>
