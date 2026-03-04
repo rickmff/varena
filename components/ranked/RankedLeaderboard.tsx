@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Table,
@@ -12,17 +12,12 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
   Trophy,
   Search,
-  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
   Swords,
   Target,
   Clock,
@@ -85,11 +80,6 @@ const REGIONS: { value: Region; label: string; Flag: React.ComponentType<{ class
   { value: "sea", label: "SEA", Flag: SG },
 ];
 
-const sortLabels: Record<SortOption, string> = {
-  mmr: "MMR",
-  wins: "Wins",
-  winrate: "Win Rate",
-};
 
 // ─── Rank Tiers ─────────────────────────────────────────────────────────────
 
@@ -102,18 +92,18 @@ interface TierConfig {
 }
 
 const TIERS: (TierConfig & { minMmr: number })[] = [
-  { name: "Bone",        minMmr: 0,    image: "/images/elos/Bone.png",        textColor: "text-orange-200/70", glowColor: "rgba(251,146,60,0.75)"   },
-  { name: "Copper",      minMmr: 1475, image: "/images/elos/Copper.png",      textColor: "text-amber-500/70",  glowColor: "rgba(203,213,225,0.7)"   },
-  { name: "Iron",        minMmr: 1525, image: "/images/elos/Iron.png",        textColor: "text-blue-200/70",   glowColor: "rgba(216,180,254,0.75)"  },
-  { name: "Dark Silver", minMmr: 1600, image: "/images/elos/DarkSilver.png",  textColor: "text-violet-400/70", glowColor: "rgba(251,191,36,0.8)"    },
+  { name: "Bone",        minMmr: 0,    image: "/images/elos/Bone.png",        textColor: "text-orange-200/70", glowColor: "rgba(251,146,60,0.95)",   rowOpacity: 0.05   },
+  { name: "Copper",      minMmr: 1475, image: "/images/elos/Copper.png",      textColor: "text-amber-500/70",  glowColor: "rgba(245,158,11,0.75)",   rowOpacity: 0.10   },
+  { name: "Iron",        minMmr: 1525, image: "/images/elos/Iron.png",        textColor: "text-blue-200/70",   glowColor: "rgba(191,219,254,0.75)",   rowOpacity: 0.08  },
+  { name: "Dark Silver", minMmr: 1600, image: "/images/elos/DarkSilver.png",  textColor: "text-violet-400/70", glowColor: "rgba(167,139,250,0.8)",   rowOpacity: 0.08   },
   { name: "Sanguine",    minMmr: 1700, image: "/images/elos/Sanguine.png",    textColor: "text-red-500/70",    glowColor: "rgba(239,68,68,0.85)",   rowOpacity: 0.10 },
-];
+]; 
 
 const DRACULA_TIER: TierConfig = {
   name: "Dracula",
   image: "/images/elos/Dracula.png",
   textColor: "text-red-500",
-  glowColor: "rgba(185,28,28,0.95)",
+  glowColor: "rgba(239,68,68,0.95)",
 };
 
 function getRankTier(mmr: number, rank: number): TierConfig {
@@ -691,15 +681,34 @@ const MOCK_PLAYERS: Player[] = [
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function RankedLeaderboard() {
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [rawPlayers, setRawPlayers] = useState<Player[]>([]);
   const [totalMatches, setTotalMatches] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<SortOption>("mmr");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
   const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
   const [region, setRegion] = useState<Region>("eu");
+
+  const players = useMemo(() => {
+    const dir = sortDir === "desc" ? 1 : -1;
+    return [...rawPlayers].sort((a, b) => {
+      if (sortBy === "wins") return dir * (b.wins - a.wins);
+      if (sortBy === "winrate") return dir * (b.winRate - a.winRate);
+      return dir * (b.mmr - a.mmr);
+    });
+  }, [rawPlayers, sortBy, sortDir]);
+
+  const handleSort = useCallback((col: SortOption) => {
+    if (sortBy === col) {
+      setSortDir((d) => (d === "desc" ? "asc" : "desc"));
+    } else {
+      setSortBy(col);
+      setSortDir("desc");
+    }
+  }, [sortBy]);
 
   useEffect(() => {
     const timer = setTimeout(() => setSearch(searchInput), 300);
@@ -710,10 +719,7 @@ export default function RankedLeaderboard() {
     if (USE_MOCK_DATA) {
       let filtered = [...MOCK_PLAYERS];
       if (search) filtered = filtered.filter(p => p.steamId.includes(search));
-      if (sortBy === "wins") filtered.sort((a, b) => b.wins - a.wins);
-      else if (sortBy === "winrate") filtered.sort((a, b) => b.winRate - a.winRate);
-      else filtered.sort((a, b) => b.mmr - a.mmr);
-      setPlayers(filtered);
+      setRawPlayers(filtered);
       setLoading(false);
       return;
     }
@@ -721,14 +727,14 @@ export default function RankedLeaderboard() {
     async function fetchData() {
       setLoading(true);
       try {
-        const params = new URLSearchParams({ sort: sortBy, region });
+        const params = new URLSearchParams({ region });
         if (search) params.set("search", search);
 
         const res = await fetch(`/api/ranked?${params}`);
         const data = await res.json();
 
         if (data.success) {
-          setPlayers(data.players);
+          setRawPlayers(data.players);
           if (data.totalMatches != null) setTotalMatches(data.totalMatches);
         }
       } catch (err) {
@@ -738,7 +744,7 @@ export default function RankedLeaderboard() {
       }
     }
     fetchData();
-  }, [sortBy, search, region]);
+  }, [search, region]);
 
   // Collapse any open panel when switching regions
   useEffect(() => {
@@ -775,49 +781,7 @@ export default function RankedLeaderboard() {
           })}
         </div>
 
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-500 uppercase tracking-wider">
-            Sort by
-          </span>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20 gap-2"
-              >
-                <ArrowUpDown className="w-3.5 h-3.5" />
-                {sortLabels[sortBy]}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="bg-black border-white/10"
-            >
-              <DropdownMenuItem
-                onClick={() => setSortBy("mmr")}
-                className="text-white hover:bg-white/10 cursor-pointer gap-2"
-              >
-                <Trophy className="w-4 h-4 text-yellow-500" />
-                MMR
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setSortBy("wins")}
-                className="text-white hover:bg-white/10 cursor-pointer gap-2"
-              >
-                <Swords className="w-4 h-4 text-emerald-500" />
-                Wins
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setSortBy("winrate")}
-                className="text-white hover:bg-white/10 cursor-pointer gap-2"
-              >
-                <Target className="w-4 h-4 text-blue-500" />
-                Win Rate
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-                  <div className="relative w-full sm:w-72">
+        <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
           <Input
             placeholder="Search by name or Steam ID..."
@@ -825,7 +789,6 @@ export default function RankedLeaderboard() {
             onChange={(e) => setSearchInput(e.target.value)}
             className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-red-600/50 focus:ring-red-600/20"
           />
-        </div>
         </div>
       </div>
 
@@ -874,27 +837,43 @@ export default function RankedLeaderboard() {
           <Table>
             <TableHeader>
               <TableRow className="border-white/10 hover:bg-transparent">
-                <TableHead className="text-gray-400 w-20 text-center">
-                  Rank
-                </TableHead>
+                <TableHead className="text-gray-400 w-20 text-center">Rank</TableHead>
                 <TableHead className="text-gray-400">Player</TableHead>
                 <TableHead className="text-gray-400 hidden sm:table-cell">Elo</TableHead>
-                <TableHead className="text-gray-400 text-center">
+                <TableHead
+                  className={`text-center cursor-pointer select-none transition-colors ${sortBy === "winrate" ? "text-white" : "text-gray-400 hover:text-gray-200"}`}
+                  onClick={() => handleSort("winrate")}
+                >
                   <div className="flex items-center justify-center gap-1.5">
                     <Target className="w-3.5 h-3.5" />
                     Win Rate
+                    {sortBy === "winrate"
+                      ? sortDir === "desc" ? <ArrowDown className="w-3 h-3" /> : <ArrowUp className="w-3 h-3" />
+                      : <ArrowDown className="w-3 h-3 opacity-20" />}
                   </div>
                 </TableHead>
-                <TableHead className="text-gray-400 text-center hidden sm:table-cell">
+                <TableHead
+                  className={`text-center hidden sm:table-cell cursor-pointer select-none transition-colors ${sortBy === "wins" ? "text-white" : "text-gray-400 hover:text-gray-200"}`}
+                  onClick={() => handleSort("wins")}
+                >
                   <div className="flex items-center justify-center gap-1.5">
                     <Swords className="w-3.5 h-3.5" />
                     W/L
+                    {sortBy === "wins"
+                      ? sortDir === "desc" ? <ArrowDown className="w-3 h-3" /> : <ArrowUp className="w-3 h-3" />
+                      : <ArrowDown className="w-3 h-3 opacity-20" />}
                   </div>
                 </TableHead>
-                <TableHead className="text-gray-400">
+                <TableHead
+                  className={`cursor-pointer select-none transition-colors ${sortBy === "mmr" ? "text-white" : "text-gray-400 hover:text-gray-200"}`}
+                  onClick={() => handleSort("mmr")}
+                >
                   <div className="flex items-center gap-1.5">
                     <Trophy className="w-3.5 h-3.5" />
                     MMR
+                    {sortBy === "mmr"
+                      ? sortDir === "desc" ? <ArrowDown className="w-3 h-3" /> : <ArrowUp className="w-3 h-3" />
+                      : <ArrowDown className="w-3 h-3 opacity-20" />}
                   </div>
                 </TableHead>
                 <TableHead className="text-gray-400 text-right hidden md:table-cell">
@@ -933,7 +912,7 @@ export default function RankedLeaderboard() {
                         transition-all duration-200 cursor-pointer select-none
                         ${
                           isTop5
-                            ? `border-l-2 border-b ${isDracula ? "border-l-red-700/60 border-b-red-900/30" : "border-l-yellow-500/50 border-b-yellow-800/20"} bg-gradient-to-r from-yellow-800/25 from-0% via-yellow-700/8 via-25% to-transparent to-50% hover:from-yellow-800/35 hover:via-yellow-700/12`
+                            ? `border-l-2 border-b ${isDracula ? "border-l-red-700/60 border-b-red-900/30 bg-gradient-to-r from-red-900/30 from-0% via-red-800/10 via-25% to-transparent to-50% hover:from-red-900/40 hover:via-red-800/15" : "border-l-yellow-500/50 border-b-yellow-800/20 bg-gradient-to-r from-yellow-800/25 from-0% via-yellow-700/8 via-25% to-transparent to-50% hover:from-yellow-800/35 hover:via-yellow-700/12"}`
                             : "border-white/5"
                         }
                       `}
