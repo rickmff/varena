@@ -249,7 +249,7 @@ function MmrDisplay({ mmr, rank }: { mmr: number; rank: number }) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className={`text-sm font-bold tabular-nums`}>
+      <span className={`text-sm tabular-nums text-white/90`}>
         {mmr}
       </span>
     </div>
@@ -434,7 +434,7 @@ function MatchHistoryPanel({
                             <span className={`text-xs font-bold uppercase tracking-widest ${won ? "text-emerald-400" : "text-red-400"}`}>
                               {won ? "WIN" : "LOSS"}
                             </span>
-                            <span className={`text-xs md:text-sm font-bold tabular-nums ${
+                            <span className={`text-xs md:text-sm tabular-nums ${
                               match.mmrDiff > 0 ? "text-emerald-400" : match.mmrDiff < 0 ? "text-red-400" : "text-stone-500"
                             }`}>
                               {match.mmrDiff > 0 ? "+" : ""}{match.mmrDiff}
@@ -963,7 +963,7 @@ export default function RankedLeaderboard() {
 
                       <TableCell className="text-center">
                         <span
-                          className={`text-sm font-bold tabular-nums ${
+                          className={`text-sm tabular-nums ${
                             player.winRate >= 60
                               ? "text-emerald-400"
                               : player.winRate >= 50
