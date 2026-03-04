@@ -69,6 +69,28 @@ const nextConfig = {
             key: 'X-Frame-Options',
             value: 'SAMEORIGIN',
           },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob: https://v-arena.com https://images.unsplash.com https://prod-files-secure.s3.us-west-2.amazonaws.com https://www.notion.so",
+              "font-src 'self'",
+              "connect-src 'self' https://v-arena.com",
+              "frame-ancestors 'self'",
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join('; '),
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
         ],
       },
       {

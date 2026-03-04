@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getRegionDb, isValidRegion } from "@/lib/game-db";
+import { rateLimit, getRequestIdentifier } from "@/lib/rate-limit";
 import type { RowDataPacket } from "mysql2";
 
 interface CountRow extends RowDataPacket {
@@ -37,6 +38,11 @@ function serializePlayer(row: PlayerMatchmakingRow) {
 
 export async function GET(request: Request) {
   try {
+    const rl = rateLimit(getRequestIdentifier(request), { windowMs: 60 * 1000, maxRequests: 30 });
+    if (!rl.allowed) {
+      return NextResponse.json({ success: false, error: "Too many requests" }, { status: 429 });
+    }
+
     const { searchParams } = new URL(request.url);
     const sortBy = searchParams.get("sort") || "mmr";
     const search = searchParams.get("search") || "";

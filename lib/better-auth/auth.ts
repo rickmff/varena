@@ -3,6 +3,15 @@ import { createPool } from "mysql2/promise";
 import prisma from "../prisma";
 import { Resend } from "resend";
 
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
+
 // Parse DATABASE_URL para criar pool MySQL
 function parseDatabaseUrl(url: string) {
   try {
@@ -139,7 +148,7 @@ export const auth = betterAuth({
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h1 style="color: #333;">Reset your password</h1>
               <p style="color: #666; line-height: 1.6;">
-                Hi ${user.name || "there"},
+                Hi ${escapeHtml(user.name || "there")},
               </p>
               <p style="color: #666; line-height: 1.6;">
                 We received a request to reset your password. Click the button below to create a new password:
@@ -160,14 +169,12 @@ export const auth = betterAuth({
               </p>
             </div>
           `,
-          text: `Hi ${user.name || "there"},\n\nWe received a request to reset your password. Click this link to create a new password:\n\n${customUrl}\n\nThis link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.`,
+          text: `Hi ${escapeHtml(user.name || "there")},\n\nWe received a request to reset your password. Click this link to create a new password:\n\n${customUrl}\n\nThis link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.`,
         });
 
         console.log("✅ [Better Auth] Password reset email sent successfully");
         console.log("   To:", user.email);
         console.log("   Resend ID:", result.data?.id || "N/A");
-        console.log("   🔗 Original URL:", url);
-        console.log("   🔗 Custom Reset URL:", customUrl);
       } catch (error: any) {
         console.error("❌ [Better Auth] Error sending password reset email:");
         console.error("   Error:", error.message || error);
@@ -231,7 +238,7 @@ export const auth = betterAuth({
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
               <h1 style="color: #333;">Verify your email address</h1>
               <p style="color: #666; line-height: 1.6;">
-                Hi ${user.name || "there"},
+                Hi ${escapeHtml(user.name || "there")},
               </p>
               <p style="color: #666; line-height: 1.6;">
                 Thank you for signing up! Please verify your email address by clicking the button below:
@@ -252,13 +259,12 @@ export const auth = betterAuth({
               </p>
             </div>
           `,
-          text: `Hi ${user.name || "there"},\n\nThank you for signing up! Please verify your email address by clicking this link:\n\n${verifyUrl}\n\nIf you didn't create an account, you can safely ignore this email.`,
+          text: `Hi ${escapeHtml(user.name || "there")},\n\nThank you for signing up! Please verify your email address by clicking this link:\n\n${verifyUrl}\n\nIf you didn't create an account, you can safely ignore this email.`,
         });
 
         console.log("✅ [Better Auth] Verification email sent successfully");
         console.log("   To:", user.email);
         console.log("   Resend ID:", result.data?.id || "N/A");
-        console.log("   🔗 Verification URL:", url);
       } catch (error: any) {
         console.error("❌ [Better Auth] Error sending verification email:");
         console.error("   Error:", error.message || error);

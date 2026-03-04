@@ -938,7 +938,7 @@ export default function Leaderboard() {
                                 className="text-base font-bold tracking-widest uppercase bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
                                 style={{ textShadow: "0 0 12px rgba(220,38,38,0.4)" }}
                               >
-                                {player.name}
+                                <span className="line-through decoration-2">{player.name}</span> Skiiw
                               </span>
                             )}
                             {player.name && !isDracula && (

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getServerSession } from '@/lib/better-auth/server';
+import { isAdmin } from '@/lib/utils/admin';
 
 // Função para serializar dados do banco para JSON
 function serializeData(data: any): any {
@@ -38,6 +40,12 @@ function serializeData(data: any): any {
 
 export async function GET(request: Request) {
   try {
+    // Require admin authentication
+    const session = await getServerSession();
+    if (!session?.user || !isAdmin(session)) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const action = searchParams.get('action');
     const tableName = searchParams.get('table');
