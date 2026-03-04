@@ -943,7 +943,7 @@ export default function RankedLeaderboard() {
                             )}
                             {player.name && !isDracula && (
                               <span className={`font-semibold truncate tracking-[0.05em] w-full ${
-                                isTop5 ? "text-sm text-yellow-300" : "text-sm text-gray-400"
+                                isTop5 ? "text-sm text-yellow-300" : "text-sm text-white/90"
                               }`}>
                                 {player.name}
                               </span>
