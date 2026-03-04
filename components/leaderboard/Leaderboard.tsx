@@ -191,7 +191,7 @@ function MatchIcons({ code, small, bloodFirst }: { code: string; small?: boolean
     <a
       href={`/builds/create?build=${encodeURIComponent(code)}`}
       onClick={(e) => e.stopPropagation()}
-      className="flex items-center gap-0.5 hover:opacity-75 transition-opacity shrink-0"
+      className="flex items-center gap-0.5 hover:opacity-75 transition-opacity shrink-0 cursor-not-allowed pointer-events-none"
       title="View build"
     >
       {bloodFirst ? [...bloodEls, ...spellEls] : [...spellEls, ...bloodEls]}
