@@ -69,7 +69,7 @@ export async function GET(request: Request) {
                   ROW_NUMBER() OVER (ORDER BY p.MMR DESC, p.Wins DESC) AS MmrRank
            FROM PlayerMatchmakingData p
            LEFT JOIN PlayerNamesData n ON p.SteamID = n.SteamID
-         ) ranked
+         ) leaderboard
          WHERE CAST(SteamID AS CHAR) LIKE ? OR Name LIKE ?
          ORDER BY ${orderClause}`,
         [`%${search.trim()}%`, `%${search.trim()}%`]

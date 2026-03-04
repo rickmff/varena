@@ -5,7 +5,7 @@ import NavBar from "@/components/NavBar";
 import SectionHeader from "@/app/components/ui/SectionHeader";
 import Leaderboard from "@/components/leaderboard/Leaderboard";
 
-export default function RankedPage() {
+export default function LeaderboardPage() {
   return (
     <div className="min-h-screen bg-black text-white overflow-auto" id="builder-page">
       <NavBar />
