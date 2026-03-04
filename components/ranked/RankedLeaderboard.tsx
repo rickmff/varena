@@ -249,7 +249,7 @@ function MmrDisplay({ mmr, rank }: { mmr: number; rank: number }) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className={`text-sm font-bold tabular-nums ${tier.textColor}`}>
+      <span className={`text-sm font-bold tabular-nums`}>
         {mmr}
       </span>
     </div>
