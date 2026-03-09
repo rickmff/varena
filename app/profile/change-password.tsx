@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { authClient } from "@/lib/better-auth/client";
-import { Eye, EyeOff, Lock, Loader2, KeyRound } from "lucide-react";
+import { Eye, EyeOff, Lock, Loader2, ChevronDown } from "lucide-react";
 
 export default function ChangePassword() {
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -62,11 +62,8 @@ export default function ChangePassword() {
       }
 
       toast.success("Password changed successfully!");
-      setFormData({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
+      setFormData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      setOpen(false);
     } catch (error: any) {
       const errorMessage = error.message || "Failed to change password";
       if (errorMessage.toLowerCase().includes("current password") || errorMessage.toLowerCase().includes("incorrect")) {
@@ -80,20 +77,23 @@ export default function ChangePassword() {
   };
 
   return (
-    <Card className="bg-black/50 border-[#5865F2]/30">
-      <CardHeader>
-        <CardTitle className="text-white flex items-center gap-2">
-          <KeyRound className="h-5 w-5" />
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-4 py-2.5 rounded-sm bg-white/[0.03] hover:bg-white/[0.06] border border-white/5 hover:border-white/10 transition-all text-sm text-gray-400 hover:text-white"
+      >
+        <span className="flex items-center gap-2">
+          <Lock className="h-3.5 w-3.5" />
           Change Password
-        </CardTitle>
-        <CardDescription className="text-gray-400">
-          Update your account password
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="currentPassword" className="text-sm font-medium text-gray-300">
+        </span>
+        <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <form onSubmit={handleSubmit} className="mt-2 space-y-3 px-1">
+          <div className="space-y-1.5">
+            <label htmlFor="currentPassword" className="text-[11px] uppercase tracking-wider text-gray-600">
               Current Password
             </label>
             <div className="relative">
@@ -102,26 +102,24 @@ export default function ChangePassword() {
                 type={showCurrentPassword ? "text" : "password"}
                 placeholder="Enter current password"
                 value={formData.currentPassword}
-                onChange={(e) =>
-                  setFormData({ ...formData, currentPassword: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
                 required
                 disabled={loading}
-                className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 pr-10"
+                className="bg-black/50 border-white/10 text-white placeholder:text-gray-600 pr-10 h-9 text-sm"
               />
               <button
                 type="button"
                 onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
                 tabIndex={-1}
               >
-                {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showCurrentPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
               </button>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="newPassword" className="text-sm font-medium text-gray-300">
+          <div className="space-y-1.5">
+            <label htmlFor="newPassword" className="text-[11px] uppercase tracking-wider text-gray-600">
               New Password
             </label>
             <div className="relative">
@@ -134,39 +132,33 @@ export default function ChangePassword() {
                 required
                 disabled={loading}
                 minLength={6}
-                className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 pr-10"
+                className="bg-black/50 border-white/10 text-white placeholder:text-gray-600 pr-10 h-9 text-sm"
               />
               <button
                 type="button"
                 onClick={() => setShowNewPassword(!showNewPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
                 tabIndex={-1}
               >
-                {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showNewPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
               </button>
             </div>
             {formData.newPassword && (
-              <div className="space-y-1">
+              <div className="space-y-1 pt-0.5">
                 <div className="flex gap-1">
                   {[1, 2, 3, 4].map((level) => (
                     <div
                       key={level}
-                      className={`h-1 flex-1 rounded ${
-                        level <= passwordStrength.strength
-                          ? passwordStrength.color
-                          : "bg-gray-700"
+                      className={`h-0.5 flex-1 rounded-full ${
+                        level <= passwordStrength.strength ? passwordStrength.color : "bg-gray-800"
                       }`}
                     />
                   ))}
                 </div>
                 {passwordStrength.label && (
-                  <p className="text-xs text-gray-400">
+                  <p className="text-[11px] text-gray-500">
                     Strength:{" "}
-                    <span
-                      className={
-                        passwordStrength.strength >= 3 ? "text-green-500" : "text-yellow-500"
-                      }
-                    >
+                    <span className={passwordStrength.strength >= 3 ? "text-green-500" : "text-yellow-500"}>
                       {passwordStrength.label}
                     </span>
                   </p>
@@ -175,8 +167,8 @@ export default function ChangePassword() {
             )}
           </div>
 
-          <div className="space-y-2">
-            <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-300">
+          <div className="space-y-1.5">
+            <label htmlFor="confirmPassword" className="text-[11px] uppercase tracking-wider text-gray-600">
               Confirm New Password
             </label>
             <div className="relative">
@@ -185,71 +177,52 @@ export default function ChangePassword() {
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirm new password"
                 value={formData.confirmPassword}
-                onChange={(e) =>
-                  setFormData({ ...formData, confirmPassword: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 required
                 disabled={loading}
                 minLength={6}
-                className="bg-black/50 border-white/10 text-white placeholder:text-gray-500 pr-10"
+                className="bg-black/50 border-white/10 text-white placeholder:text-gray-600 pr-10 h-9 text-sm"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
                 tabIndex={-1}
               >
-                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showConfirmPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
               </button>
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 pt-1">
             <Button
               type="submit"
-              className="flex-1 bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] text-white"
+              size="sm"
+              className="flex-1 bg-[#8B0000]/80 hover:bg-[#8B0000] border-0 text-white h-8 text-xs"
               disabled={loading}
             >
               {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Changing...
-                </>
+                <><Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />Saving...</>
               ) : (
-                <>
-                  <Lock className="mr-2 h-4 w-4" />
-                  Change Password
-                </>
+                <><Lock className="mr-1.5 h-3.5 w-3.5" />Update Password</>
               )}
             </Button>
             <Button
               type="button"
-              variant="outline"
+              size="sm"
+              variant="ghost"
               onClick={() => {
-                setFormData({
-                  currentPassword: "",
-                  newPassword: "",
-                  confirmPassword: "",
-                });
+                setFormData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+                setOpen(false);
               }}
               disabled={loading}
-              className="bg-black/50 border-white/10 text-gray-400 hover:text-white"
+              className="text-gray-500 hover:text-white h-8 text-xs"
             >
-              Clear
+              Cancel
             </Button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }
-
-
-
-
-
-
-
-
-
-

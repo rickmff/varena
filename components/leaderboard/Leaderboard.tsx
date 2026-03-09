@@ -478,9 +478,13 @@ function MatchHistoryPanel({
                                     {match.opponents[0].mmr != null && (
                                       <MiniTierIcon mmr={match.opponents[0].mmr - match.opponents[0].mmrDiff} />
                                     )}
-                                    <span className="text-sm font-medium text-white truncate">
+                                    <a
+                                      href={`/players/${match.opponents[0].steamId}`}
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="text-sm font-medium text-white truncate hover:underline hover:text-red-300"
+                                    >
                                       {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
-                                    </span>
+                                    </a>
                                   </div>
                                   <MatchIcons code={match.opponents[0].build} />
                                   <div className="flex items-center gap-4">
@@ -525,9 +529,13 @@ function MatchHistoryPanel({
                                     {match.opponents[0].mmr != null && (
                                       <MiniTierIcon mmr={match.opponents[0].mmr - match.opponents[0].mmrDiff} />
                                     )}
-                                    <span className="text-sm font-medium text-white truncate">
+                                    <a
+                                      href={`/players/${match.opponents[0].steamId}`}
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="text-sm font-medium text-white truncate hover:underline hover:text-red-300"
+                                    >
                                       {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
-                                    </span>
+                                    </a>
                                   </div>
                                   <MatchIcons code={match.opponents[0].build} small />
                                 </div>
@@ -934,19 +942,25 @@ export default function Leaderboard() {
                               </span>
                             )}
                             {player.name && isDracula && (
-                              <span
-                                className="text-base font-bold tracking-widest uppercase bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent"
+                              <a
+                                href={`/players/${player.steamId}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-base font-bold tracking-widest uppercase bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent hover:underline"
                                 style={{ textShadow: "0 0 12px rgba(220,38,38,0.4)" }}
                               >
                                 {player.name}
-                              </span>
+                              </a>
                             )}
                             {player.name && !isDracula && (
-                              <span className={`font-semibold truncate tracking-[0.05em] w-full ${
-                                isTop5 ? "text-sm text-yellow-300" : "text-sm text-white/90"
-                              }`}>
+                              <a
+                                href={`/players/${player.steamId}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className={`font-semibold truncate tracking-[0.05em] w-full hover:underline ${
+                                  isTop5 ? "text-sm text-yellow-300" : "text-sm text-white/90"
+                                }`}
+                              >
                                 {player.name === "ChipSa" ? "Washed ChipSa" : player.name}
-                              </span>
+                              </a>
                             )}
                           </div>
                         </div>

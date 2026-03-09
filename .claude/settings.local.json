@@ -4,7 +4,14 @@
       "Bash(npm install country-flag-icons --legacy-peer-deps)",
       "Bash(npm audit --json)",
       "Bash(node -e \"const d=JSON.parse\\(require\\(''fs''\\).readFileSync\\(''/dev/stdin'',''utf8''\\)\\); console.log\\(''Vulnerabilities:'', JSON.stringify\\(d.metadata?.vulnerabilities || {}\\)\\); console.log\\(''Total:'', d.metadata?.vulnerabilities ? Object.values\\(d.metadata.vulnerabilities\\).reduce\\(\\(a,b\\)=>a+b,0\\) : ''unknown''\\)\")",
-      "Bash(npm audit)"
+      "Bash(npm audit)",
+      "Bash(npx prisma migrate dev --name add_steam_id)",
+      "Bash(npx prisma db push)",
+      "Bash(npx prisma db push --accept-data-loss)",
+      "Bash(npm run prisma:push)",
+      "Bash(npm run build)",
+      "Bash(npx next build)",
+      "Bash(npx tsc --noEmit)"
     ]
   }
 }

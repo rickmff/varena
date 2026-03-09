@@ -28,12 +28,12 @@ export default function SendPasswordResetButton({ email }: SendPasswordResetButt
       });
 
       if (result.error) {
-        throw new Error(result.error.message || "Failed to send password reset email");
+        throw new Error(result.error.message || "Failed to Send password reset for my email");
       }
 
       toast.success(`Password reset link sent to ${email}. Please check your inbox.`);
     } catch (error: any) {
-      toast.error(error.message || "Failed to send password reset email");
+      toast.error(error.message || "Failed to Send password reset for my email");
     } finally {
       setLoading(false);
     }
@@ -54,7 +54,7 @@ export default function SendPasswordResetButton({ email }: SendPasswordResetButt
       ) : (
         <>
           <Mail className="mr-2 h-4 w-4" />
-          Send Password Reset Email
+          Send password reset for my email
         </>
       )}
     </Button>

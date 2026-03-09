@@ -37,13 +37,13 @@ export default function ResetPasswordPage() {
       });
 
       if (result.error) {
-        throw new Error(result.error.message || "Failed to send password reset email");
+        throw new Error(result.error.message || "Failed to Send password reset for my email");
       }
 
       setEmailSent(true);
       toast.success("If an account exists with this email, you'll receive a password reset link.");
     } catch (error: any) {
-      toast.error(error.message || "Failed to send password reset email");
+      toast.error(error.message || "Failed to Send password reset for my email");
     } finally {
       setLoading(false);
     }

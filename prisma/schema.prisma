@@ -97,6 +97,8 @@ model User {
   image         String?
   emailVerified DateTime?
   banned        Boolean   @default(false)
+  steamId       String?   @unique
+  profilePublic Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
