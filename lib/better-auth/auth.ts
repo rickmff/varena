@@ -88,6 +88,14 @@ console.log("[Better Auth] Email verification configured:", emailVerificationCon
 
 export const auth = betterAuth({
   database: pool,
+  session: {
+    // Session lasts 30 days total
+    expiresIn: 60 * 60 * 24 * 30,
+    // Renew session if it has less than 15 days left (sliding window)
+    updateAge: 60 * 60 * 24 * 15,
+    // Keep session fresh on every request
+    freshAge: 0,
+  },
   logger: {
     level: process.env.NODE_ENV === "development" ? "debug" : "error",
     log: (level, message, ...args) => {

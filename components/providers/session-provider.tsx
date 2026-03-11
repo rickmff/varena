@@ -46,7 +46,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     lastFetchRef.current = now;
 
     try {
-      const result = await authClient.getSession();
+      const result = await authClient.getSession({
+        fetchOptions: { cache: "no-store" },
+      });
       if (result.data) {
         // Always fetch admin status when session exists
         let adminStatus = false;
