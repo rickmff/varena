@@ -130,12 +130,13 @@ interface MatchHistoryListProps {
   playerName: string | null;
   currentMmr: number;
   region: string;
+  season?: "current" | number;
 }
 
 const PAGE_SIZE = 8;
 const MAX_RETRIES = 3;
 
-export default function MatchHistoryList({ playerToken, playerName, currentMmr, region }: MatchHistoryListProps) {
+export default function MatchHistoryList({ playerToken, playerName, currentMmr, region, season = "current" }: MatchHistoryListProps) {
   const [allMatches, setAllMatches] = useState<Match[]>([]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(false);
@@ -143,14 +144,14 @@ export default function MatchHistoryList({ playerToken, playerName, currentMmr, 
   const [retryCount, setRetryCount] = useState(0);
   const [hasError, setHasError] = useState(false);
 
-  // Reset when region changes
+  // Reset when region or season changes
   useEffect(() => {
     setAllMatches([]);
     setFetched(false);
     setVisibleCount(PAGE_SIZE);
     setRetryCount(0);
     setHasError(false);
-  }, [region]);
+  }, [region, season]);
 
   // Reconstruct MMR per match walking backwards from current MMR
   const matchesWithMmr = useMemo(() => {
@@ -174,7 +175,7 @@ export default function MatchHistoryList({ playerToken, playerName, currentMmr, 
       setLoading(true);
       setHasError(false);
       try {
-        const res = await fetch(`/api/leaderboard/${playerToken}?region=${region}`);
+        const res = await fetch(`/api/leaderboard/${playerToken}?region=${region}&season=${season}`);
         const data = await res.json();
         if (data.success && data.matches.length > 0) {
           setAllMatches(data.matches);
@@ -200,7 +201,7 @@ export default function MatchHistoryList({ playerToken, playerName, currentMmr, 
 
     fetch_();
     return () => { if (retryTimer) clearTimeout(retryTimer); };
-  }, [fetched, region, playerToken, retryCount]);
+  }, [fetched, region, season, playerToken, retryCount]);
 
   if (loading) {
     return (

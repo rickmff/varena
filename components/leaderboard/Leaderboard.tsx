@@ -39,16 +39,21 @@ interface Player {
 
 
 type SortOption = "mmr" | "wins" | "winrate";
-type Region = "eu" | "na" | "br" | "oce" | "sea";
+type Region = "eu" | "na" | "br" | "oce" | "sea" | "test";
 type Season = "current" | number;
 
-const REGIONS: { value: Region; label: string; Flag: React.ComponentType<{ className?: string }> }[] = [
-  { value: "eu",  label: "EU",  Flag: EU },
-  { value: "na",  label: "NA",  Flag: US },
-  { value: "br",  label: "BR",  Flag: BR },
-  { value: "oce", label: "OCE", Flag: AU },
-  { value: "sea", label: "SEA", Flag: SG },
+const ALL_REGION_OPTIONS: { value: Region; label: string; Flag?: React.ComponentType<{ className?: string }>; devOnly?: boolean }[] = [
+  { value: "eu",   label: "EU",   Flag: EU },
+  { value: "na",   label: "NA",   Flag: US },
+  { value: "br",   label: "BR",   Flag: BR },
+  { value: "oce",  label: "OCE",  Flag: AU },
+  { value: "sea",  label: "SEA",  Flag: SG },
+  { value: "test", label: "TEST", devOnly: true },
 ];
+
+const REGIONS = ALL_REGION_OPTIONS.filter(
+  (r) => !r.devOnly || process.env.NODE_ENV === "development"
+);
 
 
 // ─── Rank Tiers ─────────────────────────────────────────────────────────────
@@ -366,7 +371,7 @@ export default function Leaderboard() {
                       : "text-stone-500 hover:text-stone-300 hover:bg-white/[0.04]"
                   }`}
                 >
-                  <r.Flag className={`w-4 h-auto rounded-[2px] transition-opacity duration-200 ${active ? "opacity-100" : "opacity-50"}`} />
+                  {r.Flag && <r.Flag className={`w-4 h-auto rounded-[2px] transition-opacity duration-200 ${active ? "opacity-100" : "opacity-50"}`} />}
                   {r.label}
                 </button>
               );

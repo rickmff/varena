@@ -1,17 +1,18 @@
 import { createPool, type Pool } from "mysql2/promise";
 
-export type Region = "eu" | "na" | "oce" | "br" | "sea";
+export type Region = "eu" | "na" | "oce" | "br" | "sea" | "test";
 
 export const REGIONS: { value: Region; label: string }[] = [
-  { value: "eu",  label: "EU"  },
-  { value: "na",  label: "NA"  },
-  { value: "oce", label: "OCE" },
-  { value: "br",  label: "BR"  },
-  { value: "sea", label: "SEA" },
+  { value: "eu",   label: "EU"   },
+  { value: "na",   label: "NA"   },
+  { value: "oce",  label: "OCE"  },
+  { value: "br",   label: "BR"   },
+  { value: "sea",  label: "SEA"  },
+  { value: "test", label: "TEST" },
 ];
 
 export function isValidRegion(r: unknown): r is Region {
-  return typeof r === "string" && ["eu", "na", "oce", "br", "sea"].includes(r);
+  return typeof r === "string" && ["eu", "na", "oce", "br", "sea", "test"].includes(r);
 }
 
 // "current" means the live region DB; a number means an archived season in the utils DB

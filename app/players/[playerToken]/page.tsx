@@ -9,8 +9,8 @@ import type { RowDataPacket } from "mysql2";
 import PlayerProfileClient from "@/components/players/PlayerProfileClient";
 import { tokenMatchesSteamId } from "@/lib/steam-token";
 
-type Region = "eu" | "na" | "br" | "oce" | "sea";
-const ALL_REGIONS: Region[] = ["eu", "na", "br", "oce", "sea"];
+type Region = "eu" | "na" | "br" | "oce" | "sea" | "test";
+const ALL_REGIONS: Region[] = ["eu", "na", "br", "oce", "sea", "test"];
 
 interface Props {
   params: Promise<{ playerToken: string }>;
@@ -32,8 +32,10 @@ interface SteamIdRow extends RowDataPacket {
 }
 
 async function resolveSteamIdFromToken(playerToken: string): Promise<string | null> {
+  const isDev = process.env.NODE_ENV === "development";
+  const scanRegions = isDev ? ALL_REGIONS : ALL_REGIONS.filter((r) => r !== "test");
   // Scan game DB regions to find the Steam ID whose token matches
-  for (const region of ALL_REGIONS) {
+  for (const region of scanRegions) {
     try {
       const db = getRegionDb(region);
       const [rows] = await db.query<SteamIdRow[]>(
@@ -56,12 +58,15 @@ async function fetchRegionStats(steamId: string, region: Region) {
   try {
     const db = getRegionDb(region);
     const [rows] = await db.query<PlayerRow[]>(
-      `SELECT p.SteamID, p.Wins, p.Losses, p.MMR, p.LastMatchDate,
-              n.Name,
-              RANK() OVER (ORDER BY p.MMR DESC) AS MmrRank
-       FROM PlayerMatchmakingData p
-       LEFT JOIN PlayerNamesData n ON p.SteamID = n.SteamID
-       WHERE p.SteamID = CAST(? AS UNSIGNED)
+      `SELECT ranked.SteamID, ranked.Wins, ranked.Losses, ranked.MMR, ranked.LastMatchDate,
+              n.Name, ranked.MmrRank
+       FROM (
+         SELECT p.SteamID, p.Wins, p.Losses, p.MMR, p.LastMatchDate,
+                RANK() OVER (ORDER BY p.MMR DESC) AS MmrRank
+         FROM PlayerMatchmakingData p
+       ) ranked
+       LEFT JOIN PlayerNamesData n ON ranked.SteamID = n.SteamID
+       WHERE ranked.SteamID = CAST(? AS UNSIGNED)
        LIMIT 1`,
       [steamId]
     );
@@ -100,12 +105,16 @@ function getRankTier(mmr: number, rank: number) {
 export default async function PlayerProfilePage({ params, searchParams }: Props) {
   const { playerToken } = await params;
   const { region: regionParam = "eu" } = await searchParams;
-  const initialRegion = (ALL_REGIONS.includes(regionParam as Region) ? regionParam : "eu") as Region;
+  const isDev = process.env.NODE_ENV === "development";
+  const visibleRegions = isDev ? ALL_REGIONS : ALL_REGIONS.filter((r) => r !== "test");
+  const initialRegion = (visibleRegions.includes(regionParam as Region) ? regionParam : "eu") as Region;
 
   if (!/^[A-Za-z0-9_-]{16}$/.test(playerToken)) notFound();
 
   const steamId = await resolveSteamIdFromToken(playerToken);
   if (!steamId) notFound();
+
+  const activeRegions = isDev ? ALL_REGIONS : ALL_REGIONS.filter((r) => r !== "test");
 
   const [appUser, ...regionResults] = await Promise.all([
     prisma.user.findUnique({
@@ -128,10 +137,10 @@ export default async function PlayerProfilePage({ params, searchParams }: Props)
         },
       },
     }),
-    ...ALL_REGIONS.map((r) => fetchRegionStats(steamId, r)),
+    ...activeRegions.map((r) => fetchRegionStats(steamId, r)),
   ]);
 
-  const regionStats = ALL_REGIONS.map((r, i) => ({ region: r, stats: regionResults[i] }));
+  const regionStats = activeRegions.map((r, i) => ({ region: r, stats: regionResults[i] }));
   const anyStats = regionResults.some(Boolean);
 
   if (!anyStats && !appUser) notFound();

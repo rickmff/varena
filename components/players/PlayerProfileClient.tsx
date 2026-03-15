@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, Trophy, Sword, BookOpen, ThumbsUp, ThumbsDown } from "lucide-react";
 import MatchHistoryList from "./MatchHistoryList";
 import PlayerBuildsGrid from "@/components/builds/PlayerBuildsGrid";
 import Link from "next/link";
 
-type Region = "eu" | "na" | "br" | "oce" | "sea";
+type Region = "eu" | "na" | "br" | "oce" | "sea" | "test";
+type Season = "current" | number;
 type MainTab = "ranked" | "builds" | "tierlists";
 
 interface PlayerStats {
@@ -47,13 +48,18 @@ interface PlayerProfileClientProps {
   tierLists: TierList[];
 }
 
-const REGIONS: { value: Region; label: string }[] = [
-  { value: "eu",  label: "EU"  },
-  { value: "na",  label: "NA"  },
-  { value: "br",  label: "BR"  },
-  { value: "oce", label: "OCE" },
-  { value: "sea", label: "SEA" },
+const ALL_REGION_OPTIONS: { value: Region; label: string; devOnly?: boolean }[] = [
+  { value: "eu",   label: "EU"   },
+  { value: "na",   label: "NA"   },
+  { value: "br",   label: "BR"   },
+  { value: "oce",  label: "OCE"  },
+  { value: "sea",  label: "SEA"  },
+  { value: "test", label: "TEST", devOnly: true },
 ];
+
+const REGIONS = ALL_REGION_OPTIONS.filter(
+  (r) => !r.devOnly || process.env.NODE_ENV === "development"
+);
 
 const TIERS = [
   { name: "Bone",        minMmr: 0,    image: "/images/elos/Bone.png",        color: "text-orange-200/70" },
@@ -104,6 +110,17 @@ export default function PlayerProfileClient({
 }: PlayerProfileClientProps) {
   const [activeTab, setActiveTab] = useState<MainTab>("ranked");
   const [activeRegion, setActiveRegion] = useState<Region>(initialRegion);
+  const [season, setSeason] = useState<Season>("current");
+  const [archivedSeasons, setArchivedSeasons] = useState<number[]>([]);
+
+  useEffect(() => {
+    fetch("/api/seasons")
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setArchivedSeasons(d.seasons); })
+      .catch(() => {});
+  }, []);
+
+  const currentSeasonNum = archivedSeasons.length > 0 ? Math.max(...archivedSeasons) + 1 : 1;
 
   const current = regionStats.find((r) => r.region === activeRegion);
   const stats = current?.stats ?? null;
@@ -147,21 +164,51 @@ export default function PlayerProfileClient({
         {/* ── Ranked Tab ── */}
         {activeTab === "ranked" && (
           <div className="space-y-5">
-            {/* Region tabs */}
-            <div className="flex gap-1 p-1 rounded-sm bg-white/[0.03] border border-white/5 w-fit">
-              {REGIONS.map((r) => (
-                <button
-                  key={r.value}
-                  onClick={() => setActiveRegion(r.value)}
-                  className={`px-3 py-1.5 text-[11px] uppercase tracking-widest font-semibold rounded-sm transition-all ${
-                    activeRegion === r.value
-                      ? "bg-[#8B0000]/50 text-red-300 border border-[#8B0000]/50"
-                      : "text-gray-600 hover:text-gray-400 hover:bg-white/5"
-                  }`}
-                >
-                  {r.label}
-                </button>
-              ))}
+            {/* Region + Season selectors */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex gap-1 p-1 rounded-sm bg-white/[0.03] border border-white/5 w-fit">
+                {REGIONS.map((r) => (
+                  <button
+                    key={r.value}
+                    onClick={() => setActiveRegion(r.value)}
+                    className={`px-3 py-1.5 text-[11px] uppercase tracking-widest font-semibold rounded-sm transition-all ${
+                      activeRegion === r.value
+                        ? "bg-[#8B0000]/50 text-red-300 border border-[#8B0000]/50"
+                        : "text-gray-600 hover:text-gray-400 hover:bg-white/5"
+                    }`}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+
+              {archivedSeasons.length > 0 && (
+                <div className="flex gap-1 p-1 rounded-sm bg-white/[0.03] border border-white/5 w-fit">
+                  <button
+                    onClick={() => setSeason("current")}
+                    className={`px-3 py-1.5 text-[11px] uppercase tracking-widest font-semibold rounded-sm transition-all ${
+                      season === "current"
+                        ? "bg-[#8B0000]/50 text-red-300 border border-[#8B0000]/50"
+                        : "text-gray-600 hover:text-gray-400 hover:bg-white/5"
+                    }`}
+                  >
+                    S{currentSeasonNum}
+                  </button>
+                  {archivedSeasons.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setSeason(s)}
+                      className={`px-3 py-1.5 text-[11px] uppercase tracking-widest font-semibold rounded-sm transition-all ${
+                        season === s
+                          ? "bg-[#8B0000]/50 text-red-300 border border-[#8B0000]/50"
+                          : "text-gray-600 hover:text-gray-400 hover:bg-white/5"
+                      }`}
+                    >
+                      S{s}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {stats ? (
@@ -189,13 +236,14 @@ export default function PlayerProfileClient({
 
                 <div>
                   <p className="text-[10px] tracking-[0.3em] uppercase text-gray-600 mb-3">
-                    Match History · {activeRegion.toUpperCase()}
+                    Match History · {activeRegion.toUpperCase()} · {season === "current" ? `S${currentSeasonNum}` : `S${season}`}
                   </p>
                   <MatchHistoryList
                     playerToken={playerToken}
                     playerName={displayName}
                     currentMmr={stats.mmr}
                     region={activeRegion}
+                    season={season}
                   />
                 </div>
               </>
