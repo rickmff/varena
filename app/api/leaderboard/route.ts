@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getRegionDb, isValidRegion } from "@/lib/game-db";
+import { getRegionDb, getUtilsDb, isValidRegion, getSeasonTables } from "@/lib/game-db";
 import { rateLimit, getRequestIdentifier } from "@/lib/rate-limit";
 import { steamIdToToken } from "@/lib/steam-token";
 import type { RowDataPacket } from "mysql2";
@@ -49,8 +49,14 @@ export async function GET(request: Request) {
     const search = searchParams.get("search") || "";
     const regionParam = searchParams.get("region") || "eu";
     const region = isValidRegion(regionParam) ? regionParam : "eu";
+    const seasonParam = searchParams.get("season") || "current";
+    const season = seasonParam === "current" ? "current" : parseInt(seasonParam);
 
-    const db = getRegionDb(region);
+    const tables = getSeasonTables(season, region);
+    // Archived seasons live in utils DB; current season in the region DB
+    const db = season === "current" ? getRegionDb(region) : getUtilsDb();
+    // For archived seasons, names still come from the live region DB
+    const liveDb = getRegionDb(region);
 
     let orderClause: string;
     switch (sortBy) {
@@ -68,35 +74,70 @@ export async function GET(request: Request) {
 
     let rows: PlayerMatchmakingRow[];
 
-    if (search.trim()) {
-      const [results] = await db.execute<PlayerMatchmakingRow[]>(
-        `SELECT SteamID, Wins, Losses, MMR, LastMatchDate, Name, MmrRank
-         FROM (
-           SELECT p.SteamID, p.Wins, p.Losses, p.MMR, p.LastMatchDate, n.Name,
+    if (season === "current") {
+      // Live season: names table is co-located in the region DB
+      if (search.trim()) {
+        const [results] = await db.execute<PlayerMatchmakingRow[]>(
+          `SELECT SteamID, Wins, Losses, MMR, LastMatchDate, Name, MmrRank
+           FROM (
+             SELECT p.SteamID, p.Wins, p.Losses, p.MMR, p.LastMatchDate, n.Name,
+                    ROW_NUMBER() OVER (ORDER BY p.MMR DESC, p.Wins DESC) AS MmrRank
+             FROM ${tables.matchmaking} p
+             LEFT JOIN ${tables.names} n ON p.SteamID = n.SteamID
+           ) leaderboard
+           WHERE CAST(SteamID AS CHAR) LIKE ? OR Name LIKE ?
+           ORDER BY ${orderClause}`,
+          [`%${search.trim()}%`, `%${search.trim()}%`]
+        );
+        rows = results;
+      } else {
+        const [results] = await db.execute<PlayerMatchmakingRow[]>(
+          `SELECT p.SteamID, p.Wins, p.Losses, p.MMR, p.LastMatchDate, n.Name,
                   ROW_NUMBER() OVER (ORDER BY p.MMR DESC, p.Wins DESC) AS MmrRank
-           FROM PlayerMatchmakingData p
-           LEFT JOIN PlayerNamesData n ON p.SteamID = n.SteamID
-         ) leaderboard
-         WHERE CAST(SteamID AS CHAR) LIKE ? OR Name LIKE ?
-         ORDER BY ${orderClause}`,
-        [`%${search.trim()}%`, `%${search.trim()}%`]
-      );
-      rows = results;
+           FROM ${tables.matchmaking} p
+           LEFT JOIN ${tables.names} n ON p.SteamID = n.SteamID
+           ORDER BY ${orderClause}`
+        );
+        rows = results;
+      }
     } else {
-      const [results] = await db.execute<PlayerMatchmakingRow[]>(
-        `SELECT p.SteamID, p.Wins, p.Losses, p.MMR, p.LastMatchDate, n.Name,
+      // Archived season: fetch matchmaking from utils DB, then join names from live DB
+      const [mmRows] = await db.execute<PlayerMatchmakingRow[]>(
+        `SELECT p.SteamID, p.Wins, p.Losses, p.MMR, p.LastMatchDate,
                 ROW_NUMBER() OVER (ORDER BY p.MMR DESC, p.Wins DESC) AS MmrRank
-         FROM PlayerMatchmakingData p
-         LEFT JOIN PlayerNamesData n ON p.SteamID = n.SteamID
+         FROM ${tables.matchmaking} p
          ORDER BY ${orderClause}`
       );
-      rows = results;
+
+      // Fetch all names from live region DB in one query
+      if (mmRows.length > 0) {
+        const steamIds = mmRows.map((r) => r.SteamID);
+        const placeholders = steamIds.map(() => "?").join(",");
+        const [nameRows] = await liveDb.execute<(RowDataPacket & { SteamID: string; Name: string })[]>(
+          `SELECT SteamID, Name FROM PlayerNamesData WHERE SteamID IN (${placeholders})`,
+          steamIds
+        );
+        const nameMap = new Map(nameRows.map((n) => [n.SteamID, n.Name]));
+        rows = mmRows.map((r) => ({ ...r, Name: nameMap.get(r.SteamID) ?? null }));
+      } else {
+        rows = mmRows;
+      }
+
+      // Apply search filter in JS for archived seasons
+      if (search.trim()) {
+        const q = search.trim().toLowerCase();
+        rows = rows.filter(
+          (r) =>
+            String(r.SteamID).includes(q) ||
+            (r.Name && r.Name.toLowerCase().includes(q))
+        );
+      }
     }
 
     const players = rows.map(serializePlayer);
 
     const [[countRow]] = await db.execute<CountRow[]>(
-      `SELECT COUNT(*) AS total FROM MatchData`
+      `SELECT COUNT(*) AS total FROM ${tables.matchData}`
     );
     const totalMatches = Number(countRow?.total ?? 0);
 

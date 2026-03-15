@@ -71,6 +71,7 @@ interface MatchHistory {
 
 type SortOption = "mmr" | "wins" | "winrate";
 type Region = "eu" | "na" | "br" | "oce" | "sea";
+type Season = "current" | number;
 
 const REGIONS: { value: Region; label: string; Flag: React.ComponentType<{ className?: string }> }[] = [
   { value: "eu",  label: "EU",  Flag: EU },
@@ -284,12 +285,14 @@ function MatchHistoryPanel({
   isOpen,
   currentMmr,
   region,
+  season,
 }: {
   playerToken: string;
   playerName: string | null;
   isOpen: boolean;
   currentMmr: number;
   region: Region;
+  season: Season;
 }) {
   const PAGE_SIZE = 5;
   const MAX_RETRIES = 3;
@@ -300,18 +303,20 @@ function MatchHistoryPanel({
   const [retryCount, setRetryCount] = useState(0);
   const [hasError, setHasError] = useState(false);
 
-  // Reset when region changes so fresh data is fetched on next open
+  // Reset when region or season changes so fresh data is fetched on next open
   const prevRegion = React.useRef(region);
+  const prevSeason = React.useRef(season);
   useEffect(() => {
-    if (prevRegion.current !== region) {
+    if (prevRegion.current !== region || prevSeason.current !== season) {
       prevRegion.current = region;
+      prevSeason.current = season;
       setAllMatches([]);
       setFetched(false);
       setVisibleCount(PAGE_SIZE);
       setRetryCount(0);
       setHasError(false);
     }
-  }, [region]);
+  }, [region, season]);
 
   // Reconstruct MMR at each match by walking backwards from current MMR
   const allMatchesWithMmr = React.useMemo(() => {
@@ -341,7 +346,7 @@ function MatchHistoryPanel({
       setLoading(true);
       setHasError(false);
       try {
-        const res = await fetch(`/api/leaderboard/${playerToken}?region=${region}`);
+        const res = await fetch(`/api/leaderboard/${playerToken}?region=${region}&season=${season}`);
         const data = await res.json();
         if (data.success && data.matches.length > 0) {
           setAllMatches(data.matches);
@@ -369,7 +374,7 @@ function MatchHistoryPanel({
     }
     fetchMatches();
     return () => { if (retryTimer) clearTimeout(retryTimer); };
-  }, [isOpen, playerToken, fetched, region, retryCount]);
+  }, [isOpen, playerToken, fetched, region, season, retryCount]);
 
   return (
     <AnimatePresence>
@@ -699,6 +704,8 @@ export default function Leaderboard() {
   const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
   const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
   const [region, setRegion] = useState<Region>("eu");
+  const [season, setSeason] = useState<Season>("current");
+  const [availableSeasons, setAvailableSeasons] = useState<number[]>([]);
 
   const players = useMemo(() => {
     const dir = sortDir === "desc" ? 1 : -1;
@@ -718,6 +725,16 @@ export default function Leaderboard() {
     }
   }, [sortBy]);
 
+  // Fetch available archived seasons once on mount
+  useEffect(() => {
+    fetch("/api/seasons")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) setAvailableSeasons(data.seasons);
+      })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => setSearch(searchInput), 300);
     return () => clearTimeout(timer);
@@ -735,7 +752,7 @@ export default function Leaderboard() {
     async function fetchData() {
       setLoading(true);
       try {
-        const params = new URLSearchParams({ region });
+        const params = new URLSearchParams({ region, season: String(season) });
         if (search) params.set("search", search);
 
         const res = await fetch(`/api/leaderboard?${params}`);
@@ -752,12 +769,12 @@ export default function Leaderboard() {
       }
     }
     fetchData();
-  }, [search, region]);
+  }, [search, region, season]);
 
-  // Collapse any open panel when switching regions
+  // Collapse any open panel when switching regions or seasons
   useEffect(() => {
     setExpandedPlayer(null);
-  }, [region]);
+  }, [region, season]);
 
   const toggleExpanded = useCallback((playerToken: string) => {
     setExpandedPlayer((prev) => (prev === playerToken ? null : playerToken));
@@ -768,25 +785,59 @@ export default function Leaderboard() {
       {/* Controls */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
 
-                {/* Region selector */}
-        <div className="flex items-center gap-1 p-1 rounded-lg bg-white/[0.03] border border-white/[0.06] w-fit">
-          {REGIONS.map((r) => {
-            const active = region === r.value;
-            return (
+        <div className="flex flex-col gap-2">
+          {/* Season selector */}
+          {availableSeasons.length > 0 && (
+            <div className="flex items-center gap-1 p-1 rounded-lg bg-white/[0.03] border border-white/[0.06] w-fit">
               <button
-                key={r.value}
-                onClick={() => setRegion(r.value)}
-                className={`relative flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-widest transition-all duration-200 ${
-                  active
+                onClick={() => setSeason("current")}
+                className={`px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-widest transition-all duration-200 ${
+                  season === "current"
                     ? "bg-white/[0.08] text-white shadow-[0_1px_0_rgba(255,255,255,0.06),0_-1px_0_rgba(0,0,0,0.3)]"
                     : "text-stone-500 hover:text-stone-300 hover:bg-white/[0.04]"
                 }`}
               >
-                <r.Flag className={`w-4 h-auto rounded-[2px] transition-opacity duration-200 ${active ? "opacity-100" : "opacity-50"}`} />
-                {r.label}
+                S{(availableSeasons[availableSeasons.length - 1] ?? 0) + 1}
               </button>
-            );
-          })}
+              {[...availableSeasons].reverse().map((s) => {
+                const active = season === s;
+                return (
+                  <button
+                    key={s}
+                    onClick={() => setSeason(s)}
+                    className={`px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-widest transition-all duration-200 ${
+                      active
+                        ? "bg-white/[0.08] text-white shadow-[0_1px_0_rgba(255,255,255,0.06),0_-1px_0_rgba(0,0,0,0.3)]"
+                        : "text-stone-500 hover:text-stone-300 hover:bg-white/[0.04]"
+                    }`}
+                  >
+                    S{s}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Region selector */}
+          <div className="flex items-center gap-1 p-1 rounded-lg bg-white/[0.03] border border-white/[0.06] w-fit">
+            {REGIONS.map((r) => {
+              const active = region === r.value;
+              return (
+                <button
+                  key={r.value}
+                  onClick={() => setRegion(r.value)}
+                  className={`relative flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-widest transition-all duration-200 ${
+                    active
+                      ? "bg-white/[0.08] text-white shadow-[0_1px_0_rgba(255,255,255,0.06),0_-1px_0_rgba(0,0,0,0.3)]"
+                      : "text-stone-500 hover:text-stone-300 hover:bg-white/[0.04]"
+                  }`}
+                >
+                  <r.Flag className={`w-4 h-auto rounded-[2px] transition-opacity duration-200 ${active ? "opacity-100" : "opacity-50"}`} />
+                  {r.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="relative w-full sm:w-72">
@@ -1021,6 +1072,7 @@ export default function Leaderboard() {
                       isOpen={isExpanded}
                       currentMmr={player.mmr}
                       region={region}
+                      season={season}
                     />
                   </React.Fragment>
                 );

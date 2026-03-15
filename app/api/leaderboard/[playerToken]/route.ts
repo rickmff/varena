@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getRegionDb, isValidRegion } from "@/lib/game-db";
+import { getRegionDb, getUtilsDb, isValidRegion, getSeasonTables } from "@/lib/game-db";
 import { steamIdToToken, tokenMatchesSteamId } from "@/lib/steam-token";
 import type { RowDataPacket } from "mysql2";
 
@@ -22,12 +22,15 @@ interface MatchHistoryRow extends RowDataPacket {
   MatchDuration: number | null;
 }
 
-async function resolveSteamId(playerToken: string, region: string): Promise<string | null> {
+async function resolveSteamId(
+  playerToken: string,
+  matchmakingTable: string,
+  db: ReturnType<typeof getRegionDb>
+): Promise<string | null> {
   if (!/^[A-Za-z0-9_-]{16}$/.test(playerToken)) return null;
 
-  const db = getRegionDb(isValidRegion(region) ? region : "eu");
   const [rows] = await db.query<SteamIdRow[]>(
-    `SELECT SteamID FROM PlayerMatchmakingData`
+    `SELECT SteamID FROM ${matchmakingTable}`
   );
   for (const row of rows) {
     if (tokenMatchesSteamId(playerToken, row.SteamID)) return row.SteamID;
@@ -44,8 +47,14 @@ export async function GET(
     const { searchParams } = new URL(request.url);
     const regionParam = searchParams.get("region") || "eu";
     const region = isValidRegion(regionParam) ? regionParam : "eu";
+    const seasonParam = searchParams.get("season") || "current";
+    const season = seasonParam === "current" ? "current" : parseInt(seasonParam);
 
-    const steamId = await resolveSteamId(playerToken, region);
+    const tables = getSeasonTables(season, region);
+    const db = season === "current" ? getRegionDb(region) : getUtilsDb();
+    const liveDb = getRegionDb(region);
+
+    const steamId = await resolveSteamId(playerToken, tables.matchmaking, db);
     if (!steamId) {
       return NextResponse.json(
         { success: false, error: "Player not found" },
@@ -53,14 +62,12 @@ export async function GET(
       );
     }
 
-    const db = getRegionDb(region);
-
     const [rows] = await db.query<MatchHistoryRow[]>(
       `SELECT p.SteamID, p.MatchID, p.MatchmakingTeam, p.Build, p.MmrDiff,
               p.DamageDone, p.DamageReceived, p.Score, p.Kills, p.Deaths,
               m.MatchDate, m.MatchDuration
-       FROM PlayerMatchHistoryData p
-       LEFT JOIN MatchData m ON p.MatchID = m.MatchID
+       FROM ${tables.matchHistory} p
+       LEFT JOIN ${tables.matchData} m ON p.MatchID = m.MatchID
        WHERE p.SteamID = CAST(? AS UNSIGNED)
        ORDER BY p.MatchID DESC`,
       [steamId]
@@ -73,19 +80,54 @@ export async function GET(
       playerTeamByMatch.set(Number(row.MatchID), Number(row.MatchmakingTeam));
     }
 
-    let opponentsByMatch = new Map<number, { playerToken: string; name: string | null; build: string; score: number; damageDone: number; damageReceived: number; mmr: number | null; mmrDiff: number }[]>();
+    let opponentsByMatch = new Map<
+      number,
+      {
+        playerToken: string;
+        name: string | null;
+        build: string;
+        score: number;
+        damageDone: number;
+        damageReceived: number;
+        mmr: number | null;
+        mmrDiff: number;
+      }[]
+    >();
 
     if (matchIds.length > 0) {
       const placeholders = matchIds.map(() => "?").join(",");
-      const [opponentRows] = await db.query<(MatchHistoryRow & { Name: string | null; MMR: number | null })[]>(
-        `SELECT p.SteamID, p.MatchID, p.MatchmakingTeam, p.Build, p.Score, p.DamageDone, p.DamageReceived, p.MmrDiff, n.Name, pm.MMR
-         FROM PlayerMatchHistoryData p
-         LEFT JOIN PlayerNamesData n ON p.SteamID = n.SteamID
-         LEFT JOIN PlayerMatchmakingData pm ON p.SteamID = pm.SteamID
+
+      // For archived seasons, names and current MMR come from the live region DB
+      let nameMap = new Map<string, string>();
+      let mmrMap = new Map<string, number>();
+
+      // Fetch opponents from the season's match history table
+      const [opponentRows] = await db.query<(MatchHistoryRow)[]>(
+        `SELECT p.SteamID, p.MatchID, p.MatchmakingTeam, p.Build, p.Score,
+                p.DamageDone, p.DamageReceived, p.MmrDiff
+         FROM ${tables.matchHistory} p
          WHERE p.MatchID IN (${placeholders})
            AND p.SteamID != CAST(? AS UNSIGNED)`,
         [...matchIds, steamId]
       );
+
+      if (opponentRows.length > 0) {
+        const oppSteamIds = [...new Set(opponentRows.map((r) => r.SteamID))];
+        const namePlaceholders = oppSteamIds.map(() => "?").join(",");
+
+        const [nameRows] = await liveDb.execute<(RowDataPacket & { SteamID: string; Name: string })[]>(
+          `SELECT SteamID, Name FROM PlayerNamesData WHERE SteamID IN (${namePlaceholders})`,
+          oppSteamIds
+        );
+        nameMap = new Map(nameRows.map((n) => [n.SteamID, n.Name]));
+
+        // Current MMR from live DB (best-effort for archived seasons)
+        const [mmrRows] = await liveDb.execute<(RowDataPacket & { SteamID: string; MMR: number })[]>(
+          `SELECT SteamID, MMR FROM PlayerMatchmakingData WHERE SteamID IN (${namePlaceholders})`,
+          oppSteamIds
+        );
+        mmrMap = new Map(mmrRows.map((r) => [r.SteamID, Number(r.MMR)]));
+      }
 
       for (const opp of opponentRows) {
         const mId = Number(opp.MatchID);
@@ -96,12 +138,12 @@ export async function GET(
           if (!opponentsByMatch.has(mId)) opponentsByMatch.set(mId, []);
           opponentsByMatch.get(mId)!.push({
             playerToken: steamIdToToken(opp.SteamID),
-            name: opp.Name ?? null,
+            name: nameMap.get(opp.SteamID) ?? null,
             build: opp.Build || "",
             score: Number(opp.Score),
             damageDone: Math.round(Number(opp.DamageDone)),
             damageReceived: Math.round(Number(opp.DamageReceived)),
-            mmr: opp.MMR != null ? Number(opp.MMR) : null,
+            mmr: mmrMap.get(opp.SteamID) ?? null,
             mmrDiff: Number(opp.MmrDiff),
           });
         }
