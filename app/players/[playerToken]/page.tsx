@@ -202,15 +202,6 @@ export default async function PlayerProfilePage({ params, searchParams }: Props)
                   <span className="text-gray-600 text-xs">#{bestStats.rank} · {bestStats.mmr} MMR</span>
                 </>
               )}
-              <a
-                href={`https://steamcommunity.com/profiles/${steamId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[10px] text-gray-600 hover:text-gray-400 flex items-center gap-1"
-              >
-                <img src="https://store.steampowered.com/favicon.ico" alt="Steam" className="h-3 w-3" />
-                Steam
-              </a>
             </div>
           </div>
 

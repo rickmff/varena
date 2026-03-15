@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Table,
   TableBody,
@@ -21,13 +21,7 @@ import {
   Swords,
   Target,
   Clock,
-  ChevronDown,
-  Loader2,
-  Calendar,
 } from "lucide-react";
-import { convertStringToBuild } from "@/components/machines/converter";
-import bloodData from "@/data/vbuilds/bloodtypes.json";
-import "@/components/vbuilds/styles.css";
 import { EU, US, AU, BR, SG } from "country-flag-icons/react/3x2";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -43,31 +37,6 @@ interface Player {
   rank: number;
 }
 
-interface Opponent {
-  playerToken: string;
-  name: string | null;
-  build: string;
-  score: number;
-  damageDone: number;
-  damageReceived: number;
-  mmr: number | null;
-  mmrDiff: number;
-}
-
-interface MatchHistory {
-  matchId: number;
-  team: number;
-  build: string;
-  mmrDiff: number;
-  damageDone: number;
-  damageReceived: number;
-  score: number;
-  kills: number;
-  deaths: number;
-  matchDate: string | null;
-  matchDuration: number | null;
-  opponents: Opponent[];
-}
 
 type SortOption = "mmr" | "wins" | "winrate";
 type Region = "eu" | "na" | "br" | "oce" | "sea";
@@ -132,94 +101,7 @@ function timeAgo(dateStr: string): string {
   return "just now";
 }
 
-function formatNumber(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
-  return n.toString();
-}
 
-function formatDuration(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}m ${s.toString().padStart(2, "0")}s`;
-}
-
-// ─── Build display helpers ───────────────────────────────────────────────────
-
-// Combined blood + spell icons inside one clickable link.
-// bloodFirst=true  → [blood][blood][spell][spell][spell][spell]  (player side)
-// bloodFirst=false → [spell][spell][spell][spell][blood][blood]  (opponent side)
-function MatchIcons({ code, small, bloodFirst }: { code: string; small?: boolean; bloodFirst?: boolean }) {
-  if (!code || code.length < 30) return null;
-  let build;
-  try {
-    build = convertStringToBuild(code);
-  } catch {
-    return null;
-  }
-
-  const spells = build.spells;
-  const spellIcons = [spells.dash?.img, spells.spell1?.img, spells.spell2?.img, spells.ultimate?.img];
-
-  const primaryKey = build.blood?.primary as keyof typeof bloodData | undefined;
-  const secondaryKey = build.blood?.secondary as keyof typeof bloodData | undefined;
-  const bloods = [primaryKey, secondaryKey]
-    .map((k) => (k ? bloodData[k] : null))
-    .filter(Boolean) as (typeof bloodData)[keyof typeof bloodData][];
-
-  const outer = small ? "w-6 h-6" : "w-8 h-8";
-  const inner = small ? "w-5 h-5" : "w-7 h-7";
-
-  const bloodEls = bloods.map((blood, i) => (
-    <div
-      key={`b${i}`}
-      className={`relative ${outer} rounded border border-red-900/40 flex items-center justify-center overflow-hidden`}
-      title={blood.name}
-    >
-      <img src={blood.image} className={`${inner} object-contain`} alt={blood.name} />
-    </div>
-  ));
-
-  const spellEls = spellIcons.map((img, i) => (
-    <div
-      key={`s${i}`}
-      className={`relative ${outer} bg-zinc-900/50 rounded border border-stone-700/50 flex items-center justify-center overflow-hidden`}
-    >
-      {img ? <img src={img} className={inner} alt="" /> : <div className={`${inner} bg-stone-800/50 rounded-sm`} />}
-    </div>
-  ));
-
-  return (
-    <a
-      href={`/builds/create?build=${encodeURIComponent(code)}`}
-      onClick={(e) => e.stopPropagation()}
-      className="flex items-center gap-0.5 hover:opacity-75 transition-opacity shrink-0 cursor-not-allowed pointer-events-none"
-      title="View build"
-    >
-      {bloodFirst ? [...bloodEls, ...spellEls] : [...spellEls, ...bloodEls]}
-    </a>
-  );
-}
-
-function MiniTierIcon({ mmr }: { mmr: number }) {
-  const tier = getRankTier(mmr, 2); // rank=2 avoids Dracula special case
-  return (
-    <img
-      src={tier.image}
-      alt={tier.name}
-      title={tier.name}
-      className="w-5 h-5 object-contain shrink-0"
-    />
-  );
-}
-
-function StatCol({ value, label }: { value: string | number; label: string }) {
-  return (
-    <div className="flex flex-col items-center min-w-[36px]">
-      <span className="text-xs font-semibold text-stone-300 tabular-nums leading-none">{value}</span>
-      <span className="text-[9px] text-stone-600 uppercase tracking-wider leading-none mt-0.5">{label}</span>
-    </div>
-  );
-}
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
@@ -260,344 +142,6 @@ function MmrDisplay({ mmr, rank }: { mmr: number; rank: number }) {
 // Set to true to use mock data for UI testing
 const USE_MOCK_DATA = false;
 
-const BUILD_A = "222222222bcaoif3462l3452412461c07B9b0B7900000000000000000000000000000041111643";
-const BUILD_B = "622222222bcn8721367j1245523642d03824083200000000000000000000000000000014444751";
-const BUILD_C = "822222222bc1k42136734563223565103E8n218700000000000000000000000000000052222751";
-const BUILD_D = "722222222bcg9af3456g2456413656o6479n218700000000000000000000000000000033333961";
-const BUILD_E = "522222222icbj6i1256r1246312458c08B7b07B8g628Ef028En379Dr528Ei64B9o128E41111623";
-
-const MOCK_MATCHES: MatchHistory[] = [
-  { matchId: 2010, team: 1, build: BUILD_A, mmrDiff: 28,  damageDone: 5200, damageReceived: 1900, score: 2, kills: 9,  deaths: 2, matchDate: new Date(Date.now() - 1000 * 60 * 20).toISOString(),           matchDuration: 680,  opponents: [{ playerToken: "mock_token_0002", name: "Hunter",    build: BUILD_B, score: 0, damageDone: 1900, damageReceived: 5200, mmr: 1850, mmrDiff: -28  }] },
-  { matchId: 2009, team: 2, build: BUILD_C, mmrDiff: -22, damageDone: 3100, damageReceived: 4800, score: 1, kills: 3,  deaths: 7, matchDate: new Date(Date.now() - 1000 * 60 * 95).toISOString(),           matchDuration: 540,  opponents: [{ playerToken: "mock_token_0003", name: "Hunter",    build: BUILD_D, score: 2, damageDone: 4800, damageReceived: 3100, mmr: 2100, mmrDiff: 22   }] },
-  { matchId: 2008, team: 1, build: BUILD_E, mmrDiff: 31,  damageDone: 6100, damageReceived: 2200, score: 2, kills: 11, deaths: 1, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(),       matchDuration: 710,  opponents: [{ playerToken: "mock_token_0004", name: "Hunter",    build: BUILD_A, score: 0, damageDone: 2200, damageReceived: 6100, mmr: 1970, mmrDiff: -31  }] },
-  { matchId: 2007, team: 2, build: BUILD_B, mmrDiff: -19, damageDone: 2900, damageReceived: 3600, score: 1, kills: 4,  deaths: 6, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 9).toISOString(),       matchDuration: 890,  opponents: [{ playerToken: "mock_token_0005", name: "Hunter",    build: BUILD_C, score: 2, damageDone: 3600, damageReceived: 2900, mmr: 2240, mmrDiff: 19   }] },
-  { matchId: 2006, team: 1, build: BUILD_D, mmrDiff: 25,  damageDone: 4700, damageReceived: 2500, score: 2, kills: 8,  deaths: 3, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),      matchDuration: 620,  opponents: [{ playerToken: "mock_token_0006", name: "Hunter",    build: BUILD_E, score: 1, damageDone: 2500, damageReceived: 4700, mmr: 1730, mmrDiff: -25  }] },
-  { matchId: 2005, team: 1, build: BUILD_A, mmrDiff: 20,  damageDone: 4300, damageReceived: 3000, score: 2, kills: 7,  deaths: 4, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 50).toISOString(),      matchDuration: 810,  opponents: [{ playerToken: "mock_token_0007", name: "Hunter",    build: BUILD_D, score: 0, damageDone: 3000, damageReceived: 4300, mmr: 1900, mmrDiff: -20  }] },
-  { matchId: 2004, team: 2, build: BUILD_C, mmrDiff: -14, damageDone: 2600, damageReceived: 3300, score: 0, kills: 2,  deaths: 5, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 75).toISOString(),      matchDuration: 460,  opponents: [{ playerToken: "mock_token_0008", name: "Hunter",    build: BUILD_B, score: 2, damageDone: 3300, damageReceived: 2600, mmr: 2050, mmrDiff: 14   }] },
-  { matchId: 2003, team: 1, build: BUILD_E, mmrDiff: 18,  damageDone: 3900, damageReceived: 2800, score: 2, kills: 6,  deaths: 3, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(),  matchDuration: 590,  opponents: [{ playerToken: "mock_token_0009", name: "Hunter",    build: BUILD_A, score: 1, damageDone: 2800, damageReceived: 3900, mmr: 1780, mmrDiff: -18  }] },
-  { matchId: 2002, team: 2, build: BUILD_B, mmrDiff: -10, damageDone: 2400, damageReceived: 2900, score: 1, kills: 3,  deaths: 4, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(),  matchDuration: 505,  opponents: [{ playerToken: "mock_token_0010", name: "Hunter",    build: BUILD_C, score: 2, damageDone: 2900, damageReceived: 2400, mmr: 2160, mmrDiff: 10   }] },
-  { matchId: 2001, team: 1, build: BUILD_D, mmrDiff: 15,  damageDone: 3500, damageReceived: 2100, score: 2, kills: 5,  deaths: 2, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 9).toISOString(),  matchDuration: 740,  opponents: [{ playerToken: "mock_token_0011", name: null,        build: BUILD_E, score: 0, damageDone: 2100, damageReceived: 3500, mmr: null,  mmrDiff: -15  }] },
-];
-
-function MatchHistoryPanel({
-  playerToken,
-  playerName,
-  isOpen,
-  currentMmr,
-  region,
-  season,
-}: {
-  playerToken: string;
-  playerName: string | null;
-  isOpen: boolean;
-  currentMmr: number;
-  region: Region;
-  season: Season;
-}) {
-  const PAGE_SIZE = 5;
-  const MAX_RETRIES = 3;
-  const [allMatches, setAllMatches] = useState<MatchHistory[]>([]);
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [loading, setLoading] = useState(false);
-  const [fetched, setFetched] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
-  const [hasError, setHasError] = useState(false);
-
-  // Reset when region or season changes so fresh data is fetched on next open
-  const prevRegion = React.useRef(region);
-  const prevSeason = React.useRef(season);
-  useEffect(() => {
-    if (prevRegion.current !== region || prevSeason.current !== season) {
-      prevRegion.current = region;
-      prevSeason.current = season;
-      setAllMatches([]);
-      setFetched(false);
-      setVisibleCount(PAGE_SIZE);
-      setRetryCount(0);
-      setHasError(false);
-    }
-  }, [region, season]);
-
-  // Reconstruct MMR at each match by walking backwards from current MMR
-  const allMatchesWithMmr = React.useMemo(() => {
-    let mmr = currentMmr;
-    return allMatches.map((match) => {
-      const mmrAfter = mmr;
-      mmr -= match.mmrDiff;
-      return { ...match, mmrAfter };
-    });
-  }, [allMatches, currentMmr]);
-
-  const matches = allMatchesWithMmr.slice(0, visibleCount);
-  const hasMore = visibleCount < allMatches.length;
-
-  useEffect(() => {
-    if (!isOpen || fetched) return;
-
-    if (USE_MOCK_DATA) {
-      setAllMatches(MOCK_MATCHES);
-      setFetched(true);
-      return;
-    }
-
-    let retryTimer: ReturnType<typeof setTimeout> | null = null;
-
-    async function fetchMatches() {
-      setLoading(true);
-      setHasError(false);
-      try {
-        const res = await fetch(`/api/leaderboard/${playerToken}?region=${region}&season=${season}`);
-        const data = await res.json();
-        if (data.success && data.matches.length > 0) {
-          setAllMatches(data.matches);
-          setFetched(true);
-        } else if (data.success && data.matches.length === 0 && retryCount < MAX_RETRIES) {
-          // Empty response — retry in case the server wasn't ready
-          retryTimer = setTimeout(() => setRetryCount((c) => c + 1), 2000);
-        } else if (data.success) {
-          // Still empty after all retries — accept it
-          setFetched(true);
-        } else {
-          throw new Error(data.error || "Unknown error");
-        }
-      } catch (err) {
-        console.error("Failed to fetch match history:", err);
-        if (retryCount < MAX_RETRIES) {
-          retryTimer = setTimeout(() => setRetryCount((c) => c + 1), 2000);
-        } else {
-          setHasError(true);
-          setFetched(true);
-        }
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchMatches();
-    return () => { if (retryTimer) clearTimeout(retryTimer); };
-  }, [isOpen, playerToken, fetched, region, season, retryCount]);
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.tr>
-          <td colSpan={7} className="p-0">
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="overflow-hidden"
-            >
-              <div className="px-4 py-5 border-t border-stone-700/50 w-full">
-                <h4 className="text-xs font-semibold text-stone-500 uppercase tracking-[0.2em] mb-4">
-                  Match History
-                </h4>
-
-                {loading ? (
-                  <div className="flex items-center justify-center py-8 gap-2 text-stone-500">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span className="text-sm">
-                      {retryCount > 0
-                        ? `Retrying... (${retryCount}/${MAX_RETRIES})`
-                        : "Loading matches..."}
-                    </span>
-                  </div>
-                ) : hasError ? (
-                  <div className="flex flex-col items-center justify-center py-8 gap-3 text-stone-500">
-                    <span className="text-sm">Failed to load match history.</span>
-                    <button
-                      onClick={() => { setFetched(false); setRetryCount(0); setHasError(false); }}
-                      className="text-xs px-3 py-1 rounded border border-stone-700 hover:border-stone-500 hover:text-stone-300 transition-colors"
-                    >
-                      Try again
-                    </button>
-                  </div>
-                ) : matches.length === 0 ? (
-                  <p className="text-center py-6 text-sm text-stone-500">
-                    No match history found
-                  </p>
-                ) : (
-                  <div className="grid gap-1.5">
-                    {matches.map((match, i) => {
-                      const won = match.score === 2 || (match.score === 0 && match.opponents[0]?.score === 0 && match.mmrDiff > 0);
-
-
-                      return (
-                        <motion.div
-                          key={`${match.matchId}-${match.team}`}
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.04, duration: 0.2 }}
-                          className={`relative flex rounded border transition-all duration-200 overflow-hidden ${
-                            won
-                              ? "bg-gradient-to-r from-emerald-950/40 via-emerald-950/20 to-stone-900/60 border-emerald-800/30 hover:border-emerald-700/40"
-                              : "bg-gradient-to-r from-red-950/40 via-red-950/20 to-stone-900/60 border-red-800/30 hover:border-red-700/40"
-                          }`}
-                        >
-                          {/* Result col — full height */}
-                          <div className="flex flex-col items-center justify-center text-center gap-1 px-3 md:px-4 shrink-0 border-r border-stone-800/50 min-w-[80px] md:min-w-[80px] self-stretch">
-                            <span className={`text-xs font-bold uppercase tracking-widest ${won ? "text-emerald-400" : "text-red-400"}`}>
-                              {won ? "WIN" : "LOSS"}
-                            </span>
-                            <span className={`text-xs md:text-sm tabular-nums ${
-                              match.mmrDiff > 0 ? "text-emerald-400" : match.mmrDiff < 0 ? "text-red-400" : "text-stone-500"
-                            }`}>
-                              {match.mmrDiff > 0 ? "+" : ""}{match.mmrDiff}
-                            </span>
-                          </div>
-
-                          {/* Content col */}
-                          <div className="flex flex-col flex-1 min-w-0">
-
-                            {/* ── Desktop layout (md+): mirrored horizontal ── */}
-                            <div className="hidden md:flex items-center">
-                              {/* Player side: stats → blood → build → name */}
-                              <div className="flex items-center justify-end gap-3 px-4 py-2.5 flex-1 min-w-0">
-                                <div className="flex items-center gap-4">
-                                  <StatCol value={formatNumber(match.damageReceived)} label="REC" />
-                                  <StatCol value={formatNumber(match.damageDone)} label="DMG" />
-                                  <StatCol value={match.mmrAfter - match.mmrDiff} label="MMR" />
-                                </div>
-                                <MatchIcons code={match.build} bloodFirst />
-                                <div className="flex items-center gap-1.5 shrink-0 max-w-[120px]">
-                                  <MiniTierIcon mmr={match.mmrAfter - match.mmrDiff} />
-                                  <span className="text-sm font-medium text-white truncate">
-                                    {playerName ?? `#${playerToken.slice(-6)}`}
-                                  </span>
-                                </div>
-                              </div>
-
-                              {/* Score */}
-                              <div className="flex items-center gap-1.5 px-5 py-2.5 shrink-0 border-x border-stone-800/50">
-                                <span className={`text-xl font-bold tabular-nums ${won ? "text-emerald-400" : "text-red-400"}`}>{match.score}</span>
-                                <span className="text-stone-600 text-xs font-medium">vs</span>
-                                {match.opponents.length > 0 && (
-                                  <span className={`text-xl font-bold tabular-nums ${won ? "text-red-400" : "text-emerald-400"}`}>{match.opponents[0].score}</span>
-                                )}
-                              </div>
-
-                              {/* Opponent side: name → build → blood → stats */}
-                              {match.opponents.length > 0 && (
-                                <div className="flex items-center gap-3 px-4 py-2.5 flex-1 min-w-0">
-                                  <div className="flex items-center gap-1.5 shrink-0 max-w-[120px]">
-                                    {match.opponents[0].mmr != null && (
-                                      <MiniTierIcon mmr={match.opponents[0].mmr - match.opponents[0].mmrDiff} />
-                                    )}
-                                    <a
-                                      href={`/players/${match.opponents[0].playerToken}`}
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="text-sm font-medium text-white truncate hover:underline hover:text-red-300"
-                                    >
-                                      {match.opponents[0].name ?? `#${match.opponents[0].playerToken.slice(-6)}`}
-                                    </a>
-                                  </div>
-                                  <MatchIcons code={match.opponents[0].build} />
-                                  <div className="flex items-center gap-4">
-                                    {match.opponents[0].mmr != null && (
-                                      <StatCol value={match.opponents[0].mmr - match.opponents[0].mmrDiff} label="MMR" />
-                                    )}
-                                    <StatCol value={formatNumber(match.opponents[0].damageDone)} label="DMG" />
-                                    <StatCol value={formatNumber(match.opponents[0].damageReceived)} label="REC" />
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* ── Mobile layout (<md): stacked ── */}
-                            <div className="flex md:hidden flex-col">
-                              {/* Player row */}
-                              <div className="flex items-center gap-2 px-3 py-2">
-                                <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                  <MiniTierIcon mmr={match.mmrAfter - match.mmrDiff} />
-                                  <span className="text-sm font-medium text-white truncate">
-                                    {playerName ?? `#${playerToken.slice(-6)}`}
-                                  </span>
-                                </div>
-                                <MatchIcons code={match.build} small bloodFirst />
-                              </div>
-
-                              {/* Score divider */}
-                              <div className="flex items-center gap-2 px-3 py-1 border-y border-stone-800/30 bg-black/10">
-                                <div className="flex-1 h-px bg-stone-800/40" />
-                                <span className={`text-base font-bold tabular-nums ${won ? "text-emerald-400" : "text-red-400"}`}>{match.score}</span>
-                                <span className="text-stone-600 text-xs font-medium">vs</span>
-                                {match.opponents.length > 0 && (
-                                  <span className={`text-base font-bold tabular-nums ${won ? "text-red-400" : "text-emerald-400"}`}>{match.opponents[0].score}</span>
-                                )}
-                                <div className="flex-1 h-px bg-stone-800/40" />
-                              </div>
-
-                              {/* Opponent row */}
-                              {match.opponents.length > 0 && (
-                                <div className="flex items-center gap-2 px-3 py-2">
-                                  <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                    {match.opponents[0].mmr != null && (
-                                      <MiniTierIcon mmr={match.opponents[0].mmr - match.opponents[0].mmrDiff} />
-                                    )}
-                                    <a
-                                      href={`/players/${match.opponents[0].playerToken}`}
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="text-sm font-medium text-white truncate hover:underline hover:text-red-300"
-                                    >
-                                      {match.opponents[0].name ?? `#${match.opponents[0].playerToken.slice(-6)}`}
-                                    </a>
-                                  </div>
-                                  <MatchIcons code={match.opponents[0].build} small />
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Bottom info row */}
-                            <div className="flex items-center justify-center gap-5 px-4 py-1 border-t border-stone-800/30 bg-black/15 text-xs">
-                              {match.matchDuration != null && (
-                                <div className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-stone-600 shrink-0" />
-                                  <span className="tabular-nums text-stone-500">{formatDuration(match.matchDuration)}</span>
-                                </div>
-                              )}
-                              {match.matchDate && (
-                                <div className="flex items-center gap-1">
-                                  <Calendar className="w-3 h-3 text-stone-600 shrink-0" />
-                                  <span className="tabular-nums text-stone-500">{timeAgo(match.matchDate)}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-
-                    {/* Load More */}
-                    {hasMore && (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="flex justify-center pt-2"
-                      >
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setVisibleCount((prev) => prev + PAGE_SIZE);
-                          }}
-                          className="text-xs text-stone-400 hover:text-stone-200 hover:bg-stone-800/50 border border-stone-700/40 gap-1.5"
-                        >
-                          <ChevronDown className="w-3.5 h-3.5" />
-                          Load more ({allMatches.length - visibleCount} remaining)
-                        </Button>
-                      </motion.div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </td>
-        </motion.tr>
-      )}
-    </AnimatePresence>
-  );
-}
 
 const NAME_WIDTHS = [28, 20, 24, 16, 32, 18, 22, 26, 20, 14, 28, 18];
 
@@ -701,7 +245,6 @@ export default function Leaderboard() {
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const [expandedPlayer, setExpandedPlayer] = useState<string | null>(null);
   const [hoveredPlayer, setHoveredPlayer] = useState<string | null>(null);
   const [region, setRegion] = useState<Region>("eu");
   const [season, setSeason] = useState<Season>("current");
@@ -770,15 +313,6 @@ export default function Leaderboard() {
     }
     fetchData();
   }, [search, region, season]);
-
-  // Collapse any open panel when switching regions or seasons
-  useEffect(() => {
-    setExpandedPlayer(null);
-  }, [region, season]);
-
-  const toggleExpanded = useCallback((playerToken: string) => {
-    setExpandedPlayer((prev) => (prev === playerToken ? null : playerToken));
-  }, []);
 
   return (
     <div className="space-y-6">
@@ -949,7 +483,6 @@ export default function Leaderboard() {
                 const tier = getRankTier(player.mmr, rank);
                 const isDracula = tier.name === "Dracula";
                 const isTop5 = rank <= 5;
-                const isExpanded = expandedPlayer === player.playerToken;
 
                 return (
                   <React.Fragment key={player.playerToken}>
@@ -960,7 +493,6 @@ export default function Leaderboard() {
                         duration: 0.3,
                         delay: Math.min(index * 0.05, 1),
                       }}
-                      onClick={() => toggleExpanded(player.playerToken)}
                       onMouseEnter={() => !isTop5 && setHoveredPlayer(player.playerToken)}
                       onMouseLeave={() => !isTop5 && setHoveredPlayer(null)}
                       style={!isTop5 ? {
@@ -968,7 +500,7 @@ export default function Leaderboard() {
                       } : undefined}
                       className={`
                         border-white/20 border-t border-b
-                        transition-all duration-200 cursor-pointer select-none
+                        transition-all duration-200
                         ${
                           isTop5
                             ? `border-l-2 border-b ${isDracula ? "border-l-red-700/60 border-b-red-900/30 bg-gradient-to-r from-red-900/30 from-0% via-red-800/10 via-25% to-transparent to-50% hover:from-red-900/40 hover:via-red-800/15" : "border-l-yellow-500/50 border-b-yellow-800/20 bg-gradient-to-r from-yellow-800/25 from-0% via-yellow-700/8 via-25% to-transparent to-50% hover:from-yellow-800/35 hover:via-yellow-700/12"}`
@@ -1065,15 +597,6 @@ export default function Leaderboard() {
                       </TableCell>
                     </motion.tr>
 
-                    <MatchHistoryPanel
-                      key={`history-${player.playerToken}`}
-                      playerToken={player.playerToken}
-                      playerName={player.name}
-                      isOpen={isExpanded}
-                      currentMmr={player.mmr}
-                      region={region}
-                      season={season}
-                    />
                   </React.Fragment>
                 );
               })}
