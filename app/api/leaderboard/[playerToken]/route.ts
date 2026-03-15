@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { getRegionDb, isValidRegion } from "@/lib/game-db";
+import { steamIdToToken, tokenMatchesSteamId } from "@/lib/steam-token";
 import type { RowDataPacket } from "mysql2";
+
+interface SteamIdRow extends RowDataPacket {
+  SteamID: string;
+}
 
 interface MatchHistoryRow extends RowDataPacket {
   SteamID: string;
@@ -17,23 +22,36 @@ interface MatchHistoryRow extends RowDataPacket {
   MatchDuration: number | null;
 }
 
+async function resolveSteamId(playerToken: string, region: string): Promise<string | null> {
+  if (!/^[A-Za-z0-9_-]{16}$/.test(playerToken)) return null;
+
+  const db = getRegionDb(isValidRegion(region) ? region : "eu");
+  const [rows] = await db.query<SteamIdRow[]>(
+    `SELECT SteamID FROM PlayerMatchmakingData`
+  );
+  for (const row of rows) {
+    if (tokenMatchesSteamId(playerToken, row.SteamID)) return row.SteamID;
+  }
+  return null;
+}
+
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ steamId: string }> }
+  { params }: { params: Promise<{ playerToken: string }> }
 ) {
   try {
-    const { steamId } = await params;
-
-    if (!/^\d+$/.test(steamId)) {
-      return NextResponse.json(
-        { success: false, error: "Invalid Steam ID" },
-        { status: 400 }
-      );
-    }
-
+    const { playerToken } = await params;
     const { searchParams } = new URL(request.url);
     const regionParam = searchParams.get("region") || "eu";
     const region = isValidRegion(regionParam) ? regionParam : "eu";
+
+    const steamId = await resolveSteamId(playerToken, region);
+    if (!steamId) {
+      return NextResponse.json(
+        { success: false, error: "Player not found" },
+        { status: 404 }
+      );
+    }
 
     const db = getRegionDb(region);
 
@@ -55,7 +73,7 @@ export async function GET(
       playerTeamByMatch.set(Number(row.MatchID), Number(row.MatchmakingTeam));
     }
 
-    let opponentsByMatch = new Map<number, { steamId: string; name: string | null; build: string; score: number; damageDone: number; damageReceived: number; mmr: number | null; mmrDiff: number }[]>();
+    let opponentsByMatch = new Map<number, { playerToken: string; name: string | null; build: string; score: number; damageDone: number; damageReceived: number; mmr: number | null; mmrDiff: number }[]>();
 
     if (matchIds.length > 0) {
       const placeholders = matchIds.map(() => "?").join(",");
@@ -77,7 +95,7 @@ export async function GET(
         if (playerTeam !== undefined && oppTeam !== playerTeam) {
           if (!opponentsByMatch.has(mId)) opponentsByMatch.set(mId, []);
           opponentsByMatch.get(mId)!.push({
-            steamId: opp.SteamID,
+            playerToken: steamIdToToken(opp.SteamID),
             name: opp.Name ?? null,
             build: opp.Build || "",
             score: Number(opp.Score),

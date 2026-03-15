@@ -12,6 +12,7 @@ import NavBar from "@/components/NavBar";
 import DataExportButton from "@/components/gdpr/DataExportButton";
 import DeleteAccountButton from "@/components/gdpr/DeleteAccountButton";
 import SteamLink from "./steam-link";
+import { steamIdToToken } from "@/lib/steam-token";
 import PrivacyToggle from "./privacy-toggle";
 import { Suspense } from "react";
 
@@ -188,12 +189,16 @@ export default async function ProfilePage() {
               <div className="space-y-2">
                 <div className="px-4 py-3 rounded-sm bg-white/[0.03] border border-white/5">
                   <Suspense fallback={null}>
-                    <SteamLink steamId={dbUser?.steamId ?? null} />
+                    <SteamLink
+                      steamLinked={!!dbUser?.steamId}
+                      steamProfileUrl={dbUser?.steamId ? `https://steamcommunity.com/profiles/${dbUser.steamId}` : null}
+                      playerToken={dbUser?.steamId ? steamIdToToken(dbUser.steamId) : null}
+                    />
                   </Suspense>
                 </div>
                 {dbUser?.steamId && (
                   <Link
-                    href={`/players/${dbUser.steamId}`}
+                    href={`/players/${steamIdToToken(dbUser.steamId)}`}
                     className="group flex items-center gap-2 px-4 py-2.5 rounded-sm bg-white/[0.03] hover:bg-[#8B0000]/20 border border-white/5 hover:border-[#8B0000]/40 transition-all text-sm text-gray-500 hover:text-white"
                   >
                     <BarChart2 className="h-3.5 w-3.5 text-[#8B0000]" />

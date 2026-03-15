@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getRegionDb, isValidRegion } from "@/lib/game-db";
+import { steamIdToToken } from "@/lib/steam-token";
 import type { RowDataPacket } from "mysql2";
 
 interface CountRow extends RowDataPacket {
@@ -21,7 +22,7 @@ function serializePlayer(row: PlayerMatchmakingRow) {
   const losses = Number(row.Losses);
   const total = wins + losses;
   return {
-    steamId: row.SteamID,
+    playerToken: steamIdToToken(row.SteamID),
     name: row.Name ?? null,
     wins,
     losses,

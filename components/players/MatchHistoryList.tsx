@@ -11,7 +11,7 @@ import "@/components/vbuilds/styles.css";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Opponent {
-  steamId: string;
+  playerToken: string;
   name: string | null;
   build: string;
   score: number;
@@ -126,7 +126,7 @@ function MatchIcons({ code, small, bloodFirst }: { code: string; small?: boolean
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 interface MatchHistoryListProps {
-  steamId: string;
+  playerToken: string;
   playerName: string | null;
   currentMmr: number;
   region: string;
@@ -135,7 +135,7 @@ interface MatchHistoryListProps {
 const PAGE_SIZE = 8;
 const MAX_RETRIES = 3;
 
-export default function MatchHistoryList({ steamId, playerName, currentMmr, region }: MatchHistoryListProps) {
+export default function MatchHistoryList({ playerToken, playerName, currentMmr, region }: MatchHistoryListProps) {
   const [allMatches, setAllMatches] = useState<Match[]>([]);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(false);
@@ -174,7 +174,7 @@ export default function MatchHistoryList({ steamId, playerName, currentMmr, regi
       setLoading(true);
       setHasError(false);
       try {
-        const res = await fetch(`/api/leaderboard/${steamId}?region=${region}`);
+        const res = await fetch(`/api/leaderboard/${playerToken}?region=${region}`);
         const data = await res.json();
         if (data.success && data.matches.length > 0) {
           setAllMatches(data.matches);
@@ -200,7 +200,7 @@ export default function MatchHistoryList({ steamId, playerName, currentMmr, regi
 
     fetch_();
     return () => { if (retryTimer) clearTimeout(retryTimer); };
-  }, [fetched, region, steamId, retryCount]);
+  }, [fetched, region, playerToken, retryCount]);
 
   if (loading) {
     return (
@@ -273,7 +273,7 @@ export default function MatchHistoryList({ steamId, playerName, currentMmr, regi
                     <MatchIcons code={match.build} bloodFirst />
                     <div className="flex items-center gap-1.5 shrink-0 max-w-[120px]">
                       <MiniTierIcon mmr={match.mmrAfter - match.mmrDiff} />
-                      <span className="text-sm font-medium text-white truncate">{playerName ?? steamId.slice(-8)}</span>
+                      <span className="text-sm font-medium text-white truncate">{playerName ?? `#${playerToken.slice(-6)}`}</span>
                     </div>
                   </div>
 
@@ -290,10 +290,10 @@ export default function MatchHistoryList({ steamId, playerName, currentMmr, regi
                       <div className="flex items-center gap-1.5 shrink-0 max-w-[120px]">
                         {match.opponents[0].mmr != null && <MiniTierIcon mmr={match.opponents[0].mmr - match.opponents[0].mmrDiff} />}
                         <a
-                          href={`/players/${match.opponents[0].steamId}`}
+                          href={`/players/${match.opponents[0].playerToken}`}
                           className="text-sm font-medium text-white truncate hover:underline hover:text-red-300"
                         >
-                          {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
+                          {match.opponents[0].name ?? `#${match.opponents[0].playerToken.slice(-6)}`}
                         </a>
                       </div>
                       <MatchIcons code={match.opponents[0].build} />
@@ -311,7 +311,7 @@ export default function MatchHistoryList({ steamId, playerName, currentMmr, regi
                   <div className="flex items-center gap-2 px-3 py-2">
                     <div className="flex items-center gap-1.5 min-w-0 flex-1">
                       <MiniTierIcon mmr={match.mmrAfter - match.mmrDiff} />
-                      <span className="text-sm font-medium text-white truncate">{playerName ?? steamId.slice(-8)}</span>
+                      <span className="text-sm font-medium text-white truncate">{playerName ?? `#${playerToken.slice(-6)}`}</span>
                     </div>
                     <MatchIcons code={match.build} small bloodFirst />
                   </div>
@@ -329,10 +329,10 @@ export default function MatchHistoryList({ steamId, playerName, currentMmr, regi
                       <div className="flex items-center gap-1.5 min-w-0 flex-1">
                         {match.opponents[0].mmr != null && <MiniTierIcon mmr={match.opponents[0].mmr - match.opponents[0].mmrDiff} />}
                         <a
-                          href={`/players/${match.opponents[0].steamId}`}
+                          href={`/players/${match.opponents[0].playerToken}`}
                           className="text-sm font-medium text-white truncate hover:underline hover:text-red-300"
                         >
-                          {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
+                          {match.opponents[0].name ?? `#${match.opponents[0].playerToken.slice(-6)}`}
                         </a>
                       </div>
                       <MatchIcons code={match.opponents[0].build} small />

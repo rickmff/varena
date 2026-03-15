@@ -39,7 +39,7 @@ interface TierList {
 }
 
 interface PlayerProfileClientProps {
-  steamId: string;
+  playerToken: string;
   displayName: string;
   initialRegion: Region;
   regionStats: RegionStats[];
@@ -95,7 +95,7 @@ function EmptyState({ text }: { text: string }) {
 }
 
 export default function PlayerProfileClient({
-  steamId,
+  playerToken,
   displayName,
   initialRegion,
   regionStats,
@@ -192,7 +192,7 @@ export default function PlayerProfileClient({
                     Match History · {activeRegion.toUpperCase()}
                   </p>
                   <MatchHistoryList
-                    steamId={steamId}
+                    playerToken={playerToken}
                     playerName={displayName}
                     currentMmr={stats.mmr}
                     region={activeRegion}

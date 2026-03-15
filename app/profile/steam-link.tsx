@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 interface SteamLinkProps {
-  steamId: string | null;
+  steamLinked: boolean;
+  steamProfileUrl: string | null;
+  playerToken: string | null;
 }
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -17,12 +19,12 @@ const ERROR_MESSAGES: Record<string, string> = {
   already_linked: "This Steam account is already linked to another user.",
 };
 
-export default function SteamLink({ steamId: initialSteamId }: SteamLinkProps) {
+export default function SteamLink({ steamLinked: initialLinked, steamProfileUrl, playerToken }: SteamLinkProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const steamStatus = searchParams.get("steam");
   const steamReason = searchParams.get("reason");
-  const [steamId, setSteamId] = useState(initialSteamId);
+  const [linked, setLinked] = useState(initialLinked);
   const [unlinking, setUnlinking] = useState(false);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export default function SteamLink({ steamId: initialSteamId }: SteamLinkProps) {
     setUnlinking(true);
     try {
       await fetch("/api/auth/steam/unlink", { method: "POST" });
-      setSteamId(null);
+      setLinked(false);
       router.refresh();
     } finally {
       setUnlinking(false);
@@ -63,7 +65,7 @@ export default function SteamLink({ steamId: initialSteamId }: SteamLinkProps) {
         </p>
       )}
 
-      {steamId ? (
+      {linked ? (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <img
@@ -73,14 +75,18 @@ export default function SteamLink({ steamId: initialSteamId }: SteamLinkProps) {
             />
             <span className="text-white text-sm">
               Steam linked:{" "}
-              <a
-                href={`https://steamcommunity.com/profiles/${steamId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#5865F2] hover:underline"
-              >
-                {steamId}
-              </a>
+              {steamProfileUrl ? (
+                <a
+                  href={steamProfileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#5865F2] hover:underline"
+                >
+                  View profile
+                </a>
+              ) : (
+                <span className="text-gray-400">connected</span>
+              )}
             </span>
           </div>
           <Button

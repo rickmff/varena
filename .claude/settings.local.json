@@ -11,7 +11,8 @@
       "Bash(npm run prisma:push)",
       "Bash(npm run build)",
       "Bash(npx next build)",
-      "Bash(npx tsc --noEmit)"
+      "Bash(npx tsc --noEmit)",
+      "Bash(grep -rn steamId c:/Users/rickm/Documents/Code/varena/app c:/Users/rickm/Documents/Code/varena/components --include=*.ts --include=*.tsx)"
     ]
   }
 }

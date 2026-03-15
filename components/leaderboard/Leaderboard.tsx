@@ -33,7 +33,7 @@ import { EU, US, AU, BR, SG } from "country-flag-icons/react/3x2";
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface Player {
-  steamId: string;
+  playerToken: string;
   name: string | null;
   wins: number;
   losses: number;
@@ -44,7 +44,7 @@ interface Player {
 }
 
 interface Opponent {
-  steamId: string;
+  playerToken: string;
   name: string | null;
   build: string;
   score: number;
@@ -266,26 +266,26 @@ const BUILD_D = "722222222bcg9af3456g2456413656o6479n218700000000000000000000000
 const BUILD_E = "522222222icbj6i1256r1246312458c08B7b07B8g628Ef028En379Dr528Ei64B9o128E41111623";
 
 const MOCK_MATCHES: MatchHistory[] = [
-  { matchId: 2010, team: 1, build: BUILD_A, mmrDiff: 28,  damageDone: 5200, damageReceived: 1900, score: 2, kills: 9,  deaths: 2, matchDate: new Date(Date.now() - 1000 * 60 * 20).toISOString(),           matchDuration: 680,  opponents: [{ steamId: "76561198000000002", name: "Hunter",       build: BUILD_B, score: 0, damageDone: 1900, damageReceived: 5200, mmr: 1850, mmrDiff: -28  }] },
-  { matchId: 2009, team: 2, build: BUILD_C, mmrDiff: -22, damageDone: 3100, damageReceived: 4800, score: 1, kills: 3,  deaths: 7, matchDate: new Date(Date.now() - 1000 * 60 * 95).toISOString(),           matchDuration: 540,  opponents: [{ steamId: "76561198000000003", name: "Hunter",    build: BUILD_D, score: 2, damageDone: 4800, damageReceived: 3100, mmr: 2100, mmrDiff: 22   }] },
-  { matchId: 2008, team: 1, build: BUILD_E, mmrDiff: 31,  damageDone: 6100, damageReceived: 2200, score: 2, kills: 11, deaths: 1, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(),       matchDuration: 710,  opponents: [{ steamId: "76561198000000004", name: "Hunter",    build: BUILD_A, score: 0, damageDone: 2200, damageReceived: 6100, mmr: 1970, mmrDiff: -31  }] },
-  { matchId: 2007, team: 2, build: BUILD_B, mmrDiff: -19, damageDone: 2900, damageReceived: 3600, score: 1, kills: 4,  deaths: 6, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 9).toISOString(),       matchDuration: 890,  opponents: [{ steamId: "76561198000000005", name: "Hunter",    build: BUILD_C, score: 2, damageDone: 3600, damageReceived: 2900, mmr: 2240, mmrDiff: 19   }] },
-  { matchId: 2006, team: 1, build: BUILD_D, mmrDiff: 25,  damageDone: 4700, damageReceived: 2500, score: 2, kills: 8,  deaths: 3, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),      matchDuration: 620,  opponents: [{ steamId: "76561198000000006", name: "Hunter",    build: BUILD_E, score: 1, damageDone: 2500, damageReceived: 4700, mmr: 1730, mmrDiff: -25  }] },
-  { matchId: 2005, team: 1, build: BUILD_A, mmrDiff: 20,  damageDone: 4300, damageReceived: 3000, score: 2, kills: 7,  deaths: 4, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 50).toISOString(),      matchDuration: 810,  opponents: [{ steamId: "76561198000000007", name: "Hunter",    build: BUILD_D, score: 0, damageDone: 3000, damageReceived: 4300, mmr: 1900, mmrDiff: -20  }] },
-  { matchId: 2004, team: 2, build: BUILD_C, mmrDiff: -14, damageDone: 2600, damageReceived: 3300, score: 0, kills: 2,  deaths: 5, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 75).toISOString(),      matchDuration: 460,  opponents: [{ steamId: "76561198000000008", name: "Hunter",    build: BUILD_B, score: 2, damageDone: 3300, damageReceived: 2600, mmr: 2050, mmrDiff: 14   }] },
-  { matchId: 2003, team: 1, build: BUILD_E, mmrDiff: 18,  damageDone: 3900, damageReceived: 2800, score: 2, kills: 6,  deaths: 3, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(),  matchDuration: 590,  opponents: [{ steamId: "76561198000000009", name: "Hunter",    build: BUILD_A, score: 1, damageDone: 2800, damageReceived: 3900, mmr: 1780, mmrDiff: -18  }] },
-  { matchId: 2002, team: 2, build: BUILD_B, mmrDiff: -10, damageDone: 2400, damageReceived: 2900, score: 1, kills: 3,  deaths: 4, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(),  matchDuration: 505,  opponents: [{ steamId: "76561198000000010", name: "Hunter",    build: BUILD_C, score: 2, damageDone: 2900, damageReceived: 2400, mmr: 2160, mmrDiff: 10   }] },
-  { matchId: 2001, team: 1, build: BUILD_D, mmrDiff: 15,  damageDone: 3500, damageReceived: 2100, score: 2, kills: 5,  deaths: 2, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 9).toISOString(),  matchDuration: 740,  opponents: [{ steamId: "76561198000000011", name: null,         build: BUILD_E, score: 0, damageDone: 2100, damageReceived: 3500, mmr: null,  mmrDiff: -15  }] },
+  { matchId: 2010, team: 1, build: BUILD_A, mmrDiff: 28,  damageDone: 5200, damageReceived: 1900, score: 2, kills: 9,  deaths: 2, matchDate: new Date(Date.now() - 1000 * 60 * 20).toISOString(),           matchDuration: 680,  opponents: [{ playerToken: "mock_token_0002", name: "Hunter",    build: BUILD_B, score: 0, damageDone: 1900, damageReceived: 5200, mmr: 1850, mmrDiff: -28  }] },
+  { matchId: 2009, team: 2, build: BUILD_C, mmrDiff: -22, damageDone: 3100, damageReceived: 4800, score: 1, kills: 3,  deaths: 7, matchDate: new Date(Date.now() - 1000 * 60 * 95).toISOString(),           matchDuration: 540,  opponents: [{ playerToken: "mock_token_0003", name: "Hunter",    build: BUILD_D, score: 2, damageDone: 4800, damageReceived: 3100, mmr: 2100, mmrDiff: 22   }] },
+  { matchId: 2008, team: 1, build: BUILD_E, mmrDiff: 31,  damageDone: 6100, damageReceived: 2200, score: 2, kills: 11, deaths: 1, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(),       matchDuration: 710,  opponents: [{ playerToken: "mock_token_0004", name: "Hunter",    build: BUILD_A, score: 0, damageDone: 2200, damageReceived: 6100, mmr: 1970, mmrDiff: -31  }] },
+  { matchId: 2007, team: 2, build: BUILD_B, mmrDiff: -19, damageDone: 2900, damageReceived: 3600, score: 1, kills: 4,  deaths: 6, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 9).toISOString(),       matchDuration: 890,  opponents: [{ playerToken: "mock_token_0005", name: "Hunter",    build: BUILD_C, score: 2, damageDone: 3600, damageReceived: 2900, mmr: 2240, mmrDiff: 19   }] },
+  { matchId: 2006, team: 1, build: BUILD_D, mmrDiff: 25,  damageDone: 4700, damageReceived: 2500, score: 2, kills: 8,  deaths: 3, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),      matchDuration: 620,  opponents: [{ playerToken: "mock_token_0006", name: "Hunter",    build: BUILD_E, score: 1, damageDone: 2500, damageReceived: 4700, mmr: 1730, mmrDiff: -25  }] },
+  { matchId: 2005, team: 1, build: BUILD_A, mmrDiff: 20,  damageDone: 4300, damageReceived: 3000, score: 2, kills: 7,  deaths: 4, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 50).toISOString(),      matchDuration: 810,  opponents: [{ playerToken: "mock_token_0007", name: "Hunter",    build: BUILD_D, score: 0, damageDone: 3000, damageReceived: 4300, mmr: 1900, mmrDiff: -20  }] },
+  { matchId: 2004, team: 2, build: BUILD_C, mmrDiff: -14, damageDone: 2600, damageReceived: 3300, score: 0, kills: 2,  deaths: 5, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 75).toISOString(),      matchDuration: 460,  opponents: [{ playerToken: "mock_token_0008", name: "Hunter",    build: BUILD_B, score: 2, damageDone: 3300, damageReceived: 2600, mmr: 2050, mmrDiff: 14   }] },
+  { matchId: 2003, team: 1, build: BUILD_E, mmrDiff: 18,  damageDone: 3900, damageReceived: 2800, score: 2, kills: 6,  deaths: 3, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(),  matchDuration: 590,  opponents: [{ playerToken: "mock_token_0009", name: "Hunter",    build: BUILD_A, score: 1, damageDone: 2800, damageReceived: 3900, mmr: 1780, mmrDiff: -18  }] },
+  { matchId: 2002, team: 2, build: BUILD_B, mmrDiff: -10, damageDone: 2400, damageReceived: 2900, score: 1, kills: 3,  deaths: 4, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(),  matchDuration: 505,  opponents: [{ playerToken: "mock_token_0010", name: "Hunter",    build: BUILD_C, score: 2, damageDone: 2900, damageReceived: 2400, mmr: 2160, mmrDiff: 10   }] },
+  { matchId: 2001, team: 1, build: BUILD_D, mmrDiff: 15,  damageDone: 3500, damageReceived: 2100, score: 2, kills: 5,  deaths: 2, matchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 9).toISOString(),  matchDuration: 740,  opponents: [{ playerToken: "mock_token_0011", name: null,        build: BUILD_E, score: 0, damageDone: 2100, damageReceived: 3500, mmr: null,  mmrDiff: -15  }] },
 ];
 
 function MatchHistoryPanel({
-  steamId,
+  playerToken,
   playerName,
   isOpen,
   currentMmr,
   region,
 }: {
-  steamId: string;
+  playerToken: string;
   playerName: string | null;
   isOpen: boolean;
   currentMmr: number;
@@ -341,7 +341,7 @@ function MatchHistoryPanel({
       setLoading(true);
       setHasError(false);
       try {
-        const res = await fetch(`/api/leaderboard/${steamId}?region=${region}`);
+        const res = await fetch(`/api/leaderboard/${playerToken}?region=${region}`);
         const data = await res.json();
         if (data.success && data.matches.length > 0) {
           setAllMatches(data.matches);
@@ -369,7 +369,7 @@ function MatchHistoryPanel({
     }
     fetchMatches();
     return () => { if (retryTimer) clearTimeout(retryTimer); };
-  }, [isOpen, steamId, fetched, region, retryCount]);
+  }, [isOpen, playerToken, fetched, region, retryCount]);
 
   return (
     <AnimatePresence>
@@ -457,7 +457,7 @@ function MatchHistoryPanel({
                                 <div className="flex items-center gap-1.5 shrink-0 max-w-[120px]">
                                   <MiniTierIcon mmr={match.mmrAfter - match.mmrDiff} />
                                   <span className="text-sm font-medium text-white truncate">
-                                    {playerName ?? steamId.slice(-8)}
+                                    {playerName ?? `#${playerToken.slice(-6)}`}
                                   </span>
                                 </div>
                               </div>
@@ -479,11 +479,11 @@ function MatchHistoryPanel({
                                       <MiniTierIcon mmr={match.opponents[0].mmr - match.opponents[0].mmrDiff} />
                                     )}
                                     <a
-                                      href={`/players/${match.opponents[0].steamId}`}
+                                      href={`/players/${match.opponents[0].playerToken}`}
                                       onClick={(e) => e.stopPropagation()}
                                       className="text-sm font-medium text-white truncate hover:underline hover:text-red-300"
                                     >
-                                      {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
+                                      {match.opponents[0].name ?? `#${match.opponents[0].playerToken.slice(-6)}`}
                                     </a>
                                   </div>
                                   <MatchIcons code={match.opponents[0].build} />
@@ -505,7 +505,7 @@ function MatchHistoryPanel({
                                 <div className="flex items-center gap-1.5 min-w-0 flex-1">
                                   <MiniTierIcon mmr={match.mmrAfter - match.mmrDiff} />
                                   <span className="text-sm font-medium text-white truncate">
-                                    {playerName ?? steamId.slice(-8)}
+                                    {playerName ?? `#${playerToken.slice(-6)}`}
                                   </span>
                                 </div>
                                 <MatchIcons code={match.build} small bloodFirst />
@@ -530,11 +530,11 @@ function MatchHistoryPanel({
                                       <MiniTierIcon mmr={match.opponents[0].mmr - match.opponents[0].mmrDiff} />
                                     )}
                                     <a
-                                      href={`/players/${match.opponents[0].steamId}`}
+                                      href={`/players/${match.opponents[0].playerToken}`}
                                       onClick={(e) => e.stopPropagation()}
                                       className="text-sm font-medium text-white truncate hover:underline hover:text-red-300"
                                     >
-                                      {match.opponents[0].name ?? match.opponents[0].steamId.slice(-8)}
+                                      {match.opponents[0].name ?? `#${match.opponents[0].playerToken.slice(-6)}`}
                                     </a>
                                   </div>
                                   <MatchIcons code={match.opponents[0].build} small />
@@ -671,19 +671,19 @@ function LoadingSkeleton() {
 
 const MOCK_PLAYERS: Player[] = [
   // ── Legendary (ranks 1–5, any mmr) ──────────────────────────────────────
-  { rank: 1, steamId: "76561198000000001", name: "Skiiw",      wins: 98, losses: 18, mmr: 2480, winRate: 84.5, lastMatchDate: new Date(Date.now() - 1000 * 60 * 20).toISOString() },
-  { rank: 2, steamId: "76561198000000002", name: "SNK",         wins: 90, losses: 22, mmr: 2380, winRate: 80.4, lastMatchDate: new Date(Date.now() - 1000 * 60 * 95).toISOString() },
-  { rank: 3, steamId: "76561198000000003", name: "Isaiah",      wins: 82, losses: 26, mmr: 2290, winRate: 75.9, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString() },
-  { rank: 4, steamId: "76561198000000004", name: "Kurama",      wins: 75, losses: 30, mmr: 2210, winRate: 71.4, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 9).toISOString() },
-  { rank: 5, steamId: "76561198000000005", name: "sweets",      wins: 68, losses: 34, mmr: 2150, winRate: 66.7, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString() },
+  { rank: 1, playerToken: "mock_token_0001", name: "Skiiw",      wins: 98, losses: 18, mmr: 2480, winRate: 84.5, lastMatchDate: new Date(Date.now() - 1000 * 60 * 20).toISOString() },
+  { rank: 2, playerToken: "mock_token_0002", name: "SNK",         wins: 90, losses: 22, mmr: 2380, winRate: 80.4, lastMatchDate: new Date(Date.now() - 1000 * 60 * 95).toISOString() },
+  { rank: 3, playerToken: "mock_token_0003", name: "Isaiah",      wins: 82, losses: 26, mmr: 2290, winRate: 75.9, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString() },
+  { rank: 4, playerToken: "mock_token_0004", name: "Kurama",      wins: 75, losses: 30, mmr: 2210, winRate: 71.4, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 9).toISOString() },
+  { rank: 5, playerToken: "mock_token_0005", name: "sweets",      wins: 68, losses: 34, mmr: 2150, winRate: 66.7, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString() },
   // ── Dracula (rank 6+, mmr ≥ 2100) ────────────────────────────────────────
-  { rank: 6, steamId: "76561198000000006", name: "Torlic",      wins: 60, losses: 40, mmr: 2110, winRate: 60.0, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 50).toISOString() },
+  { rank: 6, playerToken: "mock_token_0006", name: "Torlic",      wins: 60, losses: 40, mmr: 2110, winRate: 60.0, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 50).toISOString() },
   // ── Dark Silver (1900–2099) ───────────────────────────────────────────────
-  { rank: 7, steamId: "76561198000000007", name: "Kaelith",     wins: 45, losses: 48, mmr: 1980, winRate: 48.4, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 75).toISOString() },
+  { rank: 7, playerToken: "mock_token_0007", name: "Kaelith",     wins: 45, losses: 48, mmr: 1980, winRate: 48.4, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 75).toISOString() },
   // ── Iron (1700–1899) ──────────────────────────────────────────────────────
-  { rank: 8, steamId: "76561198000000008", name: "Velmira",     wins: 32, losses: 52, mmr: 1790, winRate: 38.1, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString() },
+  { rank: 8, playerToken: "mock_token_0008", name: "Velmira",     wins: 32, losses: 52, mmr: 1790, winRate: 38.1, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString() },
   // ── Copper (any mmr) ──────────────────────────────────────────────────────
-  { rank: 9, steamId: "76561198000000009", name: "Noctavelle",  wins: 20, losses: 55, mmr: 1250, winRate: 26.7, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 8).toISOString() },
+  { rank: 9, playerToken: "mock_token_0009", name: "Noctavelle",  wins: 20, losses: 55, mmr: 1250, winRate: 26.7, lastMatchDate: new Date(Date.now() - 1000 * 60 * 60 * 24 * 8).toISOString() },
 ];
 
 // ─── Main Component ──────────────────────────────────────────────────────────
@@ -726,7 +726,7 @@ export default function Leaderboard() {
   useEffect(() => {
     if (USE_MOCK_DATA) {
       let filtered = [...MOCK_PLAYERS];
-      if (search) filtered = filtered.filter(p => p.steamId.includes(search));
+      if (search) filtered = filtered.filter(p => p.name?.toLowerCase().includes(search.toLowerCase()));
       setRawPlayers(filtered);
       setLoading(false);
       return;
@@ -759,8 +759,8 @@ export default function Leaderboard() {
     setExpandedPlayer(null);
   }, [region]);
 
-  const toggleExpanded = useCallback((steamId: string) => {
-    setExpandedPlayer((prev) => (prev === steamId ? null : steamId));
+  const toggleExpanded = useCallback((playerToken: string) => {
+    setExpandedPlayer((prev) => (prev === playerToken ? null : playerToken));
   }, []);
 
   return (
@@ -898,10 +898,10 @@ export default function Leaderboard() {
                 const tier = getRankTier(player.mmr, rank);
                 const isDracula = tier.name === "Dracula";
                 const isTop5 = rank <= 5;
-                const isExpanded = expandedPlayer === player.steamId;
+                const isExpanded = expandedPlayer === player.playerToken;
 
                 return (
-                  <React.Fragment key={player.steamId}>
+                  <React.Fragment key={player.playerToken}>
                     <motion.tr
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -909,11 +909,11 @@ export default function Leaderboard() {
                         duration: 0.3,
                         delay: Math.min(index * 0.05, 1),
                       }}
-                      onClick={() => toggleExpanded(player.steamId)}
-                      onMouseEnter={() => !isTop5 && setHoveredPlayer(player.steamId)}
+                      onClick={() => toggleExpanded(player.playerToken)}
+                      onMouseEnter={() => !isTop5 && setHoveredPlayer(player.playerToken)}
                       onMouseLeave={() => !isTop5 && setHoveredPlayer(null)}
                       style={!isTop5 ? {
-                        background: `linear-gradient(to right, ${tier.glowColor.replace(/[\d.]+\)$/, `${hoveredPlayer === player.steamId ? (tier.rowOpacity ?? 0.07) * 1.8 : tier.rowOpacity ?? 0.07})`)}, transparent 45%)`,
+                        background: `linear-gradient(to right, ${tier.glowColor.replace(/[\d.]+\)$/, `${hoveredPlayer === player.playerToken ? (tier.rowOpacity ?? 0.07) * 1.8 : tier.rowOpacity ?? 0.07})`)}, transparent 45%)`,
                       } : undefined}
                       className={`
                         border-white/20 border-t border-b
@@ -943,7 +943,7 @@ export default function Leaderboard() {
                             )}
                             {player.name && isDracula && (
                               <a
-                                href={`/players/${player.steamId}`}
+                                href={`/players/${player.playerToken}`}
                                 onClick={(e) => e.stopPropagation()}
                                 className="text-base font-bold tracking-widest uppercase bg-gradient-to-r from-red-400 via-red-500 to-red-600 bg-clip-text text-transparent hover:underline"
                                 style={{ textShadow: "0 0 12px rgba(220,38,38,0.4)" }}
@@ -953,7 +953,7 @@ export default function Leaderboard() {
                             )}
                             {player.name && !isDracula && (
                               <a
-                                href={`/players/${player.steamId}`}
+                                href={`/players/${player.playerToken}`}
                                 onClick={(e) => e.stopPropagation()}
                                 className={`font-semibold truncate tracking-[0.05em] w-full hover:underline ${
                                   isTop5 ? "text-sm text-yellow-300" : "text-sm text-white/90"
@@ -1015,8 +1015,8 @@ export default function Leaderboard() {
                     </motion.tr>
 
                     <MatchHistoryPanel
-                      key={`history-${player.steamId}`}
-                      steamId={player.steamId}
+                      key={`history-${player.playerToken}`}
+                      playerToken={player.playerToken}
                       playerName={player.name}
                       isOpen={isExpanded}
                       currentMmr={player.mmr}
