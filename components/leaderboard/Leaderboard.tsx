@@ -547,7 +547,7 @@ export default function Leaderboard() {
                                   isTop5 ? "text-sm text-yellow-300" : "text-sm text-white/90"
                                 }`}
                               >
-                                {player.name === "ChipSa" ? "Washed ChipSa" : player.name}
+                                player.name
                               </a>
                             )}
                           </div>
