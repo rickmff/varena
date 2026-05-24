@@ -8,16 +8,6 @@ export type Servant = {
 
 export const servants: Servant[] = [
   {
-    "id": "CHAR_Gloomrot_AceIncinerator",
-    "name": "Ace Incinerator",
-    "prefabs": [
-      "CHAR_Gloomrot_AceIncinerator",
-      "CHAR_Gloomrot_AceIncinerator_Servant"
-    ],
-    "code": "0",
-    "group": null
-  },
-  {
     "id": "CHAR_Blackfang_Alchemist",
     "name": "Alchemist",
     "prefabs": [
@@ -114,7 +104,7 @@ export const servants: Servant[] = [
       "CHAR_ChurchOfLight_Lightweaver",
       "CHAR_ChurchOfLight_Lightweaver_Servant"
     ],
-    "code": "A",
+    "code": "a",
     "group": "B"
   },
   {
@@ -124,7 +114,7 @@ export const servants: Servant[] = [
       "CHAR_Legion_NightMaiden",
       "CHAR_Legion_NightMaiden_Servant"
     ],
-    "code": "B",
+    "code": "b",
     "group": "C"
   },
   {
@@ -134,7 +124,7 @@ export const servants: Servant[] = [
       "CHAR_Legion_NightMaiden_Lesser",
       "CHAR_Legion_NightMaiden_Lesser_Servant"
     ],
-    "code": "C",
+    "code": "c",
     "group": "C"
   },
   {
@@ -144,7 +134,7 @@ export const servants: Servant[] = [
       "CHAR_Gloomrot_TractorBeamer",
       "CHAR_Gloomrot_TractorBeamer_Servant"
     ],
-    "code": "D",
+    "code": "d",
     "group": "C"
   },
   {
@@ -154,7 +144,7 @@ export const servants: Servant[] = [
       "CHAR_Legion_Assassin",
       "CHAR_Legion_Assassin_Servant"
     ],
-    "code": "E",
+    "code": "e",
     "group": "C"
   },
   {
@@ -164,7 +154,7 @@ export const servants: Servant[] = [
       "CHAR_ChurchOfLight_Rifleman",
       "CHAR_ChurchOfLight_Rifleman_Servant"
     ],
-    "code": "F",
+    "code": "f",
     "group": "C"
   },
   {
@@ -174,7 +164,7 @@ export const servants: Servant[] = [
       "CHAR_Blackfang_Venomblade",
       "CHAR_Blackfang_Venomblade_Servant"
     ],
-    "code": "G",
+    "code": "g",
     "group": "D"
   },
   {
@@ -184,7 +174,7 @@ export const servants: Servant[] = [
       "CHAR_ChurchOfLight_Knight_2H",
       "CHAR_ChurchOfLight_Knight_2H_Servant"
     ],
-    "code": "H",
+    "code": "h",
     "group": "D"
   },
   {
@@ -194,7 +184,7 @@ export const servants: Servant[] = [
       "CHAR_ChurchOfLight_Knight_Shield",
       "CHAR_ChurchOfLight_Knight_Shield_Servant"
     ],
-    "code": "I",
+    "code": "i",
     "group": "D"
   },
   {
@@ -204,7 +194,7 @@ export const servants: Servant[] = [
       "CHAR_Militia_Guard",
       "CHAR_Militia_Guard_Servant"
     ],
-    "code": "J",
+    "code": "j",
     "group": "D"
   },
   {
@@ -214,7 +204,7 @@ export const servants: Servant[] = [
       "CHAR_Militia_Devoted",
       "CHAR_Militia_Devoted_Servant"
     ],
-    "code": "K",
+    "code": "k",
     "group": "D"
   },
   {
@@ -224,7 +214,7 @@ export const servants: Servant[] = [
       "CHAR_ChurchOfLight_SlaveMaster_Enforcer",
       "CHAR_ChurchOfLight_SlaveMaster_Enforcer_Servant"
     ],
-    "code": "L",
+    "code": "l",
     "group": "D"
   },
   {
@@ -234,7 +224,7 @@ export const servants: Servant[] = [
       "CHAR_ChurchOfLight_SlaveMaster_Sentry",
       "CHAR_ChurchOfLight_SlaveMaster_Sentry_Servant"
     ],
-    "code": "M",
+    "code": "m",
     "group": "D"
   },
   {
@@ -244,7 +234,7 @@ export const servants: Servant[] = [
       "CHAR_Gloomrot_SentryOfficer",
       "CHAR_Gloomrot_SentryOfficer_Servant"
     ],
-    "code": "N",
+    "code": "n",
     "group": "D"
   },
   {
@@ -254,7 +244,7 @@ export const servants: Servant[] = [
       "CHAR_Gloomrot_Railgunner",
       "CHAR_Gloomrot_Railgunner_Servant"
     ],
-    "code": "O",
+    "code": "o",
     "group": "D"
   },
   {
@@ -264,7 +254,7 @@ export const servants: Servant[] = [
       "CHAR_Gloomrot_Tazer",
       "CHAR_Gloomrot_Tazer_Servant"
     ],
-    "code": "P",
+    "code": "p",
     "group": "D"
   },
   {
@@ -274,7 +264,7 @@ export const servants: Servant[] = [
       "CHAR_Gloomrot_Pyro",
       "CHAR_Gloomrot_Pyro_Servant"
     ],
-    "code": "Q",
+    "code": "q",
     "group": "D"
   },
   {
@@ -284,7 +274,7 @@ export const servants: Servant[] = [
       "CHAR_Bandit_Mugger",
       "CHAR_Bandit_Mugger_Servant"
     ],
-    "code": "R",
+    "code": "r",
     "group": "D"
   },
   {
@@ -294,7 +284,7 @@ export const servants: Servant[] = [
       "CHAR_Bandit_Thief",
       "CHAR_Bandit_Thief_Servant"
     ],
-    "code": "S",
+    "code": "s",
     "group": "D"
   },
   {
@@ -304,8 +294,18 @@ export const servants: Servant[] = [
       "CHAR_Bandit_Trapper",
       "CHAR_Bandit_Trapper_Servant"
     ],
-    "code": "T",
+    "code": "t",
     "group": "D"
+  },
+  {
+    "id": "CHAR_Gloomrot_AceIncinerator",
+    "name": "Ace Incinerator",
+    "prefabs": [
+      "CHAR_Gloomrot_AceIncinerator",
+      "CHAR_Gloomrot_AceIncinerator_Servant"
+    ],
+    "code": "u",
+    "group": null
   },
   {
     "id": "CHAR_Bandit_Stalker",
@@ -314,7 +314,7 @@ export const servants: Servant[] = [
       "CHAR_Bandit_Stalker",
       "CHAR_Bandit_Stalker_Servant"
     ],
-    "code": "U",
+    "code": "v",
     "group": "E"
   },
   {
@@ -324,7 +324,7 @@ export const servants: Servant[] = [
       "CHAR_Militia_Torchbearer",
       "CHAR_Militia_Torchbearer_Servant"
     ],
-    "code": "V",
+    "code": "w",
     "group": "E"
   },
   {
@@ -334,7 +334,7 @@ export const servants: Servant[] = [
       "CHAR_Bandit_Bomber",
       "CHAR_Bandit_Bomber_Servant"
     ],
-    "code": "W",
+    "code": "x",
     "group": "E"
   },
   {
@@ -344,7 +344,7 @@ export const servants: Servant[] = [
       "CHAR_Militia_Bomber",
       "CHAR_Militia_Bomber_Servant"
     ],
-    "code": "X",
+    "code": "y",
     "group": "E"
   },
   {
@@ -354,7 +354,7 @@ export const servants: Servant[] = [
       "CHAR_Militia_Crossbow",
       "CHAR_Militia_Crossbow_Servant"
     ],
-    "code": "Y",
+    "code": "z",
     "group": "E"
   },
   {
@@ -364,7 +364,7 @@ export const servants: Servant[] = [
       "CHAR_ChurchOfLight_Archer",
       "CHAR_ChurchOfLight_Archer_Servant"
     ],
-    "code": "Z",
+    "code": "A",
     "group": "E"
   },
   {
@@ -374,7 +374,7 @@ export const servants: Servant[] = [
       "CHAR_Blackfang_DartFlinger",
       "CHAR_Blackfang_DartFlinger_Servant"
     ],
-    "code": "a",
+    "code": "B",
     "group": "E"
   },
   {
@@ -384,7 +384,7 @@ export const servants: Servant[] = [
       "CHAR_Militia_Longbowman",
       "CHAR_Militia_Longbowman_Servant"
     ],
-    "code": "b",
+    "code": "C",
     "group": "E"
   },
   {
@@ -394,7 +394,7 @@ export const servants: Servant[] = [
       "CHAR_Bandit_Deadeye",
       "CHAR_Bandit_Deadeye_Servant"
     ],
-    "code": "c",
+    "code": "D",
     "group": "E"
   },
   {
@@ -404,7 +404,7 @@ export const servants: Servant[] = [
       "CHAR_Blackfang_Lurker",
       "CHAR_Blackfang_Lurker_Servant"
     ],
-    "code": "d",
+    "code": "E",
     "group": "E"
   },
   {
@@ -414,7 +414,7 @@ export const servants: Servant[] = [
       "CHAR_Bandit_Hunter",
       "CHAR_Bandit_Hunter_Servant"
     ],
-    "code": "e",
+    "code": "F",
     "group": "E"
   },
   {
@@ -424,7 +424,7 @@ export const servants: Servant[] = [
       "CHAR_ChurchOfLight_SlaveRuffian",
       "CHAR_ChurchOfLight_SlaveRuffian_Servant"
     ],
-    "code": "f",
+    "code": "G",
     "group": "E"
   },
   {
@@ -434,7 +434,7 @@ export const servants: Servant[] = [
       "CHAR_ChurchOfLight_Miner_Standard",
       "CHAR_ChurchOfLight_Miner_Standard_Servant"
     ],
-    "code": "g",
+    "code": "H",
     "group": "E"
   },
   {
@@ -444,7 +444,7 @@ export const servants: Servant[] = [
       "CHAR_Militia_Light",
       "CHAR_Militia_Light_Servant"
     ],
-    "code": "h",
+    "code": "I",
     "group": "E"
   },
   {
@@ -454,7 +454,7 @@ export const servants: Servant[] = [
       "CHAR_Bandit_Thug",
       "CHAR_Bandit_Thug_Servant"
     ],
-    "code": "i",
+    "code": "J",
     "group": "E"
   },
   {
@@ -464,7 +464,7 @@ export const servants: Servant[] = [
       "CHAR_Bandit_Scout",
       "CHAR_Bandit_Scout_Servant"
     ],
-    "code": "j",
+    "code": "K",
     "group": "E"
   },
   {
@@ -474,7 +474,7 @@ export const servants: Servant[] = [
       "CHAR_ChurchOfLight_Footman",
       "CHAR_ChurchOfLight_Footman_Servant"
     ],
-    "code": "k",
+    "code": "L",
     "group": "E"
   },
   {
@@ -484,7 +484,7 @@ export const servants: Servant[] = [
       "CHAR_Blackfang_Peon",
       "CHAR_Blackfang_Peon_Servant"
     ],
-    "code": "l",
+    "code": "M",
     "group": "E"
   },
   {
@@ -494,7 +494,7 @@ export const servants: Servant[] = [
       "CHAR_Gloomrot_Batoon",
       "CHAR_Gloomrot_Batoon_Servant"
     ],
-    "code": "m",
+    "code": "N",
     "group": "E"
   },
   {
@@ -504,7 +504,7 @@ export const servants: Servant[] = [
       "CHAR_Farmlands_Woodcutter_Standard",
       "CHAR_Farmlands_Woodcutter_Standard_Servant"
     ],
-    "code": "n",
+    "code": "O",
     "group": "E"
   },
   {
@@ -514,7 +514,7 @@ export const servants: Servant[] = [
       "CHAR_Farmlands_Farmer",
       "CHAR_Farmlands_Farmer_Servant"
     ],
-    "code": "o",
+    "code": "P",
     "group": "E"
   },
   {
@@ -524,7 +524,7 @@ export const servants: Servant[] = [
       "CHAR_Blackfang_WoodCarver",
       "CHAR_Blackfang_WoodCarver_Servant"
     ],
-    "code": "p",
+    "code": "Q",
     "group": "E"
   },
   {
@@ -534,7 +534,7 @@ export const servants: Servant[] = [
       "CHAR_Bandit_Rascal",
       "CHAR_Bandit_Rascal_Servant"
     ],
-    "code": "q",
+    "code": "R",
     "group": "E"
   },
   {
@@ -544,7 +544,7 @@ export const servants: Servant[] = [
       "CHAR_Vampire_Cultist_Patrolling",
       "CHAR_Vampire_Cultist_Male_Servant"
     ],
-    "code": "r",
+    "code": "S",
     "group": "E"
   },
   {
@@ -554,7 +554,7 @@ export const servants: Servant[] = [
       "CHAR_Vampire_Cultist_Patrolling_Female",
       "CHAR_Vampire_Cultist_Female_Servant"
     ],
-    "code": "s",
+    "code": "T",
     "group": "E"
   },
   {
@@ -564,7 +564,7 @@ export const servants: Servant[] = [
       "CHAR_Bandit_Worker_Gatherer",
       "CHAR_Bandit_Worker_Gatherer_Servant"
     ],
-    "code": "t",
+    "code": "U",
     "group": "E"
   },
   {
@@ -574,7 +574,7 @@ export const servants: Servant[] = [
       "CHAR_Bandit_Worker_Miner",
       "CHAR_Bandit_Miner_Standard_Servant"
     ],
-    "code": "u",
+    "code": "V",
     "group": "E"
   },
   {
@@ -584,7 +584,7 @@ export const servants: Servant[] = [
       "CHAR_Bandit_Worker_Woodcutter",
       "CHAR_Bandit_Woodcutter_Standard_Servant"
     ],
-    "code": "v",
+    "code": "W",
     "group": "E"
   },
   {
@@ -594,7 +594,7 @@ export const servants: Servant[] = [
       "CHAR_Gloomrot_Technician_Labworker",
       "CHAR_Gloomrot_Technician_Labworker_Servant"
     ],
-    "code": "w",
+    "code": "X",
     "group": "E"
   },
   {
@@ -604,7 +604,7 @@ export const servants: Servant[] = [
       "CHAR_Gloomrot_Technician",
       "CHAR_Gloomrot_Technician_Servant"
     ],
-    "code": "x",
+    "code": "Y",
     "group": "E"
   },
   {
@@ -614,7 +614,7 @@ export const servants: Servant[] = [
       "CHAR_Gloomrot_Villager_Female",
       "CHAR_Gloomrot_Villager_Female_Servant"
     ],
-    "code": "y",
+    "code": "Z",
     "group": "E"
   },
   {
@@ -624,7 +624,7 @@ export const servants: Servant[] = [
       "CHAR_Gloomrot_Villager_Male",
       "CHAR_Gloomrot_Villager_Male_Servant"
     ],
-    "code": "z",
+    "code": "!",
     "group": "E"
   },
   {
@@ -634,7 +634,7 @@ export const servants: Servant[] = [
       "CHAR_Militia_Miner_Standard",
       "CHAR_Militia_Miner_Standard_Servant"
     ],
-    "code": null,
+    "code": "#",
     "group": "E"
   },
   {
@@ -644,7 +644,7 @@ export const servants: Servant[] = [
       "CHAR_ChurchOfLight_Villager_Female",
       "CHAR_ChurchOfLight_Villager_Female_Servant"
     ],
-    "code": null,
+    "code": "$",
     "group": "E"
   },
   {
@@ -654,7 +654,7 @@ export const servants: Servant[] = [
       "CHAR_ChurchOfLight_Villager_Male",
       "CHAR_ChurchOfLight_Villager_Male_Servant"
     ],
-    "code": null,
+    "code": "%",
     "group": "E"
   },
   {
@@ -664,7 +664,7 @@ export const servants: Servant[] = [
       "CHAR_Farmlands_Villager_Female",
       "CHAR_Farmlands_Villager_Female_Servant"
     ],
-    "code": null,
+    "code": "&",
     "group": "E"
   },
   {
@@ -674,7 +674,7 @@ export const servants: Servant[] = [
       "CHAR_Farmlands_Villager_Female_Sister",
       "CHAR_Farmlands_Villager_Female_Sister_Servant"
     ],
-    "code": null,
+    "code": "(",
     "group": "E"
   },
   {
@@ -684,7 +684,7 @@ export const servants: Servant[] = [
       "CHAR_Farmlands_Villager_Male",
       "CHAR_Farmlands_Villager_Male_Servant"
     ],
-    "code": null,
+    "code": ")",
     "group": "E"
   },
   {
@@ -694,7 +694,7 @@ export const servants: Servant[] = [
       "CHAR_Militia_BellRinger",
       "CHAR_Militia_BellRinger_Servant"
     ],
-    "code": null,
+    "code": "*",
     "group": "E"
   }
 ];

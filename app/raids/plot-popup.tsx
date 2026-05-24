@@ -1,6 +1,6 @@
 "use client";
 
-import { Ban, ChevronDown, X } from "lucide-react";
+import { Ban, ChevronDown, Copy, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -37,38 +37,40 @@ export function PlotPopup({
 
 	return (
 		<div
-			className="w-[22rem] rounded-xl border border-zinc-700/70 bg-zinc-900/95 p-4 shadow-2xl backdrop-blur"
+			className="w-[22rem] rounded-xl border border-white/10 bg-zinc-950 p-4 shadow-2xl transition-all duration-300 sm:p-5"
 			onPointerDown={(e) => e.stopPropagation()}
 		>
-			<div className="flex items-start justify-between">
-				<h3 className="text-xl font-bold tracking-wide text-white">
-					PLOT {plotId}
+			<div className="mb-4 flex items-center gap-3">
+				<div className="h-6 w-1 rounded-full bg-gradient-to-b from-green-400 to-green-600" />
+				<h3 className="text-lg font-bold tracking-wide text-grey-100">
+					PLOT #{plotId}
 				</h3>
+				<div className="h-px flex-1 bg-gradient-to-r from-grey-600 to-transparent" />
 				<button
 					type="button"
 					onClick={onClose}
-					className="rounded-md p-1 text-zinc-400 hover:bg-zinc-800 hover:text-white"
+					className="rounded-md border border-white/10 bg-white/5 p-1 text-zinc-400 transition-colors hover:border-white/20 hover:bg-white/10 hover:text-white"
 					aria-label="Close"
 				>
 					<X className="h-4 w-4" />
 				</button>
 			</div>
 
-			<label className="mt-3 flex items-center gap-3">
-				<span className="w-20 shrink-0 text-sm text-zinc-300">Opponent</span>
+			<label className="flex items-center gap-2">
+				<span className="shrink-0 text-sm font-medium text-zinc-300">Opponent</span>
 				<Input
 					autoFocus
 					type="text"
 					value={opponent}
 					onChange={(e) => onOpponentChange(e.target.value)}
 					placeholder="e.g. Nemesis"
-					className="flex-1"
+					className="h-9 flex-1 border-white/10 bg-white/[0.025] text-zinc-100 placeholder:text-zinc-600 focus-visible:ring-sky-500/40"
 				/>
 			</label>
 
-			<div className="mt-3 flex items-start gap-3">
-				<label className="flex min-w-0 flex-1 items-center gap-2">
-					<span className="text-sm text-zinc-300">Time</span>
+			<div className="mt-3 grid grid-cols-[0.85fr_1.1fr] items-start gap-3">
+				<label className="flex min-w-0 items-center gap-2">
+					<span className="text-sm font-medium text-zinc-300">Time</span>
 					<InlineDropdown
 						value={String(time)}
 						onChange={(v) => onTimeChange(Number(v))}
@@ -79,8 +81,8 @@ export function PlotPopup({
 						}))}
 					/>
 				</label>
-				<label className="flex min-w-0 flex-1 items-center gap-2">
-					<span className="text-sm text-zinc-300">Shard</span>
+				<label className="flex min-w-0 items-center gap-2">
+					<span className="text-sm font-medium text-zinc-300">Shard</span>
 					<InlineDropdown
 						value={shard}
 						onChange={onShardChange}
@@ -93,15 +95,13 @@ export function PlotPopup({
 				</label>
 			</div>
 
-			<div className="my-3 h-px bg-zinc-700/50" />
-
 			<input
 				readOnly
 				value={command}
-				className="w-full rounded-md border bg-black/50 px-3 py-2 text-sm text-gray-400"
+				className="mt-3 w-full rounded-md bg-white/[0.025] px-4 py-2 text-center font-mono text-sm text-gray-300 focus:outline-none"
 			/>
 
-			<div className="mt-3 flex justify-end">
+			<div className="mt-4 flex justify-end">
 				<Button
 					type="button"
 					disabled={!canCopy}
@@ -116,8 +116,9 @@ export function PlotPopup({
 							toast.error("Failed to copy command");
 						}
 					}}
-					className="border-red-900/70 bg-red-900/50 px-3 py-2 text-white transition-colors hover:bg-red-800 disabled:opacity-50 disabled:hover:bg-red-900/50"
+					className="w-full border border-red-900/70 bg-red-900/50 px-3 py-2 text-white transition-colors hover:bg-red-800 disabled:opacity-50 disabled:hover:bg-red-900/50"
 				>
+					<Copy className="mr-2 h-4 w-4" />
 					COPY COMMAND
 				</Button>
 			</div>
@@ -160,7 +161,7 @@ function InlineDropdown({
 			<button
 				type="button"
 				onClick={() => setOpen((o) => !o)}
-				className="flex h-9 w-full items-center justify-between gap-2 overflow-hidden rounded-md border border-zinc-700 bg-zinc-950/60 px-2 text-sm text-zinc-200 hover:bg-zinc-900"
+				className="flex h-9 w-full items-center justify-between gap-2 overflow-hidden rounded-md border border-white/10 bg-white/[0.025] px-2 text-sm text-zinc-200 transition-colors hover:border-white/20 hover:bg-white/[0.06]"
 			>
 				<span className="flex min-w-0 flex-1 items-center gap-2 text-left">
 					{trigger}
@@ -168,7 +169,7 @@ function InlineDropdown({
 				<ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
 			</button>
 			{open && (
-				<div className="absolute left-0 right-0 top-full z-30 mt-1 max-h-64 overflow-y-auto rounded-md border border-zinc-700 bg-zinc-900 p-1 shadow-xl">
+				<div className="absolute left-0 right-0 top-full z-30 mt-1 max-h-64 overflow-y-auto rounded-md border border-white/10 bg-zinc-950 p-1 shadow-xl">
 					{options.map((o) => (
 						<button
 							key={o.value}
@@ -177,8 +178,8 @@ function InlineDropdown({
 								onChange(o.value);
 								setOpen(false);
 							}}
-							className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm hover:bg-zinc-800 ${
-								o.value === value ? "bg-zinc-800/70" : ""
+							className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-sm text-zinc-200 hover:bg-white/10 ${
+								o.value === value ? "bg-white/10" : ""
 							}`}
 						>
 							{o.label}

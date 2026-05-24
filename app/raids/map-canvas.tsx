@@ -111,25 +111,25 @@ export function MapCanvas() {
         ctx.shadowBlur = 40;
         ctx.fillStyle = "rgba(34, 197, 94, 0.6)";
         ctx.strokeStyle = SELECTED_COLOR;
-        ctx.lineWidth = 14;
+        ctx.lineWidth = 6;
       } else if (isHovered) {
-        ctx.shadowColor = "rgba(96, 165, 250, 1)";
+        ctx.shadowColor = "rgba(64, 220, 255, 0.95)";
         ctx.shadowBlur = 40;
-        ctx.fillStyle = "rgba(96, 165, 250, 0.75)";
-        ctx.strokeStyle = "#eff6ff";
-        ctx.lineWidth = 12;
+        ctx.fillStyle = "rgba(64, 220, 255, 0.55)";
+        ctx.strokeStyle = "#6ee7ff";
+        ctx.lineWidth = 6;
       } else if (highlight) {
         ctx.shadowColor = "transparent";
         ctx.shadowBlur = 0;
         ctx.fillStyle = "rgba(255, 30, 30, 0.55)";
         ctx.strokeStyle = "#ff1e1e";
-        ctx.lineWidth = 8;
+        ctx.lineWidth = 6;
       } else {
-        ctx.shadowColor = "rgba(59, 130, 246, 0.9)";
+        ctx.shadowColor = "rgba(0, 194, 255, 0.75)";
         ctx.shadowBlur = 28;
-        ctx.fillStyle = "rgba(59, 130, 246, 0.55)";
-        ctx.strokeStyle = "#93c5fd";
-        ctx.lineWidth = 10;
+        ctx.fillStyle = "rgba(0, 194, 255, 0.42)";
+        ctx.strokeStyle = "#00c2ff";
+        ctx.lineWidth = 6;
       }
 
       ctx.beginPath();
@@ -167,8 +167,8 @@ export function MapCanvas() {
         const x = scale * wx + offsetX;
         const y = scale * wy + offsetY;
         const label = String(terr.id);
-        ctx.strokeStyle = "rgba(0,0,0,0.85)";
-        ctx.fillStyle = selectedPlot === terr.id ? SELECTED_COLOR : "white";
+        ctx.strokeStyle = "rgba(0,0,0,0.35)";
+        ctx.fillStyle = "white";
         ctx.strokeText(label, x, y);
         ctx.fillText(label, x, y);
       }
@@ -339,11 +339,15 @@ export function MapCanvas() {
 
   return (
     <div className="relative">
-      <div
-        ref={outerRef}
-        className="relative mx-auto aspect-square overflow-hidden"
+      <section
+        className="mx-auto max-w-full rounded-xl border border-white/10 bg-grey-900/40 p-1.5 shadow-2xl transition-all duration-300 hover:border-white/15"
         style={{ width: "min(100%, calc(100vh - 12rem))" }}
       >
+        <div
+          ref={outerRef}
+          className="relative mx-auto aspect-square w-full overflow-hidden rounded-lg border border-white/10 bg-black/30 shadow-[inset_0_0_36px_rgba(0,0,0,0.45)]"
+        >
+          <div className="pointer-events-none absolute inset-0 z-10 rounded-lg ring-1 ring-inset ring-white/5" />
         <div
           className="absolute inset-0"
           style={{
@@ -351,6 +355,11 @@ export function MapCanvas() {
             transformOrigin: "0 0",
           }}
         >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: "url('/images/map/vr-map-preview.webp')" }}
+          />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/map/vr-map.webp"
@@ -408,7 +417,8 @@ export function MapCanvas() {
             />
           </div>
         )}
-      </div>
+        </div>
+      </section>
 
       {debug && (
         <div className="fixed bottom-4 left-4 z-10 w-80 space-y-3 rounded border border-zinc-700 bg-zinc-900/95 p-4 font-mono text-xs text-zinc-200 shadow-lg">

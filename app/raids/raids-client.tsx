@@ -1,11 +1,9 @@
 "use client";
 
-import "@/components/vbuilds/styles.css";
-
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Copy, Shield, Swords, X } from "lucide-react";
+import { Copy, Search, Shield, Swords, X } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,11 +20,22 @@ export function RaidsClient() {
 	const [slots, setSlots] = useState<(string | null)[]>(() =>
 		Array(SLOT_COUNT).fill(null),
 	);
+	const [servantSearch, setServantSearch] = useState("");
 
 	const servantById = useMemo(
 		() => new Map(servants.map((s) => [s.id, s])),
 		[],
 	);
+
+	const visibleServants = useMemo(() => {
+		const query = servantSearch.trim().toLowerCase();
+		return servants.filter(
+			(servant) =>
+				!query ||
+				servant.name.toLowerCase().includes(query) ||
+				servant.id.toLowerCase().includes(query),
+		);
+	}, [servantSearch]);
 
 	const command = useMemo(() => {
 		const code = slots
@@ -100,40 +109,68 @@ export function RaidsClient() {
 			</TabsContent>
 
 			<TabsContent value="defenders">
-				<div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-					<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-						{servants.map((servant) => {
-							const disabled = !servant.code;
-							return (
-								<button
-									key={servant.id}
-									type="button"
-									disabled={disabled}
-									onClick={() => addServant(servant)}
-									className="build-spellSchool build-spellSchool-empty group relative overflow-hidden rounded-lg border text-left transition-all duration-200 hover:shadow-lg hover:shadow-indigo-900/50 disabled:cursor-not-allowed disabled:opacity-40"
-									title={disabled ? "No code available for this servant" : `Add ${servant.name}`}
-								>
-									<div className="relative aspect-square">
-										<Image
-											src={`/images/servants/${servant.id}.png`}
-											alt={servant.name}
-											fill
-											sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 12vw"
-											className="object-contain"
-										/>
-									</div>
-									<div className="border-t border-zinc-700/50 bg-zinc-900/40 px-2 py-1.5 text-center text-xs font-medium text-zinc-300 group-hover:text-white">
-										{servant.name}
-									</div>
-								</button>
-							);
-						})}
+				<div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+					<div>
+						<div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+							<div className="flex min-w-0">
+								<label className="relative w-full sm:w-72">
+									<Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+									<input
+										type="search"
+										value={servantSearch}
+										onChange={(e) => setServantSearch(e.target.value)}
+										placeholder="Search servants..."
+										className="h-10 w-full rounded-md border border-white/10 bg-black/35 pl-9 pr-3 text-sm text-zinc-200 outline-none transition-colors placeholder:text-zinc-600 focus:border-sky-500/40 focus:bg-black/45"
+									/>
+								</label>
+							</div>
+
+							<div className="flex h-10 items-center justify-end text-sm font-medium text-zinc-400">
+								{visibleServants.length}{" "}
+								{visibleServants.length === 1 ? "Servant" : "Servants"}
+							</div>
+						</div>
+
+						{visibleServants.length > 0 ? (
+							<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+								{visibleServants.map((servant) => {
+									const disabled = !servant.code;
+									return (
+										<button
+											key={servant.id}
+											type="button"
+											disabled={disabled}
+											onClick={() => addServant(servant)}
+											className="group relative overflow-hidden rounded-lg border border-zinc-800/80 bg-zinc-950/90 text-left shadow-lg shadow-black/25 transition-all duration-200 hover:border-zinc-500/90 hover:bg-zinc-900 hover:shadow-[0_0_22px_rgba(161,161,170,0.18)] disabled:cursor-not-allowed disabled:opacity-40"
+											title={disabled ? "No code available for this servant" : `Add ${servant.name}`}
+										>
+											<div className="relative aspect-square overflow-hidden bg-[#08070d]">
+												<Image
+													src={`/images/servants/${servant.id}.png`}
+													alt={servant.name}
+													fill
+													sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 12vw"
+													className="object-cover transition-transform duration-300 group-hover:scale-105"
+												/>
+												<div className="absolute inset-x-0 bottom-0 truncate border-t border-white/10 bg-black/25 px-2 py-2.5 text-center text-sm font-semibold text-zinc-100 shadow-[0_-8px_18px_rgba(0,0,0,0.28)] backdrop-blur-md">
+													{servant.name}
+												</div>
+											</div>
+										</button>
+									);
+								})}
+							</div>
+						) : (
+							<div className="rounded-lg border border-white/10 bg-black/30 px-4 py-10 text-center text-sm text-zinc-500">
+								No servants found.
+							</div>
+						)}
 					</div>
 
-					<aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">
-						<section className="rounded-xl border border-grey-700/50 bg-grey-900/40 p-4 shadow-2xl transition-all duration-300 hover:border-grey-600/50 sm:p-6">
+					<aside className="lg:sticky lg:top-6 lg:self-start">
+						<section className="rounded-xl border border-white/10 bg-grey-900/40 p-4 shadow-2xl transition-all duration-300 hover:border-white/15 sm:p-6">
 							<div className="mb-4 flex items-center gap-3 sm:mb-6">
-								<div className="h-6 w-1 rounded-full bg-gradient-to-b from-green-400 to-green-600" />
+								<div className="h-6 w-1 rounded-full bg-gradient-to-b from-sky-300 to-sky-500" />
 								<h3 className="text-lg font-bold tracking-wide text-grey-100 sm:text-xl">
 									SERVANTS
 								</h3>
@@ -142,13 +179,13 @@ export function RaidsClient() {
 									type="button"
 									onClick={clearAll}
 									disabled={slots.every((s) => s === null)}
-									className="text-xs uppercase tracking-wider text-zinc-500 transition-colors hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-40"
+									className="rounded-md border border-white/10 bg-white/5 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-zinc-400 transition-colors hover:border-white/20 hover:bg-white/10 hover:text-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-white/10 disabled:hover:bg-white/5 disabled:hover:text-zinc-400"
 								>
 									Clear
 								</button>
 							</div>
 
-							<div className="grid grid-cols-4 gap-2 rounded-lg bg-zinc-900 p-2">
+							<div className="grid grid-cols-4 gap-2 rounded-lg bg-white/[0.025] p-2">
 								{slots.map((id, idx) => {
 									const servant = id ? servantById.get(id) : null;
 									return (
@@ -182,22 +219,12 @@ export function RaidsClient() {
 									);
 								})}
 							</div>
-						</section>
 
-						<section className="rounded-xl border border-grey-700/50 bg-grey-900/40 p-4 shadow-2xl transition-all duration-300 hover:border-grey-600/50 sm:p-6">
-							<div className="mb-4 flex items-center gap-3 sm:mb-6">
-								<div className="h-6 w-1 rounded-full bg-gradient-to-b from-teal-400 to-teal-600" />
-								<h3 className="text-lg font-bold tracking-wide text-grey-100 sm:text-xl">
-									COMMAND
-								</h3>
-								<div className="h-px flex-1 bg-gradient-to-r from-grey-600 to-transparent" />
-							</div>
-
-							<div className="space-y-3">
+							<div className="mt-3 space-y-4 sm:space-y-6">
 								<input
 									readOnly
 									value={command}
-									className="w-full rounded-md bg-black/50 px-4 py-2 text-center font-mono text-sm text-gray-400 focus:outline-none"
+									className="w-full rounded-md bg-white/[0.025] px-4 py-2 text-center font-mono text-sm text-gray-300 focus:outline-none"
 								/>
 								<Button
 									onClick={copyCommand}
