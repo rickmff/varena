@@ -36,7 +36,8 @@ function SignInForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const turnstileEnabled = process.env.NEXT_PUBLIC_TURNSTILE_ENABLED !== "false";
+  const turnstileSiteKey = turnstileEnabled ? process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY : undefined;
   const turnstileRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetId = useRef<string | null>(null);
   const [loading, setLoading] = useState(false);
