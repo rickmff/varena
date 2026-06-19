@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -14,10 +14,31 @@ import NavBar from "@/components/NavBar";
 import { useAuth } from "@/components/providers/session-provider";
 import { isValidEnglishAlphabet, filterEnglishAlphabet } from "@/lib/utils";
 
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        element: HTMLElement,
+        options: {
+          sitekey: string;
+          size?: "normal" | "compact" | "flexible";
+          callback: (token: string) => void;
+          "expired-callback": () => void;
+          "error-callback": () => void;
+        }
+      ) => string;
+      reset: (widgetId?: string) => void;
+    };
+  }
+}
+
 function SignUpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const turnstileWidgetId = useRef<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -27,7 +48,9 @@ function SignUpForm() {
     password?: string;
     confirmPassword?: string;
     tos?: string;
+    captcha?: string;
   }>({});
+  const [turnstileToken, setTurnstileToken] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,6 +59,60 @@ function SignUpForm() {
   });
   const [acceptedTOS, setAcceptedTOS] = useState(false);
   const [isCheckingName, setIsCheckingName] = useState(false);
+
+  useEffect(() => {
+    if (!turnstileSiteKey) return;
+
+    const renderTurnstile = () => {
+      if (!window.turnstile || !turnstileRef.current || turnstileWidgetId.current) {
+        return;
+      }
+
+      turnstileWidgetId.current = window.turnstile.render(turnstileRef.current, {
+        sitekey: turnstileSiteKey,
+        size: "flexible",
+        callback: (token: string) => {
+          setTurnstileToken(token);
+          setErrors((prev) => ({ ...prev, captcha: undefined }));
+        },
+        "expired-callback": () => {
+          setTurnstileToken("");
+        },
+        "error-callback": () => {
+          setTurnstileToken("");
+          setErrors((prev) => ({
+            ...prev,
+            captcha: "Captcha could not be loaded. Please try again.",
+          }));
+        },
+      });
+    };
+
+    const existingScript = document.getElementById("cloudflare-turnstile-script");
+    if (existingScript) {
+      renderTurnstile();
+      existingScript.addEventListener("load", renderTurnstile);
+      return () => existingScript.removeEventListener("load", renderTurnstile);
+    }
+
+    const script = document.createElement("script");
+    script.id = "cloudflare-turnstile-script";
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.async = true;
+    script.defer = true;
+    script.addEventListener("load", renderTurnstile);
+    document.body.appendChild(script);
+
+    return () => script.removeEventListener("load", renderTurnstile);
+  }, [turnstileSiteKey]);
+
+  const resetTurnstile = () => {
+    setTurnstileToken("");
+
+    if (turnstileWidgetId.current && window.turnstile) {
+      window.turnstile.reset(turnstileWidgetId.current);
+    }
+  };
 
   // Check if name is available
   useEffect(() => {
@@ -107,6 +184,7 @@ function SignUpForm() {
       password?: string;
       confirmPassword?: string;
       tos?: string;
+      captcha?: string;
     } = {};
 
     if (!formData.name.trim()) {
@@ -148,6 +226,9 @@ function SignUpForm() {
     if (!acceptedTOS) {
       newErrors.tos = "You must accept the Terms of Service to create an account";
     }
+    if (turnstileSiteKey && !turnstileToken) {
+      newErrors.captcha = "Please complete the captcha";
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -167,25 +248,31 @@ function SignUpForm() {
         email: formData.email,
         password: formData.password,
         name: formData.name,
-      });
+        turnstileToken,
+      } as any);
 
       if (result.error) {
         const errorMessage = result.error.message || "Error creating account";
-        console.error("Signup error:", result.error);
         toast.error(errorMessage);
 
         // Map specific errors
-        if (errorMessage.toLowerCase().includes("email")) {
+        if (
+          errorMessage.toLowerCase().includes("email") ||
+          errorMessage.toLowerCase().includes("disposable")
+        ) {
           setErrors({ email: errorMessage });
         } else if (errorMessage.toLowerCase().includes("password")) {
           setErrors({ password: errorMessage });
+        } else if (errorMessage.toLowerCase().includes("captcha")) {
+          setErrors({ captcha: errorMessage });
         } else if (errorMessage.toLowerCase().includes("name")) {
           setErrors({ name: errorMessage });
         } else {
           // General error that doesn't map to a specific field
           toast.error(errorMessage);
         }
-        throw new Error(errorMessage);
+        resetTurnstile();
+        return;
       }
 
       // Sign out immediately to prevent auto-login before email verification
@@ -222,6 +309,7 @@ function SignUpForm() {
       } else if (!error.message?.includes("already in use")) {
         toast.error(error.message || "Error creating account");
       }
+      resetTurnstile();
     } finally {
       setLoading(false);
     }
@@ -428,7 +516,17 @@ function SignUpForm() {
                     </p>
                   )}
                 </div>
-                <Button type="submit" className="items-center justify-center gap-2 whitespace-nowrap rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border hover:text-accent-foreground h-10 px-4 py-2 flex font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 w-full" disabled={loading || !acceptedTOS || isCheckingName}>
+                {turnstileSiteKey && (
+                  <div className="space-y-2">
+                    <div ref={turnstileRef} className="min-h-[65px] w-full" />
+                    {errors.captcha && (
+                      <p className="text-sm text-red-500" role="alert">
+                        {errors.captcha}
+                      </p>
+                    )}
+                  </div>
+                )}
+                <Button type="submit" className="!mt-4 items-center justify-center gap-2 whitespace-nowrap rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border hover:text-accent-foreground h-10 px-4 py-2 flex font-bold text-white bg-[#0f0a47] hover:bg-[#4752C4] border-[#5865F2] hover:border-[#4752C4] transition-all duration-300 w-full" disabled={loading || !acceptedTOS || isCheckingName || (!!turnstileSiteKey && !turnstileToken)}>
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -481,4 +579,3 @@ export default function SignUpPage() {
     </Suspense>
   );
 }
-

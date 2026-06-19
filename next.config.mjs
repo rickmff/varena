@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  outputFileTracingIncludes: {
+    '/*': ['./data/disposable_email_blocklist.conf'],
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -73,11 +76,12 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https://v-arena.com https://images.unsplash.com https://prod-files-secure.s3.us-west-2.amazonaws.com https://www.notion.so",
               "font-src 'self'",
-              "connect-src 'self' https://v-arena.com",
+              "connect-src 'self' https://v-arena.com https://challenges.cloudflare.com",
+              "frame-src https://challenges.cloudflare.com",
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'",

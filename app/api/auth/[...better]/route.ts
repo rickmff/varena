@@ -1,6 +1,8 @@
 import { auth } from "@/lib/better-auth/auth";
 import { toNextJsHandler } from "better-auth/next-js";
 import { rateLimit, getRequestIdentifier } from "@/lib/rate-limit";
+import { getEmailDomain, isDisposableEmail } from "@/lib/disposable-email";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -96,6 +98,39 @@ export async function POST(request: NextRequest) {
             },
           }
         );
+      }
+
+      const requiresCaptcha =
+        url.pathname.includes("/sign-up") || url.pathname.includes("/sign-in");
+
+      if (requiresCaptcha) {
+        const body = await request.clone().json().catch(() => null);
+        const email = typeof body?.email === "string" ? body.email : null;
+        const turnstileToken =
+          typeof body?.turnstileToken === "string" ? body.turnstileToken : null;
+
+        if (url.pathname.includes("/sign-up") && isDisposableEmail(email)) {
+          const domain = getEmailDomain(email);
+
+          return NextResponse.json(
+            {
+              error: "Disposable email addresses are not allowed.",
+              domain,
+            },
+            { status: 400 }
+          );
+        }
+
+        const forwarded = request.headers.get("x-forwarded-for");
+        const remoteIp = forwarded?.split(",")[0]?.trim() || request.headers.get("x-real-ip");
+        const captchaValid = await verifyTurnstileToken(turnstileToken, remoteIp);
+
+        if (!captchaValid) {
+          return NextResponse.json(
+            { error: "Captcha verification failed. Please try again." },
+            { status: 400 }
+          );
+        }
       }
 
       // Add rate limit headers to response
