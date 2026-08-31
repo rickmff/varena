@@ -3,7 +3,8 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat
 COPY package.json yarn.lock ./
 COPY prisma ./prisma
-RUN yarn install --frozen-lockfile
+ENV YARN_CACHE_FOLDER=/cache/yarn
+RUN --mount=type=cache,target=/cache/yarn yarn install --frozen-lockfile
 
 FROM node:22-alpine AS builder
 WORKDIR /app
@@ -41,5 +42,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 USER nextjs
+# newest-build label; declared at stage END so it never busts earlier layers
+ARG BUILD_DATE
+LABEL org.opencontainers.image.created=$BUILD_DATE
 EXPOSE 3000
 CMD ["node", "server.js"]
